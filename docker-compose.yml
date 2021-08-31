@@ -19,7 +19,7 @@ services:
     image: node:15
     working_dir: /app
     ports:
-      - '4001:4001'
+      - '4025:4025'
     volumes:
       - ./:/app
     environment:
