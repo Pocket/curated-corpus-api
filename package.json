@@ -1,5 +1,5 @@
 {
-  "name": "backend-typescript-template",
+  "name": "prospect-curation-api",
   "version": "1.0.0",
   "description": "",
   "main": "dist/main.js",
@@ -17,14 +17,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Pocket/backend-typescript-template.git"
+    "url": "git+git@github.com:Pocket/prospect-curation-api.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Pocket/backend-typescript-template/issues"
+    "url": "https://github.com/Pocket/prospect-curation-api/issues"
   },
-  "homepage": "https://github.com/Pocket/backend-typescript-template#readme",
+  "homepage": "https://github.com/Pocket/prospect-curation-api#readme",
   "dependencies": {
     "@apollo/federation": "^0.29.0",
     "@pocket-tools/apollo-utils": "^1.1.0",

@@ -1,3 +1,6 @@
-"""
-Remove me if this is not a graphql service
-"""
+type Query {
+    """
+    Test this build
+    """
+    hello: String!
+}

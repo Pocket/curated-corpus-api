@@ -11,11 +11,9 @@ import AWSXRay from 'aws-xray-sdk-core';
 import xrayExpress from 'aws-xray-sdk-express';
 import express from 'express';
 import https from 'https';
-import { getRedisCache } from './cache';
 import { ApolloServerPluginCacheControl } from 'apollo-server-core';
 
-const serviceName = 'Acme';
-//todo: change service name
+const serviceName = 'ProspectCurationAPI';
 
 //Set XRAY to just log if the context is missing instead of a runtime error
 AWSXRay.setContextMissingStrategy('LOG_ERROR');
@@ -35,23 +33,10 @@ Sentry.init({
   debug: config.sentry.environment == 'development',
 });
 
-// TODO: Decide whether the example caching strategy below suits your project.
-const cache = getRedisCache();
 // The ApolloServer constructor requires two parameters: your schema
 // definition and your set of resolvers.
 const server = new ApolloServer({
   schema: buildFederatedSchema([{ typeDefs, resolvers }]),
-  // Caches the queries that apollo clients can send via a hashed get request
-  // This allows us to cache resolver decisions
-  persistedQueries: {
-    cache,
-    ttl: 300, // caching expiration time in seconds
-  },
-  //The cache that Apollo should use for all of its responses
-  //https://www.apollographql.com/docs/apollo-server/data/data-sources/#using-memcachedredis-as-a-cache-storage-backend
-  //This will only be used if all data in the response is cacheable
-  //This will add the CDN cache control headers to the response and will cache it in memcached if its cacheable
-  cache,
   plugins: [
     //Copied from Apollo docs, the sessionID signifies if we should seperate out caches by user.
     responseCachePlugin({
@@ -88,12 +73,14 @@ app.use(xrayExpress.openSegment(serviceName));
 AWSXRay.middleware.enableDynamicNaming('*');
 
 //Apply the GraphQL middleware into the express app
-server.applyMiddleware({ app, path: '/' });
+server.start().then(() => {
+  server.applyMiddleware({ app, path: '/' });
+});
 
 //Make sure the express app has the xray close segment handler
 app.use(xrayExpress.closeSegment());
 
 // The `listen` method launches a web server.
-app.listen({ port: 4001 }, () =>
-  console.log(`🚀 Server ready at http://localhost:4001${server.graphqlPath}`)
+app.listen({ port: 4025 }, () =>
+  console.log(`🚀 Server ready at http://localhost:4025${server.graphqlPath}`)
 );
