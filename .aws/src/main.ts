@@ -11,39 +11,86 @@ import {
   DataAwsKmsAlias,
   DataAwsRegion,
   DataAwsSnsTopic,
-} from '../.gen/providers/aws';
+} from '@cdktf/provider-aws';
 import { config } from './config';
 import {
-  ApplicationRedis,
   PocketALBApplication,
+  PocketECSCodePipeline,
   PocketPagerDuty,
   PocketVPC,
-} from '@pocket/terraform-modules';
-import { PagerdutyProvider } from '../.gen/providers/pagerduty';
+} from '@pocket-tools/terraform-modules';
+import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
 
-//todo: change class name to your service name
-class Acme extends TerraformStack {
+class ProspectCurationAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
     super(scope, name);
 
-    new AwsProvider(this, 'aws', {
-      region: 'us-east-1',
-    });
+    new AwsProvider(this, 'aws', { region: 'us-east-1' });
 
-    new PagerdutyProvider(this, 'pagerduty_provider', {
-      token: undefined,
-    });
+    new PagerdutyProvider(this, 'pagerduty_provider', { token: undefined });
 
     new RemoteBackend(this, {
       hostname: 'app.terraform.io',
       organization: 'Pocket',
-      workspaces: [
-        {
-          prefix: `${config.name}-`,
-        },
-      ],
+      workspaces: [{ prefix: `${config.name}-` }],
     });
 
+    const pocketVpc = new PocketVPC(this, 'pocket-vpc');
+    const region = new DataAwsRegion(this, 'region');
+    const caller = new DataAwsCallerIdentity(this, 'caller');
+
+    const pocketApp = this.createPocketAlbApplication({
+      pagerDuty: this.createPagerDuty(),
+      secretsManagerKmsAlias: this.getSecretsManagerKmsAlias(),
+      snsTopic: this.getCodeDeploySnsTopic(),
+      region,
+      caller,
+    });
+
+    this.createApplicationCodePipeline(pocketApp);
+  }
+
+  /**
+   * Get the sns topic for code deploy
+   * @private
+   */
+  private getCodeDeploySnsTopic() {
+    return new DataAwsSnsTopic(this, 'backend_notifications', {
+      name: `Backend-${config.environment}-ChatBot`,
+    });
+  }
+
+  /**
+   * Get secrets manager kms alias
+   * @private
+   */
+  private getSecretsManagerKmsAlias() {
+    return new DataAwsKmsAlias(this, 'kms_alias', {
+      name: 'alias/aws/secretsmanager',
+    });
+  }
+
+  /**
+   * Create CodePipeline to build and deploy terraform and ecs
+   * @param app
+   * @private
+   */
+  private createApplicationCodePipeline(app: PocketALBApplication) {
+    new PocketECSCodePipeline(this, 'code-pipeline', {
+      prefix: config.prefix,
+      source: {
+        codeStarConnectionArn: config.codePipeline.githubConnectionArn,
+        repository: config.codePipeline.repository,
+        branchName: config.codePipeline.branch,
+      },
+    });
+  }
+
+  /**
+   * Create PagerDuty service for alerts
+   * @private
+   */
+  private createPagerDuty() {
     const incidentManagement = new DataTerraformRemoteState(
       this,
       'incident_management',
@@ -55,7 +102,7 @@ class Acme extends TerraformStack {
       }
     );
 
-    const pagerDuty = new PocketPagerDuty(this, 'pagerduty', {
+    return new PocketPagerDuty(this, 'pagerduty', {
       prefix: config.prefix,
       service: {
         criticalEscalationPolicyId: incidentManagement.get(
@@ -66,24 +113,19 @@ class Acme extends TerraformStack {
         ),
       },
     });
+  }
 
-    const criticalPagerDutyAlarmIfProd = config.environment === 'Prod'
-      ? [pagerDuty.snsCriticalAlarmTopic.arn]
-      : [pagerDuty.snsNonCriticalAlarmTopic.arn];
+  private createPocketAlbApplication(dependencies: {
+    pagerDuty: PocketPagerDuty;
+    region: DataAwsRegion;
+    caller: DataAwsCallerIdentity;
+    secretsManagerKmsAlias: DataAwsKmsAlias;
+    snsTopic: DataAwsSnsTopic;
+  }): PocketALBApplication {
+    const { pagerDuty, region, caller, secretsManagerKmsAlias, snsTopic } =
+      dependencies;
 
-    const region = new DataAwsRegion(this, 'region');
-    const caller = new DataAwsCallerIdentity(this, 'caller');
-    const secretsManager = new DataAwsKmsAlias(this, 'kms_alias', {
-      name: 'alias/aws/secretsmanager',
-    });
-
-    const snsTopic = new DataAwsSnsTopic(this, 'backend_notifications', {
-      name: `Backend-${config.environment}-ChatBot`,
-    });
-
-    const { primaryEndpoint, readerEndpoint } = Acme.createElasticache(this);
-
-    new PocketALBApplication(this, 'application', {
+    return new PocketALBApplication(this, 'application', {
       internal: true,
       prefix: config.prefix,
       alb6CharacterPrefix: config.shortName,
@@ -95,34 +137,17 @@ class Acme extends TerraformStack {
           name: 'app',
           portMappings: [
             {
-              containerPort: 4001,
-              hostPort: 4001,
+              hostPort: 4025,
+              containerPort: 4025,
             },
           ],
+          healthCheck: config.healthCheck,
           envVars: [
             {
-              name: 'ENVIRONMENT',
-              value: process.env.NODE_ENV, // this gives us a nice lowercase production and development
-            },
-            {
-              name: 'REDIS_PRIMARY_ENDPOINT',
-              value: primaryEndpoint,
-            },
-            {
-              name: 'REDIS_READER_ENDPOINT',
-              value: readerEndpoint,
+              name: 'NODE_ENV',
+              value: process.env.NODE_ENV,
             },
           ],
-          healthCheck: {
-            command: [
-              'CMD-SHELL',
-              'curl -f http://localhost:4001/.well-known/apollo/server-health || exit 1',
-            ],
-            interval: 15,
-            retries: 3,
-            timeout: 5,
-            startPeriod: 0,
-          },
           secretEnvVars: [
             {
               name: 'SENTRY_DSN',
@@ -133,10 +158,11 @@ class Acme extends TerraformStack {
         {
           name: 'xray-daemon',
           containerImage: 'amazon/aws-xray-daemon',
+          repositoryCredentialsParam: `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:Shared/DockerHub`,
           portMappings: [
             {
-              containerPort: 2000,
               hostPort: 2000,
+              containerPort: 2000,
               protocol: 'udp',
             },
           ],
@@ -145,11 +171,12 @@ class Acme extends TerraformStack {
       ],
       codeDeploy: {
         useCodeDeploy: true,
+        useCodePipeline: true,
         snsNotificationTopicArn: snsTopic.arn,
       },
       exposedContainer: {
         name: 'app',
-        port: 4001,
+        port: 4025,
         healthCheckPath: '/.well-known/apollo/server-health',
       },
       ecsIamConfig: {
@@ -161,9 +188,11 @@ class Acme extends TerraformStack {
             resources: [
               `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:Shared`,
               `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:Shared/*`,
-              secretsManager.targetKeyArn,
+              secretsManagerKmsAlias.targetKeyArn,
               `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:${config.name}/${config.environment}`,
               `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:${config.name}/${config.environment}/*`,
+              `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:${config.prefix}`,
+              `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:${config.prefix}/*`,
             ],
             effect: 'Allow',
           },
@@ -193,69 +222,33 @@ class Acme extends TerraformStack {
         taskExecutionDefaultAttachmentArn:
           'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
       },
-
       autoscalingConfig: {
         targetMinCapacity: 2,
         targetMaxCapacity: 10,
       },
       alarms: {
+        //TODO: Add alarms when the API is ready
         http5xxError: {
           threshold: 10,
           evaluationPeriods: 2,
           period: 600,
-          actions: criticalPagerDutyAlarmIfProd,
+          actions: [],
         },
         httpLatency: {
           evaluationPeriods: 2,
           threshold: 500,
-          actions: criticalPagerDutyAlarmIfProd,
+          actions: [],
         },
         httpRequestCount: {
           threshold: 5000,
           evaluationPeriods: 2,
-          actions: [pagerDuty.snsNonCriticalAlarmTopic.arn],
+          actions: [],
         },
       },
     });
   }
-
-  /**
-   * Creates the elasticache and returns the node address list
-   * @param scope
-   * @private
-   */
-  private static createElasticache(
-    scope: Construct
-  ): { primaryEndpoint: string; readerEndpoint: string } {
-    const pocketVPC = new PocketVPC(scope, 'pocket-vpc');
-
-    const elasticache = new ApplicationRedis(scope, 'redis', {
-      //Usually we would set the security group ids of the service that needs to hit this.
-      //However we don't have the necessary security group because it gets created in PocketALBApplication
-      //So instead we set it to null and allow anything within the vpc to access it.
-      //This is not ideal..
-      //Ideally we need to be able to add security groups to the ALB application.
-      allowedIngressSecurityGroupIds: undefined,
-      node: {
-        count: config.cacheNodes,
-        size: config.cacheSize,
-      },
-      subnetIds: pocketVPC.privateSubnetIds,
-      tags: config.tags,
-      vpcId: pocketVPC.vpc.id,
-      prefix: config.prefix,
-    });
-
-    return {
-      primaryEndpoint:
-        elasticache.elasticacheReplicationGroup.primaryEndpointAddress,
-      readerEndpoint:
-        elasticache.elasticacheReplicationGroup.readerEndpointAddress,
-    };
-  }
 }
 
 const app = new App();
-new Acme(app, 'acme');
-// TODO: Fix the terraform version. @See https://github.com/Pocket/recommendation-api/pull/333
+new ProspectCurationAPI(app, 'prospect-curation-api');
 app.synth();

@@ -1,36 +1,46 @@
-const name = 'Acme'; //todo: change the service name
+const name = 'ProspectCurationAPI';
+const isDev = process.env.NODE_ENV === 'development';
+const branch = isDev ? 'dev' : 'main';
+const githubConnectionArn = isDev
+  ? 'arn:aws:codestar-connections:us-east-1:410318598490:connection/7426c139-1aa0-49e2-aabc-5aef11092032'
+  : 'arn:aws:codestar-connections:us-east-1:996905175585:connection/5fa5aa2b-a2d2-43e3-ab5a-72ececfc1870';
+
 let environment;
 let domain;
-let graphqlVariant;
-let cacheNodes;
-let cacheSize;
 
 if (process.env.NODE_ENV === 'development') {
   environment = 'Dev';
-  domain = `${name}.getpocket.dev`;
-  graphqlVariant = 'development';
-  cacheNodes = 2;
-  cacheSize = 'cache.t2.micro';
+  domain = 'prospect-curation-api.getpocket.dev';
 } else {
   environment = 'Prod';
-  domain = `${name}.readitlater.com`;
-  graphqlVariant = 'current';
-  //Arbitrary size and count for cache. No logic was used in deciding this.
-  cacheNodes = 2;
-  cacheSize = 'cache.t3.medium';
+  domain = 'prospect-curation-api.getpocket.com';
 }
 
 export const config = {
   name,
+  isDev,
   prefix: `${name}-${environment}`,
   circleCIPrefix: `/${name}/CircleCI/${environment}`,
-  shortName: 'ACME', //change to your service name, limit to 6 characters
+  shortName: 'PRCAPI',
   environment,
   domain,
-  cacheNodes,
-  cacheSize,
   tags: {
     service: name,
     environment,
+  },
+  codePipeline: {
+    githubConnectionArn,
+    repository: 'pocket/prospect-curation-api',
+    branch,
+  },
+  healthCheck: {
+    command: [
+      'CMD-SHELL',
+      'curl -f http://localhost:4025/.well-known/server-health || exit 1',
+    ],
+    interval: 15,
+    retries: 3,
+    timeout: 5,
+    startPeriod: 0,
   },
 };
