@@ -38,7 +38,7 @@ Sentry.init({
 const server = new ApolloServer({
   schema: buildFederatedSchema([{ typeDefs, resolvers }]),
   plugins: [
-    //Copied from Apollo docs, the sessionID signifies if we should seperate out caches by user.
+    //Copied from Apollo docs, the sessionID signifies if we should separate out caches by user.
     responseCachePlugin({
       //https://www.apollographql.com/docs/apollo-server/performance/caching/#saving-full-responses-to-a-cache
       //The user id is added to the request header by the apollo gateway (client api)
