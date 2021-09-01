@@ -1,0 +1,6 @@
+type Query {
+    """
+    Test Prospect Curation API
+    """
+    helloProspectCuration: PCTest!
+}
