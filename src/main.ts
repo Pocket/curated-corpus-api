@@ -1,18 +1,11 @@
-import { ApolloServer } from 'apollo-server-express';
-import typeDefs from './typeDefs';
-import { resolvers } from './resolvers';
-import { buildFederatedSchema } from '@apollo/federation';
 import * as Sentry from '@sentry/node';
 import config from './config';
-import responseCachePlugin from 'apollo-server-plugin-response-cache';
-import { sentryPlugin } from '@pocket-tools/apollo-utils';
-import { GraphQLRequestContext } from 'apollo-server-types';
 import AWSXRay from 'aws-xray-sdk-core';
 import xrayExpress from 'aws-xray-sdk-express';
 import express from 'express';
 import https from 'https';
-import { ApolloServerPluginCacheControl } from 'apollo-server-core';
-
+import { server as publicServer } from './public/server';
+import { server as adminServer } from './admin/server';
 const serviceName = 'ProspectCurationAPI';
 
 //Set XRAY to just log if the context is missing instead of a runtime error
@@ -33,37 +26,6 @@ Sentry.init({
   debug: config.sentry.environment == 'development',
 });
 
-// The ApolloServer constructor requires two parameters: your schema
-// definition and your set of resolvers.
-const server = new ApolloServer({
-  schema: buildFederatedSchema([{ typeDefs, resolvers }]),
-  plugins: [
-    //Copied from Apollo docs, the sessionID signifies if we should seperate out caches by user.
-    responseCachePlugin({
-      //https://www.apollographql.com/docs/apollo-server/performance/caching/#saving-full-responses-to-a-cache
-      //The user id is added to the request header by the apollo gateway (client api)
-      sessionId: (requestContext: GraphQLRequestContext) =>
-        requestContext?.request?.http?.headers?.has('userId')
-          ? requestContext?.request?.http?.headers?.get('userId')
-          : null,
-    }),
-    sentryPlugin,
-    // Set a default cache control of 0 seconds so it respects the individual set cache controls on the schema
-    // With this set to 0 it will not cache by default
-    ApolloServerPluginCacheControl({ defaultMaxAge: 0 }),
-  ],
-  context: {
-    // Example request context. This context is accessible to all resolvers.
-    // dataLoaders: {
-    //   itemIdLoader: itemIdLoader,
-    //   itemUrlLoader: itemUrlLoader,
-    // },
-    // repositories: {
-    //   itemResolver: getItemResolverRepository(),
-    // },
-  },
-});
-
 const app = express();
 
 //If there is no host header (really there always should be..) then use parser-wrapper as the name
@@ -72,15 +34,31 @@ app.use(xrayExpress.openSegment(serviceName));
 //Set XRay to use the host header to open its segment name.
 AWSXRay.middleware.enableDynamicNaming('*');
 
-//Apply the GraphQL middleware into the express app
-server.start().then(() => {
-  server.applyMiddleware({ app, path: '/' });
-});
-
 //Make sure the express app has the xray close segment handler
 app.use(xrayExpress.closeSegment());
 
-// The `listen` method launches a web server.
-app.listen({ port: 4025 }, () =>
-  console.log(`🚀 Server ready at http://localhost:4025${server.graphqlPath}`)
-);
+async function startServers() {
+  // Start the admin server first, or `/admin` will not be accessible.
+  await adminServer.start();
+  // Apply the admin graphql (This is not part of the federated graph i.e. Client API).
+  adminServer.applyMiddleware({ app, path: '/admin' });
+
+  // Start the public server at `/`.
+  await publicServer.start();
+  // Apply the public graphql (This is part of the federated graph).
+  publicServer.applyMiddleware({ app, path: '/' });
+
+  // The `listen` method launches a web server.
+  // Launch the servers straight after Apollo has started so that the API paths
+  // are the ones specified above and not the default `/graphql` one.
+  app.listen({ port: 4025 }, () => {
+    console.log(
+      `🚀 Public server ready at http://localhost:4025${publicServer.graphqlPath}`
+    );
+    console.log(
+      `🚀 Admin server ready at http://localhost:4025${adminServer.graphqlPath}`
+    );
+  });
+}
+
+startServers().then(() => console.log('Starting up...'));
