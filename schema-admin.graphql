@@ -1,0 +1,6 @@
+type Query {
+    """
+    Test Prospect Curation API - Admin side
+    """
+    helloProspectCurationAdmin: PCTest!
+}
