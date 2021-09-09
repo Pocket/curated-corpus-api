@@ -1,0 +1,28 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+
+generator typegraphql {
+  provider = "typegraphql-prisma"
+}
+
+enum ProspectType {
+  TYPE_ONE
+  TYPE_TWO
+}
+
+model Prospect {
+  id           Int                     @id @default(autoincrement())
+  externalId   String                  @default(uuid()) @db.VarChar(255)
+  url          String                  @db.VarChar(500)
+  title        String                  @db.VarChar(255)
+  type         ProspectType            @default(TYPE_ONE)
+
+  @@unique([externalId], name: "externalId")
+}

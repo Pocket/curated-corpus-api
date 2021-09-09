@@ -5,6 +5,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
   ],
+  ignorePatterns: ['src/generated/type-graphql/*'],
   plugins: [],
   rules: {
     'prettier/prettier': [

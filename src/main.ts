@@ -4,6 +4,7 @@ import AWSXRay from 'aws-xray-sdk-core';
 import xrayExpress from 'aws-xray-sdk-express';
 import express from 'express';
 import https from 'https';
+import 'reflect-metadata';
 import { server as publicServer } from './public/server';
 import { server as adminServer } from './admin/server';
 const serviceName = 'ProspectCurationAPI';

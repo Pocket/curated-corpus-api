@@ -1,6 +1,0 @@
-type Query {
-    """
-    Test this build
-    """
-    hello: String!
-}
