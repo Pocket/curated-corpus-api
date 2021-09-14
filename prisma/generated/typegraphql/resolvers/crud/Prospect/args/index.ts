@@ -1,0 +1,12 @@
+export { AggregateProspectArgs } from "./AggregateProspectArgs";
+export { CreateManyProspectArgs } from "./CreateManyProspectArgs";
+export { CreateProspectArgs } from "./CreateProspectArgs";
+export { DeleteManyProspectArgs } from "./DeleteManyProspectArgs";
+export { DeleteProspectArgs } from "./DeleteProspectArgs";
+export { FindFirstProspectArgs } from "./FindFirstProspectArgs";
+export { FindManyProspectArgs } from "./FindManyProspectArgs";
+export { FindUniqueProspectArgs } from "./FindUniqueProspectArgs";
+export { GroupByProspectArgs } from "./GroupByProspectArgs";
+export { UpdateManyProspectArgs } from "./UpdateManyProspectArgs";
+export { UpdateProspectArgs } from "./UpdateProspectArgs";
+export { UpsertProspectArgs } from "./UpsertProspectArgs";

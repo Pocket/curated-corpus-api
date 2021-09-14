@@ -1,0 +1,12 @@
+export { FindUniqueProspectResolver } from "./Prospect/FindUniqueProspectResolver";
+export { FindFirstProspectResolver } from "./Prospect/FindFirstProspectResolver";
+export { FindManyProspectResolver } from "./Prospect/FindManyProspectResolver";
+export { CreateProspectResolver } from "./Prospect/CreateProspectResolver";
+export { CreateManyProspectResolver } from "./Prospect/CreateManyProspectResolver";
+export { DeleteProspectResolver } from "./Prospect/DeleteProspectResolver";
+export { UpdateProspectResolver } from "./Prospect/UpdateProspectResolver";
+export { DeleteManyProspectResolver } from "./Prospect/DeleteManyProspectResolver";
+export { UpdateManyProspectResolver } from "./Prospect/UpdateManyProspectResolver";
+export { UpsertProspectResolver } from "./Prospect/UpsertProspectResolver";
+export { AggregateProspectResolver } from "./Prospect/AggregateProspectResolver";
+export { GroupByProspectResolver } from "./Prospect/GroupByProspectResolver";
