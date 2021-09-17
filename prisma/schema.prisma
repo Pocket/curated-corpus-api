@@ -1,24 +1,118 @@
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
-enum ProspectType {
-  TYPE_ONE
-  TYPE_TWO
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
-model Prospect {
-  id           Int                     @id @default(autoincrement())
-  externalId   String                  @default(uuid()) @db.VarChar(255)
-  url          String                  @db.VarChar(500)
-  title        String                  @db.VarChar(255)
-  type         ProspectType            @default(TYPE_ONE)
+// Verdict from one of the curators on a prospect
+enum CurationOutcome {
+  // Automatically goes to New Tab?
+  GOOD
+  // To the corpus but not on New Tab?
+  OKAY
+  // Rejected. Do we plan to save rejected prospects at all?
+  // If not, then the 'Bad' option is going to be present in the UI only, is that correct?
+  BAD
+}
 
+// A prospect that is deemed good enough for saving in the corpus
+// or recommending on New Tab.
+model CuratedItem {
+  // fields
+  id         Int             @id @default(autoincrement())
+  externalId String          @default(uuid()) @db.VarChar(255)
+  url        String          @db.VarChar(500)
+  title      String          @db.VarChar(255)
+  excerpt    String          @db.Text
+  imageUrl   String          @db.VarChar(500)
+  outcome    CurationOutcome @default(OKAY)
+
+  // 1. Is this really needed here?
+  // 2. Should it be in the association model instead?
+  // 3. language code (en, de) or locale (en_US, en_UK, de_DE)?
+  language String @default("en") @db.VarChar(2)
+
+  // indexes
   @@unique([externalId], name: "externalId")
+  CuratedPublishedItem CuratedPublishedItem[]
+}
+
+// What would be a good name for this? NewTab? NewTabSurface?
+// Something more generic, i.e. CuratedSurface? so as to
+// accommodate Pocket Hits and anything else in the future?
+model CuratedSurface {
+  // fields
+  id         Int    @id @default(autoincrement())
+  externalId String @default(uuid()) @db.VarChar(255)
+
+  // Note 6 char limit on locale field. According to the list of locales here:
+  // https://www.ibm.com/docs/en/zos/2.1.0?topic=utility-locale-naming-conventions
+  // territory names can be three characters long
+  locale    String   @default("en_US") @db.VarChar(6)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt
+
+  // associated entities
+  // This would link to all items ever scheduled to appear on that new tab
+  // in the past, present and future, but a custom resolver on the public API
+  // will only show that day's allocation of items
+  items CuratedPublishedItem[]
+
+  // indexes
+  @@unique([externalId], name: "externalId")
+  @@unique([locale], name: "locale")
+}
+
+// A curated item that's been published to one or more curated surfaces
+model CuratedPublishedItem {
+  // fields
+  id               Int      @id @default(autoincrement())
+  externalId       String   @default(uuid()) @db.VarChar(255)
+  curatedItemId    Int
+  curatedSurfaceId Int
+  createdAt        DateTime @default(now()) @db.DateTime(0)
+  updatedAt        DateTime @updatedAt
+  scheduledDate    DateTime @db.Date
+  approvedBy       String
+
+  // associated entities
+  curatedItem    CuratedItem    @relation(fields: [curatedItemId], references: [id])
+  curatedSurface CuratedSurface @relation(fields: [curatedSurfaceId], references: [id])
+
+  // indexes
+  // I'd like to make sure we don't accidentally schedule the same article twice
+  // on the same surface for the same day
+  @@unique([externalId], name: "externalId")
+  @@unique([curatedItemId, curatedSurfaceId, scheduledDate], name: "ItemSurfaceDate")
+}
+
+// A thumbnail image for a curated item.
+// (Almost entirely pinched from Collection API, minus size type
+// and entity type which don't seem to be needed here.)
+model CuratedItemImage {
+  // fields
+  id            Int      @id @default(autoincrement())
+  curatedItemId Int
+  width         Int
+  height        Int
+  mimeType      String   @db.VarChar(255)
+  fileSizeBytes Int
+  fileName      String   @db.VarChar(255)
+  path          String   @db.VarChar(255)
+  createdAt     DateTime @default(now()) @db.DateTime(0)
+  updatedAt     DateTime @updatedAt
+
+  // indexes
+  // S3 path to image must be unique
+
+  // Curated item id must be unique (unless we foresee the need
+  // to have different images for different markets or runs of the same article
+  // - and in that case we should be attaching it to the association between
+  // a curated item and new tab and not a curated item directly).
+  @@unique([path], name: "path")
+  @@unique([curatedItemId], name: "curatedItemId")
 }
