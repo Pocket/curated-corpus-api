@@ -8,6 +8,12 @@ generator client {
   binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
+// NB: when designing the new schema, review and set the desired cascade behaviour
+// https://www.prisma.io/docs/guides/upgrade-guides/upgrading-versions/upgrading-to-prisma-3/referential-actions
+
+// NB #2: If providing custom names for db constraints, do not set them to be the same as the field name
+// the constraint is on, or Prisma will reject it.
+
 enum ProspectType {
   TYPE_ONE
   TYPE_TWO
@@ -20,5 +26,5 @@ model Prospect {
   title        String                  @db.VarChar(255)
   type         ProspectType            @default(TYPE_ONE)
 
-  @@unique([externalId], name: "externalId")
+  @@unique([externalId])
 }
