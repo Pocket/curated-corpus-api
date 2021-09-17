@@ -14,6 +14,7 @@ import {
 } from '@cdktf/provider-aws';
 import { config } from './config';
 import {
+  ApplicationRDSCluster,
   PocketALBApplication,
   PocketECSCodePipeline,
   PocketPagerDuty,
@@ -40,6 +41,7 @@ class ProspectCurationAPI extends TerraformStack {
     const caller = new DataAwsCallerIdentity(this, 'caller');
 
     const pocketApp = this.createPocketAlbApplication({
+      rds: this.createRds(pocketVpc),
       pagerDuty: this.createPagerDuty(),
       secretsManagerKmsAlias: this.getSecretsManagerKmsAlias(),
       snsTopic: this.getCodeDeploySnsTopic(),
@@ -67,6 +69,34 @@ class ProspectCurationAPI extends TerraformStack {
   private getSecretsManagerKmsAlias() {
     return new DataAwsKmsAlias(this, 'kms_alias', {
       name: 'alias/aws/secretsmanager',
+    });
+  }
+
+  /**
+   * Creat Aurora database
+   * @param pocketVpc
+   * @private
+   */
+  private createRds(pocketVpc: PocketVPC) {
+    return new ApplicationRDSCluster(this, 'rds', {
+      prefix: config.prefix,
+      vpcId: pocketVpc.vpc.id,
+      subnetIds: pocketVpc.privateSubnetIds,
+      rdsConfig: {
+        databaseName: 'prospect_curation',
+        masterUsername: 'pkt_prospect_curation',
+        engine: 'aurora-mysql',
+        engineMode: 'serverless',
+        scalingConfiguration: [
+          {
+            minCapacity: config.rds.minCapacity,
+            maxCapacity: config.rds.maxCapacity,
+            autoPause: false,
+          },
+        ],
+      },
+
+      tags: config.tags,
     });
   }
 
@@ -116,13 +146,14 @@ class ProspectCurationAPI extends TerraformStack {
   }
 
   private createPocketAlbApplication(dependencies: {
+    rds: ApplicationRDSCluster;
     pagerDuty: PocketPagerDuty;
     region: DataAwsRegion;
     caller: DataAwsCallerIdentity;
     secretsManagerKmsAlias: DataAwsKmsAlias;
     snsTopic: DataAwsSnsTopic;
   }): PocketALBApplication {
-    const { pagerDuty, region, caller, secretsManagerKmsAlias, snsTopic } =
+    const { rds, pagerDuty, region, caller, secretsManagerKmsAlias, snsTopic } =
       dependencies;
 
     return new PocketALBApplication(this, 'application', {
@@ -152,6 +183,10 @@ class ProspectCurationAPI extends TerraformStack {
             {
               name: 'SENTRY_DSN',
               valueFrom: `arn:aws:ssm:${region.name}:${caller.accountId}:parameter/${config.name}/${config.environment}/SENTRY_DSN`,
+            },
+            {
+              name: 'DATABASE_URL',
+              valueFrom: `${rds.secretARN}:database_url::`,
             },
           ],
         },

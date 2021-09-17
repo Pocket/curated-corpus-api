@@ -1,14 +1,14 @@
 version: '3.1'
 services:
   mysql:
-    image: mysql:5.6
+    image: mysql:5.7
+    env_file:
+      - ./.docker/local.env
     ports:
       - '3306:3306'
-    volumes:
-      - .docker/mysql/schema:/docker-entrypoint-initdb.d:delegated
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-      - TZ=US/Central
+      - TZ=UTC
 
   redis:
     image: redis:latest
@@ -17,15 +17,15 @@ services:
 
   app:
     image: node:15
+    env_file:
+      - .docker/local.env
     working_dir: /app
     ports:
       - '4025:4025'
     volumes:
       - ./:/app
     environment:
-      - NODE_ENV=development
-      - AWS_XRAY_LOG_LEVEL=silent
-      - AWS_XRAY_CONTEXT_MISSING=LOG_ERROR
+      - NODE_ENV=local
     command: "bash -c 'cd /app && npm ci && npm run start:dev'"
     depends_on:
       - mysql
