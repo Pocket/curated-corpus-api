@@ -78,7 +78,7 @@ model NewTabScheduledItem {
   newTab      NewTab      @relation(fields: [newTabId], references: [id])
 
   // indexes
-  @@unique([externalId], name: "externalId")
+  @@unique([externalId])
 }
 
 // A thumbnail image for a curated item.
