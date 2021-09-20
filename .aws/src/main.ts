@@ -22,7 +22,7 @@ import {
 } from '@pocket-tools/terraform-modules';
 import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
 
-class ProspectCurationAPI extends TerraformStack {
+class CuratedCorpusAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
     super(scope, name);
 
@@ -285,5 +285,5 @@ class ProspectCurationAPI extends TerraformStack {
 }
 
 const app = new App();
-new ProspectCurationAPI(app, 'prospect-curation-api');
+new CuratedCorpusAPI(app, 'curated-corpus-api');
 app.synth();

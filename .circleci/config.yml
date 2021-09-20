@@ -72,7 +72,7 @@ jobs:
           steps:
             - run:
                 name: push service
-                command: rover subgraph publish pocket-client-api@current --schema ./schema.graphql --routing-url https://prospect-curation-api.readitlater.com/ --name=prospect-curation
+                command: rover subgraph publish pocket-client-api@current --schema ./schema.graphql --routing-url https://curated-corpus-api.readitlater.com/ --name=prospect-curation
 
   build:
     docker:
@@ -136,7 +136,7 @@ workflows:
           aws-access-key-id: Dev_AWS_ACCESS_KEY
           aws-secret-access-key: Dev_AWS_SECRET_ACCESS_KEY
           aws-region: Dev_AWS_DEFAULT_REGION
-          repo-name: prospectcurationapi-dev-app
+          repo-name: curatedcorpusapi-dev-app
           ecr-url: 410318598490.dkr.ecr.us-east-1.amazonaws.com
           push: false
           requires:
@@ -152,7 +152,7 @@ workflows:
           aws-region: Dev_AWS_DEFAULT_REGION
           codebuild-project-name: ProspectCurationAPI-Dev
           codebuild-project-branch: dev
-          repo-name: prospectcurationapi-dev-app
+          repo-name: curatedcorpusapi-dev-app
           ecr-url: 410318598490.dkr.ecr.us-east-1.amazonaws.com
           push: true
           requires:
@@ -184,7 +184,7 @@ workflows:
           aws-region: Prod_AWS_DEFAULT_REGION
           codebuild-project-name: ProspectCurationAPI-Prod
           codebuild-project-branch: main
-          repo-name: prospectcurationapi-prod-app
+          repo-name: curatedcorpusapi-prod-app
           ecr-url: 996905175585.dkr.ecr.us-east-1.amazonaws.com
           push: true
           requires:
@@ -228,8 +228,8 @@ workflows:
           <<: *only_main
           name: sentry-release-notification-prod
           context: pocket
-          repository_name: Pocket/prospect-curation-api
-          sentry_project_name: prospect-curation-api
+          repository_name: Pocket/curated-corpus-api
+          sentry_project_name: curated-corpus-api
           sentry_env: production
           sentry_org: pocket
           workspace-path: /tmp/workspace
@@ -241,8 +241,8 @@ workflows:
           <<: *only_dev
           name: sentry-release-notification-dev
           context: pocket
-          repository_name: Pocket/prospect-curation-api
-          sentry_project_name: prospect-curation-api
+          repository_name: Pocket/curated-corpus-api
+          sentry_project_name: curated-corpus-api
           sentry_env: development
           sentry_org: pocket
           workspace-path: /tmp/workspace
