@@ -9,85 +9,76 @@ datasource db {
 }
 
 // Verdict from one of the curators on a prospect
-enum CurationOutcome {
-  // Automatically goes to New Tab?
-  GOOD
-  // To the corpus but not on New Tab?
-  OKAY
-  // Rejected. Do we plan to save rejected prospects at all?
-  // If not, then the 'Bad' option is going to be present in the UI only, is that correct?
-  BAD
+enum CurationStatus {
+  RECOMMENDATION
+  CORPUS
+  DECLINE
 }
 
 // A prospect that is deemed good enough for saving in the corpus
-// or recommending on New Tab.
+// and (optionally) making it to New Tab.
 model CuratedItem {
   // fields
-  id         Int             @id @default(autoincrement())
-  externalId String          @default(uuid()) @db.VarChar(255)
-  url        String          @db.VarChar(500)
-  title      String          @db.VarChar(255)
-  excerpt    String          @db.Text
-  imageUrl   String          @db.VarChar(500)
-  outcome    CurationOutcome @default(OKAY)
+  id             Int            @id @default(autoincrement())
+  externalId     String         @default(uuid()) @db.VarChar(255)
+  curatedImageId Int
+  url            String         @db.VarChar(500)
+  title          String         @db.VarChar(255)
+  excerpt        String         @db.Text
+  status         CurationStatus @default(CORPUS)
+  language       String         @default("en") @db.VarChar(2)
+  createdAt      DateTime       @default(now()) @db.DateTime(0)
+  createdBy      String
+  updatedAt      DateTime       @updatedAt
+  updatedBy      String
 
-  // 1. Is this really needed here?
-  // 2. Should it be in the association model instead?
-  // 3. language code (en, de) or locale (en_US, en_UK, de_DE)?
-  language String @default("en") @db.VarChar(2)
+  // associated models
+  image         CuratedItemImage      @relation(fields: [curatedImageId], references: [id])
+  scheduledItem NewTabScheduledItem[]
 
   // indexes
-  @@unique([externalId], name: "externalId")
-  CuratedPublishedItem CuratedPublishedItem[]
+  @@unique([externalId])
+  @@unique([url])
 }
 
-// What would be a good name for this? NewTab? NewTabSurface?
-// Something more generic, i.e. CuratedSurface? so as to
-// accommodate Pocket Hits and anything else in the future?
-model CuratedSurface {
+model NewTab {
   // fields
-  id         Int    @id @default(autoincrement())
-  externalId String @default(uuid()) @db.VarChar(255)
+  id             Int      @id @default(autoincrement())
+  externalId     String   @default(uuid()) @db.VarChar(255)
+  // Similar to locale, but not quite. Examples: en-US, en-GB, en-INTL, de-DE
+  code           String   @default("en_US") @db.VarChar(10)
+  timezoneOffset String   @db.VarChar(30)
+  createdAt      DateTime @default(now()) @db.DateTime(0)
+  updatedAt      DateTime @updatedAt
 
-  // Note 6 char limit on locale field. According to the list of locales here:
-  // https://www.ibm.com/docs/en/zos/2.1.0?topic=utility-locale-naming-conventions
-  // territory names can be three characters long
-  locale    String   @default("en_US") @db.VarChar(6)
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt
-
-  // associated entities
-  // This would link to all items ever scheduled to appear on that new tab
-  // in the past, present and future, but a custom resolver on the public API
-  // will only show that day's allocation of items
-  items CuratedPublishedItem[]
+  // associated models
+  scheduledItems NewTabScheduledItem[]
 
   // indexes
-  @@unique([externalId], name: "externalId")
-  @@unique([locale], name: "locale")
+  @@unique([externalId])
+  @@unique([code])
 }
 
-// A curated item that's been published to one or more curated surfaces
-model CuratedPublishedItem {
+// A curated item that's been scheduled to go on to one or more New Tabs
+model NewTabScheduledItem {
   // fields
-  id               Int      @id @default(autoincrement())
-  externalId       String   @default(uuid()) @db.VarChar(255)
-  curatedItemId    Int
-  curatedSurfaceId Int
-  createdAt        DateTime @default(now()) @db.DateTime(0)
-  updatedAt        DateTime @updatedAt
-  scheduledDate    DateTime @db.Date
-  approvedBy       String
+  id            Int      @id @default(autoincrement())
+  externalId    String   @default(uuid()) @db.VarChar(255)
+  curatedItemId Int
+  newTabId      Int
+  createdAt     DateTime @default(now()) @db.DateTime(0)
+  createdBy     String
+  updatedAt     DateTime @updatedAt
+  updatedBy     String
+  scheduledDate DateTime
+  approvedBy    String
 
   // associated entities
-  curatedItem    CuratedItem    @relation(fields: [curatedItemId], references: [id])
-  curatedSurface CuratedSurface @relation(fields: [curatedSurfaceId], references: [id])
+  curatedItem CuratedItem @relation(fields: [curatedItemId], references: [id])
+  newTab      NewTab      @relation(fields: [newTabId], references: [id])
 
   // indexes
-  // I'd like to make sure we don't accidentally schedule the same article twice
-  // on the same surface for the same day
   @@unique([externalId], name: "externalId")
-  @@unique([curatedItemId, curatedSurfaceId, scheduledDate], name: "ItemSurfaceDate")
 }
 
 // A thumbnail image for a curated item.
@@ -96,7 +87,6 @@ model CuratedPublishedItem {
 model CuratedItemImage {
   // fields
   id            Int      @id @default(autoincrement())
-  curatedItemId Int
   width         Int
   height        Int
   mimeType      String   @db.VarChar(255)
@@ -106,13 +96,10 @@ model CuratedItemImage {
   createdAt     DateTime @default(now()) @db.DateTime(0)
   updatedAt     DateTime @updatedAt
 
+  // associated models
+  curatedItem CuratedItem[]
+
   // indexes
   // S3 path to image must be unique
-
-  // Curated item id must be unique (unless we foresee the need
-  // to have different images for different markets or runs of the same article
-  // - and in that case we should be attaching it to the association between
-  // a curated item and new tab and not a curated item directly).
-  @@unique([path], name: "path")
-  @@unique([curatedItemId], name: "curatedItemId")
+  @@unique([path])
 }
