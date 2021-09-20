@@ -21,7 +21,7 @@ export const config = {
   isDev,
   prefix: `${name}-${environment}`,
   circleCIPrefix: `/${name}/CircleCI/${environment}`,
-  shortName: 'PRCAPI',
+  shortName: 'CCSAPI',
   environment,
   domain,
   rds,
