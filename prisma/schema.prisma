@@ -1,30 +1,106 @@
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
-// NB: when designing the new schema, review and set the desired cascade behaviour
-// https://www.prisma.io/docs/guides/upgrade-guides/upgrading-versions/upgrading-to-prisma-3/referential-actions
-
-// NB #2: If providing custom names for db constraints, do not set them to be the same as the field name
-// the constraint is on, or Prisma will reject it.
-
-enum ProspectType {
-  TYPE_ONE
-  TYPE_TWO
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
-model Prospect {
-  id           Int                     @id @default(autoincrement())
-  externalId   String                  @default(uuid()) @db.VarChar(255)
-  url          String                  @db.VarChar(500)
-  title        String                  @db.VarChar(255)
-  type         ProspectType            @default(TYPE_ONE)
+// Verdict from one of the curators on a prospect
+enum CuratedStatus {
+  RECOMMENDATION
+  CORPUS
+  DECLINE
+}
 
+// A prospect that is deemed good enough for saving in the corpus
+// and (optionally) making it to New Tab.
+model CuratedItem {
+  // fields
+  id             Int           @id @default(autoincrement())
+  externalId     String        @default(uuid()) @db.VarChar(255)
+  curatedImageId Int
+  url            String        @db.VarChar(500)
+  title          String        @db.VarChar(255)
+  excerpt        String        @db.Text
+  status         CuratedStatus @default(CORPUS)
+  language       String
+  createdAt      DateTime      @default(now()) @db.DateTime(0)
+  createdBy      String
+  updatedAt      DateTime      @updatedAt
+  updatedBy      String
+
+  // associated models
+  image          CuratedItemImage     @relation(fields: [curatedImageId], references: [id])
+  scheduledItems NewTabFeedSchedule[]
+
+  // indexes
   @@unique([externalId])
+  @@unique([url])
+}
+
+model NewTabFeed {
+  // fields
+  id         Int      @id @default(autoincrement())
+  externalId String   @default(uuid()) @db.VarChar(255)
+  name       String
+  // Similar to locale, but not quite. Examples: en-US, en-GB, en-INTL, de-DE
+  shortName  String   @default("en_US") @db.VarChar(10)
+  utcOffset  String   @db.VarChar(6)
+  createdAt  DateTime @default(now()) @db.DateTime(0)
+  updatedAt  DateTime @updatedAt
+
+  // associated models
+  scheduledItems NewTabFeedSchedule[]
+
+  // indexes
+  @@unique([externalId])
+  @@unique([shortName])
+}
+
+// A curated item that's been scheduled to go on to one or more New Tabs
+model NewTabFeedSchedule {
+  // fields
+  id            Int      @id @default(autoincrement())
+  externalId    String   @default(uuid()) @db.VarChar(255)
+  curatedItemId Int
+  newTabFeedId  Int
+  createdAt     DateTime @default(now()) @db.DateTime(0)
+  createdBy     String
+  updatedAt     DateTime @updatedAt
+  updatedBy     String
+  scheduledDate DateTime @db.Date
+  approvedBy    String
+
+  // associated entities
+  curatedItem CuratedItem @relation(fields: [curatedItemId], references: [id])
+  newTabFeed  NewTabFeed  @relation(fields: [newTabFeedId], references: [id])
+
+  // indexes
+  @@unique([externalId])
+}
+
+// A thumbnail image for a curated item.
+// (Almost entirely pinched from Collection API, minus size type
+// and entity type which don't seem to be needed here.)
+model CuratedItemImage {
+  // fields
+  id            Int      @id @default(autoincrement())
+  width         Int
+  height        Int
+  mimeType      String   @db.VarChar(255)
+  fileSizeBytes Int
+  fileName      String   @db.VarChar(255)
+  path          String   @db.VarChar(255)
+  createdAt     DateTime @default(now()) @db.DateTime(0)
+  updatedAt     DateTime @updatedAt
+
+  // associated models
+  curatedItem CuratedItem[]
+
+  // indexes
+  // S3 path to image must be unique
+  @@unique([path])
 }
