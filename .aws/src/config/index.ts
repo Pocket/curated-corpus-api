@@ -1,5 +1,5 @@
-const name = 'ProspectCurationAPI';
-const domainPrefix = 'prospect-curation-api';
+const name = 'CuratedCorpusAPI';
+const domainPrefix = 'curated-corpus-api';
 const isDev = process.env.NODE_ENV === 'development';
 const branch = isDev ? 'dev' : 'main';
 const environment = isDev ? 'Dev' : 'Prod';
@@ -21,7 +21,7 @@ export const config = {
   isDev,
   prefix: `${name}-${environment}`,
   circleCIPrefix: `/${name}/CircleCI/${environment}`,
-  shortName: 'PRCAPI',
+  shortName: 'CCSAPI',
   environment,
   domain,
   rds,
@@ -31,7 +31,7 @@ export const config = {
   },
   codePipeline: {
     githubConnectionArn,
-    repository: 'pocket/prospect-curation-api',
+    repository: 'pocket/curated-corpus-api',
     branch,
   },
   healthCheck: {
