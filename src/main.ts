@@ -6,7 +6,7 @@ import express from 'express';
 import https from 'https';
 import { server as publicServer } from './public/server';
 import { server as adminServer } from './admin/server';
-const serviceName = 'ProspectCurationAPI';
+const serviceName = 'CurationCorpusAPI';
 
 //Set XRAY to just log if the context is missing instead of a runtime error
 AWSXRay.setContextMissingStrategy('LOG_ERROR');

@@ -65,14 +65,14 @@ jobs:
           command: cat schema-shared.graphql schema-public.graphql > schema.graphql
       - run:
           name: check service
-          command: rover subgraph check pocket-client-api@current --schema ./schema.graphql --name=prospect-curation
+          command: rover subgraph check pocket-client-api@current --schema ./schema.graphql --name=curated-corpus
       - when:
           condition:
             equal: [main, << pipeline.git.branch >>]
           steps:
             - run:
                 name: push service
-                command: rover subgraph publish pocket-client-api@current --schema ./schema.graphql --routing-url https://curated-corpus-api.readitlater.com/ --name=prospect-curation
+                command: rover subgraph publish pocket-client-api@current --schema ./schema.graphql --routing-url https://curated-corpus-api.readitlater.com/ --name=curated-corpus
 
   build:
     docker:
@@ -150,7 +150,7 @@ workflows:
           aws-access-key-id: Dev_AWS_ACCESS_KEY
           aws-secret-access-key: Dev_AWS_SECRET_ACCESS_KEY
           aws-region: Dev_AWS_DEFAULT_REGION
-          codebuild-project-name: ProspectCurationAPI-Dev
+          codebuild-project-name: CuratedCorpusAPI-Dev
           codebuild-project-branch: dev
           repo-name: curatedcorpusapi-dev-app
           ecr-url: 410318598490.dkr.ecr.us-east-1.amazonaws.com
@@ -167,8 +167,8 @@ workflows:
           aws-access-key-id: Dev_AWS_ACCESS_KEY
           aws-secret-access-key: Dev_AWS_SECRET_ACCESS_KEY
           aws-region: Dev_AWS_DEFAULT_REGION
-          codepipeline-name: ProspectCurationAPI-Dev-CodePipeline
-          codebuild-project-name: ProspectCurationAPI-Dev
+          codepipeline-name: CuratedCorpusAPI-Dev-CodePipeline
+          codebuild-project-name: CuratedCorpusAPI-Dev
           codebuild-project-branch: dev
           requires:
             - build_docker_dev
@@ -182,7 +182,7 @@ workflows:
           aws-access-key-id: Prod_AWS_ACCESS_KEY
           aws-secret-access-key: Prod_AWS_SECRET_ACCESS_KEY
           aws-region: Prod_AWS_DEFAULT_REGION
-          codebuild-project-name: ProspectCurationAPI-Prod
+          codebuild-project-name: CuratedCorpusAPI-Prod
           codebuild-project-branch: main
           repo-name: curatedcorpusapi-prod-app
           ecr-url: 996905175585.dkr.ecr.us-east-1.amazonaws.com
@@ -199,8 +199,8 @@ workflows:
           aws-access-key-id: Prod_AWS_ACCESS_KEY
           aws-secret-access-key: Prod_AWS_SECRET_ACCESS_KEY
           aws-region: Prod_AWS_DEFAULT_REGION
-          codepipeline-name: ProspectCurationAPI-Prod-CodePipeline
-          codebuild-project-name: ProspectCurationAPI-Prod
+          codepipeline-name: CuratedCorpusAPI-Prod-CodePipeline
+          codebuild-project-name: CuratedCorpusAPI-Prod
           codebuild-project-branch: main
           requires:
             - build_docker_prod
@@ -212,7 +212,7 @@ workflows:
           aws_secret_access_key: Prod_AWS_SECRET_ACCESS_KEY
           context: pocket
           env: Prod
-          service_name: ProspectCurationAPI
+          service_name: CuratedCorpusAPI
 
       - pocket/setup_deploy_params:
           <<: *only_dev
@@ -221,7 +221,7 @@ workflows:
           aws_secret_access_key: Dev_AWS_SECRET_ACCESS_KEY
           context: pocket
           env: Dev
-          service_name: ProspectCurationAPI
+          service_name: CuratedCorpusAPI
 
       # Notify sentry of main deployment
       - pocket/sentry_release_notification:
