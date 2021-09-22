@@ -83,8 +83,8 @@ class CuratedCorpusAPI extends TerraformStack {
       vpcId: pocketVpc.vpc.id,
       subnetIds: pocketVpc.privateSubnetIds,
       rdsConfig: {
-        databaseName: 'prospect_curation',
-        masterUsername: 'pkt_prospect_curation',
+        databaseName: 'curation_corpus',
+        masterUsername: 'pkt_curation_corpus',
         engine: 'aurora-mysql',
         engineMode: 'serverless',
         scalingConfiguration: [
