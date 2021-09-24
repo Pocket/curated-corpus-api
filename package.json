@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/Pocket/curated-corpus-api#readme",
   "dependencies": {
-    "@apollo/federation": "^0.32.0",
+    "@apollo/federation": "^0.33.0",
     "@pocket-tools/apollo-utils": "^1.1.0",
     "@prisma/client": "^3.1.1",
     "@sentry/node": "^6.13.2",
