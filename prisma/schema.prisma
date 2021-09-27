@@ -25,12 +25,12 @@ model CuratedItem {
   title      String        @db.VarChar(255)
   excerpt    String        @db.Text
   status     CuratedStatus @default(CORPUS)
-  language   String        @db.VarChar(2)
-  imageUrl   String        @db.VarChar(500)
+  language   String
+  imageUrl   String?
   createdAt  DateTime      @default(now()) @db.DateTime(0)
-  createdBy  String        @db.VarChar(255)
+  createdBy  String
   updatedAt  DateTime      @updatedAt
-  updatedBy  String?       @db.VarChar(255)
+  updatedBy  String?
 
   // associated models
   scheduledItems NewTabFeedSchedule[]
@@ -44,7 +44,7 @@ model NewTabFeed {
   // fields
   id         Int      @id @default(autoincrement())
   externalId String   @default(uuid()) @db.VarChar(255)
-  name       String   @db.VarChar(255)
+  name       String
   // Similar to locale, but not quite. Examples: en-US, en-GB, en-INTL, de-DE
   shortName  String   @default("en_US") @db.VarChar(10)
   utcOffset  String   @db.VarChar(6)
@@ -67,11 +67,11 @@ model NewTabFeedSchedule {
   curatedItemId Int
   newTabFeedId  Int
   createdAt     DateTime @default(now()) @db.DateTime(0)
-  createdBy     String   @db.VarChar(255)
+  createdBy     String
   updatedAt     DateTime @updatedAt
-  updatedBy     String?  @db.VarChar(255)
+  updatedBy     String?
   scheduledDate DateTime @db.Date
-  approvedBy    String?  @db.VarChar(255)
+  approvedBy    String?
 
   // associated entities
   curatedItem CuratedItem @relation(fields: [curatedItemId], references: [id])

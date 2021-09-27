@@ -50,7 +50,11 @@ export async function createCuratedItemHelper(
       `${faker.image.city()}?random=${random}`,
       `${faker.image.food()}?random=${random}`,
     ]),
+    createdAt: faker.date.recent(14),
     createdBy: faker.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
+    // occasionally, this may create an item that was updated before it was created. It's ok though,
+    // we're only setting this so that orderBy in queries can be tested.
+    updatedAt: faker.date.recent(7),
   };
 
   const inputs: Prisma.CuratedItemCreateInput = {

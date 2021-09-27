@@ -18,7 +18,6 @@ describe('clearDb', () => {
   });
 
   it('deletes contents of all tables', async () => {
-    // Create some data in each of the tables
     const curatedItem = await createCuratedItemHelper(db, {
       title: 'What even is time?',
     });
@@ -33,30 +32,23 @@ describe('clearDb', () => {
       newTabFeed,
     });
 
-    // Check that we have data in the DB
-    const items = await db.curatedItem.findMany({});
+    // Check that we have items in the DB
+    let items = await db.curatedItem.findMany({});
     expect(items).toHaveLength(2);
-    const newTabs = await db.newTabFeed.findMany({});
+    let newTabs = await db.newTabFeed.findMany({});
     expect(newTabs).toHaveLength(1);
-    const scheduledItems = await db.newTabFeedSchedule.findMany({});
+    let scheduledItems = await db.newTabFeedSchedule.findMany({});
     expect(scheduledItems).toHaveLength(1);
 
     // Remove all the records
     await clearDb(db);
 
-    // Get a list of tables
-    const tables: { Tables_in_curation_corpus: string }[] =
-      await db.$queryRaw`SHOW tables;`;
-
-    for (const table of tables) {
-      const tableName = table.Tables_in_curation_corpus;
-      const prismaModelName = tableName[0].toLowerCase() + tableName.slice(1);
-
-      // Check that each table, except the migrations table, has no records
-      if (tableName !== '_prisma_migrations') {
-        const result = await db[prismaModelName].findMany({});
-        expect(result).toHaveLength(0);
-      }
-    }
+    // Check again
+    items = await db.curatedItem.findMany({});
+    expect(items).toHaveLength(0);
+    newTabs = await db.newTabFeed.findMany({});
+    expect(newTabs).toHaveLength(0);
+    scheduledItems = await db.newTabFeedSchedule.findMany({});
+    expect(scheduledItems).toHaveLength(0);
   });
 });

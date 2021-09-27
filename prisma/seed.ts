@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-import { createCuratedItemHelper } from '../src/test/helpers/createCuratedItemHelper';
-import { createNewTabFeedHelper } from '../src/test/helpers/createNewTabFeedHelper';
-import { createNewTabScheduleHelper } from '../src/test/helpers/createNewTabScheduleHelper';
+import {
+  createCuratedItemHelper,
+  createNewTabFeedHelper,
+  createNewTabScheduleHelper,
+} from '../src/test/helpers';
 import faker from 'faker';
 
 const prisma = new PrismaClient();
