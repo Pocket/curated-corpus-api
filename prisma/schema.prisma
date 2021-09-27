@@ -19,21 +19,20 @@ enum CuratedStatus {
 // and (optionally) making it to New Tab.
 model CuratedItem {
   // fields
-  id             Int           @id @default(autoincrement())
-  externalId     String        @default(uuid()) @db.VarChar(255)
-  curatedImageId Int
-  url            String        @db.VarChar(500)
-  title          String        @db.VarChar(255)
-  excerpt        String        @db.Text
-  status         CuratedStatus @default(CORPUS)
-  language       String
-  createdAt      DateTime      @default(now()) @db.DateTime(0)
-  createdBy      String
-  updatedAt      DateTime      @updatedAt
-  updatedBy      String
+  id         Int           @id @default(autoincrement())
+  externalId String        @default(uuid()) @db.VarChar(255)
+  url        String        @db.VarChar(500)
+  title      String        @db.VarChar(255)
+  excerpt    String        @db.Text
+  status     CuratedStatus @default(CORPUS)
+  language   String        @db.VarChar(2)
+  imageUrl   String        @db.VarChar(500)
+  createdAt  DateTime      @default(now()) @db.DateTime(0)
+  createdBy  String        @db.VarChar(255)
+  updatedAt  DateTime      @updatedAt
+  updatedBy  String?       @db.VarChar(255)
 
   // associated models
-  image          CuratedItemImage     @relation(fields: [curatedImageId], references: [id])
   scheduledItems NewTabFeedSchedule[]
 
   // indexes
@@ -45,7 +44,7 @@ model NewTabFeed {
   // fields
   id         Int      @id @default(autoincrement())
   externalId String   @default(uuid()) @db.VarChar(255)
-  name       String
+  name       String   @db.VarChar(255)
   // Similar to locale, but not quite. Examples: en-US, en-GB, en-INTL, de-DE
   shortName  String   @default("en_US") @db.VarChar(10)
   utcOffset  String   @db.VarChar(6)
@@ -68,11 +67,11 @@ model NewTabFeedSchedule {
   curatedItemId Int
   newTabFeedId  Int
   createdAt     DateTime @default(now()) @db.DateTime(0)
-  createdBy     String
+  createdBy     String   @db.VarChar(255)
   updatedAt     DateTime @updatedAt
-  updatedBy     String
+  updatedBy     String?  @db.VarChar(255)
   scheduledDate DateTime @db.Date
-  approvedBy    String
+  approvedBy    String?  @db.VarChar(255)
 
   // associated entities
   curatedItem CuratedItem @relation(fields: [curatedItemId], references: [id])
@@ -80,27 +79,4 @@ model NewTabFeedSchedule {
 
   // indexes
   @@unique([externalId])
-}
-
-// A thumbnail image for a curated item.
-// (Almost entirely pinched from Collection API, minus size type
-// and entity type which don't seem to be needed here.)
-model CuratedItemImage {
-  // fields
-  id            Int      @id @default(autoincrement())
-  width         Int
-  height        Int
-  mimeType      String   @db.VarChar(255)
-  fileSizeBytes Int
-  fileName      String   @db.VarChar(255)
-  path          String   @db.VarChar(255)
-  createdAt     DateTime @default(now()) @db.DateTime(0)
-  updatedAt     DateTime @updatedAt
-
-  // associated models
-  curatedItem CuratedItem[]
-
-  // indexes
-  // S3 path to image must be unique
-  @@unique([path])
 }
