@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  aws-ecs: circleci/aws-ecs@2.0.0
+  aws-ecs: circleci/aws-ecs@2.2.1
   pocket: pocket/circleci-orbs@1.2.0
 
 # Workflow shortcuts
@@ -46,7 +46,7 @@ only_dev: &only_dev
 jobs:
   apollo:
     docker:
-      - image: cimg/node:16
+      - image: cimg/node:current
     steps:
       - checkout
       - run:
@@ -76,7 +76,7 @@ jobs:
 
   build:
     docker:
-      - image: cimg/node:16
+      - image: cimg/node:current
     steps:
       - checkout
       # Define the working directory for this job
@@ -124,7 +124,7 @@ jobs:
         description: 'Integration tests'
         type: string
     docker:
-      - image: cimg/node:16
+      - image: cimg/node:current
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
