@@ -1,6 +1,59 @@
+enum CuratedStatus {
+    RECOMMENDATION
+    CORPUS
+    DECLINE
+}
+
+enum OrderBy {
+    ASC
+    DESC
+}
+
+type CuratedItem {
+    externalId: ID!
+    url: Url!
+    title: String!
+    excerpt: String!
+    status: CuratedStatus!
+    language: String!
+    imageUrl: Url
+    createdAt: DateString!
+    createdBy: String!
+    updatedAt: DateString!
+    updatedBy: String
+}
+
+type CuratedItemsResult {
+    items: [CuratedItem!]!
+    pagination: Pagination
+}
+
+"""
+Available fields for sorting Curated Items
+"""
+input CuratedItemOrderByInput {
+    createdAt: OrderBy
+    updatedAt: OrderBy
+}
+
+"""
+Available fields for filtering CuratedItems
+"""
+input CuratedItemFilterInput {
+    url: Url
+    title: String
+    status: CuratedStatus
+    language: String
+}
+
 type Query {
     """
-    Test Prospect Curation API - Admin side
+    Retrieves a paged, sortable, filterable list of CuratedItems.
     """
-    helloProspectCurationAdmin: PCTest!
+    getCuratedItems(
+        page: Int,
+        perPage: Int,
+        orderBy: CuratedItemOrderByInput,
+        filters: CuratedItemFilterInput
+    ): CuratedItemsResult!
 }
