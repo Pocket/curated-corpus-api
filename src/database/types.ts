@@ -23,3 +23,13 @@ export type CuratedItemFilterInput = {
   status?: CuratedStatus;
   language?: string;
 };
+
+export type UpdateCuratedItemInput = {
+  externalId: string;
+  url: string;
+  title: string;
+  excerpt: string;
+  status: CuratedStatus;
+  language: string;
+  imageUrl?: string;
+};

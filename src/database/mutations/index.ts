@@ -1,0 +1,1 @@
+export { updateCuratedItem } from './CuratedItem';
