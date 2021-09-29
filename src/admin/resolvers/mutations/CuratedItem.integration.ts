@@ -104,7 +104,7 @@ describe('queries: CuratedItem', () => {
       });
 
       // ...without success. There is no data
-      expect(result.data).toBeFalsy();
+      expect(result.data).toBeNull();
 
       // And there is the correct error from the resolvers
       if (result.errors) {
