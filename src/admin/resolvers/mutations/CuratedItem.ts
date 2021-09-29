@@ -3,8 +3,6 @@ import { updateCuratedItem as dbUpdateCuratedItem } from '../../../database/muta
 
 /**
  * Updates a curated item with data supplied.
- * kkk
- *
  *
  * @param parent
  * @param data

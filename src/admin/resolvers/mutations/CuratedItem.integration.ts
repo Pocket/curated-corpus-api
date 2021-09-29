@@ -1,4 +1,5 @@
 import { CuratedStatus } from '@prisma/client';
+import chai from 'chai';
 import { db, server } from '../../../test/admin-server';
 import { clearDb, createCuratedItemHelper } from '../../../test/helpers';
 import { UPDATE_CURATED_ITEM } from '../../../test/admin-server/mutations.gql';
@@ -44,11 +45,7 @@ describe('queries: CuratedItem', () => {
       expect(data?.updateCuratedItem.externalId).toBe(item.externalId);
 
       // Updated properties should be... updated
-      expect(data?.updateCuratedItem.title).toBe(input.title);
-      expect(data?.updateCuratedItem.url).toBe(input.url);
-      expect(data?.updateCuratedItem.excerpt).toBe(input.excerpt);
-      expect(data?.updateCuratedItem.status).toBe(input.status);
-      expect(data?.updateCuratedItem.language).toBe(input.language);
+      chai.expect(data?.updateCuratedItem).to.deep.include(input);
 
       // The one optional property should stay unchanged
       expect(data?.updateCuratedItem.imageUrl).toBe(item.imageUrl);
@@ -78,12 +75,7 @@ describe('queries: CuratedItem', () => {
       expect(data?.updateCuratedItem.externalId).toBe(item.externalId);
 
       // Updated properties should be... updated
-      expect(data?.updateCuratedItem.title).toBe(input.title);
-      expect(data?.updateCuratedItem.url).toBe(input.url);
-      expect(data?.updateCuratedItem.excerpt).toBe(input.excerpt);
-      expect(data?.updateCuratedItem.status).toBe(input.status);
-      expect(data?.updateCuratedItem.language).toBe(input.language);
-      expect(data?.updateCuratedItem.imageUrl).toBe(input.imageUrl);
+      chai.expect(data?.updateCuratedItem).to.deep.include(input);
     });
 
     it('should fail to update a curated item with a duplicate URL', async () => {
