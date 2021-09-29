@@ -6,6 +6,16 @@ import {
 } from '../../../database/queries';
 import { getPagination } from '../../../database/utils/getPagination';
 
+/**
+ * This query retrieves curated items from the database.
+ *
+ * There is a limited set of sorting options (createdAt, updatedAt)
+ * and filters (url, title, language, curation status)
+ *
+ * @param parent
+ * @param args
+ * @param db
+ */
 export async function getCuratedItems(
   parent,
   args,
