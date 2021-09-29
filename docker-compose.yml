@@ -15,8 +15,28 @@ services:
     ports:
       - '6379:6379'
 
+  localstack:
+    image: localstack/localstack
+    env_file:
+      - .docker/local.env
+    ports:
+      - '4567:4567'
+      - '8081:8081'
+    volumes:
+      - ./.docker/localstack:/docker-entrypoint-initaws.d
+    environment:
+      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY}
+      - DEBUG=1
+      - SERVICES=s3
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - PORT_WEB_UI=8081
+      - EXTRA_CORS_ALLOWED_HEADERS=Content-Disposition, Content-Type, x-amz-acl
+      - EXTRA_CORS_EXPOSE_HEADERS=ETag
+      - HOSTNAME_EXTERNAL=localstack
+
   app:
-    image: node:15
+    image: node:16
     env_file:
       - .docker/local.env
     working_dir: /app
@@ -29,3 +49,4 @@ services:
     command: "bash -c 'cd /app && npm ci && npm run start:dev'"
     depends_on:
       - mysql
+      - localstack
