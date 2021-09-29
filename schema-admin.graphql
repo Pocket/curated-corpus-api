@@ -29,7 +29,7 @@ type CuratedItemsResult {
 }
 
 """
-Available fields for sorting Curated Items
+Available fields for sorting Curated Items.
 """
 input CuratedItemOrderByInput {
     createdAt: OrderBy
@@ -37,13 +37,26 @@ input CuratedItemOrderByInput {
 }
 
 """
-Available fields for filtering CuratedItems
+Available fields for filtering CuratedItems.
 """
 input CuratedItemFilterInput {
     url: Url
     title: String
     status: CuratedStatus
     language: String
+}
+
+"""
+Input data for updating a Curated Item.
+"""
+input UpdateCuratedItemInput {
+    externalId: ID!
+    url: Url!
+    title: String!
+    excerpt: String!
+    status: CuratedStatus!
+    language: String!
+    imageUrl: Url
 }
 
 type Query {
@@ -56,4 +69,11 @@ type Query {
         orderBy: CuratedItemOrderByInput,
         filters: CuratedItemFilterInput
     ): CuratedItemsResult!
+}
+
+type Mutation {
+    """
+    Updates a Curated Item.
+    """
+    updateCuratedItem(data: UpdateCuratedItemInput!): CuratedItem!
 }

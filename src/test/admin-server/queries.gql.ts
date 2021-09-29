@@ -1,25 +1,11 @@
 import { gql } from 'apollo-server-express';
 import { CuratedItem } from '@prisma/client';
+import { CuratedItemData } from './fragments.gql';
 
 /**
  * Sample queries for Apollo Server integration tests as used in
  * Curation Admin Tools Frontend
  */
-const CuratedItemData = gql`
-  fragment CuratedItemData on CuratedItem {
-    externalId
-    title
-    language
-    url
-    imageUrl
-    excerpt
-    status
-    createdBy
-    createdAt
-    updatedAt
-  }
-`;
-
 export const GET_CURATED_ITEMS = gql`
   query getCuratedItems($page: Int, $perPage: Int) {
     getCuratedItems(page: $page, perPage: $perPage) {
