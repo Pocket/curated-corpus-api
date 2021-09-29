@@ -264,9 +264,9 @@ class CuratedCorpusAPI extends TerraformStack {
       alarms: {
         //TODO: Add alarms when the API is ready
         http5xxErrorPercentage: {
-          threshold: 10,
-          evaluationPeriods: 2,
-          period: 600,
+          threshold: 25,
+          evaluationPeriods: 4,
+          period: 300,
           actions: [],
         },
         httpLatency: {
