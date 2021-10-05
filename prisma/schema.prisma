@@ -71,7 +71,6 @@ model NewTabFeedSchedule {
   updatedAt     DateTime @updatedAt
   updatedBy     String?  @db.VarChar(255)
   scheduledDate DateTime @db.Date
-  approvedBy    String?  @db.VarChar(255)
 
   // associated entities
   curatedItem CuratedItem @relation(fields: [curatedItemId], references: [id])
