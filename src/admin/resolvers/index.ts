@@ -1,5 +1,6 @@
 import { getCuratedItems } from './queries/CuratedItem';
 import { updateCuratedItem } from './mutations/CuratedItem';
+import { deleteNewTabFeedSchedule } from './mutations/NewTabFeedSchedule';
 
 export const resolvers = {
   Query: {
@@ -7,5 +8,6 @@ export const resolvers = {
   },
   Mutation: {
     updateCuratedItem,
+    deleteNewTabFeedSchedule,
   },
 };

@@ -5,7 +5,7 @@ scalar PCTest
 
 scalar Url
 scalar DateString
-
+scalar Date
 
 
 type Pagination {

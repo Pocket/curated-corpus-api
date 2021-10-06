@@ -5,7 +5,7 @@ import { clearDb, createCuratedItemHelper } from '../../../test/helpers';
 import { UPDATE_CURATED_ITEM } from '../../../test/admin-server/mutations.gql';
 import { UpdateCuratedItemInput } from '../../../database/types';
 
-describe('queries: CuratedItem', () => {
+describe('mutations: CuratedItem', () => {
   beforeAll(async () => {
     await server.start();
   });
