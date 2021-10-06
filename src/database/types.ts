@@ -1,4 +1,4 @@
-import { CuratedItem, CuratedStatus } from '@prisma/client';
+import { CuratedItem, CuratedStatus, NewTabFeedSchedule } from '@prisma/client';
 
 export type Pagination = {
   totalResults: number;
@@ -32,4 +32,12 @@ export type UpdateCuratedItemInput = {
   status: CuratedStatus;
   language: string;
   imageUrl?: string;
+};
+
+export type DeleteNewTabFeedScheduleInput = {
+  externalId: string;
+};
+
+export type NewTabFeedScheduleComplete = NewTabFeedSchedule & {
+  curatedItem: CuratedItem;
 };
