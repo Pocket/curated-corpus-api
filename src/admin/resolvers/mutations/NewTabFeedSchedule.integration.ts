@@ -1,4 +1,3 @@
-import chai from 'chai';
 import { db, server } from '../../../test/admin-server';
 import {
   clearDb,
@@ -6,12 +5,8 @@ import {
   createNewTabFeedHelper,
   createNewTabScheduleHelper,
 } from '../../../test/helpers';
-import {
-  DELETE_NEW_TAB_FEED_SCHEDULE,
-  UPDATE_CURATED_ITEM,
-} from '../../../test/admin-server/mutations.gql';
-import { DeleteNewTabFeedScheduleInput } from '../../../database/types';
-import faker from 'faker';
+import { DELETE_NEW_TAB_FEED_SCHEDULE } from '../../../test/admin-server/mutations.gql';
+import { DeleteNewTabFeedScheduledItemInput } from '../../../database/types';
 
 describe('mutations: NewTabFeedSchedule', () => {
   beforeAll(async () => {
@@ -27,9 +22,9 @@ describe('mutations: NewTabFeedSchedule', () => {
     await clearDb(db);
   });
 
-  describe('deleteNewTabFeedSchedule mutation', () => {
+  describe('deleteNewTabFeedScheduledItem mutation', () => {
     it('fails on invalid external ID', async () => {
-      const input: DeleteNewTabFeedScheduleInput = {
+      const input: DeleteNewTabFeedScheduledItemInput = {
         externalId: 'not-a-valid-ID-string',
       };
 
@@ -72,7 +67,7 @@ describe('mutations: NewTabFeedSchedule', () => {
       // CuratedItem, so until there is a query to retrieve the scheduled item
       // of the right shape (if it's ever implemented), laborious property-by-property
       // comparison is the go.
-      const returnedItem = data?.deleteNewTabFeedSchedule;
+      const returnedItem = data?.deleteNewTabFeedScheduledItem;
       expect(returnedItem.externalId).toBe(scheduledItem.externalId);
       expect(returnedItem.createdBy).toBe(scheduledItem.createdBy);
       expect(returnedItem.updatedBy).toBe(scheduledItem.updatedBy);

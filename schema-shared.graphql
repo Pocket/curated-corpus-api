@@ -7,7 +7,6 @@ scalar Url
 scalar DateString
 scalar Date
 
-
 type Pagination {
     currentPage: Int!
     totalPages: Int!

@@ -33,8 +33,8 @@ export const UPDATE_CURATED_ITEM = gql`
 `;
 
 export const DELETE_NEW_TAB_FEED_SCHEDULE = gql`
-  mutation deleteNewTabFeedSchedule($externalId: ID!) {
-    deleteNewTabFeedSchedule(data: { externalId: $externalId }) {
+  mutation deleteNewTabFeedScheduledItem($externalId: ID!) {
+    deleteNewTabFeedScheduledItem(data: { externalId: $externalId }) {
       externalId
       createdAt
       createdBy

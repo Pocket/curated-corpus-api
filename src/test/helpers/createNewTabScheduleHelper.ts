@@ -36,6 +36,7 @@ export async function createNewTabScheduleHelper(
 ): Promise<NewTabFeedSchedule> {
   // defaults for optional properties
   const createNewTabFeedScheduleDefaults = {
+    createdAt: faker.date.recent(14),
     createdBy: faker.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
     scheduledDate: faker.date.soon(7).toISOString(),
   };

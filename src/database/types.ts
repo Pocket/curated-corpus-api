@@ -34,10 +34,20 @@ export type UpdateCuratedItemInput = {
   imageUrl?: string;
 };
 
-export type DeleteNewTabFeedScheduleInput = {
-  externalId: string;
+export type NewTabFeedScheduledItem = NewTabFeedSchedule & {
+  curatedItem: CuratedItem;
 };
 
-export type NewTabFeedScheduleComplete = NewTabFeedSchedule & {
-  curatedItem: CuratedItem;
+export type NewTabFeedScheduledItemsResult = {
+  items: NewTabFeedSchedule[];
+};
+
+export type NewTabFeedScheduleFilterInput = {
+  newTabExternalId: string;
+  startDate: string;
+  endDate: string;
+};
+
+export type DeleteNewTabFeedScheduledItemInput = {
+  externalId: string;
 };
