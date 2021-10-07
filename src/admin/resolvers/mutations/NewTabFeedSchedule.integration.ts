@@ -1,4 +1,3 @@
-import chai from 'chai';
 import { db, server } from '../../../test/admin-server';
 import {
   clearDb,
@@ -6,12 +5,8 @@ import {
   createNewTabFeedHelper,
   createNewTabScheduleHelper,
 } from '../../../test/helpers';
-import {
-  DELETE_NEW_TAB_FEED_SCHEDULE,
-  UPDATE_CURATED_ITEM,
-} from '../../../test/admin-server/mutations.gql';
-import { DeleteNewTabFeedScheduleInput } from '../../../database/types';
-import faker from 'faker';
+import { DELETE_NEW_TAB_FEED_SCHEDULE } from '../../../test/admin-server/mutations.gql';
+import { DeleteNewTabFeedScheduledItemInput } from '../../../database/types';
 
 describe('mutations: NewTabFeedSchedule', () => {
   beforeAll(async () => {
@@ -29,7 +24,7 @@ describe('mutations: NewTabFeedSchedule', () => {
 
   describe('deleteNewTabFeedSchedule mutation', () => {
     it('fails on invalid external ID', async () => {
-      const input: DeleteNewTabFeedScheduleInput = {
+      const input: DeleteNewTabFeedScheduledItemInput = {
         externalId: 'not-a-valid-ID-string',
       };
 

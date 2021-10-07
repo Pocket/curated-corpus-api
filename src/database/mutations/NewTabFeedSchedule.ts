@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import {
-  DeleteNewTabFeedScheduleInput,
-  NewTabFeedScheduleComplete,
+  DeleteNewTabFeedScheduledItemInput,
+  NewTabFeedScheduledItem,
 } from '../types';
 
 /**
@@ -12,8 +12,8 @@ import {
  */
 export async function deleteNewTabFeedSchedule(
   db: PrismaClient,
-  data: DeleteNewTabFeedScheduleInput
-): Promise<NewTabFeedScheduleComplete> {
+  data: DeleteNewTabFeedScheduledItemInput
+): Promise<NewTabFeedScheduledItem> {
   if (!data.externalId) {
     throw new Error('externalId must be provided.');
   }

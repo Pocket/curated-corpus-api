@@ -1,5 +1,5 @@
 import { deleteNewTabFeedSchedule as dbDeleteNewTabFeedSchedule } from '../../../database/mutations';
-import { NewTabFeedScheduleComplete } from '../../../database/types';
+import { NewTabFeedScheduledItem } from '../../../database/types';
 
 /**
  * Deletes an item from the New Tab schedule.
@@ -12,6 +12,6 @@ export async function deleteNewTabFeedSchedule(
   parent,
   { data },
   { db }
-): Promise<NewTabFeedScheduleComplete> {
+): Promise<NewTabFeedScheduledItem> {
   return await dbDeleteNewTabFeedSchedule(db, data);
 }

@@ -23,7 +23,12 @@ type CuratedItem {
     updatedBy: String
 }
 
-type NewTabFeedSchedule {
+type CuratedItemsResult {
+    items: [CuratedItem!]!
+    pagination: Pagination
+}
+
+type NewTabFeedScheduledItem {
     externalId: ID!
     createdAt: DateString!
     createdBy: String!
@@ -33,9 +38,8 @@ type NewTabFeedSchedule {
     curatedItem: CuratedItem!
 }
 
-type CuratedItemsResult {
-    items: [CuratedItem!]!
-    pagination: Pagination
+type NewTabFeedScheduledItemsResult {
+    items: [NewTabFeedScheduledItem!]!
 }
 
 """
@@ -57,6 +61,15 @@ input CuratedItemFilterInput {
 }
 
 """
+Available fields for filtering NewTabFeedSchedule entries.
+"""
+input NewTabFeedScheduledItemsFilterInput {
+    newTabExternalId: ID!
+    startDate: Date!
+    endDate: Date!
+}
+
+"""
 Input data for updating a Curated Item.
 """
 input UpdateCuratedItemInput {
@@ -72,7 +85,7 @@ input UpdateCuratedItemInput {
 """
 Input data for deleting an item from the New Tab Schedule.
 """
-input DeleteNewTabFeedScheduleInput {
+input DeleteNewTabFeedScheduledItemInput {
     externalId: ID!
 }
 
@@ -86,6 +99,13 @@ type Query {
         orderBy: CuratedItemOrderByInput,
         filters: CuratedItemFilterInput
     ): CuratedItemsResult!
+
+    """
+    Retrieves a list of Curated Items that are scheduled to appear on New Tab
+    """
+    getNewTabFeedScheduledItems(
+        filters: NewTabFeedScheduledItemsFilterInput!
+    ): NewTabFeedScheduledItemsResult!
 }
 
 type Mutation {
@@ -97,5 +117,5 @@ type Mutation {
     """
     Deletes an item from New Tab Schedule.
     """
-    deleteNewTabFeedSchedule(data: DeleteNewTabFeedScheduleInput!): NewTabFeedSchedule!
+    deleteNewTabFeedSchedule(data: DeleteNewTabFeedScheduledItemInput!): NewTabFeedScheduledItem!
 }

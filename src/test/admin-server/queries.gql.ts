@@ -1,5 +1,4 @@
 import { gql } from 'apollo-server-express';
-import { CuratedItem } from '@prisma/client';
 import { CuratedItemData } from './fragments.gql';
 
 /**
@@ -86,6 +85,27 @@ export const GET_CURATED_ITEMS_KITCHEN_SINK = gql`
         totalPages
         totalResults
         perPage
+      }
+    }
+  }
+  ${CuratedItemData}
+`;
+
+export const GET_NEW_TAB_FEED_SCHEDULED_ITEMS = gql`
+  query getNewTabFeedScheduledItems(
+    $filters: NewTabFeedScheduledItemsFilterInput!
+  ) {
+    getNewTabFeedScheduledItems(filters: $filters) {
+      items {
+        externalId
+        createdAt
+        createdBy
+        updatedAt
+        updatedBy
+        scheduledDate
+        curatedItem {
+          ...CuratedItemData
+        }
       }
     }
   }
