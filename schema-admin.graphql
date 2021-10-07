@@ -117,5 +117,5 @@ type Mutation {
     """
     Deletes an item from New Tab Schedule.
     """
-    deleteNewTabFeedSchedule(data: DeleteNewTabFeedScheduledItemInput!): NewTabFeedScheduledItem!
+    deleteNewTabFeedScheduledItem(data: DeleteNewTabFeedScheduledItemInput!): NewTabFeedScheduledItem!
 }

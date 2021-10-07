@@ -22,7 +22,7 @@ describe('mutations: NewTabFeedSchedule', () => {
     await clearDb(db);
   });
 
-  describe('deleteNewTabFeedSchedule mutation', () => {
+  describe('deleteNewTabFeedScheduledItem mutation', () => {
     it('fails on invalid external ID', async () => {
       const input: DeleteNewTabFeedScheduledItemInput = {
         externalId: 'not-a-valid-ID-string',
@@ -67,7 +67,7 @@ describe('mutations: NewTabFeedSchedule', () => {
       // CuratedItem, so until there is a query to retrieve the scheduled item
       // of the right shape (if it's ever implemented), laborious property-by-property
       // comparison is the go.
-      const returnedItem = data?.deleteNewTabFeedSchedule;
+      const returnedItem = data?.deleteNewTabFeedScheduledItem;
       expect(returnedItem.externalId).toBe(scheduledItem.externalId);
       expect(returnedItem.createdBy).toBe(scheduledItem.createdBy);
       expect(returnedItem.updatedBy).toBe(scheduledItem.updatedBy);

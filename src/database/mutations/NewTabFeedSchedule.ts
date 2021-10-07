@@ -10,7 +10,7 @@ import {
  * @param db
  * @param data
  */
-export async function deleteNewTabFeedSchedule(
+export async function deleteNewTabFeedScheduledItem(
   db: PrismaClient,
   data: DeleteNewTabFeedScheduledItemInput
 ): Promise<NewTabFeedScheduledItem> {

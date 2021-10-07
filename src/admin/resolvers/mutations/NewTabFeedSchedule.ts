@@ -1,4 +1,4 @@
-import { deleteNewTabFeedSchedule as dbDeleteNewTabFeedSchedule } from '../../../database/mutations';
+import { deleteNewTabFeedScheduledItem as dbDeleteNewTabFeedScheduledItem } from '../../../database/mutations';
 import { NewTabFeedScheduledItem } from '../../../database/types';
 
 /**
@@ -8,10 +8,10 @@ import { NewTabFeedScheduledItem } from '../../../database/types';
  * @param data
  * @param db
  */
-export async function deleteNewTabFeedSchedule(
+export async function deleteNewTabFeedScheduledItem(
   parent,
   { data },
   { db }
 ): Promise<NewTabFeedScheduledItem> {
-  return await dbDeleteNewTabFeedSchedule(db, data);
+  return await dbDeleteNewTabFeedScheduledItem(db, data);
 }
