@@ -1,11 +1,58 @@
 import { PrismaClient } from '@prisma/client';
 import {
+  CreateNewTabFeedScheduledItemInput,
   DeleteNewTabFeedScheduledItemInput,
   NewTabFeedScheduledItem,
 } from '../types';
 
 /**
- * This mutation updates a curated item.
+ * This mutation adds a scheduled entry for a New Tab.
+ *
+ * @param db
+ * @param data
+ */
+export async function createNewTabFeedScheduledItem(
+  db: PrismaClient,
+  data: CreateNewTabFeedScheduledItemInput
+): Promise<NewTabFeedScheduledItem> {
+  let scheduledItem: NewTabFeedScheduledItem;
+
+  const {
+    curatedItemExternalId,
+    newTabFeedExternalId,
+    scheduledDate,
+    createdBy,
+  } = data;
+
+  const curatedItem = await db.curatedItem.findUnique({
+    where: { externalId: curatedItemExternalId },
+  });
+
+  const newTabFeed = await db.newTabFeed.findUnique({
+    where: { externalId: newTabFeedExternalId },
+  });
+
+  if (curatedItem && newTabFeed) {
+    scheduledItem = await db.newTabFeedSchedule.create({
+      data: {
+        curatedItemId: curatedItem.id,
+        newTabFeedId: newTabFeed.id,
+        scheduledDate,
+        createdBy,
+      },
+      include: {
+        curatedItem: true,
+      },
+    });
+  } else {
+    throw new Error(`Cannot create a scheduled entry with data supplied.`);
+  }
+
+  return scheduledItem;
+}
+
+/**
+ * This mutation deletes a scheduled entry for a New Tab.
  *
  * @param db
  * @param data
