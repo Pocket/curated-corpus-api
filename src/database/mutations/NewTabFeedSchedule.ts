@@ -37,7 +37,7 @@ export async function createNewTabFeedScheduledItem(
       data: {
         curatedItemId: curatedItem.id,
         newTabFeedId: newTabFeed.id,
-        scheduledDate,
+        scheduledDate: new Date(scheduledDate).toISOString(),
         createdBy,
       },
       include: {

@@ -1,3 +1,4 @@
+import chai from 'chai';
 import { db, server } from '../../../test/admin-server';
 import {
   clearDb,
@@ -5,8 +6,14 @@ import {
   createNewTabFeedHelper,
   createNewTabScheduleHelper,
 } from '../../../test/helpers';
-import { DELETE_NEW_TAB_FEED_SCHEDULE } from '../../../test/admin-server/mutations.gql';
-import { DeleteNewTabFeedScheduledItemInput } from '../../../database/types';
+import {
+  CREATE_NEW_TAB_FEED_SCHEDULE,
+  DELETE_NEW_TAB_FEED_SCHEDULE,
+} from '../../../test/admin-server/mutations.gql';
+import {
+  CreateNewTabFeedScheduledItemInput,
+  DeleteNewTabFeedScheduledItemInput,
+} from '../../../database/types';
 
 describe('mutations: NewTabFeedSchedule', () => {
   beforeAll(async () => {
@@ -20,6 +27,99 @@ describe('mutations: NewTabFeedSchedule', () => {
 
   beforeEach(async () => {
     await clearDb(db);
+  });
+
+  describe('createNewTabFeedScheduledItem mutation', () => {
+    it('fails on invalid Curated Item ID', async () => {
+      const curatedItem = await createCuratedItemHelper(db, {
+        title: 'A test story',
+      });
+      const input: CreateNewTabFeedScheduledItemInput = {
+        curatedItemExternalId: curatedItem.externalId,
+        newTabFeedExternalId: 'not-a-valid-uuid',
+        scheduledDate: '2100-01-01',
+        createdBy: 'sso-user',
+      };
+
+      const result = await server.executeOperation({
+        query: CREATE_NEW_TAB_FEED_SCHEDULE,
+        variables: input,
+      });
+
+      expect(result.data).toBeNull();
+
+      // And there is the correct error from the resolvers
+      if (result.errors) {
+        expect(result.errors[0].message).toMatch(
+          `Cannot create a scheduled entry with data supplied.`
+        );
+      }
+    });
+
+    it('fails on invalid New Tab Feed ID', async () => {
+      const newTabFeed = await createNewTabFeedHelper(db, {
+        shortName: 'en_GB',
+      });
+
+      const input: CreateNewTabFeedScheduledItemInput = {
+        curatedItemExternalId: 'not-a-valid-id-at-all',
+        newTabFeedExternalId: newTabFeed.externalId,
+        scheduledDate: '2100-01-01',
+        createdBy: 'sso-user',
+      };
+
+      const result = await server.executeOperation({
+        query: CREATE_NEW_TAB_FEED_SCHEDULE,
+        variables: input,
+      });
+
+      expect(result.data).toBeNull();
+
+      // And there is the correct error from the resolvers
+      if (result.errors) {
+        expect(result.errors[0].message).toMatch(
+          `Cannot create a scheduled entry with data supplied.`
+        );
+      }
+    });
+
+    it('should create an entry and return data (including Curated Item)', async () => {
+      const newTabFeed = await createNewTabFeedHelper(db, {
+        shortName: 'en_GB',
+      });
+
+      const curatedItem = await createCuratedItemHelper(db, {
+        title: 'A test story',
+      });
+
+      const input: CreateNewTabFeedScheduledItemInput = {
+        curatedItemExternalId: curatedItem.externalId,
+        newTabFeedExternalId: newTabFeed.externalId,
+        scheduledDate: '2100-01-01',
+        createdBy: 'sso-user',
+      };
+
+      const { data } = await server.executeOperation({
+        query: CREATE_NEW_TAB_FEED_SCHEDULE,
+        variables: input,
+      });
+
+      const scheduledItem = data?.createNewTabFeedScheduledItem;
+
+      // Expect these fields to return valid values
+      expect(scheduledItem.externalId).toBeTruthy();
+      expect(scheduledItem.createdAt).toBeTruthy();
+      expect(scheduledItem.updatedAt).toBeTruthy();
+
+      // Expect these to match the input values
+      expect(new Date(scheduledItem.scheduledDate)).toMatchObject(
+        new Date(input.scheduledDate)
+      );
+      expect(scheduledItem.createdBy).toBe(input.createdBy);
+
+      // Finally, let's compare the returned CuratedItem object
+      chai.expect(curatedItem).to.deep.include(scheduledItem.curatedItem);
+    });
   });
 
   describe('deleteNewTabFeedScheduledItem mutation', () => {
@@ -84,13 +184,7 @@ describe('mutations: NewTabFeedSchedule', () => {
       );
 
       // Finally, let's compare the returned CuratedItem object
-      expect(returnedItem.curatedItem.externalId).toBe(curatedItem.externalId);
-      expect(returnedItem.curatedItem.title).toBe(curatedItem.title);
-      expect(returnedItem.curatedItem.url).toBe(curatedItem.url);
-      expect(returnedItem.curatedItem.excerpt).toBe(curatedItem.excerpt);
-      expect(returnedItem.curatedItem.imageUrl).toBe(curatedItem.imageUrl);
-      expect(returnedItem.curatedItem.language).toBe(curatedItem.language);
-      expect(returnedItem.curatedItem.status).toBe(curatedItem.status);
+      chai.expect(curatedItem).to.deep.include(returnedItem.curatedItem);
     });
   });
 });

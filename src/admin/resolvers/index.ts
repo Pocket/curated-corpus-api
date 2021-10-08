@@ -1,7 +1,10 @@
 import { getCuratedItems } from './queries/CuratedItem';
 import { getNewTabFeedScheduledItems } from './queries/NewTabFeedSchedule';
 import { updateCuratedItem } from './mutations/CuratedItem';
-import { deleteNewTabFeedScheduledItem } from './mutations/NewTabFeedSchedule';
+import {
+  createNewTabFeedScheduledItem,
+  deleteNewTabFeedScheduledItem,
+} from './mutations/NewTabFeedSchedule';
 
 export const resolvers = {
   Query: {
@@ -10,6 +13,7 @@ export const resolvers = {
   },
   Mutation: {
     updateCuratedItem,
+    createNewTabFeedScheduledItem,
     deleteNewTabFeedScheduledItem,
   },
 };

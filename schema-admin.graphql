@@ -83,12 +83,24 @@ input UpdateCuratedItemInput {
 }
 
 """
-Input data for creating a New Tab Scheduled Item from a Curated Item
+Input data for creating a scheduled entry for a Curated Item on a New Tab Feed.
 """
 input CreateNewTabFeedScheduledItemInput {
+    """
+    The ID of the Curated Item that needs to be scheduled.
+    """
     curatedItemExternalId: ID!
+    """
+    The ID of the New Tab Feed the Curated Item above is going to appear on.
+    """
     newTabFeedExternalId: ID!
+    """
+    The date the associated Curated Item is scheduled to appear on New Tab.
+    """
     scheduledDate: Date!
+    """
+    A single sign-on user identifier of the user who created this entity.
+    """
     createdBy: String!
 }
 
