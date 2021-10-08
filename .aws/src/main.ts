@@ -21,6 +21,8 @@ import {
   PocketVPC,
 } from '@pocket-tools/terraform-modules';
 import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
+import { LocalProvider } from '@cdktf/provider-local';
+import { NullProvider } from '@cdktf/provider-null';
 
 class CuratedCorpusAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
@@ -29,6 +31,8 @@ class CuratedCorpusAPI extends TerraformStack {
     new AwsProvider(this, 'aws', { region: 'us-east-1' });
 
     new PagerdutyProvider(this, 'pagerduty_provider', { token: undefined });
+    new LocalProvider(this, 'local_provider');
+    new NullProvider(this, 'null_provider');
 
     new RemoteBackend(this, {
       hostname: 'app.terraform.io',
