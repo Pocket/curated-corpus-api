@@ -1,12 +1,25 @@
 """
-A test string
+This is a temporary return type for a test query on the public API.
 """
 scalar PCTest
 
+"""
+A URL - usually, for an interesting story on the internet that's worth saving to Pocket.
+"""
 scalar Url
+"""
+A timestamp formatted as an ISO 8601 string.
+"""
 scalar DateString
+"""
+A date in the YYYY-MM-DD format.
+"""
 scalar Date
 
+"""
+The pagination object returned with every paginated query.
+NB: currently under review
+"""
 type Pagination {
     currentPage: Int!
     totalPages: Int!

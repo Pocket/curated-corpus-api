@@ -1,44 +1,143 @@
+"""
+The outcome of the curators reviewing a prospective story.
+"""
 enum CuratedStatus {
+    """
+    Recommend this story to appear on New Tab.
+    """
     RECOMMENDATION
+    """
+    Add this story to the general curated corpus.
+    """
     CORPUS
+    """
+    Do not use this story.
+    """
     DECLINE
 }
 
+"""
+Options for returning items sorted by the supplied field.
+"""
 enum OrderBy {
+    """
+    Return items in ascending order.
+    """
     ASC
+    """
+    Return items in descending order.
+    """
     DESC
 }
 
+"""
+A prospective story that has been reviewed by the curators and saved to the curated corpus.
+"""
 type CuratedItem {
+    """
+    An alternative primary key in UUID format that is generated on creation.
+    """
     externalId: ID!
+    """
+    The URL of the story.
+    """
     url: Url!
+    """
+    The title of the story.
+    """
     title: String!
+    """
+    The excerpt of the story.
+    """
     excerpt: String!
+    """
+    The outcome of the curators' review.
+    """
     status: CuratedStatus!
+    """
+    What language this story is in. This is a two-letter code, for example, 'en' for English.
+    """
     language: String!
-    imageUrl: Url
+    """
+    The image URL associated with the story.
+    This is a link to an S3 bucket - the image will have been pre-uploaded to S3 before saving a curated item.
+    """
+    imageUrl: Url!
+    """
+    An ISO-formatted timestamp of when the entity was created.
+    """
     createdAt: DateString!
+    """
+    A single sign-on user identifier of the user who created this entity.
+    """
     createdBy: String!
+    """
+    An ISO-formatted timestamp of when the entity was last updated.
+    """
     updatedAt: DateString!
+    """
+    A single sign-on user identifier of the user who last updated this entity. Null on creation.
+    """
     updatedBy: String
 }
 
+"""
+The shape of the result returned by the getCuratedItems query.
+"""
 type CuratedItemsResult {
+    """
+    An array of Curated Items.
+    """
     items: [CuratedItem!]!
-    pagination: Pagination
+    """
+    The Pagination object.
+    """
+    pagination: Pagination!
 }
 
+"""
+A scheduled entry for a Curated Item to appear on a New Tab Feed.
+For example, a story about another story that is scheduled to appear
+on December 31st, 2021 on the New Tab in Firefox for the US audience.
+"""
 type NewTabFeedScheduledItem {
+    """
+    An alternative primary key in UUID format that is generated on creation.
+    """
     externalId: ID!
+    """
+    An ISO-formatted timestamp of when the entity was created.
+    """
     createdAt: DateString!
+    """
+    A single sign-on user identifier of the user who created this entity.
+    """
     createdBy: String!
+    """
+    An ISO-formatted timestamp of when the entity was last updated.
+    """
     updatedAt: DateString!
+    """
+    A single sign-on user identifier of the user who last updated this entity. Null on creation.
+    """
     updatedBy: String
+    """
+    The date the associated Curated Item is scheduled to appear on New Tab.
+    """
     scheduledDate: Date!
+    """
+    The associated Curated Item.
+    """
     curatedItem: CuratedItem!
 }
 
+"""
+The shape of the result returned by the getNewTabFeedScheduledItems query.
+"""
 type NewTabFeedScheduledItemsResult {
+    """
+    An array of items for a given New Tab Feed
+    """
     items: [NewTabFeedScheduledItem!]!
 }
 
@@ -46,7 +145,13 @@ type NewTabFeedScheduledItemsResult {
 Available fields for sorting Curated Items.
 """
 input CuratedItemOrderByInput {
+    """
+    Optional sorting by when Curated Items were created.
+    """
     createdAt: OrderBy
+    """
+    Optional sorting by when Curated items were last updated.
+    """
     updatedAt: OrderBy
 }
 
@@ -54,18 +159,40 @@ input CuratedItemOrderByInput {
 Available fields for filtering CuratedItems.
 """
 input CuratedItemFilterInput {
+    """
+    Optional filter on the URL field. Returns partial matches.
+    """
     url: Url
+    """
+    Optional filter on the title field. Returns partial matches.
+    """
     title: String
+    """
+    Optional filter on the status of Curated Items.
+    """
     status: CuratedStatus
+    """
+    Optional filter on the language Curated Items have been classified as.
+    This is a two-letter string, e.g. 'en' for English or 'de' for 'German'.
+    """
     language: String
 }
 
 """
-Available fields for filtering NewTabFeedSchedule entries.
+Available fields for filtering scheduled items for a given New Tab Feed.
 """
 input NewTabFeedScheduledItemsFilterInput {
+    """
+    The ID of the New Tab Feed. A string in UUID format.
+    """
     newTabExternalId: ID!
+    """
+    Which day to show scheduled items from. Expects a date in YYYY-MM-DD format.
+    """
     startDate: Date!
+    """
+    To what day to show scheduled items to, inclusive. Expects a date in YYYY-MM-DD format.
+    """
     endDate: Date!
 }
 
@@ -73,19 +200,43 @@ input NewTabFeedScheduledItemsFilterInput {
 Input data for updating a Curated Item.
 """
 input UpdateCuratedItemInput {
+    """
+    Curated Item ID.
+    """
     externalId: ID!
+    """
+    The URL of the Curated Item.
+    """
     url: Url!
+    """
+    The title of the Curated Item.
+    """
     title: String!
+    """
+    The excerpt of the Curated Item.
+    """
     excerpt: String!
+    """
+    The outcome of the curators' review of the Curated Item.
+    """
     status: CuratedStatus!
+    """
+    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    """
     language: String!
+    """
+    The image URL for this item's accompanying picture.
+    """
     imageUrl: Url
 }
 
 """
-Input data for deleting an item from the New Tab Schedule.
+Input data for deleting a scheduled item for a New Tab Feed.
 """
 input DeleteNewTabFeedScheduledItemInput {
+    """
+    ID of the scheduled item. A string in UUID format.
+    """
     externalId: ID!
 }
 
@@ -94,9 +245,21 @@ type Query {
     Retrieves a paged, sortable, filterable list of CuratedItems.
     """
     getCuratedItems(
+        """
+        The page number requested. Defaults to 1.
+        """
         page: Int,
+        """
+        How many items to retrieve. Defaults to 30.
+        """
         perPage: Int,
+        """
+        Optional fields to sort by.
+        """
         orderBy: CuratedItemOrderByInput,
+        """
+        Optional filters on status (match on enum value), url and title (the latter two allow partial matches).
+        """
         filters: CuratedItemFilterInput
     ): CuratedItemsResult!
 
@@ -104,6 +267,10 @@ type Query {
     Retrieves a list of Curated Items that are scheduled to appear on New Tab
     """
     getNewTabFeedScheduledItems(
+        """
+        Required arguments to narrow down scheduled items to a specific New Tab Feed
+        between the supplied start and end dates.
+        """
         filters: NewTabFeedScheduledItemsFilterInput!
     ): NewTabFeedScheduledItemsResult!
 }
