@@ -51,3 +51,10 @@ export type NewTabFeedScheduleFilterInput = {
 export type DeleteNewTabFeedScheduledItemInput = {
   externalId: string;
 };
+
+export type CreateNewTabFeedScheduledItemInput = {
+  curatedItemExternalId: string;
+  newTabFeedExternalId: string;
+  scheduledDate: string;
+  createdBy: string;
+};
