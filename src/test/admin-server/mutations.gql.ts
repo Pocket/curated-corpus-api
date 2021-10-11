@@ -32,6 +32,35 @@ export const UPDATE_CURATED_ITEM = gql`
   ${CuratedItemData}
 `;
 
+export const CREATE_NEW_TAB_FEED_SCHEDULE = gql`
+  mutation createNewTabFeedScheduledItem(
+    $curatedItemExternalId: ID!
+    $newTabFeedExternalId: ID!
+    $scheduledDate: Date!
+    $createdBy: String!
+  ) {
+    createNewTabFeedScheduledItem(
+      data: {
+        curatedItemExternalId: $curatedItemExternalId
+        newTabFeedExternalId: $newTabFeedExternalId
+        scheduledDate: $scheduledDate
+        createdBy: $createdBy
+      }
+    ) {
+      externalId
+      createdAt
+      createdBy
+      updatedAt
+      updatedBy
+      scheduledDate
+      curatedItem {
+        ...CuratedItemData
+      }
+    }
+  }
+  ${CuratedItemData}
+`;
+
 export const DELETE_NEW_TAB_FEED_SCHEDULE = gql`
   mutation deleteNewTabFeedScheduledItem($externalId: ID!) {
     deleteNewTabFeedScheduledItem(data: { externalId: $externalId }) {

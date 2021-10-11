@@ -83,6 +83,28 @@ input UpdateCuratedItemInput {
 }
 
 """
+Input data for creating a scheduled entry for a Curated Item on a New Tab Feed.
+"""
+input CreateNewTabFeedScheduledItemInput {
+    """
+    The ID of the Curated Item that needs to be scheduled.
+    """
+    curatedItemExternalId: ID!
+    """
+    The ID of the New Tab Feed the Curated Item above is going to appear on.
+    """
+    newTabFeedExternalId: ID!
+    """
+    The date the associated Curated Item is scheduled to appear on New Tab. Format: YYYY-MM-DD.
+    """
+    scheduledDate: Date!
+    """
+    A single sign-on user identifier of the user who created this entity.
+    """
+    createdBy: String!
+}
+
+"""
 Input data for deleting an item from the New Tab Schedule.
 """
 input DeleteNewTabFeedScheduledItemInput {
@@ -113,6 +135,11 @@ type Mutation {
     Updates a Curated Item.
     """
     updateCuratedItem(data: UpdateCuratedItemInput!): CuratedItem!
+
+    """
+    Creates a New Tab Scheduled Item.
+    """
+    createNewTabFeedScheduledItem(data: CreateNewTabFeedScheduledItemInput!): NewTabFeedScheduledItem!
 
     """
     Deletes an item from New Tab Schedule.

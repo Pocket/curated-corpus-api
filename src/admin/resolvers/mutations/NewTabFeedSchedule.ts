@@ -1,4 +1,7 @@
-import { deleteNewTabFeedScheduledItem as dbDeleteNewTabFeedScheduledItem } from '../../../database/mutations';
+import {
+  deleteNewTabFeedScheduledItem as dbDeleteNewTabFeedScheduledItem,
+  createNewTabFeedScheduledItem as dbCreateNewTabFeedScheduledItem,
+} from '../../../database/mutations';
 import { NewTabFeedScheduledItem } from '../../../database/types';
 
 /**
@@ -14,4 +17,12 @@ export async function deleteNewTabFeedScheduledItem(
   { db }
 ): Promise<NewTabFeedScheduledItem> {
   return await dbDeleteNewTabFeedScheduledItem(db, data);
+}
+
+export async function createNewTabFeedScheduledItem(
+  parent,
+  { data },
+  { db }
+): Promise<NewTabFeedScheduledItem> {
+  return await dbCreateNewTabFeedScheduledItem(db, data);
 }
