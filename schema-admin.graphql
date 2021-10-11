@@ -95,7 +95,7 @@ input CreateNewTabFeedScheduledItemInput {
     """
     newTabFeedExternalId: ID!
     """
-    The date the associated Curated Item is scheduled to appear on New Tab.
+    The date the associated Curated Item is scheduled to appear on New Tab. Format: YYYY-MM-DD.
     """
     scheduledDate: Date!
     """

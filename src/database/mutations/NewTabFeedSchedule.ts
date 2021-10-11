@@ -28,27 +28,33 @@ export async function createNewTabFeedScheduledItem(
     where: { externalId: curatedItemExternalId },
   });
 
+  if (!curatedItem) {
+    throw new Error(
+      `Cannot create a scheduled entry: Curated Item with id "${curatedItemExternalId}" does not exist.`
+    );
+  }
+
   const newTabFeed = await db.newTabFeed.findUnique({
     where: { externalId: newTabFeedExternalId },
   });
 
-  if (curatedItem && newTabFeed) {
-    scheduledItem = await db.newTabFeedSchedule.create({
-      data: {
-        curatedItemId: curatedItem.id,
-        newTabFeedId: newTabFeed.id,
-        scheduledDate: new Date(scheduledDate).toISOString(),
-        createdBy,
-      },
-      include: {
-        curatedItem: true,
-      },
-    });
-  } else {
-    throw new Error(`Cannot create a scheduled entry with data supplied.`);
+  if (!newTabFeed) {
+    throw new Error(
+      `Cannot create a scheduled entry: New Tab Feed with id "${newTabFeedExternalId}" does not exist.`
+    );
   }
 
-  return scheduledItem;
+  return await db.newTabFeedSchedule.create({
+    data: {
+      curatedItemId: curatedItem.id,
+      newTabFeedId: newTabFeed.id,
+      scheduledDate: new Date(scheduledDate).toISOString(),
+      createdBy,
+    },
+    include: {
+      curatedItem: true,
+    },
+  });
 }
 
 /**

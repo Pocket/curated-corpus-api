@@ -30,7 +30,7 @@ describe('mutations: NewTabFeedSchedule', () => {
   });
 
   describe('createNewTabFeedScheduledItem mutation', () => {
-    it('fails on invalid Curated Item ID', async () => {
+    it('fails on invalid New Tab Feed ID', async () => {
       const curatedItem = await createCuratedItemHelper(db, {
         title: 'A test story',
       });
@@ -51,12 +51,12 @@ describe('mutations: NewTabFeedSchedule', () => {
       // And there is the correct error from the resolvers
       if (result.errors) {
         expect(result.errors[0].message).toMatch(
-          `Cannot create a scheduled entry with data supplied.`
+          `Cannot create a scheduled entry: New Tab Feed with id "not-a-valid-uuid" does not exist.`
         );
       }
     });
 
-    it('fails on invalid New Tab Feed ID', async () => {
+    it('fails on invalid Curated Item ID', async () => {
       const newTabFeed = await createNewTabFeedHelper(db, {
         shortName: 'en_GB',
       });
@@ -78,7 +78,7 @@ describe('mutations: NewTabFeedSchedule', () => {
       // And there is the correct error from the resolvers
       if (result.errors) {
         expect(result.errors[0].message).toMatch(
-          `Cannot create a scheduled entry with data supplied.`
+          `Cannot create a scheduled entry: Curated Item with id "not-a-valid-id-at-all" does not exist.`
         );
       }
     });
