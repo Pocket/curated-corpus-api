@@ -97,8 +97,7 @@ type CuratedItemsResult {
 
 """
 A scheduled entry for a Curated Item to appear on a New Tab Feed.
-For example, a story about another story that is scheduled to appear
-on December 31st, 2021 on the New Tab in Firefox for the US audience.
+For example, a story that is scheduled to appear on December 31st, 2021 on the New Tab in Firefox for the US audience.
 """
 type NewTabFeedScheduledItem {
     """
