@@ -15,8 +15,6 @@ export async function createNewTabFeedScheduledItem(
   db: PrismaClient,
   data: CreateNewTabFeedScheduledItemInput
 ): Promise<NewTabFeedScheduledItem> {
-  let scheduledItem: NewTabFeedScheduledItem;
-
   const {
     curatedItemExternalId,
     newTabFeedExternalId,
@@ -48,7 +46,7 @@ export async function createNewTabFeedScheduledItem(
     data: {
       curatedItemId: curatedItem.id,
       newTabFeedId: newTabFeed.id,
-      scheduledDate: new Date(scheduledDate).toISOString(),
+      scheduledDate,
       createdBy,
     },
     include: {
