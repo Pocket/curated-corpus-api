@@ -3,11 +3,11 @@ The outcome of the curators reviewing a prospective story.
 """
 enum CuratedStatus {
     """
-    Recommend this story to appear on New Tab.
+    Recommend this story for Pocket users. This is first-tier content.
     """
     RECOMMENDATION
     """
-    Add this story to the general curated corpus.
+    This story is suitable for our curated corpus. It's a second-tier recommendation.
     """
     CORPUS
     """
@@ -123,6 +123,7 @@ type NewTabFeedScheduledItem {
     updatedBy: String
     """
     The date the associated Curated Item is scheduled to appear on New Tab.
+    This date is relative to the time zone of the New Tab. Format: YYYY-MM-DD.
     """
     scheduledDate: Date!
     """
