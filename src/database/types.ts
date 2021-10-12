@@ -31,7 +31,12 @@ export type UpdateCuratedItemInput = {
   excerpt: string;
   status: CuratedStatus;
   language: string;
-  imageUrl?: string;
+  imageUrl: string;
+  topic: string;
+  isCollection: boolean;
+  isShortLived: boolean;
+  isSyndicated: boolean;
+  updatedBy: string;
 };
 
 export type NewTabFeedScheduledItem = NewTabFeedSchedule & {

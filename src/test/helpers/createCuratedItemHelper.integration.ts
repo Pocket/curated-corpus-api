@@ -1,4 +1,5 @@
 import { CuratedStatus, PrismaClient } from '@prisma/client';
+import chai from 'chai';
 import faker from 'faker';
 import { clearDb } from './clearDb';
 import {
@@ -25,13 +26,25 @@ describe('createCuratedItemHelper', () => {
     // Expect to see the title we passed to the helper
     expect(item.title).toBe(data.title);
 
-    // Expect to see the remaining fields filled in for us
-    expect(item.externalId).toBeTruthy();
-    expect(item.excerpt).toBeTruthy();
-    expect(item.status).toBeTruthy();
-    expect(item.language).toBeTruthy();
-    expect(item.imageUrl).toBeTruthy();
-    expect(item.createdBy).toBeTruthy();
+    // Verify that all Curated Item properties requested by the query are returned
+    chai
+      .expect(item)
+      .to.include.all.keys([
+        'externalId',
+        'url',
+        'excerpt',
+        'status',
+        'language',
+        'imageUrl',
+        'topic',
+        'isCollection',
+        'isShortLived',
+        'isSyndicated',
+        'createdBy',
+        'createdAt',
+        'updatedBy',
+        'updatedAt',
+      ]);
   });
 
   it('creates a curated item with all properties supplied', async () => {
@@ -42,16 +55,15 @@ describe('createCuratedItemHelper', () => {
       language: 'en',
       imageUrl: faker.image.imageUrl(),
       createdBy: 'big-company|name.surname@example.com',
+      topic: 'Business',
+      isCollection: false,
+      isShortLived: false,
+      isSyndicated: true,
     };
 
     const item = await createCuratedItemHelper(db, data);
 
     // Expect to see everything as specified to the helper
-    expect(item.title).toBe(data.title);
-    expect(item.excerpt).toBe(data.excerpt);
-    expect(item.status).toBe(data.status);
-    expect(item.language).toBe(data.language);
-    expect(item.imageUrl).toBe(data.imageUrl);
-    expect(item.createdBy).toBe(data.createdBy);
+    chai.expect(item).to.deep.include(data);
   });
 });

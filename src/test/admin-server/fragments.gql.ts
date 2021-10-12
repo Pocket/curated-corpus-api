@@ -9,8 +9,13 @@ export const CuratedItemData = gql`
     imageUrl
     excerpt
     status
+    topic
+    isCollection
+    isShortLived
+    isSyndicated
     createdBy
     createdAt
+    updatedBy
     updatedAt
   }
 `;

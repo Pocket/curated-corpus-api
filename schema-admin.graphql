@@ -64,6 +64,24 @@ type CuratedItem {
     """
     imageUrl: Url!
     """
+    A topic this story best fits in.
+    Temporarily a string value that will be provided by Prospect API, possibly an enum in the future.
+    """
+    topic: String!
+    """
+    Whether this story is a Pocket Collection.
+    """
+    isCollection: Boolean!
+    """
+    A flag to ML to not recommend this item long term after it is added to the corpus.
+    Example: a story covering an election.
+    """
+    isShortLived: Boolean!
+    """
+    Whether this item is a syndicated article.
+    """
+    isSyndicated: Boolean!
+    """
     An ISO-formatted timestamp of when the entity was created.
     """
     createdAt: DateString!
@@ -227,7 +245,29 @@ input UpdateCuratedItemInput {
     """
     The image URL for this item's accompanying picture.
     """
-    imageUrl: Url
+    imageUrl: Url!
+    """
+    A topic this story best fits in.
+    Temporarily a string value that will be provided by Prospect API, possibly an enum in the future.
+    """
+    topic: String!
+    """
+    Whether this story is a Pocket Collection.
+    """
+    isCollection: Boolean!
+    """
+    A flag to ML to not recommend this item long term after it is added to the corpus.
+    Example: a story covering an election.
+    """
+    isShortLived: Boolean!
+    """
+    Whether this item is a syndicated article.
+    """
+    isSyndicated: Boolean!
+    """
+    A single sign-on user identifier of the user who last updated this entity.
+    """
+    updatedBy: String!
 }
 
 """
