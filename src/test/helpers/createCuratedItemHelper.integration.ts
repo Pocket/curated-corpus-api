@@ -26,25 +26,13 @@ describe('createCuratedItemHelper', () => {
     // Expect to see the title we passed to the helper
     expect(item.title).toBe(data.title);
 
-    // Verify that all Curated Item properties requested by the query are returned
-    chai
-      .expect(item)
-      .to.include.all.keys([
-        'externalId',
-        'url',
-        'excerpt',
-        'status',
-        'language',
-        'imageUrl',
-        'topic',
-        'isCollection',
-        'isShortLived',
-        'isSyndicated',
-        'createdBy',
-        'createdAt',
-        'updatedBy',
-        'updatedAt',
-      ]);
+    // Expect to see the remaining fields filled in for us
+    expect(item.externalId).toBeTruthy();
+    expect(item.excerpt).toBeTruthy();
+    expect(item.status).toBeTruthy();
+    expect(item.language).toBeTruthy();
+    expect(item.imageUrl).toBeTruthy();
+    expect(item.createdBy).toBeTruthy();
   });
 
   it('creates a curated item with all properties supplied', async () => {
