@@ -39,7 +39,6 @@ describe('mutations: CuratedItem', () => {
         isCollection: true,
         isShortLived: true,
         isSyndicated: false,
-        updatedBy: 'user-identifier-of-some-sort',
       };
 
       const { data } = await server.executeOperation({
@@ -76,7 +75,6 @@ describe('mutations: CuratedItem', () => {
         isCollection: true,
         isShortLived: true,
         isSyndicated: false,
-        updatedBy: 'user-identifier-of-some-sort',
       };
 
       // Attempt to update the second item with a duplicate URL...

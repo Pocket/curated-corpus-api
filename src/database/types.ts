@@ -36,7 +36,6 @@ export type UpdateCuratedItemInput = {
   isCollection: boolean;
   isShortLived: boolean;
   isSyndicated: boolean;
-  updatedBy: string;
 };
 
 export type NewTabFeedScheduledItem = NewTabFeedSchedule & {
@@ -61,5 +60,4 @@ export type CreateNewTabFeedScheduledItemInput = {
   curatedItemExternalId: string;
   newTabFeedExternalId: string;
   scheduledDate: string;
-  createdBy: string;
 };

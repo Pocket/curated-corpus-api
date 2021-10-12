@@ -264,10 +264,6 @@ input UpdateCuratedItemInput {
     Whether this item is a syndicated article.
     """
     isSyndicated: Boolean!
-    """
-    A single sign-on user identifier of the user who last updated this entity.
-    """
-    updatedBy: String!
 }
 
 """
@@ -286,10 +282,6 @@ input CreateNewTabFeedScheduledItemInput {
     The date the associated Curated Item is scheduled to appear on New Tab. Format: YYYY-MM-DD.
     """
     scheduledDate: Date!
-    """
-    A single sign-on user identifier of the user who created this entity.
-    """
-    createdBy: String!
 }
 
 """
