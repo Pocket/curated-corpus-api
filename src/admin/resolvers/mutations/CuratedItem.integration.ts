@@ -32,7 +32,7 @@ describe('mutations: CuratedItem', () => {
         title: 'Anything but LEGO',
         url: 'https://test.com/lego',
         excerpt: 'Updated excerpt',
-        status: CuratedStatus.DECLINE,
+        status: CuratedStatus.CORPUS,
         language: 'de',
       };
 
@@ -61,7 +61,7 @@ describe('mutations: CuratedItem', () => {
         title: 'Anything but LEGO',
         url: 'https://test.com/lego',
         excerpt: 'Updated excerpt',
-        status: CuratedStatus.DECLINE,
+        status: CuratedStatus.CORPUS,
         language: 'de',
         imageUrl: 'https://test.com/image.png',
       };
@@ -93,7 +93,7 @@ describe('mutations: CuratedItem', () => {
         title: 'Anything but LEGO',
         url: 'https://test.com/first',
         excerpt: 'Updated excerpt',
-        status: CuratedStatus.DECLINE,
+        status: CuratedStatus.RECOMMENDATION,
         language: 'de',
       };
 
