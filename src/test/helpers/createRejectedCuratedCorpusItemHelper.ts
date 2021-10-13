@@ -1,12 +1,16 @@
-import { RejectedItem, Prisma, PrismaClient } from '@prisma/client';
+import {
+  RejectedCuratedCorpusItem,
+  Prisma,
+  PrismaClient,
+} from '@prisma/client';
 import faker from 'faker';
 // the minimum of data required to create a rejected item
-interface CreateRejectedItemHelperRequiredInput {
+interface CreateRejectedCuratedCorpusItemHelperRequiredInput {
   title: string;
 }
 
 // optional information you can provide when creating a curated item
-interface CreateRejectedItemHelperOptionalInput {
+interface CreateRejectedCuratedCorpusItemHelperOptionalInput {
   url?: string;
   topic?: string;
   language?: string;
@@ -15,20 +19,21 @@ interface CreateRejectedItemHelperOptionalInput {
 }
 
 // the input type the helper function expects - a combo of required and optional parameters
-export type CreateRejectedItemHelperInput =
-  CreateRejectedItemHelperRequiredInput & CreateRejectedItemHelperOptionalInput;
+export type CreateRejectedCuratedCorpusItemHelperInput =
+  CreateRejectedCuratedCorpusItemHelperRequiredInput &
+    CreateRejectedCuratedCorpusItemHelperOptionalInput;
 
 /**
  * A helper function that creates a sample curated item for testing or local development.
  * @param prisma
  * @param data
  */
-export async function createRejectedItemHelper(
+export async function createRejectedCuratedCorpusItemHelper(
   prisma: PrismaClient,
-  data: CreateRejectedItemHelperInput
-): Promise<RejectedItem> {
+  data: CreateRejectedCuratedCorpusItemHelperInput
+): Promise<RejectedCuratedCorpusItem> {
   // defaults for optional properties
-  const createRejectedItemDefaults = {
+  const createRejectedCuratedCorpusItemDefaults = {
     url: faker.internet.url(),
     topic: faker.lorem.words(2),
     language: faker.random.arrayElement(['en', 'de']),
@@ -38,10 +43,10 @@ export async function createRejectedItemHelper(
     createdBy: faker.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
   };
 
-  const inputs: Prisma.RejectedItemCreateInput = {
-    ...createRejectedItemDefaults,
+  const inputs: Prisma.RejectedCuratedCorpusItemCreateInput = {
+    ...createRejectedCuratedCorpusItemDefaults,
     ...data,
   };
 
-  return await prisma.rejectedItem.create({ data: inputs });
+  return await prisma.rejectedCuratedCorpusItem.create({ data: inputs });
 }

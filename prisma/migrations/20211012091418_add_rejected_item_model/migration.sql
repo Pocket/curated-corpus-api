@@ -8,7 +8,7 @@
 ALTER TABLE `CuratedItem` MODIFY `status` ENUM('RECOMMENDATION', 'CORPUS') NOT NULL DEFAULT 'CORPUS';
 
 -- CreateTable
-CREATE TABLE `RejectedItem` (
+CREATE TABLE `RejectedCuratedCorpusItem` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `externalId` VARCHAR(255) NOT NULL,
     `url` VARCHAR(500) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE `RejectedItem` (
     `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `createdBy` VARCHAR(255) NOT NULL,
 
-    UNIQUE INDEX `RejectedItem_externalId_key`(`externalId`),
-    UNIQUE INDEX `RejectedItem_url_key`(`url`),
+    UNIQUE INDEX `RejectedCuratedCorpusItem_externalId_key`(`externalId`),
+    UNIQUE INDEX `RejectedCuratedCorpusItem_url_key`(`url`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

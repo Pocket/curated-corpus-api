@@ -5,7 +5,7 @@ import {
   createNewTabScheduleHelper,
 } from '../src/test/helpers';
 import faker from 'faker';
-import { createRejectedItemHelper } from '../dist/test/helpers/createRejectedItemHelper';
+import { createRejectedCuratedCorpusItemHelper } from '../src/test/helpers/createRejectedCuratedCorpusItemHelper';
 
 const prisma = new PrismaClient();
 
@@ -47,7 +47,7 @@ async function main() {
   ];
 
   for (const title of rejectedItemTitles) {
-    await createRejectedItemHelper(prisma, { title });
+    await createRejectedCuratedCorpusItemHelper(prisma, { title });
   }
 }
 

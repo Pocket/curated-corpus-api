@@ -43,7 +43,7 @@ model CuratedItem {
   @@unique([url])
 }
 
-model RejectedItem {
+model RejectedCuratedCorpusItem {
   // fields
   id         Int      @id @default(autoincrement())
   externalId String   @default(uuid()) @db.VarChar(255)

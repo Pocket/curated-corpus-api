@@ -11,5 +11,5 @@ export async function clearDb(prisma: PrismaClient): Promise<void> {
   await prisma.newTabFeedSchedule.deleteMany({});
   await prisma.newTabFeed.deleteMany({});
   await prisma.curatedItem.deleteMany({});
-  await prisma.rejectedItem.deleteMany({});
+  await prisma.rejectedCuratedCorpusItem.deleteMany({});
 }
