@@ -31,7 +31,11 @@ export type UpdateCuratedItemInput = {
   excerpt: string;
   status: CuratedStatus;
   language: string;
-  imageUrl?: string;
+  imageUrl: string;
+  topic: string;
+  isCollection: boolean;
+  isShortLived: boolean;
+  isSyndicated: boolean;
 };
 
 export type NewTabFeedScheduledItem = NewTabFeedSchedule & {
@@ -56,5 +60,4 @@ export type CreateNewTabFeedScheduledItemInput = {
   curatedItemExternalId: string;
   newTabFeedExternalId: string;
   scheduledDate: string;
-  createdBy: string;
 };

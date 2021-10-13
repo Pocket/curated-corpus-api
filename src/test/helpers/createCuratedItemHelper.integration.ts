@@ -1,4 +1,5 @@
 import { CuratedStatus, PrismaClient } from '@prisma/client';
+import chai from 'chai';
 import faker from 'faker';
 import { clearDb } from './clearDb';
 import {
@@ -42,16 +43,15 @@ describe('createCuratedItemHelper', () => {
       language: 'en',
       imageUrl: faker.image.imageUrl(),
       createdBy: 'big-company|name.surname@example.com',
+      topic: 'Business',
+      isCollection: false,
+      isShortLived: false,
+      isSyndicated: true,
     };
 
     const item = await createCuratedItemHelper(db, data);
 
     // Expect to see everything as specified to the helper
-    expect(item.title).toBe(data.title);
-    expect(item.excerpt).toBe(data.excerpt);
-    expect(item.status).toBe(data.status);
-    expect(item.language).toBe(data.language);
-    expect(item.imageUrl).toBe(data.imageUrl);
-    expect(item.createdBy).toBe(data.createdBy);
+    chai.expect(item).to.deep.include(data);
   });
 });
