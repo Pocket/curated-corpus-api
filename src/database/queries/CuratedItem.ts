@@ -14,26 +14,12 @@ export async function getCuratedItems(
   db: PrismaClient,
   page: number,
   perPage: number,
-  orderBy: CuratedItemOrderByInput,
   filters: CuratedItemFilterInput
 ): Promise<CuratedItem[]> {
-  // transform the orderBy arguments we get from the query into
-  // an object Prisma expects
-  const prismaOrderBy: prisma.Prisma.Enumerable<prisma.Prisma.CuratedItemOrderByWithRelationInput> =
-    [];
-  for (const name in orderBy) {
-    prismaOrderBy.push({ [name]: orderBy[name].toLowerCase() });
-  }
-
-  // if there is no orderBy variable in the query, order by last added first
-  if (prismaOrderBy.length < 1) {
-    prismaOrderBy.push({ createdAt: 'desc' });
-  }
-
   return db.curatedItem.findMany({
     take: perPage,
     skip: page > 1 ? (page - 1) * perPage : 0,
-    orderBy: prismaOrderBy,
+    orderBy: { createdAt: 'desc' },
     where: constructWhereClauseFromFilters(filters),
   });
 }
@@ -61,8 +47,9 @@ const constructWhereClauseFromFilters = (
     language: filters.language ? { equals: filters.language } : undefined,
     status: filters.status ? { equals: filters.status } : undefined,
 
-    // substring match for title, url
+    // substring match for title, url, topic
     title: filters.title ? { contains: filters.title } : undefined,
+    topic: filters.topic ? { contains: filters.topic } : undefined,
     url: filters.url ? { contains: filters.url } : undefined,
   };
 };

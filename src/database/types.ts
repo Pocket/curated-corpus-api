@@ -20,6 +20,7 @@ export type CuratedItemOrderByInput = {
 export type CuratedItemFilterInput = {
   url?: string;
   title?: string;
+  topic?: string;
   status?: CuratedStatus;
   language?: string;
 };

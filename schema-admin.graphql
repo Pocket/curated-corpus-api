@@ -160,20 +160,6 @@ type NewTabFeedScheduledItemsResult {
 }
 
 """
-Available fields for sorting Curated Items.
-"""
-input CuratedItemOrderByInput {
-    """
-    Optional sorting by when Curated Items were created.
-    """
-    createdAt: OrderBy
-    """
-    Optional sorting by when Curated items were last updated.
-    """
-    updatedAt: OrderBy
-}
-
-"""
 Available fields for filtering CuratedItems.
 """
 input CuratedItemFilterInput {
@@ -185,6 +171,10 @@ input CuratedItemFilterInput {
     Optional filter on the title field. Returns partial matches.
     """
     title: String
+    """
+    Optional filter on the topic field. Returns partial matches.
+    """
+    topic: String
     """
     Optional filter on the status of Curated Items.
     """
@@ -307,10 +297,6 @@ type Query {
         How many items to retrieve. Defaults to 30.
         """
         perPage: Int,
-        """
-        Optional fields to sort by.
-        """
-        orderBy: CuratedItemOrderByInput,
         """
         Optional filters on status (match on enum value), url and title (the latter two allow partial matches).
         """
