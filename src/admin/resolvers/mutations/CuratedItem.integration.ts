@@ -51,9 +51,6 @@ describe('mutations: CuratedItem', () => {
 
       // Updated properties should be... updated
       chai.expect(data?.updateCuratedItem).to.deep.include(input);
-
-      // The one optional property should stay unchanged
-      expect(data?.updateCuratedItem.imageUrl).toBe(item.imageUrl);
     });
 
     it('should fail to update a curated item with a duplicate URL', async () => {
