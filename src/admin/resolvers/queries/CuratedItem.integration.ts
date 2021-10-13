@@ -68,12 +68,12 @@ describe('queries: CuratedItem', () => {
         {
           title: 'Proof That GraphQL Is Exactly What You Are Looking For',
           language: 'de',
-          status: CuratedStatus.DECLINE,
+          status: CuratedStatus.CORPUS,
         },
         {
           title: 'If You Do Not Do GraphQL Now, You Will Hate Yourself Later',
           language: 'de',
-          status: CuratedStatus.DECLINE,
+          status: CuratedStatus.CORPUS,
         },
       ];
 
@@ -263,14 +263,14 @@ describe('queries: CuratedItem', () => {
       variables: {
         page: 1,
         perPage: 10,
-        filters: { status: CuratedStatus.DECLINE },
+        filters: { status: CuratedStatus.CORPUS },
       },
     });
 
-    // expect to see two declined stories
-    expect(data?.getCuratedItems.items).toHaveLength(2);
+    // expect to see six stories added to the corpus as second-tier recommendations
+    expect(data?.getCuratedItems.items).toHaveLength(6);
     // make sure total results value is correct
-    expect(data?.getCuratedItems.pagination.totalResults).toBe(2);
+    expect(data?.getCuratedItems.pagination.totalResults).toBe(6);
   });
 
   it('should filter by story URL', async () => {

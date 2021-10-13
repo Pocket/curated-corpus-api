@@ -3,6 +3,7 @@ import { clearDb } from './clearDb';
 import { createCuratedItemHelper } from './createCuratedItemHelper';
 import { createNewTabFeedHelper } from './createNewTabFeedHelper';
 import { createNewTabScheduleHelper } from './createNewTabScheduleHelper';
+import { createRejectedCuratedCorpusItemHelper } from './createRejectedCuratedCorpusItemHelper';
 
 const db = new PrismaClient();
 
@@ -33,6 +34,10 @@ describe('clearDb', () => {
       newTabFeed,
     });
 
+    await createRejectedCuratedCorpusItemHelper(db, {
+      title: '7 Life-Saving Tips About PHP',
+    });
+
     // Check that we have data in the DB
     const items = await db.curatedItem.findMany({});
     expect(items).toHaveLength(2);
@@ -40,6 +45,8 @@ describe('clearDb', () => {
     expect(newTabs).toHaveLength(1);
     const scheduledItems = await db.newTabFeedSchedule.findMany({});
     expect(scheduledItems).toHaveLength(1);
+    const rejectedItems = await db.rejectedCuratedCorpusItem.findMany({});
+    expect(rejectedItems).toHaveLength(1);
 
     // Remove all the records
     await clearDb(db);

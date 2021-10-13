@@ -12,7 +12,6 @@ datasource db {
 enum CuratedStatus {
   RECOMMENDATION
   CORPUS
-  DECLINE
 }
 
 // A prospect that is deemed good enough for saving in the corpus
@@ -38,6 +37,24 @@ model CuratedItem {
 
   // associated models
   scheduledItems NewTabFeedSchedule[]
+
+  // indexes
+  @@unique([externalId])
+  @@unique([url])
+}
+
+model RejectedCuratedCorpusItem {
+  // fields
+  id         Int      @id @default(autoincrement())
+  externalId String   @default(uuid()) @db.VarChar(255)
+  url        String   @db.VarChar(500)
+  title      String   @db.VarChar(255)
+  topic      String   @db.VarChar(255)
+  language   String   @db.VarChar(2)
+  publisher  String   @db.VarChar(255)
+  reason     String   @db.VarChar(255)
+  createdAt  DateTime @default(now()) @db.DateTime(0)
+  createdBy  String   @db.VarChar(255)
 
   // indexes
   @@unique([externalId])
