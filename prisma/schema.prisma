@@ -18,18 +18,22 @@ enum CuratedStatus {
 // and (optionally) making it to New Tab.
 model CuratedItem {
   // fields
-  id         Int           @id @default(autoincrement())
-  externalId String        @default(uuid()) @db.VarChar(255)
-  url        String        @db.VarChar(500)
-  title      String        @db.VarChar(255)
-  excerpt    String        @db.Text
-  status     CuratedStatus @default(CORPUS)
-  language   String        @db.VarChar(2)
-  imageUrl   String        @db.VarChar(500)
-  createdAt  DateTime      @default(now()) @db.DateTime(0)
-  createdBy  String        @db.VarChar(255)
-  updatedAt  DateTime      @updatedAt
-  updatedBy  String?       @db.VarChar(255)
+  id           Int           @id @default(autoincrement())
+  externalId   String        @default(uuid()) @db.VarChar(255)
+  url          String        @db.VarChar(500)
+  title        String        @db.VarChar(255)
+  excerpt      String        @db.Text
+  status       CuratedStatus @default(CORPUS)
+  language     String        @db.VarChar(2)
+  imageUrl     String        @db.VarChar(500)
+  topic        String        @db.VarChar(255)
+  isCollection Boolean       @default(false)
+  isShortLived Boolean       @default(false)
+  isSyndicated Boolean       @default(false)
+  createdAt    DateTime      @default(now()) @db.DateTime(0)
+  createdBy    String        @db.VarChar(255)
+  updatedAt    DateTime      @updatedAt
+  updatedBy    String?       @db.VarChar(255)
 
   // associated models
   scheduledItems NewTabFeedSchedule[]

@@ -26,6 +26,10 @@ export async function updateCuratedItem(
 
   return db.curatedItem.update({
     where: { externalId: data.externalId },
-    data: { ...data },
+    data: {
+      ...data,
+      // TODO: pass an actual user ID that comes from auth/JWT
+      createdBy: 'sso-user',
+    },
   });
 }

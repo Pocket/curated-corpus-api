@@ -18,6 +18,10 @@ interface CreateCuratedItemHelperOptionalInput {
   language?: string;
   imageUrl?: string;
   createdBy?: string;
+  topic?: string;
+  isCollection?: boolean;
+  isShortLived?: boolean;
+  isSyndicated?: boolean;
 }
 
 // the input type the helper function expects - a combo of required and optional parameters
@@ -49,6 +53,10 @@ export async function createCuratedItemHelper(
       `${faker.image.city()}?random=${random}`,
       `${faker.image.food()}?random=${random}`,
     ]),
+    topic: faker.random.arrayElement(['', '', '']),
+    isCollection: faker.datatype.boolean(),
+    isShortLived: faker.datatype.boolean(),
+    isSyndicated: faker.datatype.boolean(),
     createdAt: faker.date.recent(14),
     createdBy: faker.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
     // occasionally, this may create an item that was updated before it was created. It's ok though,

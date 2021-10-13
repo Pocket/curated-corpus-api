@@ -38,7 +38,6 @@ describe('mutations: NewTabFeedSchedule', () => {
         curatedItemExternalId: curatedItem.externalId,
         newTabFeedExternalId: 'not-a-valid-uuid',
         scheduledDate: '2100-01-01',
-        createdBy: 'sso-user',
       };
 
       const result = await server.executeOperation({
@@ -65,7 +64,6 @@ describe('mutations: NewTabFeedSchedule', () => {
         curatedItemExternalId: 'not-a-valid-id-at-all',
         newTabFeedExternalId: newTabFeed.externalId,
         scheduledDate: '2100-01-01',
-        createdBy: 'sso-user',
       };
 
       const result = await server.executeOperation({
@@ -96,7 +94,6 @@ describe('mutations: NewTabFeedSchedule', () => {
         curatedItemExternalId: curatedItem.externalId,
         newTabFeedExternalId: newTabFeed.externalId,
         scheduledDate: '2100-01-01',
-        createdBy: 'sso-user',
       };
 
       const { data } = await server.executeOperation({
@@ -115,7 +112,6 @@ describe('mutations: NewTabFeedSchedule', () => {
       expect(new Date(scheduledItem.scheduledDate)).toMatchObject(
         new Date(input.scheduledDate)
       );
-      expect(scheduledItem.createdBy).toBe(input.createdBy);
 
       // Finally, let's compare the returned CuratedItem object
       chai.expect(curatedItem).to.deep.include(scheduledItem.curatedItem);

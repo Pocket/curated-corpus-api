@@ -33,7 +33,12 @@ describe('mutations: CuratedItem', () => {
         url: 'https://test.com/lego',
         excerpt: 'Updated excerpt',
         status: CuratedStatus.CORPUS,
+        imageUrl: 'https://test.com/image.png',
         language: 'de',
+        topic: 'Business',
+        isCollection: true,
+        isShortLived: true,
+        isSyndicated: false,
       };
 
       const { data } = await server.executeOperation({
@@ -49,33 +54,6 @@ describe('mutations: CuratedItem', () => {
 
       // The one optional property should stay unchanged
       expect(data?.updateCuratedItem.imageUrl).toBe(item.imageUrl);
-    });
-
-    it('updates a curated item when all variables are supplied', async () => {
-      const item = await createCuratedItemHelper(db, {
-        title: "3 Things Everyone Knows About LEGO That You Don't",
-      });
-
-      const input: UpdateCuratedItemInput = {
-        externalId: item.externalId,
-        title: 'Anything but LEGO',
-        url: 'https://test.com/lego',
-        excerpt: 'Updated excerpt',
-        status: CuratedStatus.CORPUS,
-        language: 'de',
-        imageUrl: 'https://test.com/image.png',
-      };
-
-      const { data } = await server.executeOperation({
-        query: UPDATE_CURATED_ITEM,
-        variables: input,
-      });
-
-      // External ID should be unchanged
-      expect(data?.updateCuratedItem.externalId).toBe(item.externalId);
-
-      // Updated properties should be... updated
-      chai.expect(data?.updateCuratedItem).to.deep.include(input);
     });
 
     it('should fail to update a curated item with a duplicate URL', async () => {
@@ -94,7 +72,12 @@ describe('mutations: CuratedItem', () => {
         url: 'https://test.com/first',
         excerpt: 'Updated excerpt',
         status: CuratedStatus.RECOMMENDATION,
+        imageUrl: 'https://test.com/image.png',
         language: 'de',
+        topic: 'Business',
+        isCollection: true,
+        isShortLived: true,
+        isSyndicated: false,
       };
 
       // Attempt to update the second item with a duplicate URL...

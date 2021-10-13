@@ -1,6 +1,9 @@
 import { ApolloServer } from 'apollo-server-express';
-import { buildFederatedSchema } from '@apollo/federation';
-import { ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
+import { buildSubgraphSchema } from '@apollo/federation';
+import {
+  ApolloServerPluginLandingPageDisabled,
+  ApolloServerPluginInlineTraceDisabled,
+} from 'apollo-server-core';
 import { typeDefsAdmin } from '../../typeDefs';
 import { resolvers as adminResolvers } from '../../admin/resolvers';
 import { client } from '../../database/client';
@@ -11,7 +14,7 @@ export const db = client();
 // We can't use the server as defined in src/admin/server
 // as the Sentry plugin gets in the way of tests
 export const server = new ApolloServer({
-  schema: buildFederatedSchema([
+  schema: buildSubgraphSchema([
     { typeDefs: typeDefsAdmin, resolvers: adminResolvers },
   ]),
   context: {
@@ -21,5 +24,8 @@ export const server = new ApolloServer({
   // "Cannot read property 'headers' of undefined" errors in tests.
   // We get console.log statements that resolvers emit instead
   // but the tests pass.
-  plugins: [ApolloServerPluginLandingPageDisabled()],
+  plugins: [
+    ApolloServerPluginLandingPageDisabled(),
+    ApolloServerPluginInlineTraceDisabled(),
+  ],
 });

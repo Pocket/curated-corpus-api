@@ -13,7 +13,11 @@ export const UPDATE_CURATED_ITEM = gql`
     $excerpt: String!
     $status: CuratedStatus!
     $language: String!
-    $imageUrl: Url
+    $imageUrl: Url!
+    $topic: String!
+    $isCollection: Boolean!
+    $isShortLived: Boolean!
+    $isSyndicated: Boolean!
   ) {
     updateCuratedItem(
       data: {
@@ -24,6 +28,10 @@ export const UPDATE_CURATED_ITEM = gql`
         status: $status
         language: $language
         imageUrl: $imageUrl
+        topic: $topic
+        isCollection: $isCollection
+        isShortLived: $isShortLived
+        isSyndicated: $isSyndicated
       }
     ) {
       ...CuratedItemData
@@ -37,14 +45,12 @@ export const CREATE_NEW_TAB_FEED_SCHEDULE = gql`
     $curatedItemExternalId: ID!
     $newTabFeedExternalId: ID!
     $scheduledDate: Date!
-    $createdBy: String!
   ) {
     createNewTabFeedScheduledItem(
       data: {
         curatedItemExternalId: $curatedItemExternalId
         newTabFeedExternalId: $newTabFeedExternalId
         scheduledDate: $scheduledDate
-        createdBy: $createdBy
       }
     ) {
       externalId
