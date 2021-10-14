@@ -5,6 +5,43 @@ import { CuratedItemData } from './fragments.gql';
  * Sample mutations for Apollo Server integration tests as used in
  * Curation Admin Tools Frontend
  */
+export const CREATE_CURATED_ITEM = gql`
+  mutation createCuratedItem(
+    $url: Url!
+    $title: String!
+    $excerpt: String!
+    $status: CuratedStatus!
+    $language: String!
+    $imageUrl: Url!
+    $topic: String!
+    $isCollection: Boolean!
+    $isShortLived: Boolean!
+    $isSyndicated: Boolean!
+    $newTabFeedExternalId: ID
+    $scheduledDate: Date
+  ) {
+    createCuratedItem(
+      data: {
+        url: $url
+        title: $title
+        excerpt: $excerpt
+        status: $status
+        language: $language
+        imageUrl: $imageUrl
+        topic: $topic
+        isCollection: $isCollection
+        isShortLived: $isShortLived
+        isSyndicated: $isSyndicated
+        newTabFeedExternalId: $newTabFeedExternalId
+        scheduledDate: $scheduledDate
+      }
+    ) {
+      ...CuratedItemData
+    }
+  }
+  ${CuratedItemData}
+`;
+
 export const UPDATE_CURATED_ITEM = gql`
   mutation updateCuratedItem(
     $externalId: ID!
