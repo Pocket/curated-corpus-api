@@ -215,6 +215,62 @@ input NewTabFeedScheduledItemsFilterInput {
 }
 
 """
+Input data for creating a Curated Item and optionallly scheduling this item to appear on New Tab.
+"""
+input CreateCuratedItemInput {
+    """
+    The URL of the Curated Item.
+    """
+    url: Url!
+    """
+    The title of the Curated Item.
+    """
+    title: String!
+    """
+    The excerpt of the Curated Item.
+    """
+    excerpt: String!
+    """
+    The outcome of the curators' review of the Curated Item.
+    """
+    status: CuratedStatus!
+    """
+    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    """
+    language: String!
+    """
+    The image URL for this item's accompanying picture.
+    """
+    imageUrl: Url!
+    """
+    A topic this story best fits in.
+    Temporarily a string value that will be provided by Prospect API, possibly an enum in the future.
+    """
+    topic: String!
+    """
+    Whether this story is a Pocket Collection.
+    """
+    isCollection: Boolean!
+    """
+    A flag to ML to not recommend this item long term after it is added to the corpus.
+    Example: a story covering an election.
+    """
+    isShortLived: Boolean!
+    """
+    Whether this item is a syndicated article.
+    """
+    isSyndicated: Boolean!
+    """
+    Optionally, specify the date this item should be appearing on New Tab. Format: YYYY-MM-DD
+    """
+    scheduledDate: Date
+    """
+    Optionally, specify the external ID of the New Tab this item should be scheduled for.
+    """
+    newTabFeedExternalId: ID
+}
+
+"""
 Input data for updating a Curated Item.
 """
 input UpdateCuratedItemInput {
@@ -330,6 +386,11 @@ type Query {
 }
 
 type Mutation {
+    """
+    Creates a Curated Item and optionally schedules it to appear on New Tab.
+    """
+    createCuratedItem(data: CreateCuratedItemInput!): CuratedItem!
+
     """
     Updates a Curated Item.
     """

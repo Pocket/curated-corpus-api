@@ -2,7 +2,7 @@ import { DateResolver } from 'graphql-scalars';
 
 import { getCuratedItems } from './queries/CuratedItem';
 import { getNewTabFeedScheduledItems } from './queries/NewTabFeedSchedule';
-import { updateCuratedItem } from './mutations/CuratedItem';
+import { createCuratedItem, updateCuratedItem } from './mutations/CuratedItem';
 import {
   createNewTabFeedScheduledItem,
   deleteNewTabFeedScheduledItem,
@@ -15,6 +15,7 @@ export const resolvers = {
     getNewTabFeedScheduledItems,
   },
   Mutation: {
+    createCuratedItem,
     updateCuratedItem,
     createNewTabFeedScheduledItem,
     deleteNewTabFeedScheduledItem,
