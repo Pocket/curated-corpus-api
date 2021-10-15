@@ -46,7 +46,6 @@ export async function createCuratedItemHelper(
     status: faker.random.arrayElement([
       CuratedStatus.RECOMMENDATION,
       CuratedStatus.CORPUS,
-      CuratedStatus.DECLINE,
     ]),
     language: faker.random.arrayElement(['en', 'de']),
     imageUrl: faker.random.arrayElement([
