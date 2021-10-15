@@ -12,7 +12,7 @@ export type CuratedItemsResult = {
   pagination: Pagination;
 };
 
-export type CuratedItemFilterInput = {
+export type CuratedItemFilter = {
   url?: string;
   title?: string;
   topic?: string;

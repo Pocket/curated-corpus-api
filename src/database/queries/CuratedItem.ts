@@ -1,7 +1,7 @@
 import { CuratedItem, PrismaClient } from '@prisma/client';
 // need this to be able to use Prisma-native types for orderBy and filter clauses
 import * as prisma from '@prisma/client';
-import { CuratedItemFilterInput } from '../types';
+import { CuratedItemFilter } from '../types';
 
 /**
  * @param db
@@ -13,7 +13,7 @@ export async function getCuratedItems(
   db: PrismaClient,
   page: number,
   perPage: number,
-  filters: CuratedItemFilterInput
+  filters: CuratedItemFilter
 ): Promise<CuratedItem[]> {
   return db.curatedItem.findMany({
     take: perPage,
@@ -29,7 +29,7 @@ export async function getCuratedItems(
  */
 export async function countCuratedItems(
   db: PrismaClient,
-  filters: CuratedItemFilterInput
+  filters: CuratedItemFilter
 ): Promise<number> {
   return db.curatedItem.count({
     where: constructWhereClauseFromFilters(filters),
@@ -37,7 +37,7 @@ export async function countCuratedItems(
 }
 
 const constructWhereClauseFromFilters = (
-  filters: CuratedItemFilterInput
+  filters: CuratedItemFilter
 ): prisma.Prisma.CuratedItemWhereInput => {
   // construct filters, if any
   if (!filters) return {};

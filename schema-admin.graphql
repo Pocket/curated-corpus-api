@@ -100,17 +100,34 @@ type CuratedItem {
 }
 
 """
-The shape of the result returned by the getCuratedItems query.
+An edge in a connection.
 """
-type CuratedItemsResult {
+type CuratedItemEdge {
     """
-    An array of Curated Items.
+    A cursor for use in pagination.
     """
-    items: [CuratedItem!]!
+    cursor: String!
     """
-    The Pagination object.
+    The SavedItem at the end of the edge.
     """
-    pagination: Pagination!
+    node: CuratedItem
+}
+"""
+The connection type for CuratedItem.
+"""
+type CuratedItemConnection {
+    """
+    A list of edges.
+    """
+    edges: [CuratedItemEdge]
+    """
+    Information to aid in pagination.
+    """
+    pageInfo: PageInfo!
+    """
+    Identifies the total count of SavedItems in the connection.
+    """
+    totalCount: Int!
 }
 
 """
@@ -162,7 +179,7 @@ type NewTabFeedScheduledItemsResult {
 """
 Available fields for filtering CuratedItems.
 """
-input CuratedItemFilterInput {
+input CuratedItemFilter {
     """
     Optional filter on the URL field. Returns partial matches.
     """
@@ -286,22 +303,12 @@ input DeleteNewTabFeedScheduledItemInput {
 
 type Query {
     """
-    Retrieves a paged, sortable, filterable list of CuratedItems.
+    Retrieves a paginated, filterable list of CuratedItems.
     """
     getCuratedItems(
-        """
-        The page number requested. Defaults to 1.
-        """
-        page: Int,
-        """
-        How many items to retrieve. Defaults to 30.
-        """
-        perPage: Int,
-        """
-        Optional filters on status (match on enum value), url and title (the latter two allow partial matches).
-        """
-        filters: CuratedItemFilterInput
-    ): CuratedItemsResult!
+        filters: CuratedItemFilter
+        pagination: PaginationInput
+    ): CuratedItemConnection!
 
     """
     Retrieves a list of Curated Items that are scheduled to appear on New Tab

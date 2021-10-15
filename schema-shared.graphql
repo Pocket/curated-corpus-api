@@ -17,13 +17,52 @@ A date in the YYYY-MM-DD format.
 scalar Date
 
 """
-The pagination object returned with every paginated query.
-NB: currently under review
+Information about pagination in a connection.
 """
-type Pagination {
-    currentPage: Int!
-    totalPages: Int!
-    totalResults: Int!
-    perPage: Int!
+type PageInfo {
+    """
+    When paginating forwards, the cursor to continue.
+    """
+    endCursor: String
+    """
+    When paginating forwards, are there more items?
+    """
+    hasNextPage: Boolean!
+    """
+    When paginating backwards, are there more items?
+    """
+    hasPreviousPage: Boolean!
+    """
+    When paginating backwards, the cursor to continue.
+    """
+    startCursor: String
 }
-
+"""
+Pagination request. To determine which edges to return, the connection
+evaluates the `before` and `after` cursors (if given) to filter the
+edges, then evaluates `first`/`last` to slice the edges (only include a
+value for either `first` or `last`, not both). If all fields are null,
+by default will return a page with the first 30 elements.
+"""
+input PaginationInput {
+    """
+    Returns the elements in the list that come after the specified cursor.
+    The specified cursor is not included in the result.
+    """
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    The specified cursor is not included in the result.
+    """
+    before: String
+    """
+    Returns the first _n_ elements from the list. Must be a non-negative integer.
+    If `first` contains a value, `last` should be null/omitted in the input.
+    """
+    first: Int
+    """
+    Returns the last _n_ elements from the list. Must be a non-negative integer.
+    If `last` contains a value, `first` should be null/omitted in the input.
+    """
+    last: Int
+}
