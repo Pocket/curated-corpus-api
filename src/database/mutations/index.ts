@@ -1,4 +1,4 @@
-export { updateCuratedItem } from './CuratedItem';
+export { createCuratedItem, updateCuratedItem } from './CuratedItem';
 export {
   createNewTabFeedScheduledItem,
   deleteNewTabFeedScheduledItem,
