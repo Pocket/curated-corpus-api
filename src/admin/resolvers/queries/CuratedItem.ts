@@ -24,13 +24,12 @@ export async function getCuratedItems(
   const {
     page = 1,
     perPage = config.app.pagination.curatedItemsPerPage,
-    orderBy,
     filters,
   } = args;
 
   const totalResults = await countCuratedItems(db, filters);
 
-  const items = await dbGetCuratedItems(db, page, perPage, orderBy, filters);
+  const items = await dbGetCuratedItems(db, page, perPage, filters);
 
   return { items, pagination: getPagination(totalResults, page, perPage) };
 }

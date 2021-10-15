@@ -12,11 +12,6 @@ export type CuratedItemsResult = {
   pagination: Pagination;
 };
 
-export type CuratedItemOrderByInput = {
-  createdAt?: 'ASC' | 'DESC';
-  updatedAt?: 'ASC' | 'DESC';
-};
-
 export type CuratedItemFilterInput = {
   url?: string;
   title?: string;

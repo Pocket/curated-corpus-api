@@ -1,13 +1,12 @@
 import { CuratedItem, PrismaClient } from '@prisma/client';
 // need this to be able to use Prisma-native types for orderBy and filter clauses
 import * as prisma from '@prisma/client';
-import { CuratedItemFilterInput, CuratedItemOrderByInput } from '../types';
+import { CuratedItemFilterInput } from '../types';
 
 /**
  * @param db
  * @param page
  * @param perPage
- * @param orderBy
  * @param filters
  */
 export async function getCuratedItems(

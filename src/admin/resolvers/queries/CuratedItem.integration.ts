@@ -3,9 +3,7 @@ import { db, server } from '../../../test/admin-server';
 import { clearDb, createCuratedItemHelper } from '../../../test/helpers';
 import {
   GET_CURATED_ITEMS,
-  GET_CURATED_ITEMS_WITH_ORDER_BY,
   GET_CURATED_ITEMS_WITH_FILTERS,
-  GET_CURATED_ITEMS_KITCHEN_SINK,
 } from '../../../test/admin-server/queries.gql';
 
 describe('queries: CuratedItem', () => {
@@ -33,11 +31,13 @@ describe('queries: CuratedItem', () => {
           language: 'en',
           status: CuratedStatus.RECOMMENDATION,
           url: 'https://www.sample-domain/what-zombies-can-teach-you-graphql',
+          topic: 'Technology',
         },
         {
           title: 'How To Make Your Product Stand Out With GraphQL',
           language: 'en',
           status: CuratedStatus.RECOMMENDATION,
+          topic: 'Technology',
         },
         {
           title: 'How To Get Fabulous GraphQL On A Tight Budget',
@@ -145,86 +145,6 @@ describe('queries: CuratedItem', () => {
     });
   });
 
-  it('should sort by createdAt: ASC', async () => {
-    const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS_WITH_ORDER_BY,
-      variables: {
-        page: 1,
-        perPage: 10,
-        orderBy: { createdAt: 'ASC' },
-      },
-    });
-
-    const firstItem = data?.getCuratedItems.items[0];
-    const secondItem = data?.getCuratedItems.items[1];
-    expect(firstItem.createdAt < secondItem.createdAt).toBeTruthy();
-  });
-
-  it('should sort by createdAt: DESC', async () => {
-    const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS_WITH_ORDER_BY,
-      variables: {
-        page: 1,
-        perPage: 10,
-        orderBy: { createdAt: 'DESC' },
-      },
-    });
-
-    const firstItem = data?.getCuratedItems.items[0];
-    const secondItem = data?.getCuratedItems.items[1];
-    expect(firstItem.createdAt > secondItem.createdAt).toBeTruthy();
-  });
-
-  it('should sort by updatedAt: ASC', async () => {
-    const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS_WITH_ORDER_BY,
-      variables: {
-        page: 1,
-        perPage: 10,
-        orderBy: { updatedAt: 'ASC' },
-      },
-    });
-
-    const firstItem = data?.getCuratedItems.items[0];
-    const secondItem = data?.getCuratedItems.items[1];
-    expect(firstItem.updatedAt < secondItem.updatedAt).toBeTruthy();
-  });
-
-  it('should sort by updatedAt: DESC', async () => {
-    const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS_WITH_ORDER_BY,
-      variables: {
-        page: 1,
-        perPage: 10,
-        orderBy: { updatedAt: 'DESC' },
-      },
-    });
-
-    const firstItem = data?.getCuratedItems.items[0];
-    const secondItem = data?.getCuratedItems.items[1];
-    expect(firstItem.updatedAt > secondItem.updatedAt).toBeTruthy();
-  });
-
-  it('should sort by both createdAt and updatedAt', async () => {
-    const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS_WITH_ORDER_BY,
-      variables: {
-        page: 1,
-        perPage: 10,
-        orderBy: { createdAt: 'DESC', updatedAt: 'DESC' },
-      },
-    });
-
-    const firstItem = data?.getCuratedItems.items[0];
-    const secondItem = data?.getCuratedItems.items[1];
-
-    // Only checking the first orderBy clause here as there is no guarantee
-    // what the secondary sort order will be
-    // and also because it's mainly to check that the orderBy clause
-    // is converted correctly in the db resolver and the query doesn't fall over.
-    expect(firstItem.createdAt > secondItem.createdAt).toBeTruthy();
-  });
-
   it('should filter by language', async () => {
     const { data } = await server.executeOperation({
       query: GET_CURATED_ITEMS_WITH_FILTERS,
@@ -255,6 +175,22 @@ describe('queries: CuratedItem', () => {
     expect(data?.getCuratedItems.items).toHaveLength(1);
     // make sure total results value is correct
     expect(data?.getCuratedItems.pagination.totalResults).toBe(1);
+  });
+
+  it('should filter by topic', async () => {
+    const { data } = await server.executeOperation({
+      query: GET_CURATED_ITEMS_WITH_FILTERS,
+      variables: {
+        page: 1,
+        perPage: 10,
+        filters: { topic: 'Technology' },
+      },
+    });
+
+    // we only have two stories categorised as "Technology"
+    expect(data?.getCuratedItems.items).toHaveLength(2);
+    // make sure total results value is correct
+    expect(data?.getCuratedItems.pagination.totalResults).toBe(2);
   });
 
   it('should filter by curated status', async () => {
@@ -298,6 +234,7 @@ describe('queries: CuratedItem', () => {
         filters: {
           url: 'sample-domain',
           title: 'zombies',
+          topic: 'Technology',
           language: 'en',
           status: CuratedStatus.RECOMMENDATION,
         },
@@ -307,27 +244,6 @@ describe('queries: CuratedItem', () => {
     // expect to see just the one story
     expect(data?.getCuratedItems.items).toHaveLength(1);
     // make sure total results value is correct
-    expect(data?.getCuratedItems.pagination.totalResults).toBe(1);
-  });
-
-  it('should both filter and order results', async () => {
-    const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS_KITCHEN_SINK,
-      variables: {
-        page: 1,
-        perPage: 10,
-        orderBy: { createdAt: 'DESC', updatedAt: 'DESC' },
-        filters: {
-          url: 'sample-domain',
-          title: 'zombies',
-          language: 'en',
-          status: CuratedStatus.RECOMMENDATION,
-        },
-      },
-    });
-
-    // All I want from this query is that it doesn't fail
-    expect(data?.getCuratedItems.items).toHaveLength(1);
     expect(data?.getCuratedItems.pagination.totalResults).toBe(1);
   });
 });
