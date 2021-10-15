@@ -79,7 +79,7 @@ describe('mutations: CuratedItem', () => {
       }
     });
 
-    xit('should create an optional scheduled item', async () => {
+    it('should create an optional scheduled item', async () => {
       // a new tab entity for the optional scheduling
       const newTab = await createNewTabFeedHelper(db, { shortName: 'en-US' });
 
@@ -87,18 +87,44 @@ describe('mutations: CuratedItem', () => {
       input.scheduledDate = '2100-01-01';
       input.newTabFeedExternalId = newTab.externalId;
 
-      const result = await server.executeOperation({
+      const { data } = await server.executeOperation({
         query: CREATE_CURATED_ITEM,
         variables: input,
       });
 
       // Expect to see all the input data we supplied in the Curated Item
       // returned by the mutation
-      expect(result.data?.createCuratedItem).to.deep.include(input);
 
-      // NB we don't (yet) return anything for the scheduled item,
+      // We only return the curated item here, so need to purge the scheduling
+      // input values from the input before comparison.
+      delete input.scheduledDate;
+      delete input.newTabFeedExternalId;
+      expect(data?.createCuratedItem).to.deep.include(input);
+
+      // NB: we don't (yet) return anything for the scheduled item,
       // but if the mutation does not fall over, that means it has been created
       // successfully.
+    });
+
+    it('should not create a scheduled entry for a curated item with invalid New Tab id supplied', async () => {
+      // extra inputs
+      input.scheduledDate = '2100-01-01';
+      input.newTabFeedExternalId = 'not-a-valid-new-tab-id';
+
+      const result = await server.executeOperation({
+        query: CREATE_CURATED_ITEM,
+        variables: input,
+      });
+
+      // ...without success. There is no data
+      expect(result.data).to.be.null;
+
+      // And there is the correct error from the resolvers
+      if (result.errors) {
+        expect(result.errors[0].message).to.equal(
+          `Cannot create a scheduled entry: New Tab Feed with id "${input.newTabFeedExternalId}" does not exist.`
+        );
+      }
     });
   });
 

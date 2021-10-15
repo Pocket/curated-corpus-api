@@ -215,7 +215,7 @@ input NewTabFeedScheduledItemsFilterInput {
 }
 
 """
-Input data for creating a Curated Item and optionallly scheduling this item to appear on New Tab.
+Input data for creating a Curated Item and optionally scheduling this item to appear on New Tab.
 """
 input CreateCuratedItemInput {
     """

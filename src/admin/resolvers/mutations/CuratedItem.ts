@@ -18,16 +18,21 @@ export async function createCuratedItem(
   { data },
   { db }
 ): Promise<CuratedItem> {
+  const scheduledDate = data.scheduledDate;
+  const newTabFeedExternalId = data.newTabFeedExternalId;
+  delete data.scheduledDate;
+  delete data.newTabFeedExternalId;
+
   const curatedItem = await dbCreateCuratedItem(db, data);
 
-  if (data.scheduledDate && data.newTabFeedExternalId) {
+  if (scheduledDate && newTabFeedExternalId) {
     // Note that we create a scheduled item but don't return it
     // in the mutation response. Need to evaluate if we do need to return it
     // alongside the curated item.
     await createNewTabFeedScheduledItem(db, {
       curatedItemExternalId: curatedItem.externalId,
-      newTabFeedExternalId: data.newTabFeedExternalId,
-      scheduledDate: data.scheduledDate,
+      newTabFeedExternalId,
+      scheduledDate,
     });
   }
 
