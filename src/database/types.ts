@@ -20,8 +20,11 @@ export type CuratedItemFilter = {
   language?: string;
 };
 
-export type UpdateCuratedItemInput = {
-  externalId: string;
+/**
+ * These properties are the same for both createCuratedItem and updateCuratedItem
+ * mutations.
+ */
+type CuratedItemRequiredInput = {
   url: string;
   title: string;
   excerpt: string;
@@ -33,6 +36,15 @@ export type UpdateCuratedItemInput = {
   isShortLived: boolean;
   isSyndicated: boolean;
 };
+
+export type CreateCuratedItemInput = CuratedItemRequiredInput & {
+  scheduledDate?: string;
+  newTabFeedExternalId?: string;
+};
+
+export type UpdateCuratedItemInput = {
+  externalId: string;
+} & CuratedItemRequiredInput;
 
 export type NewTabFeedScheduledItem = NewTabFeedSchedule & {
   curatedItem: CuratedItem;
