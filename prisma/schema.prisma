@@ -52,6 +52,9 @@ model RejectedCuratedCorpusItem {
   topic      String   @db.VarChar(255)
   language   String   @db.VarChar(2)
   publisher  String   @db.VarChar(255)
+  // Can be multiple reasons. For the MVP, the frontend will be the only
+  // consumer of this data.
+  // Will be likely stored either as comma-separated values or JSON.
   reason     String   @db.VarChar(255)
   createdAt  DateTime @default(now()) @db.DateTime(0)
   createdBy  String   @db.VarChar(255)

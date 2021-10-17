@@ -19,6 +19,11 @@
     "migrate:deploy": "prisma migrate deploy",
     "migrate:reset": "prisma migrate reset"
   },
+  "nodemonConfig": {
+    "watch": [
+      "*.*", "*.graphql"
+    ]
+  },
   "prisma": {
     "seed": "ts-node --emit=false prisma/seed.ts"
   },
