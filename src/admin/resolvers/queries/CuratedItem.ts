@@ -1,16 +1,10 @@
+import { Connection } from '@devoxa/prisma-relay-cursor-connection';
+import { CuratedItem } from '@prisma/client';
 import config from '../../../config';
-import { CuratedItemsResult } from '../../../database/types';
-import {
-  getCuratedItems as dbGetCuratedItems,
-  countCuratedItems,
-} from '../../../database/queries';
-import { getPagination } from '../../../database/utils/getPagination';
+import { getCuratedItems as dbGetCuratedItems } from '../../../database/queries';
 
 /**
  * This query retrieves curated items from the database.
- *
- * There is a limited set of sorting options (createdAt, updatedAt)
- * and filters (url, title, language, curation status)
  *
  * @param parent
  * @param args
@@ -20,17 +14,25 @@ export async function getCuratedItems(
   parent,
   args,
   { db }
-): Promise<CuratedItemsResult> {
-  const {
-    page = 1,
-    perPage = config.app.pagination.curatedItemsPerPage,
-    orderBy,
-    filters,
-  } = args;
+): Promise<Connection<CuratedItem>> {
+  let { pagination } = args;
 
-  const totalResults = await countCuratedItems(db, filters);
+  // Set the defaults for pagination if nothing's been provided
+  if (
+    !pagination ||
+    (pagination.first === undefined && pagination.last === undefined)
+  ) {
+    pagination = { first: config.app.pagination.curatedItemsPerPage };
+  }
 
-  const items = await dbGetCuratedItems(db, page, perPage, orderBy, filters);
+  // Add some limits to how many items can be retrieved at any one time
+  const maxAllowedResults = config.app.pagination.maxAllowedResults;
+  if (pagination.first && pagination.first > maxAllowedResults) {
+    pagination.first = maxAllowedResults;
+  }
+  if (pagination.last && pagination.last > maxAllowedResults) {
+    pagination.last = maxAllowedResults;
+  }
 
-  return { items, pagination: getPagination(totalResults, page, perPage) };
+  return await dbGetCuratedItems(db, pagination, args.filters);
 }

@@ -1,27 +1,18 @@
 import { CuratedItem, CuratedStatus, NewTabFeedSchedule } from '@prisma/client';
 
-export type Pagination = {
-  totalResults: number;
-  totalPages: number;
-  currentPage: number;
-  perPage: number;
+export type PaginationInput = {
+  after?: string;
+  before?: string;
+  first?: number;
+  last?: number;
 };
 
-export type CuratedItemsResult = {
-  items: CuratedItem[];
-  pagination: Pagination;
-};
-
-export type CuratedItemOrderByInput = {
-  createdAt?: 'ASC' | 'DESC';
-  updatedAt?: 'ASC' | 'DESC';
-};
-
-export type CuratedItemFilterInput = {
-  url?: string;
-  title?: string;
-  status?: CuratedStatus;
+export type CuratedItemFilter = {
   language?: string;
+  status?: CuratedStatus;
+  title?: string;
+  topic?: string;
+  url?: string;
 };
 
 /**

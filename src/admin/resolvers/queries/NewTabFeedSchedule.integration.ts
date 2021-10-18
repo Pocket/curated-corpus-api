@@ -5,10 +5,7 @@ import {
   createNewTabScheduleHelper,
 } from '../../../test/helpers';
 import { db, server } from '../../../test/admin-server';
-import {
-  GET_CURATED_ITEMS,
-  GET_NEW_TAB_FEED_SCHEDULED_ITEMS,
-} from '../../../test/admin-server/queries.gql';
+import { GET_NEW_TAB_FEED_SCHEDULED_ITEMS } from '../../../test/admin-server/queries.gql';
 import { NewTabFeed } from '@prisma/client';
 
 describe('queries: NewTabFeedSchedule', () => {

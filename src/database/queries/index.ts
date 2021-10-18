@@ -1,2 +1,2 @@
-export { getCuratedItems, countCuratedItems } from './CuratedItem';
+export { getCuratedItems } from './CuratedItem';
 export { getNewTabFeedScheduledItems } from './NewTabFeedSchedule';
