@@ -53,7 +53,7 @@ export async function createCuratedItemHelper(
       `${faker.image.city()}?random=${random}`,
       `${faker.image.food()}?random=${random}`,
     ]),
-    topic: faker.random.arrayElement(['', '', '']),
+    topic: faker.random.arrayElement(['Business', 'History', 'Health']),
     isCollection: faker.datatype.boolean(),
     isShortLived: faker.datatype.boolean(),
     isSyndicated: faker.datatype.boolean(),
