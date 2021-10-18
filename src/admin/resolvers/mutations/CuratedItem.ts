@@ -18,12 +18,9 @@ export async function createCuratedItem(
   { data },
   { db }
 ): Promise<CuratedItem> {
-  const scheduledDate = data.scheduledDate;
-  const newTabFeedExternalId = data.newTabFeedExternalId;
-  delete data.scheduledDate;
-  delete data.newTabFeedExternalId;
+  const { scheduledDate, newTabFeedExternalId, ...curatedItemData } = data;
 
-  const curatedItem = await dbCreateCuratedItem(db, data);
+  const curatedItem = await dbCreateCuratedItem(db, curatedItemData);
 
   if (scheduledDate && newTabFeedExternalId) {
     // Note that we create a scheduled item but don't return it
