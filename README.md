@@ -9,7 +9,7 @@ This app is a GraphQL API written in TypeScript. To serve the API, the following
 - [Prisma](https://www.prisma.io/) as an ORM to a MySQL relational database,
 - [prisma-relay-cursor-connection](https://github.com/devoxa/prisma-relay-cursor-connection) for Relay-style pagination,
 - S3 for image storage,
-- - [Jest](https://jestjs.io/) and [Chai](https://www.chaijs.com/) for integration and unit testing.
+- [Jest](https://jestjs.io/) and [Chai](https://www.chaijs.com/) for integration and unit testing.
 
 
 ### GraphQL Schemas
