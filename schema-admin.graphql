@@ -108,12 +108,12 @@ type CuratedItemEdge {
     """
     cursor: String!
     """
-    The SavedItem at the end of the edge.
+    The Curated Item at the end of the edge.
     """
     node: CuratedItem
 }
 """
-The connection type for CuratedItem.
+The connection type for Curated Item.
 """
 type CuratedItemConnection {
     """
@@ -125,7 +125,7 @@ type CuratedItemConnection {
     """
     pageInfo: PageInfo!
     """
-    Identifies the total count of SavedItems in the connection.
+    Identifies the total count of Curated Items in the connection.
     """
     totalCount: Int!
 }
