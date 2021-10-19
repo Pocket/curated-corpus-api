@@ -7,8 +7,9 @@
 This app is a GraphQL API written in TypeScript. To serve the API, the following packages are used:
 - [Express](https://expressjs.com/) and [Apollo Server](https://www.apollographql.com/docs/apollo-server/),
 - [Prisma](https://www.prisma.io/) as an ORM to a MySQL relational database,
+- [prisma-relay-cursor-connection](https://github.com/devoxa/prisma-relay-cursor-connection) for Relay-style pagination,
 - S3 for image storage,
-- [Jest](https://jestjs.io/) and [Chai](https://www.chaijs.com/) for integration and unit testing.
+- - [Jest](https://jestjs.io/) and [Chai](https://www.chaijs.com/) for integration and unit testing.
 
 
 ### GraphQL Schemas
@@ -22,6 +23,22 @@ This application has two GraphQL schemas - one public for clients (Web, Android,
 `schema-shared.graphql` is stitched onto the other schemas in `src/typeDefs.ts`.
 
 Having two schemas means we need two GraphQL endpoints, meaning two Apollo Servers. These servers are located in `src/admin/server.ts` and `src/public/server.ts`. In `src/main.ts`, we add both Apollo Servers to Express.
+
+### Pagination
+
+This API implements [Relay-style pagination](https://relay.dev/graphql/connections.htm) with the assistance of the [prisma-relay-cursor-connection](https://github.com/devoxa/prisma-relay-cursor-connection) package. 
+
+It is important that the `PageInfo` type and the `PaginationInput` in the shared GraphQL schema do not deviate from implementations in our other federated APIs. In other words, please leave them exactly as they were initially implemented (this includes accompanying comments) to avoid schema composition errors.
+
+As specified in the `prisma-relay-cursor-connection` documentation, the following combinations of `PaginationInput` variables are supported:
+
+- `{}` All resources (no pagination variables specified in the query at all)
+- `{ first: number }` The first X resources
+- `{ first: number, after: string }` The first X resources after the cursor Y
+- `{ last: number }` The last X resources
+- `{ last: number, before: string }` The last X resources before the cursor Y
+
+GraphQL will throw an error if an unsupported combination of variables is used in the paginated query.
 
 ## Local Development
 
