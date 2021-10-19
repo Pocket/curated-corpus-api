@@ -103,7 +103,6 @@ class CuratedCorpusAPI extends TerraformStack {
         masterUsername: 'pkt_curation_corpus',
         engine: 'aurora-mysql',
         engineMode: 'serverless',
-        skipFinalSnapshot: config.isDev ? false : true,
         scalingConfiguration: [
           {
             minCapacity: config.rds.minCapacity,
