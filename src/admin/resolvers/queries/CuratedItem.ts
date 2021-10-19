@@ -23,15 +23,16 @@ export async function getCuratedItems(
     (pagination.first === undefined && pagination.last === undefined)
   ) {
     pagination = { first: config.app.pagination.curatedItemsPerPage };
-  }
-
-  // Add some limits to how many items can be retrieved at any one time
-  const maxAllowedResults = config.app.pagination.maxAllowedResults;
-  if (pagination.first && pagination.first > maxAllowedResults) {
-    pagination.first = maxAllowedResults;
-  }
-  if (pagination.last && pagination.last > maxAllowedResults) {
-    pagination.last = maxAllowedResults;
+  } else {
+    // Add some limits to how many items can be retrieved at any one time.
+    // These limits are higher than the defaults applied above.
+    const maxAllowedResults = config.app.pagination.maxAllowedResults;
+    if (pagination.first && pagination.first > maxAllowedResults) {
+      pagination.first = maxAllowedResults;
+    }
+    if (pagination.last && pagination.last > maxAllowedResults) {
+      pagination.last = maxAllowedResults;
+    }
   }
 
   return await dbGetCuratedItems(db, pagination, args.filters);
