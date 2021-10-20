@@ -11,6 +11,7 @@ import {
   DataAwsKmsAlias,
   DataAwsRegion,
   DataAwsSnsTopic,
+  S3Bucket,
 } from '@cdktf/provider-aws';
 import { config } from './config';
 import {
@@ -46,6 +47,7 @@ class CuratedCorpusAPI extends TerraformStack {
 
     const pocketApp = this.createPocketAlbApplication({
       rds: this.createRds(pocketVpc),
+      s3: this.createS3Bucket(),
       pagerDuty: this.createPagerDuty(),
       secretsManagerKmsAlias: this.getSecretsManagerKmsAlias(),
       snsTopic: this.getCodeDeploySnsTopic(),
@@ -73,6 +75,16 @@ class CuratedCorpusAPI extends TerraformStack {
   private getSecretsManagerKmsAlias() {
     return new DataAwsKmsAlias(this, 'kms_alias', {
       name: 'alias/aws/secretsmanager',
+    });
+  }
+
+  /**
+   * Create S3 bucket for image uploads
+   * @private
+   */
+  private createS3Bucket() {
+    return new S3Bucket(this, 'image-uploads', {
+      bucket: `pocket-${config.prefix.toLowerCase()}-images`,
     });
   }
 
@@ -151,14 +163,22 @@ class CuratedCorpusAPI extends TerraformStack {
 
   private createPocketAlbApplication(dependencies: {
     rds: ApplicationRDSCluster;
+    s3: S3Bucket;
     pagerDuty: PocketPagerDuty;
     region: DataAwsRegion;
     caller: DataAwsCallerIdentity;
     secretsManagerKmsAlias: DataAwsKmsAlias;
     snsTopic: DataAwsSnsTopic;
   }): PocketALBApplication {
-    const { rds, pagerDuty, region, caller, secretsManagerKmsAlias, snsTopic } =
-      dependencies;
+    const {
+      rds,
+      s3,
+      pagerDuty,
+      region,
+      caller,
+      secretsManagerKmsAlias,
+      snsTopic,
+    } = dependencies;
 
     return new PocketALBApplication(this, 'application', {
       internal: true,
@@ -181,6 +201,10 @@ class CuratedCorpusAPI extends TerraformStack {
             {
               name: 'NODE_ENV',
               value: process.env.NODE_ENV,
+            },
+            {
+              name: 'AWS_S3_BUCKET',
+              value: s3.id,
             },
           ],
           secretEnvVars: [
@@ -255,6 +279,11 @@ class CuratedCorpusAPI extends TerraformStack {
               'xray:GetSamplingStatisticSummaries',
             ],
             resources: ['*'],
+            effect: 'Allow',
+          },
+          {
+            actions: ['s3:*'],
+            resources: [`arn:aws:s3:::${s3.id}`, `arn:aws:s3:::${s3.id}/*`],
             effect: 'Allow',
           },
         ],
