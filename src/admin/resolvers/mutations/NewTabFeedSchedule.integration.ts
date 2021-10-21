@@ -14,6 +14,7 @@ import {
   CreateNewTabFeedScheduledItemInput,
   DeleteNewTabFeedScheduledItemInput,
 } from '../../../database/types';
+import { getUnixTimestamp } from '../fields/UnixTimestamp';
 
 describe('mutations: NewTabFeedSchedule', () => {
   beforeAll(async () => {
@@ -113,8 +114,21 @@ describe('mutations: NewTabFeedSchedule', () => {
         new Date(input.scheduledDate)
       );
 
-      // Finally, let's compare the returned CuratedItem object
-      chai.expect(curatedItem).to.deep.include(scheduledItem.curatedItem);
+      // Finally, let's compare the returned CuratedItem object to our inputs.
+      // Need to destructure timestamps and compare them separately
+      // as Prisma will convert to ISO string for comparison
+      // and GraphQL server returns Unix timestamps.
+      const { createdAt, updatedAt, ...otherCuratedItemProps } = curatedItem;
+      const {
+        createdAt: createdAtReturned,
+        updatedAt: updatedAtReturned,
+        ...otherReturnedCuratedItemProps
+      } = scheduledItem.curatedItem;
+      chai.expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
+      chai.expect(getUnixTimestamp(updatedAt)).to.equal(updatedAtReturned);
+      chai
+        .expect(otherCuratedItemProps)
+        .to.deep.include(otherReturnedCuratedItemProps);
     });
   });
 
@@ -168,19 +182,32 @@ describe('mutations: NewTabFeedSchedule', () => {
       expect(returnedItem.createdBy).toBe(scheduledItem.createdBy);
       expect(returnedItem.updatedBy).toBe(scheduledItem.updatedBy);
 
-      // Further complicated by the fact that Prisma returns date objects by default
-      expect(new Date(returnedItem.createdAt)).toMatchObject(
-        scheduledItem.createdAt
-      );
-      expect(new Date(returnedItem.updatedAt)).toMatchObject(
-        scheduledItem.updatedAt
-      );
+      chai
+        .expect(returnedItem.createdAt)
+        .to.equal(getUnixTimestamp(scheduledItem.createdAt));
+      chai
+        .expect(returnedItem.updatedAt)
+        .to.equal(getUnixTimestamp(scheduledItem.updatedAt));
+
       expect(new Date(returnedItem.scheduledDate)).toMatchObject(
         scheduledItem.scheduledDate
       );
 
-      // Finally, let's compare the returned CuratedItem object
-      chai.expect(curatedItem).to.deep.include(returnedItem.curatedItem);
+      // Finally, let's compare the returned CuratedItem object to our inputs.
+      // Need to destructure timestamps and compare them separately
+      // as Prisma will convert to ISO string for comparison
+      // and GraphQL server returns Unix timestamps.
+      const { createdAt, updatedAt, ...otherCuratedItemProps } = curatedItem;
+      const {
+        createdAt: createdAtReturned,
+        updatedAt: updatedAtReturned,
+        ...otherReturnedCuratedItemProps
+      } = returnedItem.curatedItem;
+      chai.expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
+      chai.expect(getUnixTimestamp(updatedAt)).to.equal(updatedAtReturned);
+      chai
+        .expect(otherCuratedItemProps)
+        .to.deep.include(otherReturnedCuratedItemProps);
     });
   });
 });

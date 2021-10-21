@@ -8,10 +8,6 @@ A URL - usually, for an interesting story on the internet that's worth saving to
 """
 scalar Url
 """
-A timestamp formatted as an ISO 8601 string.
-"""
-scalar DateString
-"""
 A date in the YYYY-MM-DD format.
 """
 scalar Date
