@@ -10,10 +10,6 @@ enum CuratedStatus {
     This story is suitable for our curated corpus. It's a second-tier recommendation.
     """
     CORPUS
-    """
-    Do not use this story.
-    """
-    DECLINE
 }
 
 """
@@ -82,17 +78,17 @@ type CuratedItem {
     """
     isSyndicated: Boolean!
     """
-    An ISO-formatted timestamp of when the entity was created.
+    A Unix timestamp of when the entity was created.
     """
-    createdAt: DateString!
+    createdAt: Int!
     """
     A single sign-on user identifier of the user who created this entity.
     """
     createdBy: String!
     """
-    An ISO-formatted timestamp of when the entity was last updated.
+    A Unix timestamp of when the entity was last updated.
     """
-    updatedAt: DateString!
+    updatedAt: Int!
     """
     A single sign-on user identifier of the user who last updated this entity. Null on creation.
     """
@@ -140,17 +136,17 @@ type NewTabFeedScheduledItem {
     """
     externalId: ID!
     """
-    An ISO-formatted timestamp of when the entity was created.
+    A Unix timestamp of when the entity was created.
     """
-    createdAt: DateString!
+    createdAt: Int!
     """
     A single sign-on user identifier of the user who created this entity.
     """
     createdBy: String!
     """
-    An ISO-formatted timestamp of when the entity was last updated.
+    A Unix timestamp of when the entity was last updated.
     """
-    updatedAt: DateString!
+    updatedAt: Int!
     """
     A single sign-on user identifier of the user who last updated this entity. Null on creation.
     """
@@ -189,7 +185,7 @@ input CuratedItemFilter {
     """
     title: String
     """
-    Optional filter on the topic field. Returns partial matches.
+    Optional filter on the topic field.
     """
     topic: String
     """

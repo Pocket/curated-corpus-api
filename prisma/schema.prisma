@@ -30,7 +30,7 @@ model CuratedItem {
   isCollection Boolean       @default(false)
   isShortLived Boolean       @default(false)
   isSyndicated Boolean       @default(false)
-  createdAt    DateTime      @default(now()) @db.DateTime(0)
+  createdAt    DateTime      @default(now())
   createdBy    String        @db.VarChar(255)
   updatedAt    DateTime      @updatedAt
   updatedBy    String?       @db.VarChar(255)
@@ -56,7 +56,7 @@ model RejectedCuratedCorpusItem {
   // consumer of this data.
   // Will be likely stored either as comma-separated values or JSON.
   reason     String   @db.VarChar(255)
-  createdAt  DateTime @default(now()) @db.DateTime(0)
+  createdAt  DateTime @default(now())
   createdBy  String   @db.VarChar(255)
 
   // indexes
@@ -72,7 +72,7 @@ model NewTabFeed {
   // Similar to locale, but not quite. Examples: en-US, en-GB, en-INTL, de-DE
   shortName  String   @default("en_US") @db.VarChar(10)
   utcOffset  String   @db.VarChar(6)
-  createdAt  DateTime @default(now()) @db.DateTime(0)
+  createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   // associated models
@@ -90,7 +90,7 @@ model NewTabFeedSchedule {
   externalId    String   @default(uuid()) @db.VarChar(255)
   curatedItemId Int
   newTabFeedId  Int
-  createdAt     DateTime @default(now()) @db.DateTime(0)
+  createdAt     DateTime @default(now())
   createdBy     String   @db.VarChar(255)
   updatedAt     DateTime @updatedAt
   updatedBy     String?  @db.VarChar(255)
