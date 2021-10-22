@@ -55,6 +55,10 @@ type CuratedItem {
     """
     language: String!
     """
+    The name of the online publication that published this story.
+    """
+    publisher: String!
+    """
     The image URL associated with the story.
     This is a link to an S3 bucket - the image will have been pre-uploaded to S3 before saving a curated item.
     """
@@ -242,6 +246,10 @@ input CreateCuratedItemInput {
     """
     language: String!
     """
+    The name of the online publication that published this story.
+    """
+    publisher: String!
+    """
     The image URL for this item's accompanying picture.
     """
     imageUrl: Url!
@@ -301,6 +309,10 @@ input UpdateCuratedItemInput {
     What language this item is in. This is a two-letter code, for example, 'en' for English.
     """
     language: String!
+    """
+    The name of the online publication that published this story.
+    """
+    publisher: String!
     """
     The image URL for this item's accompanying picture.
     """

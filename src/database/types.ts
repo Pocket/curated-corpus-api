@@ -1,5 +1,4 @@
 import { CuratedItem, CuratedStatus, NewTabFeedSchedule } from '@prisma/client';
-import * as URL from 'url';
 
 export type PaginationInput = {
   after?: string;
@@ -26,6 +25,7 @@ type CuratedItemRequiredInput = {
   excerpt: string;
   status: CuratedStatus;
   language: string;
+  publisher: string;
   imageUrl: string;
   topic: string;
   isCollection: boolean;

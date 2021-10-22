@@ -12,6 +12,7 @@ export const CREATE_CURATED_ITEM = gql`
     $excerpt: String!
     $status: CuratedStatus!
     $language: String!
+    $publisher: String!
     $imageUrl: Url!
     $topic: String!
     $isCollection: Boolean!
@@ -27,6 +28,7 @@ export const CREATE_CURATED_ITEM = gql`
         excerpt: $excerpt
         status: $status
         language: $language
+        publisher: $publisher
         imageUrl: $imageUrl
         topic: $topic
         isCollection: $isCollection
@@ -50,6 +52,7 @@ export const UPDATE_CURATED_ITEM = gql`
     $excerpt: String!
     $status: CuratedStatus!
     $language: String!
+    $publisher: String!
     $imageUrl: Url!
     $topic: String!
     $isCollection: Boolean!
@@ -64,6 +67,7 @@ export const UPDATE_CURATED_ITEM = gql`
         excerpt: $excerpt
         status: $status
         language: $language
+        publisher: $publisher
         imageUrl: $imageUrl
         topic: $topic
         isCollection: $isCollection

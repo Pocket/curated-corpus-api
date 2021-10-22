@@ -16,6 +16,7 @@ interface CreateCuratedItemHelperOptionalInput {
   excerpt?: string;
   status?: CuratedStatus;
   language?: string;
+  publisher?: string;
   imageUrl?: string;
   createdBy?: string;
   topic?: string;
@@ -48,6 +49,7 @@ export async function createCuratedItemHelper(
       CuratedStatus.CORPUS,
     ]),
     language: faker.random.arrayElement(['en', 'de']),
+    publisher: faker.company.companyName(),
     imageUrl: faker.random.arrayElement([
       `${faker.image.nature()}?random=${random}`,
       `${faker.image.city()}?random=${random}`,

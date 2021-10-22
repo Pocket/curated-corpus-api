@@ -111,6 +111,7 @@ describe('queries: CuratedItem', () => {
       expect(firstItem.externalId).to.be.not.undefined;
       expect(firstItem.title).to.be.not.undefined;
       expect(firstItem.language).to.be.not.undefined;
+      expect(firstItem.publisher).to.be.not.undefined;
       expect(firstItem.url).to.be.not.undefined;
       expect(firstItem.imageUrl).to.be.not.undefined;
       expect(firstItem.excerpt).to.be.not.undefined;
