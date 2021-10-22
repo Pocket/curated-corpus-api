@@ -43,7 +43,7 @@ export async function createCuratedItemHelper(
   // defaults for optional properties
   const createCuratedItemDefaults = {
     url: faker.internet.url(),
-    excerpt: faker.lorem.paragraphs(2),
+    excerpt: faker.lorem.sentence(15),
     status: faker.random.arrayElement([
       CuratedStatus.RECOMMENDATION,
       CuratedStatus.CORPUS,
