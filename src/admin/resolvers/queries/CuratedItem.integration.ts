@@ -23,55 +23,63 @@ describe('queries: CuratedItem', () => {
           title: 'How To Win Friends And Influence People with GraphQL',
           language: 'en',
           status: CuratedStatus.RECOMMENDATION,
+          topic: 'FOOD',
         },
         {
           title: 'What Zombies Can Teach You About GraphQL',
           language: 'en',
           status: CuratedStatus.RECOMMENDATION,
           url: 'https://www.sample-domain/what-zombies-can-teach-you-graphql',
-          topic: 'Technology',
+          topic: 'TECHNOLOGY',
         },
         {
           title: 'How To Make Your Product Stand Out With GraphQL',
           language: 'en',
           status: CuratedStatus.RECOMMENDATION,
-          topic: 'Technology',
+          topic: 'TECHNOLOGY',
         },
         {
           title: 'How To Get Fabulous GraphQL On A Tight Budget',
           language: 'en',
           status: CuratedStatus.RECOMMENDATION,
+          topic: 'FOOD',
         },
         {
           title: 'Death, GraphQL And Taxes',
           language: 'en',
           status: CuratedStatus.CORPUS,
+          topic: 'ENTERTAINMENT',
         },
         {
           title: '22 Tips To Start Building A GraphQL You Always Wanted',
           language: 'en',
           status: CuratedStatus.CORPUS,
+          topic: 'POLITICS',
         },
         {
           title: '5 Ways You Can Get More GraphQL While Spending Less',
           language: 'en',
           status: CuratedStatus.CORPUS,
+          topic: 'POLITICS',
         },
         {
           title:
             "Are You Embarrassed By Your GraphQL Skills? Here's What To Do",
           language: 'de',
           status: CuratedStatus.CORPUS,
+          topic: 'FOOD',
         },
         {
           title: 'Proof That GraphQL Is Exactly What You Are Looking For',
           language: 'de',
           status: CuratedStatus.CORPUS,
+          topic: 'TRAVEL',
         },
         {
           title: 'If You Do Not Do GraphQL Now, You Will Hate Yourself Later',
           language: 'de',
           status: CuratedStatus.CORPUS,
+          topic: 'TRAVEL',
         },
       ];
 
@@ -212,7 +220,7 @@ describe('queries: CuratedItem', () => {
     const { data } = await server.executeOperation({
       query: GET_CURATED_ITEMS,
       variables: {
-        filters: { title: 'zombies' },
+        filters: { title: 'ZoMbIeS' },
       },
     });
 
@@ -226,7 +234,7 @@ describe('queries: CuratedItem', () => {
     const { data } = await server.executeOperation({
       query: GET_CURATED_ITEMS,
       variables: {
-        filters: { topic: 'Technology' },
+        filters: { topic: 'TeChNoLoGy' },
       },
     });
 
@@ -272,7 +280,7 @@ describe('queries: CuratedItem', () => {
         filters: {
           url: 'sample-domain',
           title: 'zombies',
-          topic: 'Technology',
+          topic: 'TECHNOLOGY',
           language: 'en',
           status: CuratedStatus.RECOMMENDATION,
         },

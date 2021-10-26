@@ -17,15 +17,13 @@ async function main() {
     shortName: 'de_DE',
   });
 
-  const curatedItemTitles = [
-    'One simple trick to save thousands of lines of code',
-    'How to decide when to use code generation packages',
-    'How to quit using jQuery in 2021',
-    'Why using jQuery was always a bad idea',
-    'What is the difference between !! and ?? in JavaScript?',
-    'How can all the different NPM packages work together without breaking?',
-    'Where to find the best deals on keyboards',
-  ];
+  // Default pagination is 30 items per page. Let's generate enough data for
+  // several pages
+  const curatedItemTitles: string[] = [];
+
+  for (let i = 0; i < 170; i++) {
+    curatedItemTitles.push(faker.lorem.sentence());
+  }
 
   for (const title of curatedItemTitles) {
     const curatedItem = await createCuratedItemHelper(prisma, { title });

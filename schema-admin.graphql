@@ -110,7 +110,7 @@ type CuratedItemEdge {
     """
     The Curated Item at the end of the edge.
     """
-    node: CuratedItem
+    node: CuratedItem!
 }
 """
 The connection type for Curated Item.
@@ -119,7 +119,7 @@ type CuratedItemConnection {
     """
     A list of edges.
     """
-    edges: [CuratedItemEdge]
+    edges: [CuratedItemEdge!]!
     """
     Information to aid in pagination.
     """
