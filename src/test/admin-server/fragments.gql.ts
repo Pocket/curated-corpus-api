@@ -20,3 +20,17 @@ export const CuratedItemData = gql`
     updatedAt
   }
 `;
+
+export const RejectedCuratedCorpusItemData = gql`
+  fragment RejectedCuratedCorpusItemData on RejectedCuratedCorpusItem {
+    externalId
+    url
+    title
+    topic
+    language
+    publisher
+    reason
+    createdBy
+    createdAt
+  }
+`;

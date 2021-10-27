@@ -5,6 +5,7 @@ export default {
     defaultMaxAge: 86400,
     pagination: {
       curatedItemsPerPage: 30,
+      rejectedCuratedItemsPerPage: 30,
       maxAllowedResults: 100,
     },
   },
