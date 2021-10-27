@@ -1,5 +1,5 @@
 import { CuratedStatus, PrismaClient } from '@prisma/client';
-import chai from 'chai';
+import { expect } from 'chai';
 import faker from 'faker';
 import { clearDb } from './clearDb';
 import {
@@ -24,15 +24,20 @@ describe('createCuratedItemHelper', () => {
     const item = await createCuratedItemHelper(db, data);
 
     // Expect to see the title we passed to the helper
-    expect(item.title).toBe(data.title);
+    expect(item.title).to.equal(data.title);
 
     // Expect to see the remaining fields filled in for us
-    expect(item.externalId).toBeTruthy();
-    expect(item.excerpt).toBeTruthy();
-    expect(item.status).toBeTruthy();
-    expect(item.language).toBeTruthy();
-    expect(item.imageUrl).toBeTruthy();
-    expect(item.createdBy).toBeTruthy();
+    expect(item.externalId).to.be.not.undefined;
+    expect(item.language).to.be.not.undefined;
+    expect(item.publisher).to.be.not.undefined;
+    expect(item.url).to.be.not.undefined;
+    expect(item.imageUrl).to.be.not.undefined;
+    expect(item.excerpt).to.be.not.undefined;
+    expect(item.status).to.be.not.undefined;
+    expect(item.topic).to.be.not.undefined;
+    expect(item.isCollection).to.be.a('boolean');
+    expect(item.isShortLived).to.be.a('boolean');
+    expect(item.isSyndicated).to.be.a('boolean');
   });
 
   it('creates a curated item with all properties supplied', async () => {
@@ -52,6 +57,6 @@ describe('createCuratedItemHelper', () => {
     const item = await createCuratedItemHelper(db, data);
 
     // Expect to see everything as specified to the helper
-    chai.expect(item).to.deep.include(data);
+    expect(item).to.deep.include(data);
   });
 });
