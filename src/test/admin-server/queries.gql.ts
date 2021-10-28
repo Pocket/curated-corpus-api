@@ -1,5 +1,8 @@
 import { gql } from 'apollo-server-express';
-import { CuratedItemData } from './fragments.gql';
+import {
+  CuratedItemData,
+  RejectedCuratedCorpusItemData,
+} from './fragments.gql';
 
 /**
  * Sample queries for Apollo Server integration tests as used in
@@ -27,6 +30,30 @@ export const GET_CURATED_ITEMS = gql`
     }
   }
   ${CuratedItemData}
+`;
+
+export const GET_REJECTED_CURATED_CORPUS_ITEMS = gql`
+  query getRejectedCuratedCorpusItems(
+    $filters: RejectedCuratedCorpusItemFilter
+    $pagination: PaginationInput
+  ) {
+    getRejectedCuratedCorpusItems(filters: $filters, pagination: $pagination) {
+      totalCount
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+      edges {
+        cursor
+        node {
+          ...RejectedCuratedCorpusItemData
+        }
+      }
+    }
+  }
+  ${RejectedCuratedCorpusItemData}
 `;
 
 export const GET_NEW_TAB_FEED_SCHEDULED_ITEMS = gql`

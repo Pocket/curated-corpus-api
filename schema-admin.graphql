@@ -100,6 +100,49 @@ type CuratedItem {
 }
 
 """
+A prospective story that has been rejected by the curators.
+"""
+type RejectedCuratedCorpusItem {
+    """
+    An alternative primary key in UUID format that is generated on creation.
+    """
+    externalId: ID!
+    """
+    The URL of the story.
+    """
+    url: Url!
+    """
+    The title of the story.
+    """
+    title: String!
+    """
+    A topic this story best fits in.
+    Temporarily a string value that will be provided by Prospect API, possibly an enum in the future.
+    """
+    topic: String!
+    """
+    What language this story is in. This is a two-letter code, for example, 'en' for English.
+    """
+    language: String!
+    """
+    The name of the online publication that published this story.
+    """
+    publisher: String!
+    """
+    Reason why it was rejected. Can be multiple reasons. Will likely be stored either as comma-separated values or JSON.
+    """
+    reason: String!
+    """
+    A Unix timestamp of when the entity was created.
+    """
+    createdAt: Int!
+    """
+    A single sign-on user identifier of the user who created this entity.
+    """
+    createdBy: String!
+}
+
+"""
 An edge in a connection.
 """
 type CuratedItemEdge {
@@ -112,6 +155,21 @@ type CuratedItemEdge {
     """
     node: CuratedItem!
 }
+
+"""
+An edge in a connection for RejectedCuratedCorpusItem type.
+"""
+type RejectedCuratedCorpusItemEdge {
+    """
+    A cursor for use in pagination.
+    """
+    cursor: String!
+    """
+    The Rejected Curated Item at the end of the edge.
+    """
+    node: RejectedCuratedCorpusItem!
+}
+
 """
 The connection type for Curated Item.
 """
@@ -126,6 +184,24 @@ type CuratedItemConnection {
     pageInfo: PageInfo!
     """
     Identifies the total count of Curated Items in the connection.
+    """
+    totalCount: Int!
+}
+
+"""
+The connection type for Rejected Curated Item.
+"""
+type RejectedCuratedCorpusItemConnection {
+    """
+    A list of edges.
+    """
+    edges: [RejectedCuratedCorpusItemEdge!]!
+    """
+    Information to aid in pagination.
+    """
+    pageInfo: PageInfo!
+    """
+    Identifies the total count of Rejected Curated Items in the connection.
     """
     totalCount: Int!
 }
@@ -198,6 +274,29 @@ input CuratedItemFilter {
     status: CuratedStatus
     """
     Optional filter on the language Curated Items have been classified as.
+    This is a two-letter string, e.g. 'en' for English or 'de' for 'German'.
+    """
+    language: String
+}
+
+"""
+Available fields for filtering RejectedCuratedCorpusItems.
+"""
+input RejectedCuratedCorpusItemFilter {
+    """
+    Optional filter on the URL field. Returns partial matches.
+    """
+    url: Url
+    """
+    Optional filter on the title field. Returns partial matches.
+    """
+    title: String
+    """
+    Optional filter on the topic field.
+    """
+    topic: String
+    """
+    Optional filter on the language Rejected Curated Items have been classified as.
     This is a two-letter string, e.g. 'en' for English or 'de' for 'German'.
     """
     language: String
@@ -375,6 +474,14 @@ type Query {
     ): CuratedItemConnection!
 
     """
+    Retrieves a paginated, filterable list of RejectedCuratedCorpusItems.
+    """
+    getRejectedCuratedCorpusItems(
+        filters: RejectedCuratedCorpusItemFilter
+        pagination: PaginationInput
+    ): RejectedCuratedCorpusItemConnection!
+
+    """
     Retrieves a list of Curated Items that are scheduled to appear on New Tab
     """
     getNewTabFeedScheduledItems(
@@ -400,10 +507,14 @@ type Mutation {
     """
     Creates a New Tab Scheduled Item.
     """
-    createNewTabFeedScheduledItem(data: CreateNewTabFeedScheduledItemInput!): NewTabFeedScheduledItem!
+    createNewTabFeedScheduledItem(
+        data: CreateNewTabFeedScheduledItemInput!
+    ): NewTabFeedScheduledItem!
 
     """
     Deletes an item from New Tab Schedule.
     """
-    deleteNewTabFeedScheduledItem(data: DeleteNewTabFeedScheduledItemInput!): NewTabFeedScheduledItem!
+    deleteNewTabFeedScheduledItem(
+        data: DeleteNewTabFeedScheduledItemInput!
+    ): NewTabFeedScheduledItem!
 }

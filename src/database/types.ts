@@ -15,6 +15,13 @@ export type CuratedItemFilter = {
   url?: string;
 };
 
+export type RejectedCuratedCorpusItemFilter = {
+  url?: string;
+  title?: string;
+  topic?: string;
+  language?: string;
+};
+
 /**
  * These properties are the same for both createCuratedItem and updateCuratedItem
  * mutations.
