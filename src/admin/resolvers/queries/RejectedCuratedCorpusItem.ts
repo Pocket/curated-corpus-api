@@ -22,7 +22,9 @@ export async function getRejectedCuratedCorpusItems(
     !pagination ||
     (pagination.first === undefined && pagination.last === undefined)
   ) {
-    pagination = { first: config.app.pagination.rejectedCuratedItemsPerPage };
+    pagination = {
+      first: config.app.pagination.rejectedCuratedCorpusItemsPerPage,
+    };
   } else {
     // Add some limits to how many items can be retrieved at any one time.
     // These limits are higher than the defaults applied above.

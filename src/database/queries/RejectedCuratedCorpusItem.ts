@@ -8,15 +8,15 @@ import {
 import { RejectedCuratedCorpusItemFilter, PaginationInput } from '../types';
 
 /**
- * A dedicated type for the unique cursor value used in the getCuratedItems query.
+ * A dedicated type for the unique cursor value used in the getRejectedCuratedCorpusItems query.
  * Essential to get findManyCursorConnection to work as expected.
  */
-type RejectedCuratedItemCursor = {
+type RejectedCuratedCorpusItemCursor = {
   externalId: string;
 };
 
 /**
- * Return a Relay-style paginated, optionally filtered list of curated items.
+ * Return a Relay-style paginated, optionally filtered list of rejected items.
  *
  * @param db
  * @param pagination
@@ -34,9 +34,16 @@ export async function getRejectedCuratedCorpusItems(
     where: constructWhereClauseFromFilters(filters),
   };
 
+  /**
+   * Implementation details:
+   *
+   * The Relay-style pagination implemented for this query is the same as the getCuratedItems query.
+   * Detailed comments explaining the callback function below are in CuratedItem.ts
+   */
+
   return findManyCursorConnection<
     RejectedCuratedCorpusItem,
-    RejectedCuratedItemCursor
+    RejectedCuratedCorpusItemCursor
   >(
     (args) => db.rejectedCuratedCorpusItem.findMany({ ...args, ...baseArgs }),
     () => db.rejectedCuratedCorpusItem.count({ where: baseArgs.where }),
@@ -54,7 +61,7 @@ export async function getRejectedCuratedCorpusItems(
 }
 
 /**
- * Convert the GraphQL filter for curated items into a 'where' clause
+ * Convert the GraphQL filter for rejected curated items into a 'where' clause
  * that Prisma expects to receive.
  *
  * @param filters
