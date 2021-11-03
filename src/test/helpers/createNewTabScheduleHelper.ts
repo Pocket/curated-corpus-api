@@ -1,7 +1,7 @@
 import {
   CuratedItem,
-  NewTabFeed,
   NewTabFeedSchedule,
+  NewTabGuid,
   Prisma,
   PrismaClient,
 } from '@prisma/client';
@@ -10,12 +10,12 @@ import faker from 'faker';
 // the data required to create a scheduled item that goes onto new tab
 interface CreateNewTabScheduledHelperRequiredInput {
   curatedItem: CuratedItem;
-  newTabFeed: NewTabFeed;
 }
 
 // optional information you can provide when creating a scheduled item
 interface CreateNewTabScheduledHelperOptionalInput {
   createdBy?: string;
+  newTabGuid?: NewTabGuid;
   scheduledDate?: string;
 }
 
@@ -45,7 +45,6 @@ export async function createNewTabScheduleHelper(
     ...createNewTabFeedScheduleDefaults,
     ...data,
     curatedItem: { connect: { id: data.curatedItem.id } },
-    newTabFeed: { connect: { id: data.newTabFeed.id } },
   };
 
   return await prisma.newTabFeedSchedule.create({
