@@ -10,7 +10,7 @@ ALTER TABLE `NewTabFeedSchedule` DROP FOREIGN KEY `NewTabFeedSchedule_newTabFeed
 
 -- AlterTable
 ALTER TABLE `NewTabFeedSchedule` DROP COLUMN `newTabFeedId`,
-    ADD COLUMN `newTabGuid` ENUM('EN_US', 'EN_UK') NOT NULL DEFAULT 'EN_US';
+    ADD COLUMN `newTabGuid` ENUM('EN_US', 'DE_DE') NOT NULL DEFAULT 'EN_US';
 
 -- DropTable
 DROP TABLE `NewTabFeed`;

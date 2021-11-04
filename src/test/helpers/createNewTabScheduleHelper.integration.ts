@@ -24,7 +24,7 @@ describe('createNewTabFeedHelper', () => {
     curatedItem = await createCuratedItemHelper(db, {
       title: 'What even is time?',
     });
-    newTabGuid = NewTabGuid.EN_UK;
+    newTabGuid = NewTabGuid.DE_DE;
   });
 
   afterAll(async () => {

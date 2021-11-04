@@ -13,10 +13,10 @@ enum CuratedStatus {
   RECOMMENDATION
   CORPUS
 }
-
+// GUIDs of available New Tabs
 enum NewTabGuid {
   EN_US
-  EN_UK
+  DE_DE
 }
 
 // A prospect that is deemed good enough for saving in the corpus

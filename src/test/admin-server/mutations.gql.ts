@@ -84,13 +84,13 @@ export const UPDATE_CURATED_ITEM = gql`
 export const CREATE_NEW_TAB_FEED_SCHEDULE = gql`
   mutation createNewTabFeedScheduledItem(
     $curatedItemExternalId: ID!
-    $newTabFeedExternalId: ID!
+    $newTabGuid: NewTabGuid!
     $scheduledDate: Date!
   ) {
     createNewTabFeedScheduledItem(
       data: {
         curatedItemExternalId: $curatedItemExternalId
-        newTabFeedExternalId: $newTabFeedExternalId
+        newTabGuid: $newTabGuid
         scheduledDate: $scheduledDate
       }
     ) {

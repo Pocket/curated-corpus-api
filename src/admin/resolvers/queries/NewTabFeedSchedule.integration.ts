@@ -1,12 +1,11 @@
 import {
   clearDb,
   createCuratedItemHelper,
-  createNewTabFeedHelper,
   createNewTabScheduleHelper,
 } from '../../../test/helpers';
 import { db, server } from '../../../test/admin-server';
 import { GET_NEW_TAB_FEED_SCHEDULED_ITEMS } from '../../../test/admin-server/queries.gql';
-import { NewTabFeed } from '@prisma/client';
+import { NewTabGuid } from '@prisma/client';
 
 describe('queries: NewTabFeedSchedule', () => {
   beforeAll(async () => {
@@ -20,14 +19,7 @@ describe('queries: NewTabFeedSchedule', () => {
   });
 
   describe('getNewTabScheduledItems query', () => {
-    let newTabFeed: NewTabFeed;
-
     beforeAll(async () => {
-      // Create a dummy New Tab
-      newTabFeed = await createNewTabFeedHelper(db, {
-        shortName: 'en-UK',
-      });
-
       // Create some curated items
       const storyTitles = [
         "Here's A Quick Way To Solve A Problem with Node",
@@ -41,7 +33,7 @@ describe('queries: NewTabFeedSchedule', () => {
       for (const title of storyTitles) {
         const curatedItem = await createCuratedItemHelper(db, { title });
         await createNewTabScheduleHelper(db, {
-          newTabFeed,
+          newTabGuid: NewTabGuid.EN_US,
           curatedItem,
         });
       }
@@ -52,7 +44,7 @@ describe('queries: NewTabFeedSchedule', () => {
         query: GET_NEW_TAB_FEED_SCHEDULED_ITEMS,
         variables: {
           filters: {
-            newTabExternalId: newTabFeed.externalId,
+            newTabGuid: NewTabGuid.EN_US,
             startDate: '2000-01-01',
             endDate: '2050-12-31',
           },
@@ -72,7 +64,7 @@ describe('queries: NewTabFeedSchedule', () => {
         query: GET_NEW_TAB_FEED_SCHEDULED_ITEMS,
         variables: {
           filters: {
-            newTabExternalId: newTabFeed.externalId,
+            newTabExternalId: NewTabGuid.EN_US,
             startDate: '2000-01-01',
             endDate: '2050-12-31',
           },

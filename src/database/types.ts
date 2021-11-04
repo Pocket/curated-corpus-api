@@ -1,4 +1,9 @@
-import { CuratedItem, CuratedStatus, NewTabFeedSchedule } from '@prisma/client';
+import {
+  CuratedItem,
+  CuratedStatus,
+  NewTabGuid,
+  NewTabFeedSchedule,
+} from '@prisma/client';
 
 export type PaginationInput = {
   after?: string;
@@ -42,7 +47,7 @@ type CuratedItemRequiredInput = {
 
 export type CreateCuratedItemInput = CuratedItemRequiredInput & {
   scheduledDate?: string;
-  newTabFeedExternalId?: string;
+  newTabGuid?: NewTabGuid;
 };
 
 export type UpdateCuratedItemInput = {
@@ -58,7 +63,7 @@ export type NewTabFeedScheduledItemsResult = {
 };
 
 export type NewTabFeedScheduleFilterInput = {
-  newTabExternalId: string;
+  newTabGuid: NewTabGuid;
   startDate: string;
   endDate: string;
 };
@@ -69,6 +74,6 @@ export type DeleteNewTabFeedScheduledItemInput = {
 
 export type CreateNewTabFeedScheduledItemInput = {
   curatedItemExternalId: string;
-  newTabFeedExternalId: string;
+  newTabGuid: NewTabGuid;
   scheduledDate: string;
 };

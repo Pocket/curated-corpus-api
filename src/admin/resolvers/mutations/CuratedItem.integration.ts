@@ -1,11 +1,7 @@
-import { CuratedStatus } from '@prisma/client';
+import { CuratedStatus, NewTabGuid } from '@prisma/client';
 import { expect } from 'chai';
 import { db, server } from '../../../test/admin-server';
-import {
-  clearDb,
-  createCuratedItemHelper,
-  createNewTabFeedHelper,
-} from '../../../test/helpers';
+import { clearDb, createCuratedItemHelper } from '../../../test/helpers';
 import {
   CREATE_CURATED_ITEM,
   UPDATE_CURATED_ITEM,
@@ -81,12 +77,9 @@ describe('mutations: CuratedItem', () => {
     });
 
     it('should create an optional scheduled item', async () => {
-      // a new tab entity for the optional scheduling
-      const newTab = await createNewTabFeedHelper(db, { shortName: 'en-US' });
-
       // extra inputs
       input.scheduledDate = '2100-01-01';
-      input.newTabFeedExternalId = newTab.externalId;
+      input.newTabGuid = NewTabGuid.EN_US;
 
       const { data } = await server.executeOperation({
         query: CREATE_CURATED_ITEM,
@@ -99,7 +92,7 @@ describe('mutations: CuratedItem', () => {
       // We only return the curated item here, so need to purge the scheduling
       // input values from the input before comparison.
       delete input.scheduledDate;
-      delete input.newTabFeedExternalId;
+      delete input.newTabGuid;
       expect(data?.createCuratedItem).to.deep.include(input);
 
       // NB: we don't (yet) return anything for the scheduled item,
@@ -110,7 +103,8 @@ describe('mutations: CuratedItem', () => {
     it('should not create a scheduled entry for a curated item with invalid New Tab id supplied', async () => {
       // extra inputs
       input.scheduledDate = '2100-01-01';
-      input.newTabFeedExternalId = 'not-a-valid-new-tab-id';
+      // This is the only invalid option now that it has to be an enum value
+      input.newTabGuid = undefined;
 
       const result = await server.executeOperation({
         query: CREATE_CURATED_ITEM,
@@ -123,7 +117,7 @@ describe('mutations: CuratedItem', () => {
       // And there is the correct error from the resolvers
       if (result.errors) {
         expect(result.errors[0].message).to.equal(
-          `Cannot create a scheduled entry: New Tab Feed with id "${input.newTabFeedExternalId}" does not exist.`
+          `Cannot create a scheduled entry: New Tab Feed with id "${input.newTabGuid}" does not exist.`
         );
       }
     });
