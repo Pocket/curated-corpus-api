@@ -1,7 +1,6 @@
 import {
   CuratedItem,
   NewTabFeedSchedule,
-  NewTabGuid,
   Prisma,
   PrismaClient,
 } from '@prisma/client';
@@ -15,7 +14,7 @@ interface CreateNewTabScheduledHelperRequiredInput {
 // optional information you can provide when creating a scheduled item
 interface CreateNewTabScheduledHelperOptionalInput {
   createdBy?: string;
-  newTabGuid?: NewTabGuid;
+  newTabGuid?: string;
   scheduledDate?: string;
 }
 
@@ -39,6 +38,7 @@ export async function createNewTabScheduleHelper(
     createdAt: faker.date.recent(14),
     createdBy: faker.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
     scheduledDate: faker.date.soon(7).toISOString(),
+    newTabGuid: 'EN_US',
   };
 
   const inputs: Prisma.NewTabFeedScheduleCreateInput = {

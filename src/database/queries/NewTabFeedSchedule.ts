@@ -3,6 +3,7 @@ import {
   NewTabFeedScheduledItem,
   NewTabFeedScheduleFilterInput,
 } from '../types';
+import { NewTabs } from '../../shared/types';
 
 /**
  * @param db

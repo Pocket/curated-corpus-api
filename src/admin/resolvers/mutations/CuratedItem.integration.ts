@@ -1,4 +1,4 @@
-import { CuratedStatus, NewTabGuid } from '@prisma/client';
+import { CuratedStatus } from '@prisma/client';
 import { expect } from 'chai';
 import { db, server } from '../../../test/admin-server';
 import { clearDb, createCuratedItemHelper } from '../../../test/helpers';
@@ -42,14 +42,17 @@ describe('mutations: CuratedItem', () => {
     };
 
     it('creates a curated item with all inputs supplied', async () => {
-      const { data } = await server.executeOperation({
+      const result = await server.executeOperation({
         query: CREATE_CURATED_ITEM,
         variables: input,
       });
 
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
+
       // Expect to see all the input data we supplied in the Curated Item
       // returned by the mutation
-      expect(data?.createCuratedItem).to.deep.include(input);
+      expect(result.data?.createCuratedItem).to.deep.include(input);
     });
 
     it('should fail to create a curated item with a duplicate URL', async () => {
@@ -66,7 +69,7 @@ describe('mutations: CuratedItem', () => {
       });
 
       // ...without success. There is no data
-      expect(result.data).to.be.null;
+      expect(result.errors).not.to.be.null;
 
       // And there is the correct error from the resolvers
       if (result.errors) {
@@ -79,12 +82,15 @@ describe('mutations: CuratedItem', () => {
     it('should create an optional scheduled item', async () => {
       // extra inputs
       input.scheduledDate = '2100-01-01';
-      input.newTabGuid = NewTabGuid.EN_US;
+      input.newTabGuid = 'EN_US';
 
-      const { data } = await server.executeOperation({
+      const result = await server.executeOperation({
         query: CREATE_CURATED_ITEM,
         variables: input,
       });
+
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
 
       // Expect to see all the input data we supplied in the Curated Item
       // returned by the mutation
@@ -93,7 +99,7 @@ describe('mutations: CuratedItem', () => {
       // input values from the input before comparison.
       delete input.scheduledDate;
       delete input.newTabGuid;
-      expect(data?.createCuratedItem).to.deep.include(input);
+      expect(result.data?.createCuratedItem).to.deep.include(input);
 
       // NB: we don't (yet) return anything for the scheduled item,
       // but if the mutation does not fall over, that means it has been created
@@ -103,8 +109,7 @@ describe('mutations: CuratedItem', () => {
     it('should not create a scheduled entry for a curated item with invalid New Tab id supplied', async () => {
       // extra inputs
       input.scheduledDate = '2100-01-01';
-      // This is the only invalid option now that it has to be an enum value
-      input.newTabGuid = undefined;
+      input.newTabGuid = 'RECSAPI';
 
       const result = await server.executeOperation({
         query: CREATE_CURATED_ITEM,
@@ -113,11 +118,12 @@ describe('mutations: CuratedItem', () => {
 
       // ...without success. There is no data
       expect(result.data).to.be.null;
+      expect(result.errors).not.to.be.null;
 
       // And there is the correct error from the resolvers
       if (result.errors) {
         expect(result.errors[0].message).to.equal(
-          `Cannot create a scheduled entry: New Tab Feed with id "${input.newTabGuid}" does not exist.`
+          `Cannot create a scheduled entry with New Tab GUID of "${input.newTabGuid}".`
         );
       }
     });

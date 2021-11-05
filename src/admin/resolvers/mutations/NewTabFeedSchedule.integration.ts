@@ -14,7 +14,6 @@ import {
   DeleteNewTabFeedScheduledItemInput,
 } from '../../../database/types';
 import { getUnixTimestamp } from '../fields/UnixTimestamp';
-import { NewTabGuid } from '@prisma/client';
 
 describe('mutations: NewTabFeedSchedule', () => {
   beforeAll(async () => {
@@ -31,35 +30,36 @@ describe('mutations: NewTabFeedSchedule', () => {
   });
 
   describe('createNewTabFeedScheduledItem mutation', () => {
-    // it('fails on invalid New Tab Feed ID', async () => {
-    //   const curatedItem = await createCuratedItemHelper(db, {
-    //     title: 'A test story',
-    //   });
-    //   const input: CreateNewTabFeedScheduledItemInput = {
-    //     curatedItemExternalId: curatedItem.externalId,
-    //     newTabGuid: undefined,
-    //     scheduledDate: '2100-01-01',
-    //   };
-    //
-    //   const result = await server.executeOperation({
-    //     query: CREATE_NEW_TAB_FEED_SCHEDULE,
-    //     variables: input,
-    //   });
-    //
-    //   expect(result.data).toBeNull();
-    //
-    //   // And there is the correct error from the resolvers
-    //   if (result.errors) {
-    //     expect(result.errors[0].message).toMatch(
-    //       `Cannot create a scheduled entry: New Tab Feed with id "not-a-valid-uuid" does not exist.`
-    //     );
-    //   }
-    // });
+    it('fails on invalid New Tab Feed ID', async () => {
+      const curatedItem = await createCuratedItemHelper(db, {
+        title: 'A test story',
+      });
+      const input: CreateNewTabFeedScheduledItemInput = {
+        curatedItemExternalId: curatedItem.externalId,
+        newTabGuid: 'RECSAPI',
+        scheduledDate: '2100-01-01',
+      };
+
+      const result = await server.executeOperation({
+        query: CREATE_NEW_TAB_FEED_SCHEDULE,
+        variables: input,
+      });
+
+      expect(result.data).toBeNull();
+      expect(result.errors).not.toBeNull();
+
+      // And there is the correct error from the resolvers
+      if (result.errors) {
+        expect(result.errors[0].message).toMatch(
+          `Cannot create a scheduled entry with New Tab GUID of "RECSAPI".`
+        );
+      }
+    });
 
     it('fails on invalid Curated Item ID', async () => {
       const input: CreateNewTabFeedScheduledItemInput = {
         curatedItemExternalId: 'not-a-valid-id-at-all',
-        newTabGuid: NewTabGuid.EN_US,
+        newTabGuid: 'EN_US',
         scheduledDate: '2100-01-01',
       };
 
@@ -85,7 +85,7 @@ describe('mutations: NewTabFeedSchedule', () => {
 
       const input: CreateNewTabFeedScheduledItemInput = {
         curatedItemExternalId: curatedItem.externalId,
-        newTabGuid: NewTabGuid.EN_US,
+        newTabGuid: 'EN_US',
         scheduledDate: '2100-01-01',
       };
 
@@ -151,7 +151,7 @@ describe('mutations: NewTabFeedSchedule', () => {
       });
 
       const scheduledItem = await createNewTabScheduleHelper(db, {
-        newTabGuid: NewTabGuid.EN_US,
+        newTabGuid: 'EN_US',
         curatedItem,
       });
 

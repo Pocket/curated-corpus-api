@@ -4,6 +4,7 @@ import {
   updateCuratedItem as dbUpdateCuratedItem,
   createNewTabFeedScheduledItem,
 } from '../../../database/mutations';
+import { newTabAllowedValues } from '../../../shared/types';
 
 /**
  * Creates a curated item with data supplied. Optionally, schedules the freshly
@@ -19,6 +20,16 @@ export async function createCuratedItem(
   { db }
 ): Promise<CuratedItem> {
   const { scheduledDate, newTabGuid, ...curatedItemData } = data;
+
+  if (
+    scheduledDate &&
+    newTabGuid &&
+    !newTabAllowedValues.includes(newTabGuid)
+  ) {
+    throw new Error(
+      `Cannot create a scheduled entry with New Tab GUID of "${data.newTabGuid}".`
+    );
+  }
 
   const curatedItem = await dbCreateCuratedItem(db, curatedItemData);
 

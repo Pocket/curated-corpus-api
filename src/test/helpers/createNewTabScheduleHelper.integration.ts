@@ -1,9 +1,4 @@
-import {
-  CuratedItem,
-  NewTabFeedSchedule,
-  NewTabGuid,
-  PrismaClient,
-} from '@prisma/client';
+import { CuratedItem, NewTabFeedSchedule, PrismaClient } from '@prisma/client';
 import { clearDb } from './clearDb';
 import { createCuratedItemHelper } from './createCuratedItemHelper';
 import {
@@ -16,7 +11,7 @@ const db = new PrismaClient();
 
 describe('createNewTabFeedHelper', () => {
   let curatedItem: CuratedItem;
-  let newTabGuid: NewTabGuid;
+  let newTabGuid: string;
 
   beforeEach(async () => {
     await clearDb(db);
@@ -24,7 +19,7 @@ describe('createNewTabFeedHelper', () => {
     curatedItem = await createCuratedItemHelper(db, {
       title: 'What even is time?',
     });
-    newTabGuid = NewTabGuid.DE_DE;
+    newTabGuid = 'DE_DE';
   });
 
   afterAll(async () => {

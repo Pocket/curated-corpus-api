@@ -13,11 +13,6 @@ enum CuratedStatus {
   RECOMMENDATION
   CORPUS
 }
-// GUIDs of available New Tabs
-enum NewTabGuid {
-  EN_US
-  DE_DE
-}
 
 // A prospect that is deemed good enough for saving in the corpus
 // and (optionally) making it to New Tab.
@@ -76,7 +71,7 @@ model NewTabFeedSchedule {
   id            Int        @id @default(autoincrement())
   externalId    String     @default(uuid()) @db.VarChar(255)
   curatedItemId Int
-  newTabGuid    NewTabGuid @default(EN_US)
+  newTabGuid    String     @db.VarChar(10)
   createdAt     DateTime   @default(now())
   createdBy     String     @db.VarChar(255)
   updatedAt     DateTime   @updatedAt

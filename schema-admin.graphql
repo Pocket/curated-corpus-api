@@ -11,19 +11,6 @@ enum CuratedStatus {
     """
     CORPUS
 }
-"""
-GUIDs for available New Tabs curated items can be scheduled on.
-"""
-enum NewTabGuid {
-    """
-    New Tab GUID for users located in the US.
-    """
-    EN_US
-    """
-    New Tab GUID for users located in Germany.
-    """
-    DE_DE
-}
 
 """
 Options for returning items sorted by the supplied field.
@@ -322,7 +309,7 @@ input NewTabFeedScheduledItemsFilterInput {
     """
     The GUID of the New Tab. Example: 'EN_US'.
     """
-    newTabGuid: NewTabGuid!
+    newTabGuid: String!
     """
     Which day to show scheduled items from. Expects a date in YYYY-MM-DD format.
     """
@@ -388,9 +375,9 @@ input CreateCuratedItemInput {
     """
     scheduledDate: Date
     """
-    Optionally, specify the external ID of the New Tab this item should be scheduled for.
+    Optionally, specify the GUID of the New Tab this item should be scheduled for.
     """
-    newTabFeedExternalId: ID
+    newTabGuid: String
 }
 
 """
@@ -460,7 +447,7 @@ input CreateNewTabFeedScheduledItemInput {
     """
     The GUID of the New Tab Feed the Curated Item is going to appear on. Example: 'EN_US'.
     """
-    newTabGuid: NewTabGuid!
+    newTabGuid: String!
     """
     The date the associated Curated Item is scheduled to appear on New Tab. Format: YYYY-MM-DD.
     """

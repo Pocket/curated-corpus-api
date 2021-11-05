@@ -5,7 +5,6 @@ import {
 } from '../../../test/helpers';
 import { db, server } from '../../../test/admin-server';
 import { GET_NEW_TAB_FEED_SCHEDULED_ITEMS } from '../../../test/admin-server/queries.gql';
-import { NewTabGuid } from '@prisma/client';
 
 describe('queries: NewTabFeedSchedule', () => {
   beforeAll(async () => {
@@ -33,7 +32,7 @@ describe('queries: NewTabFeedSchedule', () => {
       for (const title of storyTitles) {
         const curatedItem = await createCuratedItemHelper(db, { title });
         await createNewTabScheduleHelper(db, {
-          newTabGuid: NewTabGuid.EN_US,
+          newTabGuid: 'EN_US',
           curatedItem,
         });
       }
@@ -44,7 +43,7 @@ describe('queries: NewTabFeedSchedule', () => {
         query: GET_NEW_TAB_FEED_SCHEDULED_ITEMS,
         variables: {
           filters: {
-            newTabGuid: NewTabGuid.EN_US,
+            newTabGuid: 'EN_US',
             startDate: '2000-01-01',
             endDate: '2050-12-31',
           },
@@ -64,7 +63,7 @@ describe('queries: NewTabFeedSchedule', () => {
         query: GET_NEW_TAB_FEED_SCHEDULED_ITEMS,
         variables: {
           filters: {
-            newTabExternalId: NewTabGuid.EN_US,
+            newTabGuid: 'EN_US',
             startDate: '2000-01-01',
             endDate: '2050-12-31',
           },
@@ -97,21 +96,16 @@ describe('queries: NewTabFeedSchedule', () => {
         query: GET_NEW_TAB_FEED_SCHEDULED_ITEMS,
         variables: {
           filters: {
-            newTabExternalId: invalidId,
+            newTabGuid: invalidId,
             startDate: '2000-01-01',
             endDate: '2050-12-31',
           },
         },
       });
 
-      expect(result.data).toBeNull();
-
-      // And there is the correct error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).toMatch(
-          `Record with ID of '${invalidId}' could not be found.`
-        );
-      }
+      // Expect to see no data returned, and no errors either
+      expect(result.data?.getNewTabFeedScheduledItems.items).toHaveLength(0);
+      expect(result.errors).toBeUndefined();
     });
   });
 });

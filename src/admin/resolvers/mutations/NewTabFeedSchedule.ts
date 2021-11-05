@@ -3,6 +3,7 @@ import {
   createNewTabFeedScheduledItem as dbCreateNewTabFeedScheduledItem,
 } from '../../../database/mutations';
 import { NewTabFeedScheduledItem } from '../../../database/types';
+import { newTabAllowedValues } from '../../../shared/types';
 
 /**
  * Deletes an item from the New Tab schedule.
@@ -24,5 +25,11 @@ export async function createNewTabFeedScheduledItem(
   { data },
   { db }
 ): Promise<NewTabFeedScheduledItem> {
+  if (!newTabAllowedValues.includes(data.newTabGuid)) {
+    throw new Error(
+      `Cannot create a scheduled entry with New Tab GUID of "${data.newTabGuid}".`
+    );
+  }
+
   return await dbCreateNewTabFeedScheduledItem(db, data);
 }

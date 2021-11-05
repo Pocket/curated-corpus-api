@@ -21,7 +21,7 @@ async function main() {
     const curatedItem = await createCuratedItemHelper(prisma, { title });
 
     await createNewTabScheduleHelper(prisma, {
-      newTabGuid: faker.random.arrayElement(['EN_US', 'EN_UK']),
+      newTabGuid: faker.random.arrayElement(['EN_US', 'DE_DE']),
       curatedItem,
     }).catch(console.error);
   }
