@@ -303,13 +303,13 @@ input RejectedCuratedCorpusItemFilter {
 }
 
 """
-Available fields for filtering scheduled items for a given New Tab Feed.
+Available fields for filtering scheduled items for a given New Tab.
 """
 input NewTabFeedScheduledItemsFilterInput {
     """
-    The ID of the New Tab Feed. A string in UUID format.
+    The GUID of the New Tab. Example: 'EN_US'.
     """
-    newTabExternalId: ID!
+    newTabGuid: ID!
     """
     Which day to show scheduled items from. Expects a date in YYYY-MM-DD format.
     """
@@ -375,9 +375,9 @@ input CreateCuratedItemInput {
     """
     scheduledDate: Date
     """
-    Optionally, specify the external ID of the New Tab this item should be scheduled for.
+    Optionally, specify the GUID of the New Tab this item should be scheduled for.
     """
-    newTabFeedExternalId: ID
+    newTabGuid: ID
 }
 
 """
@@ -445,9 +445,9 @@ input CreateNewTabFeedScheduledItemInput {
     """
     curatedItemExternalId: ID!
     """
-    The ID of the New Tab Feed the Curated Item above is going to appear on.
+    The GUID of the New Tab Feed the Curated Item is going to appear on. Example: 'EN_US'.
     """
-    newTabFeedExternalId: ID!
+    newTabGuid: ID!
     """
     The date the associated Curated Item is scheduled to appear on New Tab. Format: YYYY-MM-DD.
     """

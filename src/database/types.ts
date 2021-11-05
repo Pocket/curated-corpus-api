@@ -42,7 +42,7 @@ type CuratedItemRequiredInput = {
 
 export type CreateCuratedItemInput = CuratedItemRequiredInput & {
   scheduledDate?: string;
-  newTabFeedExternalId?: string;
+  newTabGuid?: string;
 };
 
 export type UpdateCuratedItemInput = {
@@ -58,7 +58,7 @@ export type NewTabFeedScheduledItemsResult = {
 };
 
 export type NewTabFeedScheduleFilterInput = {
-  newTabExternalId: string;
+  newTabGuid: string;
   startDate: string;
   endDate: string;
 };
@@ -69,6 +69,6 @@ export type DeleteNewTabFeedScheduledItemInput = {
 
 export type CreateNewTabFeedScheduledItemInput = {
   curatedItemExternalId: string;
-  newTabFeedExternalId: string;
+  newTabGuid: string;
   scheduledDate: string;
 };

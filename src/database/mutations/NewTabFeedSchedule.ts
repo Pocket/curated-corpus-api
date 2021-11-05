@@ -15,7 +15,7 @@ export async function createNewTabFeedScheduledItem(
   db: PrismaClient,
   data: CreateNewTabFeedScheduledItemInput
 ): Promise<NewTabFeedScheduledItem> {
-  const { curatedItemExternalId, newTabFeedExternalId, scheduledDate } = data;
+  const { curatedItemExternalId, newTabGuid, scheduledDate } = data;
 
   const curatedItem = await db.curatedItem.findUnique({
     where: { externalId: curatedItemExternalId },
@@ -27,20 +27,10 @@ export async function createNewTabFeedScheduledItem(
     );
   }
 
-  const newTabFeed = await db.newTabFeed.findUnique({
-    where: { externalId: newTabFeedExternalId },
-  });
-
-  if (!newTabFeed) {
-    throw new Error(
-      `Cannot create a scheduled entry: New Tab Feed with id "${newTabFeedExternalId}" does not exist.`
-    );
-  }
-
   return await db.newTabFeedSchedule.create({
     data: {
       curatedItemId: curatedItem.id,
-      newTabFeedId: newTabFeed.id,
+      newTabGuid,
       scheduledDate,
       // TODO: pass an actual user ID that comes from auth/JWT
       createdBy: 'sso-user',

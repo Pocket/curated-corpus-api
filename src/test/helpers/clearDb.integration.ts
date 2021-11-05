@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { clearDb } from './clearDb';
 import { createCuratedItemHelper } from './createCuratedItemHelper';
-import { createNewTabFeedHelper } from './createNewTabFeedHelper';
 import { createNewTabScheduleHelper } from './createNewTabScheduleHelper';
 import { createRejectedCuratedCorpusItemHelper } from './createRejectedCuratedCorpusItemHelper';
 
@@ -27,11 +26,8 @@ describe('clearDb', () => {
       title: 'Why earthquakes are a thing',
     });
 
-    const newTabFeed = await createNewTabFeedHelper(db, { shortName: 'en_US' });
-
     await createNewTabScheduleHelper(db, {
       curatedItem,
-      newTabFeed,
     });
 
     await createRejectedCuratedCorpusItemHelper(db, {
@@ -41,8 +37,6 @@ describe('clearDb', () => {
     // Check that we have data in the DB
     const items = await db.curatedItem.findMany({});
     expect(items).toHaveLength(2);
-    const newTabs = await db.newTabFeed.findMany({});
-    expect(newTabs).toHaveLength(1);
     const scheduledItems = await db.newTabFeedSchedule.findMany({});
     expect(scheduledItems).toHaveLength(1);
     const rejectedItems = await db.rejectedCuratedCorpusItem.findMany({});

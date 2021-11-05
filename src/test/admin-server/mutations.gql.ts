@@ -18,7 +18,7 @@ export const CREATE_CURATED_ITEM = gql`
     $isCollection: Boolean!
     $isShortLived: Boolean!
     $isSyndicated: Boolean!
-    $newTabFeedExternalId: ID
+    $newTabGuid: ID
     $scheduledDate: Date
   ) {
     createCuratedItem(
@@ -34,7 +34,7 @@ export const CREATE_CURATED_ITEM = gql`
         isCollection: $isCollection
         isShortLived: $isShortLived
         isSyndicated: $isSyndicated
-        newTabFeedExternalId: $newTabFeedExternalId
+        newTabGuid: $newTabGuid
         scheduledDate: $scheduledDate
       }
     ) {
@@ -84,13 +84,13 @@ export const UPDATE_CURATED_ITEM = gql`
 export const CREATE_NEW_TAB_FEED_SCHEDULE = gql`
   mutation createNewTabFeedScheduledItem(
     $curatedItemExternalId: ID!
-    $newTabFeedExternalId: ID!
+    $newTabGuid: ID!
     $scheduledDate: Date!
   ) {
     createNewTabFeedScheduledItem(
       data: {
         curatedItemExternalId: $curatedItemExternalId
-        newTabFeedExternalId: $newTabFeedExternalId
+        newTabGuid: $newTabGuid
         scheduledDate: $scheduledDate
       }
     ) {

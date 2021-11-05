@@ -4,6 +4,7 @@ import {
   updateCuratedItem as dbUpdateCuratedItem,
   createNewTabFeedScheduledItem,
 } from '../../../database/mutations';
+import { newTabAllowedValues } from '../../../shared/types';
 
 /**
  * Creates a curated item with data supplied. Optionally, schedules the freshly
@@ -18,17 +19,27 @@ export async function createCuratedItem(
   { data },
   { db }
 ): Promise<CuratedItem> {
-  const { scheduledDate, newTabFeedExternalId, ...curatedItemData } = data;
+  const { scheduledDate, newTabGuid, ...curatedItemData } = data;
+
+  if (
+    scheduledDate &&
+    newTabGuid &&
+    !newTabAllowedValues.includes(newTabGuid)
+  ) {
+    throw new Error(
+      `Cannot create a scheduled entry with New Tab GUID of "${data.newTabGuid}".`
+    );
+  }
 
   const curatedItem = await dbCreateCuratedItem(db, curatedItemData);
 
-  if (scheduledDate && newTabFeedExternalId) {
+  if (scheduledDate && newTabGuid) {
     // Note that we create a scheduled item but don't return it
     // in the mutation response. Need to evaluate if we do need to return it
     // alongside the curated item.
     await createNewTabFeedScheduledItem(db, {
       curatedItemExternalId: curatedItem.externalId,
-      newTabFeedExternalId,
+      newTabGuid,
       scheduledDate,
     });
   }

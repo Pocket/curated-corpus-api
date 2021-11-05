@@ -3,7 +3,6 @@ import { db, server } from '../../../test/admin-server';
 import {
   clearDb,
   createCuratedItemHelper,
-  createNewTabFeedHelper,
   createNewTabScheduleHelper,
 } from '../../../test/helpers';
 import {
@@ -37,7 +36,7 @@ describe('mutations: NewTabFeedSchedule', () => {
       });
       const input: CreateNewTabFeedScheduledItemInput = {
         curatedItemExternalId: curatedItem.externalId,
-        newTabFeedExternalId: 'not-a-valid-uuid',
+        newTabGuid: 'RECSAPI',
         scheduledDate: '2100-01-01',
       };
 
@@ -47,23 +46,20 @@ describe('mutations: NewTabFeedSchedule', () => {
       });
 
       expect(result.data).toBeNull();
+      expect(result.errors).not.toBeNull();
 
       // And there is the correct error from the resolvers
       if (result.errors) {
         expect(result.errors[0].message).toMatch(
-          `Cannot create a scheduled entry: New Tab Feed with id "not-a-valid-uuid" does not exist.`
+          `Cannot create a scheduled entry with New Tab GUID of "RECSAPI".`
         );
       }
     });
 
     it('fails on invalid Curated Item ID', async () => {
-      const newTabFeed = await createNewTabFeedHelper(db, {
-        shortName: 'en_GB',
-      });
-
       const input: CreateNewTabFeedScheduledItemInput = {
         curatedItemExternalId: 'not-a-valid-id-at-all',
-        newTabFeedExternalId: newTabFeed.externalId,
+        newTabGuid: 'EN_US',
         scheduledDate: '2100-01-01',
       };
 
@@ -83,17 +79,13 @@ describe('mutations: NewTabFeedSchedule', () => {
     });
 
     it('should create an entry and return data (including Curated Item)', async () => {
-      const newTabFeed = await createNewTabFeedHelper(db, {
-        shortName: 'en_GB',
-      });
-
       const curatedItem = await createCuratedItemHelper(db, {
         title: 'A test story',
       });
 
       const input: CreateNewTabFeedScheduledItemInput = {
         curatedItemExternalId: curatedItem.externalId,
-        newTabFeedExternalId: newTabFeed.externalId,
+        newTabGuid: 'EN_US',
         scheduledDate: '2100-01-01',
       };
 
@@ -154,16 +146,12 @@ describe('mutations: NewTabFeedSchedule', () => {
     });
 
     it('should delete an item scheduled for New Tab and return deleted data', async () => {
-      const newTabFeed = await createNewTabFeedHelper(db, {
-        shortName: 'en_US',
-      });
-
       const curatedItem = await createCuratedItemHelper(db, {
         title: 'This is a test',
       });
 
       const scheduledItem = await createNewTabScheduleHelper(db, {
-        newTabFeed,
+        newTabGuid: 'EN_US',
         curatedItem,
       });
 

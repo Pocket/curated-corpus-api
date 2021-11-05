@@ -53,8 +53,8 @@ model RejectedCuratedCorpusItem {
   topic      String   @db.VarChar(255)
   language   String   @db.VarChar(2)
   publisher  String   @db.VarChar(255)
-  // Can be multiple reasons. For the MVP, the frontend will be the only
-  // consumer of this data.
+  // Can be multiple reasons. For the MVP, Snowplow and the frontend
+  // will be the only consumers of this data.
   // Will be likely stored either as comma-separated values or JSON.
   reason     String   @db.VarChar(255)
   createdAt  DateTime @default(now())
@@ -65,41 +65,21 @@ model RejectedCuratedCorpusItem {
   @@unique([url])
 }
 
-model NewTabFeed {
-  // fields
-  id         Int      @id @default(autoincrement())
-  externalId String   @default(uuid()) @db.VarChar(255)
-  name       String   @db.VarChar(255)
-  // Similar to locale, but not quite. Examples: en-US, en-GB, en-INTL, de-DE
-  shortName  String   @default("en_US") @db.VarChar(10)
-  utcOffset  String   @db.VarChar(6)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  // associated models
-  scheduledItems NewTabFeedSchedule[]
-
-  // indexes
-  @@unique([externalId])
-  @@unique([shortName])
-}
-
 // A curated item that's been scheduled to go on to one or more New Tabs
 model NewTabFeedSchedule {
   // fields
-  id            Int      @id @default(autoincrement())
-  externalId    String   @default(uuid()) @db.VarChar(255)
+  id            Int        @id @default(autoincrement())
+  externalId    String     @default(uuid()) @db.VarChar(255)
   curatedItemId Int
-  newTabFeedId  Int
-  createdAt     DateTime @default(now())
-  createdBy     String   @db.VarChar(255)
-  updatedAt     DateTime @updatedAt
-  updatedBy     String?  @db.VarChar(255)
-  scheduledDate DateTime @db.Date
+  newTabGuid    String     @db.VarChar(10)
+  createdAt     DateTime   @default(now())
+  createdBy     String     @db.VarChar(255)
+  updatedAt     DateTime   @updatedAt
+  updatedBy     String?    @db.VarChar(255)
+  scheduledDate DateTime   @db.Date
 
   // associated entities
   curatedItem CuratedItem @relation(fields: [curatedItemId], references: [id])
-  newTabFeed  NewTabFeed  @relation(fields: [newTabFeedId], references: [id])
 
   // indexes
   @@unique([externalId])

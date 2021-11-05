@@ -1,11 +1,5 @@
-import {
-  CuratedItem,
-  NewTabFeed,
-  NewTabFeedSchedule,
-  PrismaClient,
-} from '@prisma/client';
+import { CuratedItem, NewTabFeedSchedule, PrismaClient } from '@prisma/client';
 import { clearDb } from './clearDb';
-import { createNewTabFeedHelper } from './createNewTabFeedHelper';
 import { createCuratedItemHelper } from './createCuratedItemHelper';
 import {
   CreateNewTabScheduledHelperInput,
@@ -17,7 +11,7 @@ const db = new PrismaClient();
 
 describe('createNewTabFeedHelper', () => {
   let curatedItem: CuratedItem;
-  let newTabFeed: NewTabFeed;
+  let newTabGuid: string;
 
   beforeEach(async () => {
     await clearDb(db);
@@ -25,10 +19,7 @@ describe('createNewTabFeedHelper', () => {
     curatedItem = await createCuratedItemHelper(db, {
       title: 'What even is time?',
     });
-    newTabFeed = await createNewTabFeedHelper(db, {
-      name: 'Germany',
-      shortName: 'de_DE',
-    });
+    newTabGuid = 'DE_DE';
   });
 
   afterAll(async () => {
@@ -38,14 +29,14 @@ describe('createNewTabFeedHelper', () => {
   it('creates a New Tab scheduled item with required props supplied', async () => {
     const data: CreateNewTabScheduledHelperInput = {
       curatedItem,
-      newTabFeed,
+      newTabGuid,
     };
 
     const item: NewTabFeedSchedule = await createNewTabScheduleHelper(db, data);
 
     // Expect to see the data we passed to the helper
     expect(item.curatedItemId).toBe(curatedItem.id);
-    expect(item.newTabFeedId).toBe(newTabFeed.id);
+    expect(item.newTabGuid).toBe(newTabGuid);
 
     // Expect to see the remaining fields filled in for us
     expect(item.createdBy).toBeTruthy();
@@ -57,14 +48,14 @@ describe('createNewTabFeedHelper', () => {
       createdBy: faker.fake('auth-provider|test@example.com'),
       scheduledDate: '2022-01-01T00:00:00.000Z',
       curatedItem,
-      newTabFeed,
+      newTabGuid,
     };
 
     const item: NewTabFeedSchedule = await createNewTabScheduleHelper(db, data);
 
     // Expect to see everything as specified to the helper
     expect(item.curatedItemId).toBe(curatedItem.id);
-    expect(item.newTabFeedId).toBe(newTabFeed.id);
+    expect(item.newTabGuid).toBe(newTabGuid);
     expect(item.createdBy).toBe(data.createdBy);
     expect(item.scheduledDate.toISOString()).toBe(data.scheduledDate);
   });
