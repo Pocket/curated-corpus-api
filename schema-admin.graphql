@@ -309,7 +309,7 @@ input NewTabFeedScheduledItemsFilterInput {
     """
     The GUID of the New Tab. Example: 'EN_US'.
     """
-    newTabGuid: String!
+    newTabGuid: ID!
     """
     Which day to show scheduled items from. Expects a date in YYYY-MM-DD format.
     """
@@ -377,7 +377,7 @@ input CreateCuratedItemInput {
     """
     Optionally, specify the GUID of the New Tab this item should be scheduled for.
     """
-    newTabGuid: String
+    newTabGuid: ID
 }
 
 """
@@ -447,7 +447,7 @@ input CreateNewTabFeedScheduledItemInput {
     """
     The GUID of the New Tab Feed the Curated Item is going to appear on. Example: 'EN_US'.
     """
-    newTabGuid: String!
+    newTabGuid: ID!
     """
     The date the associated Curated Item is scheduled to appear on New Tab. Format: YYYY-MM-DD.
     """

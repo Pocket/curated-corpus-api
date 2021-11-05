@@ -1,4 +1,4 @@
-// Pocket Shared Data
+// Pocket Shared Data - see Confluence for details
 export enum ProspectType {
   GLOBAL = 'GLOBAL',
   TIMESPENT = 'ORGANIC_TIMESPENT',
