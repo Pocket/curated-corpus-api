@@ -22,7 +22,8 @@
   },
   "nodemonConfig": {
     "watch": [
-      "*.*", "*.graphql"
+      "*.*",
+      "*.graphql"
     ]
   },
   "prisma": {
@@ -45,10 +46,7 @@
     "@prisma/client": "^3.4.1",
     "@sentry/node": "^6.14.1",
     "@sentry/tracing": "^6.14.0",
-    "apollo-client": "^2.6.10",
     "apollo-datasource-rest": "^3.3.0",
-    "apollo-link": "^1.2.14",
-    "apollo-link-rest": "^0.8.0-beta.0",
     "apollo-server": "^3.4.1",
     "apollo-server-cache-redis": "^3.2.0",
     "apollo-server-express": "^3.4.1",
