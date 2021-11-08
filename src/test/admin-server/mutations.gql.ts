@@ -1,12 +1,12 @@
 import { gql } from 'apollo-server';
-import { CuratedItemData } from './fragments.gql';
+import { ApprovedCuratedCorpusItemData } from './fragments.gql';
 
 /**
  * Sample mutations for Apollo Server integration tests as used in
  * Curation Admin Tools Frontend
  */
-export const CREATE_CURATED_ITEM = gql`
-  mutation createCuratedItem(
+export const CREATE_APPROVED_ITEM = gql`
+  mutation createApprovedItem(
     $url: Url!
     $title: String!
     $excerpt: String!
@@ -21,7 +21,7 @@ export const CREATE_CURATED_ITEM = gql`
     $newTabGuid: ID
     $scheduledDate: Date
   ) {
-    createCuratedItem(
+    createApprovedCuratedCorpusItem(
       data: {
         url: $url
         title: $title
@@ -38,14 +38,14 @@ export const CREATE_CURATED_ITEM = gql`
         scheduledDate: $scheduledDate
       }
     ) {
-      ...CuratedItemData
+      ...ApprovedCuratedCorpusItemData
     }
   }
-  ${CuratedItemData}
+  ${ApprovedCuratedCorpusItemData}
 `;
 
-export const UPDATE_CURATED_ITEM = gql`
-  mutation updateCuratedItem(
+export const UPDATE_APPROVED_ITEM = gql`
+  mutation updateApprovedItem(
     $externalId: ID!
     $url: Url!
     $title: String!
@@ -59,7 +59,7 @@ export const UPDATE_CURATED_ITEM = gql`
     $isShortLived: Boolean!
     $isSyndicated: Boolean!
   ) {
-    updateCuratedItem(
+    updateApprovedCuratedCorpusItem(
       data: {
         externalId: $externalId
         url: $url
@@ -75,21 +75,21 @@ export const UPDATE_CURATED_ITEM = gql`
         isSyndicated: $isSyndicated
       }
     ) {
-      ...CuratedItemData
+      ...ApprovedCuratedCorpusItemData
     }
   }
-  ${CuratedItemData}
+  ${ApprovedCuratedCorpusItemData}
 `;
 
-export const CREATE_NEW_TAB_FEED_SCHEDULE = gql`
-  mutation createNewTabFeedScheduledItem(
-    $curatedItemExternalId: ID!
+export const CREATE_SCHEDULED_ITEM = gql`
+  mutation createScheduledItem(
+    $approvedItemExternalId: ID!
     $newTabGuid: ID!
     $scheduledDate: Date!
   ) {
-    createNewTabFeedScheduledItem(
+    createScheduledCuratedCorpusItem(
       data: {
-        curatedItemExternalId: $curatedItemExternalId
+        approvedItemExternalId: $approvedItemExternalId
         newTabGuid: $newTabGuid
         scheduledDate: $scheduledDate
       }
@@ -100,27 +100,27 @@ export const CREATE_NEW_TAB_FEED_SCHEDULE = gql`
       updatedAt
       updatedBy
       scheduledDate
-      curatedItem {
-        ...CuratedItemData
+      approvedItem {
+        ...ApprovedCuratedCorpusItemData
       }
     }
   }
-  ${CuratedItemData}
+  ${ApprovedCuratedCorpusItemData}
 `;
 
-export const DELETE_NEW_TAB_FEED_SCHEDULE = gql`
-  mutation deleteNewTabFeedScheduledItem($externalId: ID!) {
-    deleteNewTabFeedScheduledItem(data: { externalId: $externalId }) {
+export const DELETE_SCHEDULE_ITEM = gql`
+  mutation deleteScheduledItem($externalId: ID!) {
+    deleteScheduledCuratedCorpusItem(data: { externalId: $externalId }) {
       externalId
       createdAt
       createdBy
       updatedAt
       updatedBy
       scheduledDate
-      curatedItem {
-        ...CuratedItemData
+      approvedItem {
+        ...ApprovedCuratedCorpusItemData
       }
     }
   }
-  ${CuratedItemData}
+  ${ApprovedCuratedCorpusItemData}
 `;

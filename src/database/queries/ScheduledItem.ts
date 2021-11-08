@@ -1,20 +1,17 @@
 import { PrismaClient } from '@prisma/client';
-import {
-  NewTabFeedScheduledItem,
-  NewTabFeedScheduleFilterInput,
-} from '../types';
+import { ScheduledItem, ScheduledItemFilterInput } from '../types';
 
 /**
  * @param db
  * @param filters
  */
-export async function getNewTabFeedScheduledItems(
+export async function getScheduledItems(
   db: PrismaClient,
-  filters: NewTabFeedScheduleFilterInput
-): Promise<NewTabFeedScheduledItem[]> {
+  filters: ScheduledItemFilterInput
+): Promise<ScheduledItem[]> {
   const { newTabGuid, startDate, endDate } = filters;
 
-  return await db.newTabFeedSchedule.findMany({
+  return await db.scheduledItem.findMany({
     // for now, assume that we only ever want to retrieve these
     // ordered by last added first
     orderBy: { createdAt: 'desc' },
@@ -26,7 +23,7 @@ export async function getNewTabFeedScheduledItems(
       },
     },
     include: {
-      curatedItem: true,
+      approvedItem: true,
     },
   });
 }

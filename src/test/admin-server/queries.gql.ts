@@ -1,6 +1,6 @@
 import { gql } from 'apollo-server-express';
 import {
-  CuratedItemData,
+  ApprovedCuratedCorpusItemData,
   RejectedCuratedCorpusItemData,
 } from './fragments.gql';
 
@@ -8,12 +8,12 @@ import {
  * Sample queries for Apollo Server integration tests as used in
  * Curation Admin Tools Frontend
  */
-export const GET_CURATED_ITEMS = gql`
-  query getCuratedItems(
-    $filters: CuratedItemFilter
+export const GET_APPROVED_ITEMS = gql`
+  query getApprovedItems(
+    $filters: ApprovedCuratedCorpusItemFilter
     $pagination: PaginationInput
   ) {
-    getCuratedItems(filters: $filters, pagination: $pagination) {
+    getApprovedCuratedCorpusItems(filters: $filters, pagination: $pagination) {
       totalCount
       pageInfo {
         hasNextPage
@@ -24,16 +24,16 @@ export const GET_CURATED_ITEMS = gql`
       edges {
         cursor
         node {
-          ...CuratedItemData
+          ...ApprovedCuratedCorpusItemData
         }
       }
     }
   }
-  ${CuratedItemData}
+  ${ApprovedCuratedCorpusItemData}
 `;
 
-export const GET_REJECTED_CURATED_CORPUS_ITEMS = gql`
-  query getRejectedCuratedCorpusItems(
+export const GET_REJECTED_ITEMS = gql`
+  query getRejectedItems(
     $filters: RejectedCuratedCorpusItemFilter
     $pagination: PaginationInput
   ) {
@@ -56,11 +56,9 @@ export const GET_REJECTED_CURATED_CORPUS_ITEMS = gql`
   ${RejectedCuratedCorpusItemData}
 `;
 
-export const GET_NEW_TAB_FEED_SCHEDULED_ITEMS = gql`
-  query getNewTabFeedScheduledItems(
-    $filters: NewTabFeedScheduledItemsFilterInput!
-  ) {
-    getNewTabFeedScheduledItems(filters: $filters) {
+export const GET_SCHEDULED_ITEMS = gql`
+  query getScheduledItems($filters: ScheduledCuratedCorpusItemsFilterInput!) {
+    getScheduledCuratedCorpusItems(filters: $filters) {
       items {
         externalId
         createdAt
@@ -68,11 +66,11 @@ export const GET_NEW_TAB_FEED_SCHEDULED_ITEMS = gql`
         updatedAt
         updatedBy
         scheduledDate
-        curatedItem {
-          ...CuratedItemData
+        approvedItem {
+          ...ApprovedCuratedCorpusItemData
         }
       }
     }
   }
-  ${CuratedItemData}
+  ${ApprovedCuratedCorpusItemData}
 `;

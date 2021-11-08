@@ -1,7 +1,7 @@
 import { gql } from 'apollo-server-express';
 
-export const CuratedItemData = gql`
-  fragment CuratedItemData on CuratedItem {
+export const ApprovedCuratedCorpusItemData = gql`
+  fragment ApprovedCuratedCorpusItemData on ApprovedCuratedCorpusItem {
     externalId
     title
     language

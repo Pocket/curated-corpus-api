@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { clearDb } from './clearDb';
-import { createCuratedItemHelper } from './createCuratedItemHelper';
-import { createNewTabScheduleHelper } from './createNewTabScheduleHelper';
+import { createApprovedItemHelper } from './createApprovedItemHelper';
+import { createScheduledItemHelper } from './createScheduledItemHelper';
 import { createRejectedCuratedCorpusItemHelper } from './createRejectedCuratedCorpusItemHelper';
 
 const db = new PrismaClient();
@@ -19,15 +19,15 @@ describe('clearDb', () => {
 
   it('deletes contents of all tables', async () => {
     // Create some data in each of the tables
-    const curatedItem = await createCuratedItemHelper(db, {
+    const approvedItem = await createApprovedItemHelper(db, {
       title: 'What even is time?',
     });
-    await createCuratedItemHelper(db, {
+    await createApprovedItemHelper(db, {
       title: 'Why earthquakes are a thing',
     });
 
-    await createNewTabScheduleHelper(db, {
-      curatedItem,
+    await createScheduledItemHelper(db, {
+      approvedItem,
     });
 
     await createRejectedCuratedCorpusItemHelper(db, {
@@ -35,9 +35,9 @@ describe('clearDb', () => {
     });
 
     // Check that we have data in the DB
-    const items = await db.curatedItem.findMany({});
+    const items = await db.approvedItem.findMany({});
     expect(items).toHaveLength(2);
-    const scheduledItems = await db.newTabFeedSchedule.findMany({});
+    const scheduledItems = await db.scheduledItem.findMany({});
     expect(scheduledItems).toHaveLength(1);
     const rejectedItems = await db.rejectedCuratedCorpusItem.findMany({});
     expect(rejectedItems).toHaveLength(1);

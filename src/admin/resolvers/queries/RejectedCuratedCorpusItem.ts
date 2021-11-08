@@ -10,7 +10,7 @@ import { getRejectedCuratedCorpusItems as dbGetRejectedCuratedCorpusItems } from
  * @param args
  * @param db
  */
-export async function getRejectedCuratedCorpusItems(
+export async function getRejectedItems(
   parent,
   args,
   { db }
@@ -23,7 +23,7 @@ export async function getRejectedCuratedCorpusItems(
     (pagination.first === undefined && pagination.last === undefined)
   ) {
     pagination = {
-      first: config.app.pagination.rejectedCuratedCorpusItemsPerPage,
+      first: config.app.pagination.rejectedItemsPerPage,
     };
   } else {
     // Add some limits to how many items can be retrieved at any one time.

@@ -1,3 +1,3 @@
-export { getCuratedItems } from './CuratedItem';
+export { getApprovedItem } from './ApprovedItem';
 export { getRejectedCuratedCorpusItems } from './RejectedCuratedCorpusItem';
-export { getNewTabFeedScheduledItems } from './NewTabFeedSchedule';
+export { getScheduledItems } from './ScheduledItem';

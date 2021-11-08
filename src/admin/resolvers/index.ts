@@ -1,20 +1,23 @@
 import { DateResolver } from 'graphql-scalars';
 import { UnixTimestampResolver } from './fields/UnixTimestamp';
-import { getCuratedItems } from './queries/CuratedItem';
-import { getRejectedCuratedCorpusItems } from './queries/RejectedCuratedCorpusItem';
-import { getNewTabFeedScheduledItems } from './queries/NewTabFeedSchedule';
-import { createCuratedItem, updateCuratedItem } from './mutations/CuratedItem';
+import { getApprovedItems } from './queries/ApprovedItem';
+import { getRejectedItems } from './queries/RejectedCuratedCorpusItem';
+import { getScheduledItems } from './queries/ScheduledItem';
 import {
-  createNewTabFeedScheduledItem,
-  deleteNewTabFeedScheduledItem,
-} from './mutations/NewTabFeedSchedule';
+  createApprovedItem,
+  updateApprovedItem,
+} from './mutations/ApprovedItem';
+import {
+  createScheduledItem,
+  deleteScheduledItem,
+} from './mutations/ScheduledItem';
 
 export const resolvers = {
   // The custom scalars from GraphQL-Scalars that we find useful.
   Date: DateResolver,
   // Our own entities that need timestamp conversion, hence field resolvers
   // everywhere for values returned by `createdAt` and `updatedAt` fields.
-  CuratedItem: {
+  ApprovedCuratedCorpusItem: {
     createdAt: UnixTimestampResolver,
     updatedAt: UnixTimestampResolver,
   },
@@ -25,21 +28,21 @@ export const resolvers = {
     createdAt: UnixTimestampResolver,
     updatedAt: UnixTimestampResolver,
   },
-  NewTabFeedScheduledItem: {
+  ScheduledCuratedCorpusItem: {
     createdAt: UnixTimestampResolver,
     updatedAt: UnixTimestampResolver,
   },
   // The queries available
   Query: {
-    getCuratedItems,
-    getRejectedCuratedCorpusItems,
-    getNewTabFeedScheduledItems,
+    getApprovedCuratedCorpusItems: getApprovedItems,
+    getRejectedCuratedCorpusItems: getRejectedItems,
+    getScheduledCuratedCorpusItems: getScheduledItems,
   },
   // Mutations that we need in the admin interface
   Mutation: {
-    createCuratedItem,
-    updateCuratedItem,
-    createNewTabFeedScheduledItem,
-    deleteNewTabFeedScheduledItem,
+    createApprovedCuratedCorpusItem: createApprovedItem,
+    updateApprovedCuratedCorpusItem: updateApprovedItem,
+    createScheduledCuratedCorpusItem: createScheduledItem,
+    deleteScheduledCuratedCorpusItem: deleteScheduledItem,
   },
 };
