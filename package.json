@@ -46,7 +46,7 @@
     "@prisma/client": "^3.4.1",
     "@sentry/node": "^6.14.1",
     "@sentry/tracing": "^6.14.0",
-    "apollo-datasource-rest": "^3.3.0",
+    "apollo-datasource-rest": "^3.4.0",
     "apollo-server": "^3.4.1",
     "apollo-server-cache-redis": "^3.2.0",
     "apollo-server-express": "^3.4.1",
