@@ -10,11 +10,6 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - TZ=UTC
 
-  redis:
-    image: redis:latest
-    ports:
-      - '6379:6379'
-
   localstack:
     image: localstack/localstack
     env_file:
@@ -50,3 +45,9 @@ services:
     depends_on:
       - mysql
       - localstack
+      - snowplow
+
+  snowplow:
+    image: pocket/snowplow-micro:prod
+    ports:
+      - '9090:9090'
