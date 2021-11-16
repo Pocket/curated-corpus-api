@@ -4,8 +4,8 @@ export default {
     environment: process.env.NODE_ENV || 'development',
     defaultMaxAge: 86400,
     pagination: {
-      curatedItemsPerPage: 30,
-      rejectedCuratedCorpusItemsPerPage: 30,
+      approvedItemsPerPage: 30,
+      rejectedItemsPerPage: 30,
       maxAllowedResults: 100,
     },
   },

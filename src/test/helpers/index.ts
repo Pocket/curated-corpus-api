@@ -1,4 +1,4 @@
 export { clearDb } from './clearDb';
-export { createCuratedItemHelper } from './createCuratedItemHelper';
-export { createNewTabScheduleHelper } from './createNewTabScheduleHelper';
+export { createApprovedItemHelper } from './createApprovedItemHelper';
+export { createScheduledItemHelper } from './createScheduledItemHelper';
 export { createRejectedCuratedCorpusItemHelper } from './createRejectedCuratedCorpusItemHelper';

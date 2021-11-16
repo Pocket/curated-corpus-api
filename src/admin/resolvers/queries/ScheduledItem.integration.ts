@@ -1,10 +1,10 @@
 import {
   clearDb,
-  createCuratedItemHelper,
-  createNewTabScheduleHelper,
+  createApprovedItemHelper,
+  createScheduledItemHelper,
 } from '../../../test/helpers';
 import { db, server } from '../../../test/admin-server';
-import { GET_NEW_TAB_FEED_SCHEDULED_ITEMS } from '../../../test/admin-server/queries.gql';
+import { GET_SCHEDULED_ITEMS } from '../../../test/admin-server/queries.gql';
 
 describe('queries: NewTabFeedSchedule', () => {
   beforeAll(async () => {
@@ -19,7 +19,7 @@ describe('queries: NewTabFeedSchedule', () => {
 
   describe('getNewTabScheduledItems query', () => {
     beforeAll(async () => {
-      // Create some curated items
+      // Create some approved items
       const storyTitles = [
         "Here's A Quick Way To Solve A Problem with Node",
         'Proof That Node Really Works',
@@ -30,17 +30,17 @@ describe('queries: NewTabFeedSchedule', () => {
 
       // And schedule them for the near future
       for (const title of storyTitles) {
-        const curatedItem = await createCuratedItemHelper(db, { title });
-        await createNewTabScheduleHelper(db, {
+        const approvedItem = await createApprovedItemHelper(db, { title });
+        await createScheduledItemHelper(db, {
           newTabGuid: 'EN_US',
-          curatedItem,
+          approvedItem,
         });
       }
     });
 
     it('should get all requested items', async () => {
       const { data } = await server.executeOperation({
-        query: GET_NEW_TAB_FEED_SCHEDULED_ITEMS,
+        query: GET_SCHEDULED_ITEMS,
         variables: {
           filters: {
             newTabGuid: 'EN_US',
@@ -50,17 +50,17 @@ describe('queries: NewTabFeedSchedule', () => {
         },
       });
 
-      expect(data?.getNewTabFeedScheduledItems.items).toHaveLength(5);
+      expect(data?.getScheduledCuratedCorpusItems.items).toHaveLength(5);
 
       // Check default sorting - createdAt.DESC
-      const firstItem = data?.getNewTabFeedScheduledItems.items[0];
-      const secondItem = data?.getNewTabFeedScheduledItems.items[1];
+      const firstItem = data?.getScheduledCuratedCorpusItems.items[0];
+      const secondItem = data?.getScheduledCuratedCorpusItems.items[1];
       expect(firstItem.createdAt > secondItem.createdAt).toBeTruthy();
     });
 
     it('should return all expected properties', async () => {
       const { data } = await server.executeOperation({
-        query: GET_NEW_TAB_FEED_SCHEDULED_ITEMS,
+        query: GET_SCHEDULED_ITEMS,
         variables: {
           filters: {
             newTabGuid: 'EN_US',
@@ -70,7 +70,7 @@ describe('queries: NewTabFeedSchedule', () => {
         },
       });
 
-      const firstItem = data?.getNewTabFeedScheduledItems.items[0];
+      const firstItem = data?.getScheduledCuratedCorpusItems.items[0];
 
       // Scalar properties
       expect(firstItem.externalId).toBeTruthy();
@@ -80,20 +80,20 @@ describe('queries: NewTabFeedSchedule', () => {
       expect(firstItem.updatedBy).toBeNull();
       expect(firstItem.scheduledDate).toBeTruthy();
 
-      // The underlying Curated Item
-      expect(firstItem.curatedItem.externalId).toBeTruthy();
-      expect(firstItem.curatedItem.title).toBeTruthy();
-      expect(firstItem.curatedItem.url).toBeTruthy();
-      expect(firstItem.curatedItem.excerpt).toBeTruthy();
-      expect(firstItem.curatedItem.imageUrl).toBeTruthy();
-      expect(firstItem.curatedItem.createdBy).toBeTruthy();
+      // The underlying Approved Item
+      expect(firstItem.approvedItem.externalId).toBeTruthy();
+      expect(firstItem.approvedItem.title).toBeTruthy();
+      expect(firstItem.approvedItem.url).toBeTruthy();
+      expect(firstItem.approvedItem.excerpt).toBeTruthy();
+      expect(firstItem.approvedItem.imageUrl).toBeTruthy();
+      expect(firstItem.approvedItem.createdBy).toBeTruthy();
     });
 
     it('should fail on non-existent New Tab ID', async () => {
       const invalidId = 'not-a-valid-id-by-any-means';
 
       const result = await server.executeOperation({
-        query: GET_NEW_TAB_FEED_SCHEDULED_ITEMS,
+        query: GET_SCHEDULED_ITEMS,
         variables: {
           filters: {
             newTabGuid: invalidId,
@@ -104,7 +104,7 @@ describe('queries: NewTabFeedSchedule', () => {
       });
 
       // Expect to see no data returned, and no errors either
-      expect(result.data?.getNewTabFeedScheduledItems.items).toHaveLength(0);
+      expect(result.data?.getScheduledCuratedCorpusItems.items).toHaveLength(0);
       expect(result.errors).toBeUndefined();
     });
   });

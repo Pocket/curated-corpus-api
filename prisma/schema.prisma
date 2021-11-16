@@ -16,7 +16,7 @@ enum CuratedStatus {
 
 // A prospect that is deemed good enough for saving in the corpus
 // and (optionally) making it to New Tab.
-model CuratedItem {
+model ApprovedItem {
   // fields
   id           Int           @id @default(autoincrement())
   externalId   String        @default(uuid()) @db.VarChar(255)
@@ -37,7 +37,7 @@ model CuratedItem {
   updatedBy    String?       @db.VarChar(255)
 
   // associated models
-  scheduledItems NewTabFeedSchedule[]
+  scheduledItems ScheduledItem[]
 
   // indexes
   @@unique([externalId])
@@ -66,20 +66,20 @@ model RejectedCuratedCorpusItem {
 }
 
 // A curated item that's been scheduled to go on to one or more New Tabs
-model NewTabFeedSchedule {
+model ScheduledItem {
   // fields
-  id            Int        @id @default(autoincrement())
-  externalId    String     @default(uuid()) @db.VarChar(255)
-  curatedItemId Int
-  newTabGuid    String     @db.VarChar(10)
-  createdAt     DateTime   @default(now())
-  createdBy     String     @db.VarChar(255)
-  updatedAt     DateTime   @updatedAt
-  updatedBy     String?    @db.VarChar(255)
-  scheduledDate DateTime   @db.Date
+  id             Int      @id @default(autoincrement())
+  externalId     String   @default(uuid()) @db.VarChar(255)
+  approvedItemId Int
+  newTabGuid     String   @db.VarChar(10)
+  createdAt      DateTime @default(now())
+  createdBy      String   @db.VarChar(255)
+  updatedAt      DateTime @updatedAt
+  updatedBy      String?  @db.VarChar(255)
+  scheduledDate  DateTime @db.Date
 
   // associated entities
-  curatedItem CuratedItem @relation(fields: [curatedItemId], references: [id])
+  approvedItem ApprovedItem @relation(fields: [approvedItemId], references: [id])
 
   // indexes
   @@unique([externalId])

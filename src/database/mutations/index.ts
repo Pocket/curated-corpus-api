@@ -1,5 +1,2 @@
-export { createCuratedItem, updateCuratedItem } from './CuratedItem';
-export {
-  createNewTabFeedScheduledItem,
-  deleteNewTabFeedScheduledItem,
-} from './NewTabFeedSchedule';
+export { createApprovedItem, updateApprovedItem } from './ApprovedItem';
+export { createScheduledItem, deleteScheduledItem } from './ScheduledItem';
