@@ -27,6 +27,42 @@ enum OrderBy {
 }
 
 """
+The list of Pocket topics. This enum is not used anywhere in this schema, however it is used
+by the Curation Admin Tools frontend to edit curated items.
+"""
+enum Topics {
+    BUSINESS
+    CAREER
+    CORONAVIRUS
+    EDUCATION
+    ENTERTAINMENT
+    FOOD
+    GAMING
+    HEALTH_FITNESS
+    PARENTING
+    PERSONAL_FINANCE
+    POLITICS
+    SCIENCE
+    SELF_IMPROVEMENT
+    SPORTS
+    TECHNOLOGY
+    TRAVEL
+}
+
+"""
+Possible reasons for rejecting a prospect. This enum is not used anywhere in this schema,
+however it is used by the Curation Admin Tools frontend to specify rejection reasons.
+"""
+enum RejectionReason {
+    PAYWALL
+    POLITICAL_OPINION
+    OFFENSIVE_MATERIAL
+    TIME_SENSITIVE
+    MISINFORMATION
+    OTHER
+}
+
+"""
 A prospective story that has been reviewed by the curators and saved to the curated corpus.
 """
 type ApprovedCuratedCorpusItem {
