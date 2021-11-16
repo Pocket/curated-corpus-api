@@ -1,7 +1,7 @@
 import { gql } from 'apollo-server-express';
 
-export const ApprovedCuratedCorpusItemData = gql`
-  fragment ApprovedCuratedCorpusItemData on ApprovedCuratedCorpusItem {
+export const CuratedItemData = gql`
+  fragment CuratedItemData on ApprovedCuratedCorpusItem {
     externalId
     title
     language
@@ -21,8 +21,8 @@ export const ApprovedCuratedCorpusItemData = gql`
   }
 `;
 
-export const RejectedCuratedCorpusItemData = gql`
-  fragment RejectedCuratedCorpusItemData on RejectedCuratedCorpusItem {
+export const RejectedItemData = gql`
+  fragment RejectedItemData on RejectedCuratedCorpusItem {
     externalId
     url
     title

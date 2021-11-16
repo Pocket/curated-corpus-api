@@ -1,7 +1,7 @@
 import { DateResolver } from 'graphql-scalars';
 import { UnixTimestampResolver } from './fields/UnixTimestamp';
 import { getApprovedItems } from './queries/ApprovedItem';
-import { getRejectedItems } from './queries/RejectedCuratedCorpusItem';
+import { getRejectedItems } from './queries/RejectedItem';
 import { getScheduledItems } from './queries/ScheduledItem';
 import {
   createApprovedItem,

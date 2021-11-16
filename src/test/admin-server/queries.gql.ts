@@ -1,8 +1,5 @@
 import { gql } from 'apollo-server-express';
-import {
-  ApprovedCuratedCorpusItemData,
-  RejectedCuratedCorpusItemData,
-} from './fragments.gql';
+import { CuratedItemData, RejectedItemData } from './fragments.gql';
 
 /**
  * Sample queries for Apollo Server integration tests as used in
@@ -24,12 +21,12 @@ export const GET_APPROVED_ITEMS = gql`
       edges {
         cursor
         node {
-          ...ApprovedCuratedCorpusItemData
+          ...CuratedItemData
         }
       }
     }
   }
-  ${ApprovedCuratedCorpusItemData}
+  ${CuratedItemData}
 `;
 
 export const GET_REJECTED_ITEMS = gql`
@@ -48,12 +45,12 @@ export const GET_REJECTED_ITEMS = gql`
       edges {
         cursor
         node {
-          ...RejectedCuratedCorpusItemData
+          ...RejectedItemData
         }
       }
     }
   }
-  ${RejectedCuratedCorpusItemData}
+  ${RejectedItemData}
 `;
 
 export const GET_SCHEDULED_ITEMS = gql`
@@ -67,10 +64,10 @@ export const GET_SCHEDULED_ITEMS = gql`
         updatedBy
         scheduledDate
         approvedItem {
-          ...ApprovedCuratedCorpusItemData
+          ...CuratedItemData
         }
       }
     }
   }
-  ${ApprovedCuratedCorpusItemData}
+  ${CuratedItemData}
 `;

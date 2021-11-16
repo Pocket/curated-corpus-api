@@ -1,5 +1,5 @@
 import { gql } from 'apollo-server';
-import { ApprovedCuratedCorpusItemData } from './fragments.gql';
+import { CuratedItemData } from './fragments.gql';
 
 /**
  * Sample mutations for Apollo Server integration tests as used in
@@ -38,10 +38,10 @@ export const CREATE_APPROVED_ITEM = gql`
         scheduledDate: $scheduledDate
       }
     ) {
-      ...ApprovedCuratedCorpusItemData
+      ...CuratedItemData
     }
   }
-  ${ApprovedCuratedCorpusItemData}
+  ${CuratedItemData}
 `;
 
 export const UPDATE_APPROVED_ITEM = gql`
@@ -75,10 +75,10 @@ export const UPDATE_APPROVED_ITEM = gql`
         isSyndicated: $isSyndicated
       }
     ) {
-      ...ApprovedCuratedCorpusItemData
+      ...CuratedItemData
     }
   }
-  ${ApprovedCuratedCorpusItemData}
+  ${CuratedItemData}
 `;
 
 export const CREATE_SCHEDULED_ITEM = gql`
@@ -101,11 +101,11 @@ export const CREATE_SCHEDULED_ITEM = gql`
       updatedBy
       scheduledDate
       approvedItem {
-        ...ApprovedCuratedCorpusItemData
+        ...CuratedItemData
       }
     }
   }
-  ${ApprovedCuratedCorpusItemData}
+  ${CuratedItemData}
 `;
 
 export const DELETE_SCHEDULE_ITEM = gql`
@@ -118,9 +118,9 @@ export const DELETE_SCHEDULE_ITEM = gql`
       updatedBy
       scheduledDate
       approvedItem {
-        ...ApprovedCuratedCorpusItemData
+        ...CuratedItemData
       }
     }
   }
-  ${ApprovedCuratedCorpusItemData}
+  ${CuratedItemData}
 `;
