@@ -39,7 +39,7 @@ enum ProspectType {
 """
 A prospective story that has been reviewed by the curators and saved to the curated corpus.
 """
-type CuratedItem {
+type ApprovedCuratedCorpusItem {
     """
     An alternative primary key in UUID format that is generated on creation.
     """
@@ -155,15 +155,15 @@ type RejectedCuratedCorpusItem {
 """
 An edge in a connection.
 """
-type CuratedItemEdge {
+type ApprovedCuratedCorpusItemEdge {
     """
     A cursor for use in pagination.
     """
     cursor: String!
     """
-    The Curated Item at the end of the edge.
+    The Approved Item at the end of the edge.
     """
-    node: CuratedItem!
+    node: ApprovedCuratedCorpusItem!
 }
 
 """
@@ -181,19 +181,19 @@ type RejectedCuratedCorpusItemEdge {
 }
 
 """
-The connection type for Curated Item.
+The connection type for Approved Item.
 """
-type CuratedItemConnection {
+type ApprovedCuratedCorpusItemConnection {
     """
     A list of edges.
     """
-    edges: [CuratedItemEdge!]!
+    edges: [ApprovedCuratedCorpusItemEdge!]!
     """
     Information to aid in pagination.
     """
     pageInfo: PageInfo!
     """
-    Identifies the total count of Curated Items in the connection.
+    Identifies the total count of Approved Items in the connection.
     """
     totalCount: Int!
 }
@@ -217,10 +217,10 @@ type RejectedCuratedCorpusItemConnection {
 }
 
 """
-A scheduled entry for a Curated Item to appear on a New Tab Feed.
+A scheduled entry for an Approved Item to appear on a New Tab Feed.
 For example, a story that is scheduled to appear on December 31st, 2021 on the New Tab in Firefox for the US audience.
 """
-type NewTabFeedScheduledItem {
+type ScheduledCuratedCorpusItem {
     """
     An alternative primary key in UUID format that is generated on creation.
     """
@@ -242,30 +242,30 @@ type NewTabFeedScheduledItem {
     """
     updatedBy: String
     """
-    The date the associated Curated Item is scheduled to appear on New Tab.
+    The date the associated Approved Item is scheduled to appear on New Tab.
     This date is relative to the time zone of the New Tab. Format: YYYY-MM-DD.
     """
     scheduledDate: Date!
     """
-    The associated Curated Item.
+    The associated Approved Item.
     """
-    curatedItem: CuratedItem!
+    approvedItem: ApprovedCuratedCorpusItem!
 }
 
 """
-The shape of the result returned by the getNewTabFeedScheduledItems query.
+The shape of the result returned by the getScheduledCuratedCorpusItems query.
 """
-type NewTabFeedScheduledItemsResult {
+type ScheduledCuratedCorpusItemsResult {
     """
     An array of items for a given New Tab Feed
     """
-    items: [NewTabFeedScheduledItem!]!
+    items: [ScheduledCuratedCorpusItem!]!
 }
 
 """
-Available fields for filtering CuratedItems.
+Available fields for filtering ApprovedCuratedCorpusItems.
 """
-input CuratedItemFilter {
+input ApprovedCuratedCorpusItemFilter {
     """
     Optional filter on the URL field. Returns partial matches.
     """
@@ -279,11 +279,11 @@ input CuratedItemFilter {
     """
     topic: String
     """
-    Optional filter on the status of Curated Items.
+    Optional filter on the status of Approved Items.
     """
     status: CuratedStatus
     """
-    Optional filter on the language Curated Items have been classified as.
+    Optional filter on the language Approved Items have been classified as.
     This is a two-letter string, e.g. 'en' for English or 'de' for 'German'.
     """
     language: String
@@ -315,7 +315,7 @@ input RejectedCuratedCorpusItemFilter {
 """
 Available fields for filtering scheduled items for a given New Tab.
 """
-input NewTabFeedScheduledItemsFilterInput {
+input ScheduledCuratedCorpusItemsFilterInput {
     """
     The GUID of the New Tab. Example: 'EN_US'.
     """
@@ -331,23 +331,23 @@ input NewTabFeedScheduledItemsFilterInput {
 }
 
 """
-Input data for creating a Curated Item and optionally scheduling this item to appear on New Tab.
+Input data for creating an Approved Item and optionally scheduling this item to appear on New Tab.
 """
-input CreateCuratedItemInput {
+input CreateApprovedCuratedCorpusItemInput {
     """
-    The URL of the Curated Item.
+    The URL of the Approved Item.
     """
     url: Url!
     """
-    The title of the Curated Item.
+    The title of the Approved Item.
     """
     title: String!
     """
-    The excerpt of the Curated Item.
+    The excerpt of the Approved Item.
     """
     excerpt: String!
     """
-    The outcome of the curators' review of the Curated Item.
+    The outcome of the curators' review of the Approved Item.
     """
     status: CuratedStatus!
     """
@@ -391,27 +391,27 @@ input CreateCuratedItemInput {
 }
 
 """
-Input data for updating a Curated Item.
+Input data for updating an Approved Item.
 """
-input UpdateCuratedItemInput {
+input UpdateApprovedCuratedCorpusItemInput {
     """
-    Curated Item ID.
+    Approved Item ID.
     """
     externalId: ID!
     """
-    The URL of the Curated Item.
+    The URL of the Approved Item.
     """
     url: Url!
     """
-    The title of the Curated Item.
+    The title of the Approved Item.
     """
     title: String!
     """
-    The excerpt of the Curated Item.
+    The excerpt of the Approved Item.
     """
     excerpt: String!
     """
-    The outcome of the curators' review of the Curated Item.
+    The outcome of the curators' review of the Approved Item.
     """
     status: CuratedStatus!
     """
@@ -447,19 +447,19 @@ input UpdateCuratedItemInput {
 }
 
 """
-Input data for creating a scheduled entry for a Curated Item on a New Tab Feed.
+Input data for creating a scheduled entry for an Approved Item on a New Tab Feed.
 """
-input CreateNewTabFeedScheduledItemInput {
+input CreateScheduledCuratedCorpusItemInput {
     """
-    The ID of the Curated Item that needs to be scheduled.
+    The ID of the Approved Item that needs to be scheduled.
     """
-    curatedItemExternalId: ID!
+    approvedItemExternalId: ID!
     """
-    The GUID of the New Tab Feed the Curated Item is going to appear on. Example: 'EN_US'.
+    The GUID of the New Tab Feed the Approved Item is going to appear on. Example: 'EN_US'.
     """
     newTabGuid: ID!
     """
-    The date the associated Curated Item is scheduled to appear on New Tab. Format: YYYY-MM-DD.
+    The date the associated Approved Item is scheduled to appear on New Tab. Format: YYYY-MM-DD.
     """
     scheduledDate: Date!
 }
@@ -467,7 +467,7 @@ input CreateNewTabFeedScheduledItemInput {
 """
 Input data for deleting a scheduled item for a New Tab Feed.
 """
-input DeleteNewTabFeedScheduledItemInput {
+input DeleteScheduledCuratedCorpusItemInput {
     """
     ID of the scheduled item. A string in UUID format.
     """
@@ -476,12 +476,12 @@ input DeleteNewTabFeedScheduledItemInput {
 
 type Query {
     """
-    Retrieves a paginated, filterable list of CuratedItems.
+    Retrieves a paginated, filterable list of ApprovedCuratedCorpusItems.
     """
-    getCuratedItems(
-        filters: CuratedItemFilter
+    getApprovedCuratedCorpusItems(
+        filters: ApprovedCuratedCorpusItemFilter
         pagination: PaginationInput
-    ): CuratedItemConnection!
+    ): ApprovedCuratedCorpusItemConnection!
 
     """
     Retrieves a paginated, filterable list of RejectedCuratedCorpusItems.
@@ -492,39 +492,43 @@ type Query {
     ): RejectedCuratedCorpusItemConnection!
 
     """
-    Retrieves a list of Curated Items that are scheduled to appear on New Tab
+    Retrieves a list of Approved Items that are scheduled to appear on New Tab
     """
-    getNewTabFeedScheduledItems(
+    getScheduledCuratedCorpusItems(
         """
         Required arguments to narrow down scheduled items to a specific New Tab Feed
         between the supplied start and end dates.
         """
-        filters: NewTabFeedScheduledItemsFilterInput!
-    ): NewTabFeedScheduledItemsResult!
+        filters: ScheduledCuratedCorpusItemsFilterInput!
+    ): ScheduledCuratedCorpusItemsResult!
 }
 
 type Mutation {
     """
-    Creates a Curated Item and optionally schedules it to appear on New Tab.
+    Creates an Approved Item and optionally schedules it to appear on New Tab.
     """
-    createCuratedItem(data: CreateCuratedItemInput!): CuratedItem!
+    createApprovedCuratedCorpusItem(
+        data: CreateApprovedCuratedCorpusItemInput!
+    ): ApprovedCuratedCorpusItem!
 
     """
-    Updates a Curated Item.
+    Updates an Approved Item.
     """
-    updateCuratedItem(data: UpdateCuratedItemInput!): CuratedItem!
+    updateApprovedCuratedCorpusItem(
+        data: UpdateApprovedCuratedCorpusItemInput!
+    ): ApprovedCuratedCorpusItem!
 
     """
     Creates a New Tab Scheduled Item.
     """
-    createNewTabFeedScheduledItem(
-        data: CreateNewTabFeedScheduledItemInput!
-    ): NewTabFeedScheduledItem!
+    createScheduledCuratedCorpusItem(
+        data: CreateScheduledCuratedCorpusItemInput!
+    ): ScheduledCuratedCorpusItem!
 
     """
     Deletes an item from New Tab Schedule.
     """
-    deleteNewTabFeedScheduledItem(
-        data: DeleteNewTabFeedScheduledItemInput!
-    ): NewTabFeedScheduledItem!
+    deleteScheduledCuratedCorpusItem(
+        data: DeleteScheduledCuratedCorpusItemInput!
+    ): ScheduledCuratedCorpusItem!
 }

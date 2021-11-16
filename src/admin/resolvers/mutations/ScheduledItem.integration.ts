@@ -2,16 +2,16 @@ import chai from 'chai';
 import { db, server } from '../../../test/admin-server';
 import {
   clearDb,
-  createCuratedItemHelper,
-  createNewTabScheduleHelper,
+  createApprovedItemHelper,
+  createScheduledItemHelper,
 } from '../../../test/helpers';
 import {
-  CREATE_NEW_TAB_FEED_SCHEDULE,
-  DELETE_NEW_TAB_FEED_SCHEDULE,
+  CREATE_SCHEDULED_ITEM,
+  DELETE_SCHEDULE_ITEM,
 } from '../../../test/admin-server/mutations.gql';
 import {
-  CreateNewTabFeedScheduledItemInput,
-  DeleteNewTabFeedScheduledItemInput,
+  CreateScheduledItemInput,
+  DeleteScheduledItemInput,
 } from '../../../database/types';
 import { getUnixTimestamp } from '../fields/UnixTimestamp';
 
@@ -29,19 +29,19 @@ describe('mutations: NewTabFeedSchedule', () => {
     await clearDb(db);
   });
 
-  describe('createNewTabFeedScheduledItem mutation', () => {
-    it('fails on invalid New Tab Feed ID', async () => {
-      const curatedItem = await createCuratedItemHelper(db, {
+  describe('createScheduledCuratedCorpusItem mutation', () => {
+    it('should fail on invalid New Tab Feed ID', async () => {
+      const approvedItem = await createApprovedItemHelper(db, {
         title: 'A test story',
       });
-      const input: CreateNewTabFeedScheduledItemInput = {
-        curatedItemExternalId: curatedItem.externalId,
+      const input: CreateScheduledItemInput = {
+        approvedItemExternalId: approvedItem.externalId,
         newTabGuid: 'RECSAPI',
         scheduledDate: '2100-01-01',
       };
 
       const result = await server.executeOperation({
-        query: CREATE_NEW_TAB_FEED_SCHEDULE,
+        query: CREATE_SCHEDULED_ITEM,
         variables: input,
       });
 
@@ -56,15 +56,15 @@ describe('mutations: NewTabFeedSchedule', () => {
       }
     });
 
-    it('fails on invalid Curated Item ID', async () => {
-      const input: CreateNewTabFeedScheduledItemInput = {
-        curatedItemExternalId: 'not-a-valid-id-at-all',
+    it('should fail on invalid Approved Item ID', async () => {
+      const input: CreateScheduledItemInput = {
+        approvedItemExternalId: 'not-a-valid-id-at-all',
         newTabGuid: 'EN_US',
         scheduledDate: '2100-01-01',
       };
 
       const result = await server.executeOperation({
-        query: CREATE_NEW_TAB_FEED_SCHEDULE,
+        query: CREATE_SCHEDULED_ITEM,
         variables: input,
       });
 
@@ -73,28 +73,28 @@ describe('mutations: NewTabFeedSchedule', () => {
       // And there is the correct error from the resolvers
       if (result.errors) {
         expect(result.errors[0].message).toMatch(
-          `Cannot create a scheduled entry: Curated Item with id "not-a-valid-id-at-all" does not exist.`
+          `Cannot create a scheduled entry: Approved Item with id "not-a-valid-id-at-all" does not exist.`
         );
       }
     });
 
-    it('should create an entry and return data (including Curated Item)', async () => {
-      const curatedItem = await createCuratedItemHelper(db, {
+    it('should create an entry and return data (including Approved Item)', async () => {
+      const approvedItem = await createApprovedItemHelper(db, {
         title: 'A test story',
       });
 
-      const input: CreateNewTabFeedScheduledItemInput = {
-        curatedItemExternalId: curatedItem.externalId,
+      const input: CreateScheduledItemInput = {
+        approvedItemExternalId: approvedItem.externalId,
         newTabGuid: 'EN_US',
         scheduledDate: '2100-01-01',
       };
 
       const { data } = await server.executeOperation({
-        query: CREATE_NEW_TAB_FEED_SCHEDULE,
+        query: CREATE_SCHEDULED_ITEM,
         variables: input,
       });
 
-      const scheduledItem = data?.createNewTabFeedScheduledItem;
+      const scheduledItem = data?.createScheduledCuratedCorpusItem;
 
       // Expect these fields to return valid values
       expect(scheduledItem.externalId).toBeTruthy();
@@ -106,32 +106,32 @@ describe('mutations: NewTabFeedSchedule', () => {
         new Date(input.scheduledDate)
       );
 
-      // Finally, let's compare the returned CuratedItem object to our inputs.
+      // Finally, let's compare the returned ApprovedItem object to our inputs.
       // Need to destructure timestamps and compare them separately
       // as Prisma will convert to ISO string for comparison
       // and GraphQL server returns Unix timestamps.
-      const { createdAt, updatedAt, ...otherCuratedItemProps } = curatedItem;
+      const { createdAt, updatedAt, ...otherApprovedItemProps } = approvedItem;
       const {
         createdAt: createdAtReturned,
         updatedAt: updatedAtReturned,
-        ...otherReturnedCuratedItemProps
-      } = scheduledItem.curatedItem;
+        ...otherReturnedApprovedItemProps
+      } = scheduledItem.approvedItem;
       chai.expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
       chai.expect(getUnixTimestamp(updatedAt)).to.equal(updatedAtReturned);
       chai
-        .expect(otherCuratedItemProps)
-        .to.deep.include(otherReturnedCuratedItemProps);
+        .expect(otherApprovedItemProps)
+        .to.deep.include(otherReturnedApprovedItemProps);
     });
   });
 
-  describe('deleteNewTabFeedScheduledItem mutation', () => {
-    it('fails on invalid external ID', async () => {
-      const input: DeleteNewTabFeedScheduledItemInput = {
+  describe('deleteScheduledCuratedCorpusItem mutation', () => {
+    it('should fail on invalid external ID', async () => {
+      const input: DeleteScheduledItemInput = {
         externalId: 'not-a-valid-ID-string',
       };
 
       const result = await server.executeOperation({
-        query: DELETE_NEW_TAB_FEED_SCHEDULE,
+        query: DELETE_SCHEDULE_ITEM,
         variables: input,
       });
 
@@ -146,26 +146,26 @@ describe('mutations: NewTabFeedSchedule', () => {
     });
 
     it('should delete an item scheduled for New Tab and return deleted data', async () => {
-      const curatedItem = await createCuratedItemHelper(db, {
+      const approvedItem = await createApprovedItemHelper(db, {
         title: 'This is a test',
       });
 
-      const scheduledItem = await createNewTabScheduleHelper(db, {
+      const scheduledItem = await createScheduledItemHelper(db, {
         newTabGuid: 'EN_US',
-        curatedItem,
+        approvedItem,
       });
 
       const { data } = await server.executeOperation({
-        query: DELETE_NEW_TAB_FEED_SCHEDULE,
+        query: DELETE_SCHEDULE_ITEM,
         variables: { externalId: scheduledItem.externalId },
       });
 
       // The shape of the Prisma objects the above helpers return doesn't quite match
-      // the type we return in GraphQL (for example, IDs stay internal, we attach a
-      // CuratedItem, so until there is a query to retrieve the scheduled item
+      // the type we return in GraphQL (for example, IDs stay internal, we attach an
+      // ApprovedItem, so until there is a query to retrieve the scheduled item
       // of the right shape (if it's ever implemented), laborious property-by-property
       // comparison is the go.
-      const returnedItem = data?.deleteNewTabFeedScheduledItem;
+      const returnedItem = data?.deleteScheduledCuratedCorpusItem;
       expect(returnedItem.externalId).toBe(scheduledItem.externalId);
       expect(returnedItem.createdBy).toBe(scheduledItem.createdBy);
       expect(returnedItem.updatedBy).toBe(scheduledItem.updatedBy);
@@ -181,21 +181,21 @@ describe('mutations: NewTabFeedSchedule', () => {
         scheduledItem.scheduledDate
       );
 
-      // Finally, let's compare the returned CuratedItem object to our inputs.
+      // Finally, let's compare the returned ApprovedItem object to our inputs.
       // Need to destructure timestamps and compare them separately
       // as Prisma will convert to ISO string for comparison
       // and GraphQL server returns Unix timestamps.
-      const { createdAt, updatedAt, ...otherCuratedItemProps } = curatedItem;
+      const { createdAt, updatedAt, ...otherApprovedItemProps } = approvedItem;
       const {
         createdAt: createdAtReturned,
         updatedAt: updatedAtReturned,
-        ...otherReturnedCuratedItemProps
-      } = returnedItem.curatedItem;
+        ...otherReturnedApprovedItemProps
+      } = returnedItem.approvedItem;
       chai.expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
       chai.expect(getUnixTimestamp(updatedAt)).to.equal(updatedAtReturned);
       chai
-        .expect(otherCuratedItemProps)
-        .to.deep.include(otherReturnedCuratedItemProps);
+        .expect(otherApprovedItemProps)
+        .to.deep.include(otherReturnedApprovedItemProps);
     });
   });
 });

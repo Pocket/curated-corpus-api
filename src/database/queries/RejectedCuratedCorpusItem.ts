@@ -37,8 +37,8 @@ export async function getRejectedCuratedCorpusItems(
   /**
    * Implementation details:
    *
-   * The Relay-style pagination implemented for this query is the same as the getCuratedItems query.
-   * Detailed comments explaining the callback function below are in CuratedItem.ts
+   * The Relay-style pagination implemented for this query is the same as the getApprovedItems query.
+   * Detailed comments explaining the callback function below are in ApprovedItem.ts
    */
 
   return findManyCursorConnection<

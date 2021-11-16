@@ -1,17 +1,17 @@
 import { CuratedStatus } from '@prisma/client';
 import { expect } from 'chai';
 import { db, server } from '../../../test/admin-server';
-import { clearDb, createCuratedItemHelper } from '../../../test/helpers';
+import { clearDb, createApprovedItemHelper } from '../../../test/helpers';
 import {
-  CREATE_CURATED_ITEM,
-  UPDATE_CURATED_ITEM,
+  CREATE_APPROVED_ITEM,
+  UPDATE_APPROVED_ITEM,
 } from '../../../test/admin-server/mutations.gql';
 import {
-  CreateCuratedItemInput,
-  UpdateCuratedItemInput,
+  CreateApprovedItemInput,
+  UpdateApprovedItemInput,
 } from '../../../database/types';
 
-describe('mutations: CuratedItem', () => {
+describe('mutations: ApprovedItem', () => {
   beforeAll(async () => {
     await server.start();
   });
@@ -25,9 +25,9 @@ describe('mutations: CuratedItem', () => {
     await clearDb(db);
   });
 
-  describe('createCuratedItem mutation', () => {
+  describe('createApprovedCuratedCorpusItem mutation', () => {
     // a standard set of inputs for this mutation
-    const input: CreateCuratedItemInput = {
+    const input: CreateApprovedItemInput = {
       title: 'Find Out How I Cured My Docker In 2 Days',
       url: 'https://test.com/docker',
       excerpt: 'A short summary of what this story is about',
@@ -41,30 +41,32 @@ describe('mutations: CuratedItem', () => {
       isSyndicated: false,
     };
 
-    it('creates a curated item with all inputs supplied', async () => {
+    it('creates an approved item with all inputs supplied', async () => {
       const result = await server.executeOperation({
-        query: CREATE_CURATED_ITEM,
+        query: CREATE_APPROVED_ITEM,
         variables: input,
       });
 
       expect(result.errors).to.be.undefined;
       expect(result.data).not.to.be.null;
 
-      // Expect to see all the input data we supplied in the Curated Item
+      // Expect to see all the input data we supplied in the Approved Item
       // returned by the mutation
-      expect(result.data?.createCuratedItem).to.deep.include(input);
+      expect(result.data?.createApprovedCuratedCorpusItem).to.deep.include(
+        input
+      );
     });
 
-    it('should fail to create a curated item with a duplicate URL', async () => {
-      // Create a curated item with a set URL
-      await createCuratedItemHelper(db, {
+    it('should fail to create an approved item with a duplicate URL', async () => {
+      // Create a approved item with a set URL
+      await createApprovedItemHelper(db, {
         title: 'I was here first!',
         url: 'https://test.com/docker',
       });
 
       // Attempt to create another item with the same URL
       const result = await server.executeOperation({
-        query: CREATE_CURATED_ITEM,
+        query: CREATE_APPROVED_ITEM,
         variables: input,
       });
 
@@ -74,7 +76,7 @@ describe('mutations: CuratedItem', () => {
       // And there is the correct error from the resolvers
       if (result.errors) {
         expect(result.errors[0].message).to.equal(
-          `A curated item with the URL "${input.url}" already exists`
+          `An approved item with the URL "${input.url}" already exists`
         );
       }
     });
@@ -85,34 +87,36 @@ describe('mutations: CuratedItem', () => {
       input.newTabGuid = 'EN_US';
 
       const result = await server.executeOperation({
-        query: CREATE_CURATED_ITEM,
+        query: CREATE_APPROVED_ITEM,
         variables: input,
       });
 
       expect(result.errors).to.be.undefined;
       expect(result.data).not.to.be.null;
 
-      // Expect to see all the input data we supplied in the Curated Item
+      // Expect to see all the input data we supplied in the Approved Item
       // returned by the mutation
 
-      // We only return the curated item here, so need to purge the scheduling
+      // We only return the approved item here, so need to purge the scheduling
       // input values from the input before comparison.
       delete input.scheduledDate;
       delete input.newTabGuid;
-      expect(result.data?.createCuratedItem).to.deep.include(input);
+      expect(result.data?.createApprovedCuratedCorpusItem).to.deep.include(
+        input
+      );
 
       // NB: we don't (yet) return anything for the scheduled item,
       // but if the mutation does not fall over, that means it has been created
       // successfully.
     });
 
-    it('should not create a scheduled entry for a curated item with invalid New Tab id supplied', async () => {
+    it('should not create a scheduled entry for an approved item with invalid New Tab id supplied', async () => {
       // extra inputs
       input.scheduledDate = '2100-01-01';
       input.newTabGuid = 'RECSAPI';
 
       const result = await server.executeOperation({
-        query: CREATE_CURATED_ITEM,
+        query: CREATE_APPROVED_ITEM,
         variables: input,
       });
 
@@ -130,14 +134,14 @@ describe('mutations: CuratedItem', () => {
   });
 
   describe('updateCuratedItem mutation', () => {
-    it('updates a curated item when required variables are supplied', async () => {
-      const item = await createCuratedItemHelper(db, {
+    it('updates an approved item when required variables are supplied', async () => {
+      const item = await createApprovedItemHelper(db, {
         title: "3 Things Everyone Knows About LEGO That You Don't",
         status: CuratedStatus.RECOMMENDATION,
         language: 'en',
       });
 
-      const input: UpdateCuratedItemInput = {
+      const input: UpdateApprovedItemInput = {
         externalId: item.externalId,
         title: 'Anything but LEGO',
         url: 'https://test.com/lego',
@@ -153,28 +157,30 @@ describe('mutations: CuratedItem', () => {
       };
 
       const { data } = await server.executeOperation({
-        query: UPDATE_CURATED_ITEM,
+        query: UPDATE_APPROVED_ITEM,
         variables: input,
       });
 
       // External ID should be unchanged
-      expect(data?.updateCuratedItem.externalId).to.equal(item.externalId);
+      expect(data?.updateApprovedCuratedCorpusItem.externalId).to.equal(
+        item.externalId
+      );
 
       // Updated properties should be... updated
-      expect(data?.updateCuratedItem).to.deep.include(input);
+      expect(data?.updateApprovedCuratedCorpusItem).to.deep.include(input);
     });
 
-    it('should fail to update a curated item with a duplicate URL', async () => {
-      await createCuratedItemHelper(db, {
+    it('should fail to update an approved item with a duplicate URL', async () => {
+      await createApprovedItemHelper(db, {
         title: 'I was here first',
         url: 'https://test.com/first',
       });
-      const item = await createCuratedItemHelper(db, {
+      const item = await createApprovedItemHelper(db, {
         title: "3 Things Everyone Knows About LEGO That You Don't",
         url: 'https://sample.com/three-things',
       });
 
-      const input: UpdateCuratedItemInput = {
+      const input: UpdateApprovedItemInput = {
         externalId: item.externalId,
         title: 'Anything but LEGO',
         url: 'https://test.com/first',
@@ -191,7 +197,7 @@ describe('mutations: CuratedItem', () => {
 
       // Attempt to update the second item with a duplicate URL...
       const result = await server.executeOperation({
-        query: UPDATE_CURATED_ITEM,
+        query: UPDATE_APPROVED_ITEM,
         variables: input,
       });
 
@@ -201,7 +207,7 @@ describe('mutations: CuratedItem', () => {
       // And there is the correct error from the resolvers
       if (result.errors) {
         expect(result.errors[0].message).to.equal(
-          `A curated item with the URL "${input.url}" already exists`
+          `An approved item with the URL "${input.url}" already exists`
         );
       }
     });

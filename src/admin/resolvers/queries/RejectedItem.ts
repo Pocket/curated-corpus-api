@@ -1,20 +1,20 @@
 import { Connection } from '@devoxa/prisma-relay-cursor-connection';
-import { CuratedItem } from '@prisma/client';
+import { RejectedCuratedCorpusItem } from '@prisma/client';
 import config from '../../../config';
-import { getCuratedItems as dbGetCuratedItems } from '../../../database/queries';
+import { getRejectedCuratedCorpusItems as dbGetRejectedCuratedCorpusItems } from '../../../database/queries';
 
 /**
- * This query retrieves curated items from the database.
+ * This query retrieves rejected curated items from the database.
  *
  * @param parent
  * @param args
  * @param db
  */
-export async function getCuratedItems(
+export async function getRejectedItems(
   parent,
   args,
   { db }
-): Promise<Connection<CuratedItem>> {
+): Promise<Connection<RejectedCuratedCorpusItem>> {
   let { pagination } = args;
 
   // Set the defaults for pagination if nothing's been provided
@@ -22,7 +22,9 @@ export async function getCuratedItems(
     !pagination ||
     (pagination.first === undefined && pagination.last === undefined)
   ) {
-    pagination = { first: config.app.pagination.curatedItemsPerPage };
+    pagination = {
+      first: config.app.pagination.rejectedItemsPerPage,
+    };
   } else {
     // Add some limits to how many items can be retrieved at any one time.
     // These limits are higher than the defaults applied above.
@@ -35,5 +37,5 @@ export async function getCuratedItems(
     }
   }
 
-  return await dbGetCuratedItems(db, pagination, args.filters);
+  return await dbGetRejectedCuratedCorpusItems(db, pagination, args.filters);
 }
