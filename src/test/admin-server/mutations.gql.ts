@@ -7,6 +7,7 @@ import { CuratedItemData } from './fragments.gql';
  */
 export const CREATE_APPROVED_ITEM = gql`
   mutation createApprovedItem(
+    $prospectId: ID!
     $url: Url!
     $title: String!
     $excerpt: String!
@@ -23,6 +24,7 @@ export const CREATE_APPROVED_ITEM = gql`
   ) {
     createApprovedCuratedCorpusItem(
       data: {
+        prospectId: $prospectId
         url: $url
         title: $title
         excerpt: $excerpt
@@ -47,6 +49,7 @@ export const CREATE_APPROVED_ITEM = gql`
 export const UPDATE_APPROVED_ITEM = gql`
   mutation updateApprovedItem(
     $externalId: ID!
+    $prospectId: ID!
     $url: Url!
     $title: String!
     $excerpt: String!
@@ -62,6 +65,7 @@ export const UPDATE_APPROVED_ITEM = gql`
     updateApprovedCuratedCorpusItem(
       data: {
         externalId: $externalId
+        prospectId: $prospectId
         url: $url
         title: $title
         excerpt: $excerpt

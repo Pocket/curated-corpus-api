@@ -28,6 +28,7 @@ describe('createApprovedItemHelper', () => {
 
     // Expect to see the remaining fields filled in for us
     expect(item.externalId).to.be.not.undefined;
+    expect(item.prospectId).to.be.not.undefined;
     expect(item.language).to.be.not.undefined;
     expect(item.publisher).to.be.not.undefined;
     expect(item.url).to.be.not.undefined;
@@ -42,6 +43,7 @@ describe('createApprovedItemHelper', () => {
 
   it('creates a curated item with all properties supplied', async () => {
     const data: CreateApprovedItemHelperInput = {
+      prospectId: '123-abc',
       title: 'What even is time?',
       excerpt: faker.lorem.sentences(3),
       status: CuratedStatus.RECOMMENDATION,

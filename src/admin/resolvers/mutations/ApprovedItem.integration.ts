@@ -28,6 +28,7 @@ describe('mutations: ApprovedItem', () => {
   describe('createApprovedCuratedCorpusItem mutation', () => {
     // a standard set of inputs for this mutation
     const input: CreateApprovedItemInput = {
+      prospectId: '123-abc',
       title: 'Find Out How I Cured My Docker In 2 Days',
       url: 'https://test.com/docker',
       excerpt: 'A short summary of what this story is about',
@@ -143,6 +144,7 @@ describe('mutations: ApprovedItem', () => {
 
       const input: UpdateApprovedItemInput = {
         externalId: item.externalId,
+        prospectId: '123-abc',
         title: 'Anything but LEGO',
         url: 'https://test.com/lego',
         excerpt: 'Updated excerpt',
@@ -182,6 +184,7 @@ describe('mutations: ApprovedItem', () => {
 
       const input: UpdateApprovedItemInput = {
         externalId: item.externalId,
+        prospectId: '456-qwe',
         title: 'Anything but LEGO',
         url: 'https://test.com/first',
         excerpt: 'Updated excerpt',

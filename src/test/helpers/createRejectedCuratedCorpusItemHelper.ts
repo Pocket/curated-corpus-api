@@ -11,6 +11,7 @@ interface CreateRejectedCuratedCorpusItemHelperRequiredInput {
 
 // optional information you can provide when creating a curated item
 interface CreateRejectedCuratedCorpusItemHelperOptionalInput {
+  prospectId?: string;
   url?: string;
   topic?: string;
   language?: string;
@@ -34,6 +35,7 @@ export async function createRejectedCuratedCorpusItemHelper(
 ): Promise<RejectedCuratedCorpusItem> {
   // defaults for optional properties
   const createRejectedCuratedCorpusItemDefaults = {
+    prospectId: faker.datatype.uuid(),
     url: faker.internet.url(),
     topic: faker.lorem.words(2),
     language: faker.random.arrayElement(['en', 'de']),

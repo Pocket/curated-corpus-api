@@ -31,6 +31,7 @@ export type RejectedCuratedCorpusItemFilter = {
  * mutations.
  */
 type ApprovedItemRequiredInput = {
+  prospectId: string;
   url: string;
   title: string;
   excerpt: string;
