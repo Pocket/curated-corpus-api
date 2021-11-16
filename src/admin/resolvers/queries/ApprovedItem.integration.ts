@@ -117,6 +117,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       // The important thing to test here is that the query returns all of these
       // properties without falling over, and not that they hold any specific value.
       expect(firstItem.externalId).to.be.not.undefined;
+      expect(firstItem.prospectId).to.be.not.undefined;
       expect(firstItem.title).to.be.not.undefined;
       expect(firstItem.language).to.be.not.undefined;
       expect(firstItem.publisher).to.be.not.undefined;

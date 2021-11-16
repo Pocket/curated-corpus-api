@@ -81,6 +81,10 @@ type ApprovedCuratedCorpusItem {
     """
     externalId: ID!
     """
+    The GUID of the corresponding Prospect ID.
+    """
+    prospectId: ID!
+    """
     The URL of the story.
     """
     url: Url!
@@ -153,6 +157,10 @@ type RejectedCuratedCorpusItem {
     An alternative primary key in UUID format that is generated on creation.
     """
     externalId: ID!
+    """
+    The GUID of the corresponding Prospect ID.
+    """
+    prospectId: ID!
     """
     The URL of the story.
     """
@@ -371,6 +379,10 @@ Input data for creating an Approved Item and optionally scheduling this item to 
 """
 input CreateApprovedCuratedCorpusItemInput {
     """
+    The GUID of the corresponding Prospect ID.
+    """
+    prospectId: ID!
+    """
     The URL of the Approved Item.
     """
     url: Url!
@@ -434,6 +446,10 @@ input UpdateApprovedCuratedCorpusItemInput {
     Approved Item ID.
     """
     externalId: ID!
+    """
+    The GUID of the corresponding Prospect ID.
+    """
+    prospectId: ID!
     """
     The URL of the Approved Item.
     """
