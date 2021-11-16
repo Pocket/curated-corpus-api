@@ -27,6 +27,16 @@ enum OrderBy {
 }
 
 """
+Prospect types. This enum is not used anywhere in this schema, however it is used
+by the Curation Admin Tools frontend to filter prospects.
+"""
+enum ProspectType {
+    GLOBAL
+    ORGANIC_TIMESPENT
+    SYNDICATED
+}
+
+"""
 A prospective story that has been reviewed by the curators and saved to the curated corpus.
 """
 type CuratedItem {
