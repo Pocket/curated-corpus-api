@@ -1,5 +1,5 @@
-import { CuratedItem, RejectedCuratedCorpusItem } from '@prisma/client';
-import { NewTabFeedScheduledItem } from '../database/types';
+import { ApprovedItem, RejectedCuratedCorpusItem } from '@prisma/client';
+import { ScheduledItem } from '../database/types';
 
 export enum ReviewedCorpusItemEventType {
   ADD_ITEM = 'ADD_ITEM',
@@ -30,10 +30,10 @@ export type BaseEventData = {
 
 // Data for the events that are fired on changes to curated items
 export type ReviewedCorpusItemPayload = {
-  reviewedCorpusItem: CuratedItem | RejectedCuratedCorpusItem;
+  reviewedCorpusItem: ApprovedItem | RejectedCuratedCorpusItem;
 };
 
 // Data for the events that are fired on updates to New Tab schedule
 export type ScheduledCorpusItemPayload = {
-  scheduledCorpusItem: NewTabFeedScheduledItem;
+  scheduledCorpusItem: ScheduledItem;
 };

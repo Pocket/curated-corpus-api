@@ -1,20 +1,20 @@
 import { CuratedCorpusEventEmitter } from './curatedCorpusEventEmitter';
 import {
-  BaseEventData,
   ReviewedCorpusItemPayload,
   ScheduledCorpusItemPayload,
-  EventType,
+  ReviewedCorpusItemEventType,
+  ScheduledCorpusItemEventType,
 } from './types';
 import config from '../config';
 import sinon from 'sinon';
 import { getUnixTimestamp } from '../shared/utils';
 import {
-  CuratedItem,
+  ApprovedItem,
   CuratedStatus,
   RejectedCuratedCorpusItem,
 } from '@prisma/client';
 import { Topics } from '../shared/types';
-import { NewTabFeedScheduledItem } from '../database/types';
+import { ScheduledItem } from '../database/types';
 
 describe('CuratedCorpusEventEmitter', () => {
   const emitter = new CuratedCorpusEventEmitter();
@@ -22,12 +22,18 @@ describe('CuratedCorpusEventEmitter', () => {
   const unixDate = getUnixTimestamp(date);
   let clock;
   const handler = sinon.mock();
-  Object.values(EventType).forEach((event: string) =>
+
+  Object.values(ReviewedCorpusItemEventType).forEach((event: string) =>
     emitter.on(event, handler)
   );
 
-  const approvedItem: CuratedItem = {
+  Object.values(ScheduledCorpusItemEventType).forEach((event: string) =>
+    emitter.on(event, handler)
+  );
+
+  const approvedItem: ApprovedItem = {
     externalId: '123-abc',
+    prospectId: 'abc-123',
     url: 'https://test.com',
     status: CuratedStatus.CORPUS,
     id: 123,
@@ -56,14 +62,14 @@ describe('CuratedCorpusEventEmitter', () => {
     scheduledCorpusItem: {
       id: 1234,
       externalId: '1234-abc',
-      curatedItemId: 123,
+      approvedItemId: 123,
       newTabGuid: 'EN-US',
       createdAt: new Date(),
       createdBy: '',
       updatedAt: new Date(),
       updatedBy: null,
       scheduledDate: new Date(),
-      curatedItem: approvedItem,
+      approvedItem: approvedItem,
     },
   };
 
@@ -85,10 +91,13 @@ describe('CuratedCorpusEventEmitter', () => {
 
   it('should emit an ADD_ITEM event with expected data', () => {
     // Event is emitted synchronously so don't need to wait
-    emitter.emitEvent(EventType.ADD_ITEM, approvedItemPayload);
+    emitter.emitEvent(
+      ReviewedCorpusItemEventType.ADD_ITEM,
+      approvedItemPayload
+    );
     const expectedData = {
       ...approvedItemPayload,
-      eventType: EventType.ADD_ITEM,
+      eventType: ReviewedCorpusItemEventType.ADD_ITEM,
       timestamp: unixDate,
       source: config.events.source,
       version: config.events.version,
@@ -99,10 +108,13 @@ describe('CuratedCorpusEventEmitter', () => {
 
   it('should emit an UPDATE_ITEM event with expected data', () => {
     // Event is emitted synchronously so don't need to wait
-    emitter.emitEvent(EventType.UPDATE_ITEM, approvedItemPayload);
+    emitter.emitEvent(
+      ReviewedCorpusItemEventType.UPDATE_ITEM,
+      approvedItemPayload
+    );
     const expectedData = {
       ...approvedItemPayload,
-      eventType: EventType.UPDATE_ITEM,
+      eventType: ReviewedCorpusItemEventType.UPDATE_ITEM,
       timestamp: unixDate,
       source: config.events.source,
       version: config.events.version,
@@ -113,10 +125,13 @@ describe('CuratedCorpusEventEmitter', () => {
 
   it('should emit a REMOVE_ITEM event with expected data', () => {
     // Event is emitted synchronously so don't need to wait
-    emitter.emitEvent(EventType.REMOVE_ITEM, approvedItemPayload);
+    emitter.emitEvent(
+      ReviewedCorpusItemEventType.REMOVE_ITEM,
+      approvedItemPayload
+    );
     const expectedData = {
       ...approvedItemPayload,
-      eventType: EventType.REMOVE_ITEM,
+      eventType: ReviewedCorpusItemEventType.REMOVE_ITEM,
       timestamp: unixDate,
       source: config.events.source,
       version: config.events.version,
@@ -130,6 +145,7 @@ describe('CuratedCorpusEventEmitter', () => {
     const rejectedItem: RejectedCuratedCorpusItem = {
       id: 123,
       externalId: '345-abc',
+      prospectId: 'abc-543',
       url: 'https://test.com',
       title: 'Rejected item title',
       topic: Topics.POLITICS,
@@ -144,10 +160,10 @@ describe('CuratedCorpusEventEmitter', () => {
       reviewedCorpusItem: rejectedItem,
     };
 
-    emitter.emitEvent(EventType.REJECT_ITEM, rejectedPayload);
+    emitter.emitEvent(ReviewedCorpusItemEventType.REJECT_ITEM, rejectedPayload);
     const expectedData = {
       ...rejectedPayload,
-      eventType: EventType.REJECT_ITEM,
+      eventType: ReviewedCorpusItemEventType.REJECT_ITEM,
       timestamp: unixDate,
       source: config.events.source,
       version: config.events.version,
@@ -157,10 +173,13 @@ describe('CuratedCorpusEventEmitter', () => {
   });
 
   it('should emit an ADD_SCHEDULE event with expected data', () => {
-    emitter.emitEvent(EventType.ADD_SCHEDULE, scheduledItemPayload);
+    emitter.emitEvent(
+      ScheduledCorpusItemEventType.ADD_SCHEDULE,
+      scheduledItemPayload
+    );
     const expectedData = {
       ...scheduledItemPayload,
-      eventType: EventType.ADD_SCHEDULE,
+      eventType: ScheduledCorpusItemEventType.ADD_SCHEDULE,
       timestamp: unixDate,
       source: config.events.source,
       version: config.events.version,
@@ -170,10 +189,13 @@ describe('CuratedCorpusEventEmitter', () => {
   });
 
   it('should emit a REMOVE_SCHEDULE event with expected data', () => {
-    emitter.emitEvent(EventType.REMOVE_SCHEDULE, scheduledItemPayload);
+    emitter.emitEvent(
+      ScheduledCorpusItemEventType.REMOVE_SCHEDULE,
+      scheduledItemPayload
+    );
     const expectedData = {
       ...scheduledItemPayload,
-      eventType: EventType.REMOVE_SCHEDULE,
+      eventType: ScheduledCorpusItemEventType.REMOVE_SCHEDULE,
       timestamp: unixDate,
       source: config.events.source,
       version: config.events.version,

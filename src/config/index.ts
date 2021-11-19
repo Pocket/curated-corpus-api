@@ -1,6 +1,6 @@
 import {
-  CuratedCorpusItemEventType,
-  CuratedCorpusScheduleEventType,
+  ReviewedCorpusItemEventType,
+  ScheduledCorpusItemEventType,
 } from '../events/types';
 
 const snowplowHttpProtocol =
@@ -36,14 +36,14 @@ export default {
     retries: 3,
     namespace: 'pocket-backend',
     appId: 'pocket-backend-curated-corpus-api',
-    corpusItemEvents: CuratedCorpusItemEventType,
-    corpusScheduleEvents: CuratedCorpusScheduleEventType,
+    corpusItemEvents: ReviewedCorpusItemEventType,
+    corpusScheduleEvents: ScheduledCorpusItemEventType,
     schemas: {
+      objectUpdate: 'iglu:com.pocket/object_update/jsonschema/1-0-5',
       reviewedCorpusItem:
         'iglu:com.pocket/reviewed_corpus_item/jsonschema/1-0-0',
       scheduledCorpusItem:
         'iglu:com.pocket/scheduled_corpus_item/jsonschema/1-0-0',
-      objectUpdate: 'iglu:com.pocket/object_update/jsonschema/1-0-5',
     },
   },
 };

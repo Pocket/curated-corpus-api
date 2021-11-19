@@ -2,15 +2,15 @@ import EventEmitter from 'events';
 import config from '../config';
 import {
   BaseEventData,
-  CuratedCorpusItemEventType,
-  CuratedCorpusScheduleEventType,
+  ReviewedCorpusItemEventType,
+  ScheduledCorpusItemEventType,
 } from './types';
 import { getUnixTimestamp } from '../shared/utils';
 
 export class CuratedCorpusEventEmitter extends EventEmitter {
   private static buildEvent<BaseEventPayload>(
     eventData: BaseEventPayload,
-    eventType: CuratedCorpusItemEventType | CuratedCorpusScheduleEventType
+    eventType: ReviewedCorpusItemEventType | ScheduledCorpusItemEventType
   ): BaseEventPayload & BaseEventData {
     return {
       ...eventData,
@@ -22,7 +22,7 @@ export class CuratedCorpusEventEmitter extends EventEmitter {
   }
 
   emitEvent<BaseEventPayload>(
-    event: CuratedCorpusScheduleEventType | CuratedCorpusItemEventType,
+    event: ReviewedCorpusItemEventType | ScheduledCorpusItemEventType,
     data: BaseEventPayload
   ): void {
     this.emit(event, CuratedCorpusEventEmitter.buildEvent(data, event));

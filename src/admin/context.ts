@@ -1,14 +1,14 @@
 import { client } from '../database/client';
 import {
-  CuratedItem,
+  ApprovedItem,
   PrismaClient,
   RejectedCuratedCorpusItem,
 } from '@prisma/client';
-import { NewTabFeedScheduledItem } from '../database/types';
+import { ScheduledItem } from '../database/types';
 import { CuratedCorpusEventEmitter } from '../events/curatedCorpusEventEmitter';
 import {
-  CuratedCorpusItemEventType,
-  CuratedCorpusScheduleEventType,
+  ReviewedCorpusItemEventType,
+  ScheduledCorpusItemEventType,
   ReviewedCorpusItemPayload,
   ScheduledCorpusItemPayload,
 } from '../events/types';
@@ -19,13 +19,13 @@ export interface IContext {
   eventEmitter: CuratedCorpusEventEmitter;
 
   emitReviewedCorpusItemEvent(
-    event: CuratedCorpusItemEventType,
-    reviewedCorpusItem: CuratedItem | RejectedCuratedCorpusItem
+    event: ReviewedCorpusItemEventType,
+    reviewedCorpusItem: ApprovedItem | RejectedCuratedCorpusItem
   ): void;
 
   emitScheduledCorpusItemEvent(
-    event: CuratedCorpusScheduleEventType,
-    scheduledCorpusItem: NewTabFeedScheduledItem
+    event: ScheduledCorpusItemEventType,
+    scheduledCorpusItem: ScheduledItem
   ): void;
 }
 
@@ -47,8 +47,8 @@ export class ContextManager implements IContext {
   }
 
   emitReviewedCorpusItemEvent(
-    event: CuratedCorpusItemEventType,
-    reviewedCorpusItem: CuratedItem | RejectedCuratedCorpusItem
+    event: ReviewedCorpusItemEventType,
+    reviewedCorpusItem: ApprovedItem | RejectedCuratedCorpusItem
   ): void {
     this.eventEmitter.emitEvent<ReviewedCorpusItemPayload>(event, {
       reviewedCorpusItem,
@@ -56,8 +56,8 @@ export class ContextManager implements IContext {
   }
 
   emitScheduledCorpusItemEvent(
-    event: CuratedCorpusScheduleEventType,
-    scheduledCorpusItem: NewTabFeedScheduledItem
+    event: ScheduledCorpusItemEventType,
+    scheduledCorpusItem: ScheduledItem
   ): void {
     this.eventEmitter.emitEvent<ScheduledCorpusItemPayload>(event, {
       scheduledCorpusItem,

@@ -11,7 +11,7 @@ import {
 } from './schema';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 import config from '../../config';
-import { CuratedItem } from '@prisma/client';
+import { ApprovedItem } from '@prisma/client';
 import { getUnixTimestamp } from '../../shared/utils';
 
 type CuratedCorpusItemUpdateEvent = Omit<SelfDescribingJson, 'data'> & {
@@ -171,7 +171,7 @@ export class CuratedCorpusSnowplowHandler {
 
     // Additionally, send in everything we have for approved curated items
     if (isApprovedItem) {
-      const approvedItem = result.reviewedCorpusItem as CuratedItem;
+      const approvedItem = result.reviewedCorpusItem as ApprovedItem;
       context.data = {
         ...context.data,
         excerpt: approvedItem.excerpt,
