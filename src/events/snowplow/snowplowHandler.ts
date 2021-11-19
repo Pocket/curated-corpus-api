@@ -1,19 +1,18 @@
 import * as Sentry from '@sentry/node';
 import { buildSelfDescribingEvent, Tracker } from '@snowplow/node-tracker';
-import { CuratedCorpusEventPayload, SnowplowEventMap } from '../types';
+import { ReviewedCorpusItemPayload, BaseEventData } from '../types';
+import { ReviewedItemSnowplowEventMap } from './types';
 import { PayloadBuilder, SelfDescribingJson } from '@snowplow/tracker-core';
 import {
   CorpusReviewStatus,
   CuratedCorpusItemUpdate,
   ObjectVersion,
   ReviewedCorpusItem,
-  ScheduledCorpusItem,
 } from './schema';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 import config from '../../config';
 import { CuratedItem } from '@prisma/client';
 import { getUnixTimestamp } from '../../shared/utils';
-import { getNewTabByGuid } from '../../shared/types';
 
 type CuratedCorpusItemUpdateEvent = Omit<SelfDescribingJson, 'data'> & {
   data: CuratedCorpusItemUpdate;
@@ -22,14 +21,14 @@ type CuratedCorpusItemUpdateEvent = Omit<SelfDescribingJson, 'data'> & {
 type ReviewedCorpusItemContext = Omit<SelfDescribingJson, 'data'> & {
   data: ReviewedCorpusItem;
 };
+//
+// type ScheduledCorpusItemContext =
+//   | (Omit<SelfDescribingJson, 'data'> & {
+//       data: ScheduledCorpusItem;
+//     })
+//   | undefined;
 
-type ScheduledCorpusItemContext =
-  | (Omit<SelfDescribingJson, 'data'> & {
-      data: ScheduledCorpusItem;
-    })
-  | undefined;
-
-export class SnowplowHandler {
+export class CuratedCorpusSnowplowHandler {
   constructor(
     private emitter: CuratedCorpusEventEmitter,
     private tracker: Tracker,
@@ -42,11 +41,18 @@ export class SnowplowHandler {
   /**
    * @param data
    */
-  async process(data: CuratedCorpusEventPayload): Promise<void> {
+  async process(
+    data: ReviewedCorpusItemPayload & BaseEventData
+  ): Promise<void> {
     const event = buildSelfDescribingEvent({
-      event: SnowplowHandler.generateCuratedCorpusItemUpdateEvent(data),
+      event:
+        CuratedCorpusSnowplowHandler.generateReviewedCorpusItemUpdateEvent(
+          data
+        ),
     });
-    const context = await SnowplowHandler.generateEventContext(data);
+    const context = await CuratedCorpusSnowplowHandler.generateEventContext(
+      data
+    );
     await this.track(event, context);
   }
 
@@ -74,34 +80,34 @@ export class SnowplowHandler {
    * @private
    */
   private static async generateEventContext(
-    data: CuratedCorpusEventPayload
+    data: ReviewedCorpusItemPayload
   ): Promise<SelfDescribingJson[]> {
+    const eventContext: SelfDescribingJson[] = [];
+
     const reviewedItemContext =
-      await SnowplowHandler.generateReviewedCorpusItemContext(data);
-
-    const eventContext: SelfDescribingJson[] = [reviewedItemContext];
-
-    const scheduledItemContext =
-      await SnowplowHandler.generateScheduledCorpusItemContext(data);
-
-    // Add a scheduled item if one was created or removed
-    if (scheduledItemContext) {
-      eventContext.push(scheduledItemContext);
+      await CuratedCorpusSnowplowHandler.generateReviewedCorpusItemContext(
+        data
+      );
+    if (reviewedItemContext) {
+      eventContext.push(reviewedItemContext);
     }
+
+    // const scheduledItemContext =
+    //   await CuratedCorpusSnowplowHandler.generateScheduledCorpusItemContext(data);
+    // if (scheduledItemContext) {
+    //   eventContext.push(scheduledItemContext);
+    // }
 
     return eventContext;
   }
 
-  /**
-   * @private
-   */
-  private static generateCuratedCorpusItemUpdateEvent(
-    data: CuratedCorpusEventPayload
+  private static generateReviewedCorpusItemUpdateEvent(
+    data: ReviewedCorpusItemPayload & BaseEventData
   ): CuratedCorpusItemUpdateEvent {
     return {
       schema: config.snowplow.schemas.objectUpdate,
       data: {
-        trigger: SnowplowEventMap[data.eventType],
+        trigger: ReviewedItemSnowplowEventMap[data.eventType],
       },
     };
   }
@@ -109,11 +115,28 @@ export class SnowplowHandler {
   /**
    * @private
    */
-  private static async generateReviewedCorpusItemContext(
-    data: CuratedCorpusEventPayload
-  ): Promise<ReviewedCorpusItemContext> {
-    const result: CuratedCorpusEventPayload = await data;
+  // private static generateCuratedCorpusItemUpdateEvent(
+  //   data: CuratedCorpusEventPayload
+  // ): CuratedCorpusItemUpdateEvent {
+  //   return {
+  //     schema: config.snowplow.schemas.objectUpdate,
+  //     data: {
+  //       trigger: SnowplowEventMap[data.eventType],
+  //     },
+  //   };
+  // }
 
+  /**
+   * @private
+   */
+  private static async generateReviewedCorpusItemContext(
+    data: ReviewedCorpusItemPayload
+  ): Promise<ReviewedCorpusItemContext> {
+    const result: ReviewedCorpusItemPayload = await data;
+
+    // generate common data here
+
+    // call item-specific methods to add the extra fields
     const item = result.reviewedCorpusItem;
     let isApprovedItem = false;
 
@@ -137,7 +160,7 @@ export class SnowplowHandler {
         // TODO: this is not correct. Need to return rejected_corpus_item_external_id prop
         // if reviewed item was rejected
         // Also, rejected items need reasons for rejection returned
-        approved_corpus_item_external_id: item.externalId,
+
         title: item.title,
         language: item.language,
         topic: item.topic,
@@ -156,10 +179,12 @@ export class SnowplowHandler {
         is_collection: approvedItem.isCollection,
         is_syndicated: approvedItem.isSyndicated,
         is_short_lived: approvedItem.isShortLived,
-
+        approved_corpus_item_external_id: item.externalId,
         updated_at: getUnixTimestamp(approvedItem.updatedAt),
         updated_by: approvedItem.updatedBy ?? undefined,
       };
+    } else {
+      /// add the rejected external id
     }
 
     return context;
@@ -168,44 +193,44 @@ export class SnowplowHandler {
   /**
    * @private
    */
-  private static async generateScheduledCorpusItemContext(
-    data: CuratedCorpusEventPayload
-  ): Promise<ScheduledCorpusItemContext> {
-    const result: CuratedCorpusEventPayload = await data;
-
-    const item = result.scheduledCorpusItem;
-
-    // If no scheduled item is created, don't send anything to Snowplow.
-    if (!item) return;
-
-    // Set up data to be returned
-    const context: ScheduledCorpusItemContext = {
-      schema: config.snowplow.schemas.scheduledCorpusItem,
-      data: {
-        object_version: ObjectVersion.NEW,
-        scheduled_corpus_item_external_id: item.externalId,
-        scheduled_at: getUnixTimestamp(item.scheduledDate),
-        url: item.curatedItem.url,
-        approved_corpus_item_external_id: item.curatedItem.externalId,
-        new_tab_id: item.newTabGuid,
-        created_at: getUnixTimestamp(item.createdAt),
-        created_by: item.createdBy,
-        updated_at: getUnixTimestamp(item.updatedAt),
-        updated_by: item.updatedBy ?? undefined,
-      },
-    };
-
-    // Get the NewTab info
-    const newTab = getNewTabByGuid(item.newTabGuid);
-
-    if (newTab) {
-      context.data = {
-        ...context.data,
-        new_tab_name: newTab.name,
-        new_tab_feed_utc_offset: newTab.utcOffset.toString(),
-      };
-    }
-
-    return context;
-  }
+  // private static async generateScheduledCorpusItemContext(
+  //   data: CuratedCorpusEventPayload
+  // ): Promise<ScheduledCorpusItemContext> {
+  //   const result: CuratedCorpusEventPayload = await data;
+  //
+  //   const item = result.scheduledCorpusItem;
+  //
+  //   // If no scheduled item is created, don't send anything to Snowplow.
+  //   if (!item) return;
+  //
+  //   // Set up data to be returned
+  //   const context: ScheduledCorpusItemContext = {
+  //     schema: config.snowplow.schemas.scheduledCorpusItem,
+  //     data: {
+  //       object_version: ObjectVersion.NEW,
+  //       scheduled_corpus_item_external_id: item.externalId,
+  //       scheduled_at: getUnixTimestamp(item.scheduledDate),
+  //       url: item.curatedItem.url,
+  //       approved_corpus_item_external_id: item.curatedItem.externalId,
+  //       new_tab_id: item.newTabGuid,
+  //       created_at: getUnixTimestamp(item.createdAt),
+  //       created_by: item.createdBy,
+  //       updated_at: getUnixTimestamp(item.updatedAt),
+  //       updated_by: item.updatedBy ?? undefined,
+  //     },
+  //   };
+  //
+  //   // Get the NewTab info
+  //   const newTab = getNewTabByGuid(item.newTabGuid);
+  //
+  //   if (newTab) {
+  //     context.data = {
+  //       ...context.data,
+  //       new_tab_name: newTab.name,
+  //       new_tab_feed_utc_offset: newTab.utcOffset.toString(),
+  //     };
+  //   }
+  //
+  //   return context;
+  // }
 }

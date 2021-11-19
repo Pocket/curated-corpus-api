@@ -1,47 +1,39 @@
 import { CuratedItem, RejectedCuratedCorpusItem } from '@prisma/client';
 import { NewTabFeedScheduledItem } from '../database/types';
 
-export enum EventType {
+export enum ReviewedCorpusItemEventType {
   ADD_ITEM = 'ADD_ITEM',
   UPDATE_ITEM = 'UPDATE_ITEM',
   REMOVE_ITEM = 'REMOVE_ITEM',
   REJECT_ITEM = 'REJECT_ITEM',
+}
+
+export enum ScheduledCorpusItemEventType {
   ADD_SCHEDULE = 'ADD_SCHEDULE',
   REMOVE_SCHEDULE = 'REMOVE_SCHEDULE',
 }
 
+export type ReviewedCorpusItemEventTypeString =
+  keyof typeof ReviewedCorpusItemEventType;
+export type ScheduledCorpusItemEventTypeString =
+  keyof typeof ScheduledCorpusItemEventType;
+
 // Data common to all events
-export type BasicEventData = {
+export type BaseEventData = {
+  eventType:
+    | ReviewedCorpusItemEventTypeString
+    | ScheduledCorpusItemEventTypeString;
   timestamp: number; // epoch time (ms)
   source: string;
   version: string; // semver (e.g. 1.2.33)
 };
 
-export type EventTypeString = keyof typeof EventType;
-
-export type BasicCuratedCorpusEventPayload = {
-  // Always send the reviewed_corpus_item entity
+// Data for the events that are fired on changes to curated items
+export type ReviewedCorpusItemPayload = {
   reviewedCorpusItem: CuratedItem | RejectedCuratedCorpusItem;
-  // If a schedule event was triggered, send the scheduled_corpus_item entity, too
-  scheduledCorpusItem?: NewTabFeedScheduledItem;
 };
 
-export type CuratedCorpusEventPayload = BasicCuratedCorpusEventPayload &
-  BasicEventData & { eventType: EventTypeString };
-
-export type SnowplowEventType =
-  | 'reviewed_corpus_item_added'
-  | 'reviewed_corpus_item_updated'
-  | 'reviewed_corpus_item_removed'
-  | 'reviewed_corpus_item_rejected'
-  | 'scheduled_corpus_item_added'
-  | 'scheduled_corpus_item_removed';
-
-export const SnowplowEventMap: Record<EventTypeString, SnowplowEventType> = {
-  ADD_ITEM: 'reviewed_corpus_item_added',
-  UPDATE_ITEM: 'reviewed_corpus_item_updated',
-  REMOVE_ITEM: 'reviewed_corpus_item_removed',
-  REJECT_ITEM: 'reviewed_corpus_item_rejected',
-  ADD_SCHEDULE: 'scheduled_corpus_item_added',
-  REMOVE_SCHEDULE: 'scheduled_corpus_item_removed',
+// Data for the events that are fired on updates to New Tab schedule
+export type ScheduledCorpusItemPayload = {
+  scheduledCorpusItem: NewTabFeedScheduledItem;
 };

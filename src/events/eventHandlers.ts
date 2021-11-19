@@ -1,5 +1,5 @@
 import { CuratedCorpusEventEmitter } from './curatedCorpusEventEmitter';
-import { SnowplowHandler } from './snowplow/snowplowHandler';
+import { CuratedCorpusSnowplowHandler } from './snowplow/snowplowHandler';
 import { tracker } from './snowplow/tracker';
 import config from '../config';
 
@@ -10,9 +10,23 @@ export type CuratedCorpusEventHandlerFn = (
 /**
  * @param emitter
  */
-export function snowplowEventHandler(emitter: CuratedCorpusEventEmitter): void {
+export function corpusItemSnowplowEventHandler(
+  emitter: CuratedCorpusEventEmitter
+): void {
   const snowplowEventsToListen = Object.values(
-    config.snowplow.events
+    config.snowplow.corpusItemEvents
   ) as string[];
-  new SnowplowHandler(emitter, tracker, snowplowEventsToListen);
+  new CuratedCorpusSnowplowHandler(emitter, tracker, snowplowEventsToListen);
+}
+
+/**
+ * @param emitter
+ */
+export function corpusScheduleSnowplowEventHandler(
+  emitter: CuratedCorpusEventEmitter
+): void {
+  const snowplowEventsToListen = Object.values(
+    config.snowplow.corpusScheduleEvents
+  ) as string[];
+  // new CuratedCorpusSnowplowHandler(emitter, tracker, snowplowEventsToListen);
 }

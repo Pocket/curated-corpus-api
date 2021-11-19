@@ -1,17 +1,17 @@
 import EventEmitter from 'events';
 import config from '../config';
 import {
-  BasicCuratedCorpusEventPayload,
-  EventType,
-  CuratedCorpusEventPayload,
+  BaseEventData,
+  CuratedCorpusItemEventType,
+  CuratedCorpusScheduleEventType,
 } from './types';
 import { getUnixTimestamp } from '../shared/utils';
 
 export class CuratedCorpusEventEmitter extends EventEmitter {
-  private static buildEvent(
-    eventData: BasicCuratedCorpusEventPayload,
-    eventType: EventType
-  ): CuratedCorpusEventPayload {
+  private static buildEvent<BaseEventPayload>(
+    eventData: BaseEventPayload,
+    eventType: CuratedCorpusItemEventType | CuratedCorpusScheduleEventType
+  ): BaseEventPayload & BaseEventData {
     return {
       ...eventData,
       eventType: eventType,
@@ -21,7 +21,10 @@ export class CuratedCorpusEventEmitter extends EventEmitter {
     };
   }
 
-  emitUserEvent(event: EventType, data: BasicCuratedCorpusEventPayload): void {
+  emitEvent<BaseEventPayload>(
+    event: CuratedCorpusScheduleEventType | CuratedCorpusItemEventType,
+    data: BaseEventPayload
+  ): void {
     this.emit(event, CuratedCorpusEventEmitter.buildEvent(data, event));
   }
 }

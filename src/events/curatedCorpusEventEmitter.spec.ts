@@ -1,5 +1,10 @@
 import { CuratedCorpusEventEmitter } from './curatedCorpusEventEmitter';
-import { BasicCuratedCorpusEventPayload, EventType } from './types';
+import {
+  BaseEventData,
+  ReviewedCorpusItemPayload,
+  ScheduledCorpusItemPayload,
+  EventType,
+} from './types';
 import config from '../config';
 import sinon from 'sinon';
 import { getUnixTimestamp } from '../shared/utils';
@@ -41,23 +46,25 @@ describe('CuratedCorpusEventEmitter', () => {
     updatedBy: null,
   };
 
-  const approvedItemPayload: BasicCuratedCorpusEventPayload = {
+  const approvedItemPayload: ReviewedCorpusItemPayload = {
     reviewedCorpusItem: approvedItem,
   };
 
   // Set up separately to the main payload - only for scheduling events
   // when we need to send this data
-  const scheduledItem: NewTabFeedScheduledItem = {
-    id: 1234,
-    externalId: '1234-abc',
-    curatedItemId: 123,
-    newTabGuid: 'EN-US',
-    createdAt: new Date(),
-    createdBy: '',
-    updatedAt: new Date(),
-    updatedBy: null,
-    scheduledDate: new Date(),
-    curatedItem: approvedItem,
+  const scheduledItemPayload: ScheduledCorpusItemPayload = {
+    scheduledCorpusItem: {
+      id: 1234,
+      externalId: '1234-abc',
+      curatedItemId: 123,
+      newTabGuid: 'EN-US',
+      createdAt: new Date(),
+      createdBy: '',
+      updatedAt: new Date(),
+      updatedBy: null,
+      scheduledDate: new Date(),
+      curatedItem: approvedItem,
+    },
   };
 
   afterAll(() => {
@@ -78,7 +85,7 @@ describe('CuratedCorpusEventEmitter', () => {
 
   it('should emit an ADD_ITEM event with expected data', () => {
     // Event is emitted synchronously so don't need to wait
-    emitter.emitUserEvent(EventType.ADD_ITEM, approvedItemPayload);
+    emitter.emitEvent(EventType.ADD_ITEM, approvedItemPayload);
     const expectedData = {
       ...approvedItemPayload,
       eventType: EventType.ADD_ITEM,
@@ -92,7 +99,7 @@ describe('CuratedCorpusEventEmitter', () => {
 
   it('should emit an UPDATE_ITEM event with expected data', () => {
     // Event is emitted synchronously so don't need to wait
-    emitter.emitUserEvent(EventType.UPDATE_ITEM, approvedItemPayload);
+    emitter.emitEvent(EventType.UPDATE_ITEM, approvedItemPayload);
     const expectedData = {
       ...approvedItemPayload,
       eventType: EventType.UPDATE_ITEM,
@@ -106,7 +113,7 @@ describe('CuratedCorpusEventEmitter', () => {
 
   it('should emit a REMOVE_ITEM event with expected data', () => {
     // Event is emitted synchronously so don't need to wait
-    emitter.emitUserEvent(EventType.REMOVE_ITEM, approvedItemPayload);
+    emitter.emitEvent(EventType.REMOVE_ITEM, approvedItemPayload);
     const expectedData = {
       ...approvedItemPayload,
       eventType: EventType.REMOVE_ITEM,
@@ -133,11 +140,11 @@ describe('CuratedCorpusEventEmitter', () => {
       createdBy: 'Anyone',
     };
 
-    const rejectedPayload: BasicCuratedCorpusEventPayload = {
+    const rejectedPayload: ReviewedCorpusItemPayload = {
       reviewedCorpusItem: rejectedItem,
     };
 
-    emitter.emitUserEvent(EventType.REJECT_ITEM, rejectedPayload);
+    emitter.emitEvent(EventType.REJECT_ITEM, rejectedPayload);
     const expectedData = {
       ...rejectedPayload,
       eventType: EventType.REJECT_ITEM,
@@ -150,12 +157,9 @@ describe('CuratedCorpusEventEmitter', () => {
   });
 
   it('should emit an ADD_SCHEDULE event with expected data', () => {
-    // This event returns both the curated item and a scheduled entry
-    approvedItemPayload.scheduledCorpusItem = scheduledItem;
-
-    emitter.emitUserEvent(EventType.ADD_SCHEDULE, approvedItemPayload);
+    emitter.emitEvent(EventType.ADD_SCHEDULE, scheduledItemPayload);
     const expectedData = {
-      ...approvedItemPayload,
+      ...scheduledItemPayload,
       eventType: EventType.ADD_SCHEDULE,
       timestamp: unixDate,
       source: config.events.source,
@@ -166,12 +170,9 @@ describe('CuratedCorpusEventEmitter', () => {
   });
 
   it('should emit a REMOVE_SCHEDULE event with expected data', () => {
-    // This event returns both the curated item and a scheduled entry
-    approvedItemPayload.scheduledCorpusItem = scheduledItem;
-
-    emitter.emitUserEvent(EventType.REMOVE_SCHEDULE, approvedItemPayload);
+    emitter.emitEvent(EventType.REMOVE_SCHEDULE, scheduledItemPayload);
     const expectedData = {
-      ...approvedItemPayload,
+      ...scheduledItemPayload,
       eventType: EventType.REMOVE_SCHEDULE,
       timestamp: unixDate,
       source: config.events.source,

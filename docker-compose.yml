@@ -48,6 +48,6 @@ services:
       - snowplow
 
   snowplow:
-    image: pocket/snowplow-micro:prod
+    image: pocket/snowplow-micro:dev
     ports:
       - '9090:9090'

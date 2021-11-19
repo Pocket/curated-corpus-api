@@ -1,4 +1,7 @@
-import { EventType } from '../events/types';
+import {
+  CuratedCorpusItemEventType,
+  CuratedCorpusScheduleEventType,
+} from '../events/types';
 
 const snowplowHttpProtocol =
   process.env.NODE_ENV && process.env.NODE_ENV === 'production'
@@ -33,7 +36,8 @@ export default {
     retries: 3,
     namespace: 'pocket-backend',
     appId: 'pocket-backend-curated-corpus-api',
-    events: EventType,
+    corpusItemEvents: CuratedCorpusItemEventType,
+    corpusScheduleEvents: CuratedCorpusScheduleEventType,
     schemas: {
       reviewedCorpusItem:
         'iglu:com.pocket/reviewed_corpus_item/jsonschema/1-0-0',
