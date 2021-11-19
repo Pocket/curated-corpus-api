@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import {
-  createCuratedItemHelper,
-  createNewTabScheduleHelper,
+  createApprovedItemHelper,
+  createScheduledItemHelper,
   createRejectedCuratedCorpusItemHelper,
 } from '../src/test/helpers';
 import faker from 'faker';
@@ -11,18 +11,18 @@ const prisma = new PrismaClient();
 async function main() {
   // Default pagination is 30 items per page. Let's generate enough data for
   // several pages
-  const curatedItemTitles: string[] = [];
+  const approvedItemTitles: string[] = [];
 
   for (let i = 0; i < 170; i++) {
-    curatedItemTitles.push(faker.lorem.sentence());
+    approvedItemTitles.push(faker.lorem.sentence());
   }
 
-  for (const title of curatedItemTitles) {
-    const curatedItem = await createCuratedItemHelper(prisma, { title });
+  for (const title of approvedItemTitles) {
+    const approvedItem = await createApprovedItemHelper(prisma, { title });
 
-    await createNewTabScheduleHelper(prisma, {
+    await createScheduledItemHelper(prisma, {
       newTabGuid: faker.random.arrayElement(['EN_US', 'DE_DE']),
-      curatedItem,
+      approvedItem,
     }).catch(console.error);
   }
 

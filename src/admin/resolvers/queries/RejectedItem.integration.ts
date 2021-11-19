@@ -5,7 +5,7 @@ import {
   clearDb,
   createRejectedCuratedCorpusItemHelper,
 } from '../../../test/helpers';
-import { GET_REJECTED_CURATED_CORPUS_ITEMS } from '../../../test/admin-server/queries.gql';
+import { GET_REJECTED_ITEMS } from '../../../test/admin-server/queries.gql';
 
 describe('queries: RejectedCuratedCorpusItem', () => {
   beforeAll(async () => {
@@ -75,7 +75,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
 
     it('should get all items when number of requested items is greater than total items', async () => {
       const { data } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           pagination: { first: 20 },
         },
@@ -91,7 +91,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
 
     it('should correctly sort items by createdAt when using default sort', async () => {
       const { data } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
       });
 
       const firstItem = data?.getRejectedCuratedCorpusItems.edges[0].node;
@@ -102,7 +102,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
 
     it('should return all available properties of an rejected curated corpus item', async () => {
       const { data } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           pagination: { first: 1 },
         },
@@ -113,6 +113,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
       // The important thing to test here is that the query returns all of these
       // properties without falling over, and not that they hold any specific value.
       expect(firstItem.externalId).to.be.not.undefined;
+      expect(firstItem.prospectId).to.be.not.undefined;
       expect(firstItem.title).to.be.not.undefined;
       expect(firstItem.language).to.be.not.undefined;
       expect(firstItem.publisher).to.be.not.undefined;
@@ -125,7 +126,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
 
     it('should return correct paginated results', async () => {
       const { data } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           pagination: { first: 2 },
         },
@@ -137,7 +138,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
 
     it('should return a PageInfo object', async () => {
       const { data } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           pagination: { first: 5 },
         },
@@ -151,7 +152,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
     });
     it('should return after cursor without overfetching', async () => {
       const { data } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           pagination: { first: 4 },
         },
@@ -160,7 +161,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
       const cursor = data?.getRejectedCuratedCorpusItems.edges[3].cursor;
 
       const { data: nextPageData } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           pagination: { first: 4, after: cursor },
         },
@@ -173,7 +174,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
 
     it('should return before cursor without overfetching', async () => {
       const { data } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           pagination: { last: 4 },
         },
@@ -182,7 +183,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
       const cursor = data?.getRejectedCuratedCorpusItems.edges[0].cursor;
 
       const { data: prevPageData } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           pagination: { last: 4, before: cursor },
         },
@@ -195,7 +196,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
 
     it('should filter by language', async () => {
       const { data } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           filters: { language: 'de' },
         },
@@ -216,7 +217,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
 
     it('should filter by story title', async () => {
       const { data } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           filters: { title: 'laravel' },
         },
@@ -230,7 +231,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
 
     it('should filter by topic', async () => {
       const { data } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           filters: { topic: 'Technology' },
         },
@@ -245,7 +246,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
 
     it('should filter by story URL', async () => {
       const { data } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           filters: { url: 'sample-domain' },
         },
@@ -259,7 +260,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
 
     it('should filter url, title, topic and language', async () => {
       const { data } = await server.executeOperation({
-        query: GET_REJECTED_CURATED_CORPUS_ITEMS,
+        query: GET_REJECTED_ITEMS,
         variables: {
           filters: {
             url: 'sample-domain',

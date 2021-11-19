@@ -1,8 +1,9 @@
 import { gql } from 'apollo-server-express';
 
 export const CuratedItemData = gql`
-  fragment CuratedItemData on CuratedItem {
+  fragment CuratedItemData on ApprovedCuratedCorpusItem {
     externalId
+    prospectId
     title
     language
     publisher
@@ -21,9 +22,10 @@ export const CuratedItemData = gql`
   }
 `;
 
-export const RejectedCuratedCorpusItemData = gql`
-  fragment RejectedCuratedCorpusItemData on RejectedCuratedCorpusItem {
+export const RejectedItemData = gql`
+  fragment RejectedItemData on RejectedCuratedCorpusItem {
     externalId
+    prospectId
     url
     title
     topic

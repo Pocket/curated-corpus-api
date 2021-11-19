@@ -3,13 +3,13 @@ import { expect } from 'chai';
 import faker from 'faker';
 import { clearDb } from './clearDb';
 import {
-  createCuratedItemHelper,
-  CreateCuratedItemHelperInput,
-} from './createCuratedItemHelper';
+  createApprovedItemHelper,
+  CreateApprovedItemHelperInput,
+} from './createApprovedItemHelper';
 
 const db = new PrismaClient();
 
-describe('createCuratedItemHelper', () => {
+describe('createApprovedItemHelper', () => {
   beforeEach(async () => {
     await clearDb(db);
   });
@@ -18,16 +18,17 @@ describe('createCuratedItemHelper', () => {
     await db.$disconnect();
   });
 
-  it('creates a curated item with just the title supplied', async () => {
-    const data: CreateCuratedItemHelperInput = { title: 'What even is time?' };
+  it('creates an approved item with just the title supplied', async () => {
+    const data: CreateApprovedItemHelperInput = { title: 'What even is time?' };
 
-    const item = await createCuratedItemHelper(db, data);
+    const item = await createApprovedItemHelper(db, data);
 
     // Expect to see the title we passed to the helper
     expect(item.title).to.equal(data.title);
 
     // Expect to see the remaining fields filled in for us
     expect(item.externalId).to.be.not.undefined;
+    expect(item.prospectId).to.be.not.undefined;
     expect(item.language).to.be.not.undefined;
     expect(item.publisher).to.be.not.undefined;
     expect(item.url).to.be.not.undefined;
@@ -41,7 +42,8 @@ describe('createCuratedItemHelper', () => {
   });
 
   it('creates a curated item with all properties supplied', async () => {
-    const data: CreateCuratedItemHelperInput = {
+    const data: CreateApprovedItemHelperInput = {
+      prospectId: '123-abc',
       title: 'What even is time?',
       excerpt: faker.lorem.sentences(3),
       status: CuratedStatus.RECOMMENDATION,
@@ -54,7 +56,7 @@ describe('createCuratedItemHelper', () => {
       isSyndicated: true,
     };
 
-    const item = await createCuratedItemHelper(db, data);
+    const item = await createApprovedItemHelper(db, data);
 
     // Expect to see everything as specified to the helper
     expect(item).to.deep.include(data);

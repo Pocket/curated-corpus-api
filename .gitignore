@@ -31,6 +31,7 @@ tmp
 .DS_Store
 /test-results.xml
 .vscode
+.env
 
 # Build files
 dist

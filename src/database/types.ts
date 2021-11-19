@@ -1,4 +1,8 @@
-import { CuratedItem, CuratedStatus, NewTabFeedSchedule } from '@prisma/client';
+import {
+  ApprovedItem,
+  CuratedStatus,
+  ScheduledItem as ScheduledItemModel,
+} from '@prisma/client';
 
 export type PaginationInput = {
   after?: string;
@@ -7,7 +11,7 @@ export type PaginationInput = {
   last?: number;
 };
 
-export type CuratedItemFilter = {
+export type ApprovedItemFilter = {
   language?: string;
   status?: CuratedStatus;
   title?: string;
@@ -23,10 +27,11 @@ export type RejectedCuratedCorpusItemFilter = {
 };
 
 /**
- * These properties are the same for both createCuratedItem and updateCuratedItem
+ * These properties are the same for both createApprovedItem and updateApprovedItem
  * mutations.
  */
-type CuratedItemRequiredInput = {
+type ApprovedItemRequiredInput = {
+  prospectId: string;
   url: string;
   title: string;
   excerpt: string;
@@ -40,35 +45,35 @@ type CuratedItemRequiredInput = {
   isSyndicated: boolean;
 };
 
-export type CreateCuratedItemInput = CuratedItemRequiredInput & {
+export type CreateApprovedItemInput = ApprovedItemRequiredInput & {
   scheduledDate?: string;
   newTabGuid?: string;
 };
 
-export type UpdateCuratedItemInput = {
+export type UpdateApprovedItemInput = {
   externalId: string;
-} & CuratedItemRequiredInput;
+} & ApprovedItemRequiredInput;
 
-export type NewTabFeedScheduledItem = NewTabFeedSchedule & {
-  curatedItem: CuratedItem;
+export type ScheduledItem = ScheduledItemModel & {
+  approvedItem: ApprovedItem;
 };
 
-export type NewTabFeedScheduledItemsResult = {
-  items: NewTabFeedSchedule[];
+export type ScheduledItemsResult = {
+  items: ScheduledItem[];
 };
 
-export type NewTabFeedScheduleFilterInput = {
+export type ScheduledItemFilterInput = {
   newTabGuid: string;
   startDate: string;
   endDate: string;
 };
 
-export type DeleteNewTabFeedScheduledItemInput = {
+export type DeleteScheduledItemInput = {
   externalId: string;
 };
 
-export type CreateNewTabFeedScheduledItemInput = {
-  curatedItemExternalId: string;
+export type CreateScheduledItemInput = {
+  approvedItemExternalId: string;
   newTabGuid: string;
   scheduledDate: string;
 };

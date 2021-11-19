@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { CuratedStatus } from '@prisma/client';
 import { db, server } from '../../../test/admin-server';
-import { clearDb, createCuratedItemHelper } from '../../../test/helpers';
-import { GET_CURATED_ITEMS } from '../../../test/admin-server/queries.gql';
+import { clearDb, createApprovedItemHelper } from '../../../test/helpers';
+import { GET_APPROVED_ITEMS } from '../../../test/admin-server/queries.gql';
 
-describe('queries: CuratedItem', () => {
+describe('queries: ApprovedCuratedCorpusItem', () => {
   beforeAll(async () => {
     await clearDb(db);
     await server.start();
@@ -15,7 +15,7 @@ describe('queries: CuratedItem', () => {
     await server.stop();
   });
 
-  describe('getCuratedItems query', () => {
+  describe('getApprovedCuratedCorpusItems query', () => {
     beforeAll(async () => {
       // Create some items
       const stories = [
@@ -84,39 +84,40 @@ describe('queries: CuratedItem', () => {
       ];
 
       for (const story of stories) {
-        await createCuratedItemHelper(db, story);
+        await createApprovedItemHelper(db, story);
       }
     });
 
     it('should get all requested items', async () => {
       const { data } = await server.executeOperation({
-        query: GET_CURATED_ITEMS,
+        query: GET_APPROVED_ITEMS,
         variables: {
           pagination: { first: 20 },
         },
       });
 
-      expect(data?.getCuratedItems.edges).to.have.length(10);
-      expect(data?.getCuratedItems.totalCount).to.equal(10);
+      expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(10);
+      expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(10);
 
       // Check default sorting - createdAt.DESC
-      const firstItem = data?.getCuratedItems.edges[0].node;
-      const secondItem = data?.getCuratedItems.edges[1].node;
+      const firstItem = data?.getApprovedCuratedCorpusItems.edges[0].node;
+      const secondItem = data?.getApprovedCuratedCorpusItems.edges[1].node;
       expect(firstItem.createdAt > secondItem.createdAt).to.be.true;
     });
 
     it('should get all available properties of curated items', async () => {
       const { data } = await server.executeOperation({
-        query: GET_CURATED_ITEMS,
+        query: GET_APPROVED_ITEMS,
         variables: {
           pagination: { first: 1 },
         },
       });
 
-      const firstItem = data?.getCuratedItems.edges[0].node;
+      const firstItem = data?.getApprovedCuratedCorpusItems.edges[0].node;
       // The important thing to test here is that the query returns all of these
       // properties without falling over, and not that they hold any specific value.
       expect(firstItem.externalId).to.be.not.undefined;
+      expect(firstItem.prospectId).to.be.not.undefined;
       expect(firstItem.title).to.be.not.undefined;
       expect(firstItem.language).to.be.not.undefined;
       expect(firstItem.publisher).to.be.not.undefined;
@@ -132,25 +133,25 @@ describe('queries: CuratedItem', () => {
 
     it('should respect pagination', async () => {
       const { data } = await server.executeOperation({
-        query: GET_CURATED_ITEMS,
+        query: GET_APPROVED_ITEMS,
         variables: {
           pagination: { first: 2 },
         },
       });
 
       // We expect to get two results back
-      expect(data?.getCuratedItems.edges).to.have.length(2);
+      expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(2);
     });
 
     it('should return a PageInfo object', async () => {
       const { data } = await server.executeOperation({
-        query: GET_CURATED_ITEMS,
+        query: GET_APPROVED_ITEMS,
         variables: {
           pagination: { first: 5 },
         },
       });
 
-      const pageInfo = data?.getCuratedItems.pageInfo;
+      const pageInfo = data?.getApprovedCuratedCorpusItems.pageInfo;
       expect(pageInfo.hasNextPage).to.equal(true);
       expect(pageInfo.hasPreviousPage).to.equal(false);
       expect(pageInfo.startCursor).to.be.a('string');
@@ -160,122 +161,122 @@ describe('queries: CuratedItem', () => {
 
   it('should return after cursor without overfetching', async () => {
     const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS,
+      query: GET_APPROVED_ITEMS,
       variables: {
         pagination: { first: 4 },
       },
     });
 
-    const cursor = data?.getCuratedItems.edges[3].cursor;
+    const cursor = data?.getApprovedCuratedCorpusItems.edges[3].cursor;
 
     const { data: nextPageData } = await server.executeOperation({
-      query: GET_CURATED_ITEMS,
+      query: GET_APPROVED_ITEMS,
       variables: {
         pagination: { first: 4, after: cursor },
       },
     });
 
-    expect(nextPageData?.getCuratedItems.edges)
+    expect(nextPageData?.getApprovedCuratedCorpusItems.edges)
       .to.be.an('array')
       .that.does.not.contain({ cursor });
   });
 
   it('should return before cursor without overfetching', async () => {
     const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS,
+      query: GET_APPROVED_ITEMS,
       variables: {
         pagination: { last: 4 },
       },
     });
 
-    const cursor = data?.getCuratedItems.edges[0].cursor;
+    const cursor = data?.getApprovedCuratedCorpusItems.edges[0].cursor;
 
     const { data: prevPageData } = await server.executeOperation({
-      query: GET_CURATED_ITEMS,
+      query: GET_APPROVED_ITEMS,
       variables: {
         pagination: { last: 4, before: cursor },
       },
     });
 
-    expect(prevPageData?.getCuratedItems.edges)
+    expect(prevPageData?.getApprovedCuratedCorpusItems.edges)
       .to.be.an('array')
       .that.does.not.contain({ cursor });
   });
 
   it('should filter by language', async () => {
     const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS,
+      query: GET_APPROVED_ITEMS,
       variables: {
         filters: { language: 'de' },
       },
     });
 
     // we only have three stories in German set up before each test
-    expect(data?.getCuratedItems.edges).to.have.length(3);
+    expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(3);
     // make sure the total count is not _all_ results, i.e. 10, but only three
-    expect(data?.getCuratedItems.totalCount).to.equal(3);
+    expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(3);
   });
 
   it('should filter by story title', async () => {
     const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS,
+      query: GET_APPROVED_ITEMS,
       variables: {
         filters: { title: 'ZoMbIeS' },
       },
     });
 
     // we only have one story with "Zombies" in the title
-    expect(data?.getCuratedItems.edges).to.have.length(1);
+    expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(1);
     // make sure total results value is correct
-    expect(data?.getCuratedItems.totalCount).to.equal(1);
+    expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(1);
   });
 
   it('should filter by topic', async () => {
     const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS,
+      query: GET_APPROVED_ITEMS,
       variables: {
         filters: { topic: 'TeChNoLoGy' },
       },
     });
 
     // we only have two stories categorised as "Technology"
-    expect(data?.getCuratedItems.edges).to.have.length(2);
+    expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(2);
 
     // make sure total results value is correct
-    expect(data?.getCuratedItems.totalCount).to.equal(2);
+    expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(2);
   });
 
   it('should filter by curated status', async () => {
     const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS,
+      query: GET_APPROVED_ITEMS,
       variables: {
         filters: { status: CuratedStatus.CORPUS },
       },
     });
 
     // expect to see six stories added to the corpus as second-tier recommendations
-    expect(data?.getCuratedItems.edges).to.have.length(6);
+    expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(6);
     // make sure total results value is correct
-    expect(data?.getCuratedItems.totalCount).to.equal(6);
+    expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(6);
   });
 
   it('should filter by story URL', async () => {
     const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS,
+      query: GET_APPROVED_ITEMS,
       variables: {
         filters: { url: 'sample-domain' },
       },
     });
 
     // expect to see just the one story with the above domain
-    expect(data?.getCuratedItems.edges).to.have.length(1);
+    expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(1);
     // make sure total results value is correct
-    expect(data?.getCuratedItems.totalCount).to.equal(1);
+    expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(1);
   });
 
   it('should filter by several parameters', async () => {
     const { data } = await server.executeOperation({
-      query: GET_CURATED_ITEMS,
+      query: GET_APPROVED_ITEMS,
       variables: {
         filters: {
           url: 'sample-domain',
@@ -288,8 +289,8 @@ describe('queries: CuratedItem', () => {
     });
 
     // expect to see just the one story
-    expect(data?.getCuratedItems.edges).to.have.length(1);
+    expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(1);
     // make sure total results value is correct
-    expect(data?.getCuratedItems.totalCount).to.equal(1);
+    expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(1);
   });
 });

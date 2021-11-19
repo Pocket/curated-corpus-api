@@ -40,11 +40,11 @@
   },
   "homepage": "https://github.com/Pocket/curated-corpus-api#readme",
   "dependencies": {
-    "@apollo/federation": "^0.33.6",
+    "@apollo/federation": "^0.33.7",
     "@devoxa/prisma-relay-cursor-connection": "^2.0.3",
     "@pocket-tools/apollo-utils": "^2.0.0",
-    "@prisma/client": "^3.4.2",
-    "@sentry/node": "^6.14.3",
+    "@prisma/client": "^3.5.0",
+    "@sentry/node": "^6.15.0",
     "@sentry/tracing": "^6.14.2",
     "@snowplow/node-tracker": "^3.1.6",
     "apollo-datasource-rest": "^3.4.0",
@@ -53,19 +53,19 @@
     "apollo-server-express": "^3.4.1",
     "apollo-server-plugin-response-cache": "^3.3.0",
     "aws-xray-sdk-core": "^3.3.4",
-    "aws-xray-sdk-express": "^3.3.3",
+    "aws-xray-sdk-express": "^3.3.4",
     "dataloader": "^2.0.0",
     "graphql": "^15.7.2",
     "graphql-anywhere": "^4.2.7",
-    "graphql-scalars": "^1.12.0",
+    "graphql-scalars": "^1.13.6",
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
     "@types/chai": "^4.2.22",
     "@types/faker": "^5.5.9",
     "@types/jest": "^27.0.2",
-    "@typescript-eslint/eslint-plugin": "^5.3.1",
-    "@typescript-eslint/parser": "^5.3.1",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
     "chai": "^4.3.4",
     "eslint": "^8.2.0",
     "eslint-config-prettier": "^8.3.0",
@@ -75,9 +75,9 @@
     "nock": "^13.2.1",
     "nodemon": "^2.0.15",
     "prettier": "^2.4.1",
-    "prisma": "^3.4.2",
+    "prisma": "^3.5.0",
     "ts-jest": "^27.0.7",
     "ts-node": "^10.4.0",
-    "typescript": "^4.4.4"
+    "typescript": "^4.5.2"
   }
 }
