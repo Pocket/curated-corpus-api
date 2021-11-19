@@ -5,6 +5,10 @@ import {
   createScheduledItem,
 } from '../../../database/mutations';
 import { newTabAllowedValues } from '../../../shared/types';
+import {
+  ReviewedCorpusItemEventType,
+  ScheduledCorpusItemEventType,
+} from '../../../events/types';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -17,7 +21,7 @@ import { newTabAllowedValues } from '../../../shared/types';
 export async function createApprovedItem(
   parent,
   { data },
-  { db }
+  context
 ): Promise<ApprovedItem> {
   const { scheduledDate, newTabGuid, ...approvedItemData } = data;
 
@@ -31,18 +35,27 @@ export async function createApprovedItem(
     );
   }
 
-  const approvedItem = await dbCreateApprovedItem(db, approvedItemData);
+  const approvedItem = await dbCreateApprovedItem(context.db, approvedItemData);
+
+  context.emitReviewedCorpusItemEvent(
+    ReviewedCorpusItemEventType.ADD_ITEM,
+    approvedItem
+  );
 
   if (scheduledDate && newTabGuid) {
     // Note that we create a scheduled item but don't return it
     // in the mutation response. Need to evaluate if we do need to return it
     // alongside the approved item.
-
-    await createScheduledItem(db, {
+    const scheduledItem = await createScheduledItem(context.db, {
       approvedItemExternalId: approvedItem.externalId,
       newTabGuid,
       scheduledDate,
     });
+
+    context.emitScheduledCorpusItemEvent(
+      ScheduledCorpusItemEventType.ADD_SCHEDULE,
+      scheduledItem
+    );
   }
 
   return approvedItem;
@@ -58,7 +71,14 @@ export async function createApprovedItem(
 export async function updateApprovedItem(
   parent,
   { data },
-  { db }
+  context
 ): Promise<ApprovedItem> {
-  return await dbUpdateApprovedItem(db, data);
+  const approvedItem = await dbUpdateApprovedItem(context.db, data);
+
+  context.emitReviewedCorpusItemEvent(
+    ReviewedCorpusItemEventType.UPDATE_ITEM,
+    approvedItem
+  );
+
+  return approvedItem;
 }

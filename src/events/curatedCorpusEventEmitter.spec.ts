@@ -14,7 +14,6 @@ import {
   RejectedCuratedCorpusItem,
 } from '@prisma/client';
 import { Topics } from '../shared/types';
-import { ScheduledItem } from '../database/types';
 
 describe('CuratedCorpusEventEmitter', () => {
   const emitter = new CuratedCorpusEventEmitter();

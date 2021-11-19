@@ -3,10 +3,13 @@ import {
   createApprovedItemHelper,
   createScheduledItemHelper,
 } from '../../../test/helpers';
-import { db, server } from '../../../test/admin-server';
+import { db, getServer } from '../../../test/admin-server';
 import { GET_SCHEDULED_ITEMS } from '../../../test/admin-server/queries.gql';
+import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 
 describe('queries: NewTabFeedSchedule', () => {
+  const server = getServer(new CuratedCorpusEventEmitter());
+
   beforeAll(async () => {
     await clearDb(db);
     await server.start();

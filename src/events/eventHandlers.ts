@@ -25,8 +25,8 @@ export function corpusItemSnowplowEventHandler(
 export function corpusScheduleSnowplowEventHandler(
   emitter: CuratedCorpusEventEmitter
 ): void {
-  const snowplowEventsToListen = Object.values(
-    config.snowplow.corpusScheduleEvents
-  ) as string[];
+  // const snowplowEventsToListen = Object.values(
+  //   config.snowplow.corpusScheduleEvents
+  // ) as string[];
   // new CuratedCorpusSnowplowHandler(emitter, tracker, snowplowEventsToListen);
 }
