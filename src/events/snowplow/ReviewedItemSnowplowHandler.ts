@@ -34,7 +34,7 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
     const context = await ReviewedItemSnowplowHandler.generateEventContext(
       data
     );
-    await this.track(event, context);
+    await super.track(event, context);
   }
 
   /**

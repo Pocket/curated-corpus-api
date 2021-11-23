@@ -33,7 +33,7 @@ export class ScheduledItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
     const context = await ScheduledItemSnowplowHandler.generateEventContext(
       data
     );
-    await this.track(event, context);
+    await super.track(event, context);
   }
 
   /**
