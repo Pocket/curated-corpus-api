@@ -1,3 +1,4 @@
+import config from '../../../config';
 import { CuratedStatus } from '@prisma/client';
 import { expect } from 'chai';
 import { db, server } from '../../../test/admin-server';
@@ -5,11 +6,14 @@ import { clearDb, createApprovedItemHelper } from '../../../test/helpers';
 import {
   CREATE_APPROVED_ITEM,
   UPDATE_APPROVED_ITEM,
+  UPLOAD_APPROVED_ITEM_IMAGE,
 } from '../../../test/admin-server/mutations.gql';
 import {
   CreateApprovedItemInput,
   UpdateApprovedItemInput,
 } from '../../../database/types';
+import { Upload } from 'graphql-upload';
+import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 
 describe('mutations: ApprovedItem', () => {
   beforeAll(async () => {
@@ -213,6 +217,46 @@ describe('mutations: ApprovedItem', () => {
           `An approved item with the URL "${input.url}" already exists`
         );
       }
+    });
+  });
+
+  describe('uploadApprovedCuratedCorpusItemImage mutation', () => {
+    const testFilePath = __dirname + '/test-image.jpeg';
+
+    beforeEach(() => {
+      writeFileSync(testFilePath, 'I am an image');
+    });
+
+    afterEach(() => {
+      unlinkSync(testFilePath);
+    });
+    it.only('it should execute the mutation without errors and return the s3 location url', async () => {
+      const image: Upload = new Upload();
+
+      image.resolve({
+        filename: 'test.jpg',
+        mimetype: 'image/jpeg',
+        encoding: '7bit',
+        createReadStream: () => createReadStream(testFilePath),
+      });
+
+      const { data, errors } = await server.executeOperation({
+        query: UPLOAD_APPROVED_ITEM_IMAGE,
+        variables: {
+          image: image,
+        },
+      });
+
+      const urlPrefix = config.aws.s3.localEndpoint;
+      const urlPattern = new RegExp(
+        `^${urlPrefix}/${config.aws.s3.bucket}/.+.jpeg$`
+      );
+
+      expect(errors).to.be.undefined;
+      expect(data).to.have.keys('uploadApprovedCuratedCorpusItemImage');
+      expect(data?.uploadApprovedCuratedCorpusItemImage.url).to.match(
+        urlPattern
+      );
     });
   });
 });

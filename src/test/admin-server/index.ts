@@ -7,6 +7,7 @@ import {
 import { typeDefsAdmin } from '../../typeDefs';
 import { resolvers as adminResolvers } from '../../admin/resolvers';
 import { client } from '../../database/client';
+import s3 from '../../admin/aws/s3';
 
 // Export this separately so that it can be used in Apollo integration tests
 export const db = client();
@@ -19,6 +20,7 @@ export const server = new ApolloServer({
   ]),
   context: {
     db,
+    s3,
   },
   // Note the absence of the Sentry plugin - it emits
   // "Cannot read property 'headers' of undefined" errors in tests.

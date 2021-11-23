@@ -4,7 +4,11 @@ import {
   updateApprovedItem as dbUpdateApprovedItem,
   createScheduledItem,
 } from '../../../database/mutations';
-import { newTabAllowedValues } from '../../../shared/types';
+import { uploadImageToS3 } from '../../aws/upload';
+import {
+  newTabAllowedValues,
+  ApprovedItemS3ImageUrl,
+} from '../../../shared/types';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -61,4 +65,21 @@ export async function updateApprovedItem(
   { db }
 ): Promise<ApprovedItem> {
   return await dbUpdateApprovedItem(db, data);
+}
+
+/**
+ * Uploads an image to the S3 bucket for an
+ * Approved Curated item
+ *
+ * @param parent
+ * @param data
+ * @param s3
+ */
+export async function uploadApprovedItemImage(
+  parent,
+  { data },
+  { s3 }
+): Promise<ApprovedItemS3ImageUrl> {
+  const image = await data;
+  return await uploadImageToS3(s3, image);
 }

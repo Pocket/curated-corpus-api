@@ -1,3 +1,5 @@
+scalar Upload
+
 """
 The outcome of the curators reviewing a prospective story.
 """
@@ -208,6 +210,13 @@ type ApprovedCuratedCorpusItemEdge {
     The Approved Item at the end of the edge.
     """
     node: ApprovedCuratedCorpusItem!
+}
+
+type ApprovedCuratedCorpusImageUrl {
+    """
+    The url of the image stored in the s3 bucket
+    """
+    url: String!
 }
 
 """
@@ -583,4 +592,11 @@ type Mutation {
     deleteScheduledCuratedCorpusItem(
         data: DeleteScheduledCuratedCorpusItemInput!
     ): ScheduledCuratedCorpusItem!
+
+    """
+    Uploads an image to S3 for an Approved Curated Corpus Item
+    """
+    uploadApprovedCuratedCorpusItemImage(
+        data: Upload!
+    ): ApprovedCuratedCorpusImageUrl!
 }

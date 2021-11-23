@@ -10,6 +10,7 @@ import {
   ApolloServerPluginLandingPageGraphQLPlayground,
 } from 'apollo-server-core';
 import { client } from '../database/client';
+import s3 from './aws/s3';
 
 export const server = new ApolloServer({
   schema: buildSubgraphSchema([
@@ -34,5 +35,6 @@ export const server = new ApolloServer({
   ],
   context: {
     db: client(),
+    s3,
   },
 });
