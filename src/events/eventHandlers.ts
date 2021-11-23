@@ -1,13 +1,16 @@
 import { CuratedCorpusEventEmitter } from './curatedCorpusEventEmitter';
-import { CuratedCorpusSnowplowHandler } from './snowplow/snowplowHandler';
 import { tracker } from './snowplow/tracker';
 import config from '../config';
+import { ReviewedItemSnowplowHandler } from './snowplow/reviewedItemSnowplowHandler';
+import { ScheduledItemSnowplowHandler } from './snowplow/ScheduledItemSnowplowHandler';
 
 export type CuratedCorpusEventHandlerFn = (
   emitter: CuratedCorpusEventEmitter
 ) => void;
 
 /**
+ *   Listen to and track events on Reviewed Corpus Items
+ *
  * @param emitter
  */
 export function corpusItemSnowplowEventHandler(
@@ -16,7 +19,7 @@ export function corpusItemSnowplowEventHandler(
   const snowplowEventsToListen = Object.values(
     config.snowplow.corpusItemEvents
   ) as string[];
-  new CuratedCorpusSnowplowHandler(emitter, tracker, snowplowEventsToListen);
+  new ReviewedItemSnowplowHandler(emitter, tracker, snowplowEventsToListen);
 }
 
 /**
@@ -25,8 +28,8 @@ export function corpusItemSnowplowEventHandler(
 export function corpusScheduleSnowplowEventHandler(
   emitter: CuratedCorpusEventEmitter
 ): void {
-  // const snowplowEventsToListen = Object.values(
-  //   config.snowplow.corpusScheduleEvents
-  // ) as string[];
-  // new CuratedCorpusSnowplowHandler(emitter, tracker, snowplowEventsToListen);
+  const snowplowEventsToListen = Object.values(
+    config.snowplow.corpusScheduleEvents
+  ) as string[];
+  new ScheduledItemSnowplowHandler(emitter, tracker, snowplowEventsToListen);
 }
