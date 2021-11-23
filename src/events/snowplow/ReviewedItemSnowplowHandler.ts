@@ -94,8 +94,6 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       },
     };
 
-    // call item-specific methods to add the extra fields
-
     // Additionally, send in everything we have for approved curated items
     if (isApprovedItem) {
       context = ReviewedItemSnowplowHandler.generateApprovedItemContext(

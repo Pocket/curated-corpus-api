@@ -1,7 +1,7 @@
 import { CuratedCorpusEventEmitter } from './curatedCorpusEventEmitter';
 import { tracker } from './snowplow/tracker';
 import config from '../config';
-import { ReviewedItemSnowplowHandler } from './snowplow/reviewedItemSnowplowHandler';
+import { ReviewedItemSnowplowHandler } from './snowplow/ReviewedItemSnowplowHandler';
 import { ScheduledItemSnowplowHandler } from './snowplow/ScheduledItemSnowplowHandler';
 
 export type CuratedCorpusEventHandlerFn = (

@@ -4,13 +4,6 @@ import { PayloadBuilder, SelfDescribingJson } from '@snowplow/tracker-core';
 
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 
-//
-// type ScheduledCorpusItemContext =
-//   | (Omit<SelfDescribingJson, 'data'> & {
-//       data: ScheduledCorpusItem;
-//     })
-//   | undefined;
-
 export class CuratedCorpusSnowplowHandler {
   constructor(
     protected emitter: CuratedCorpusEventEmitter,
