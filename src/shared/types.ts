@@ -12,6 +12,10 @@ export type NewTab = {
   prospectTypes: ProspectType[];
 };
 
+export type ApprovedItemS3ImageUrl = {
+  url: string;
+};
+
 export const NewTabs: NewTab[] = [
   {
     name: 'en-US',

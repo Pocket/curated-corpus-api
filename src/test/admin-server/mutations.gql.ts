@@ -128,3 +128,11 @@ export const DELETE_SCHEDULE_ITEM = gql`
   }
   ${CuratedItemData}
 `;
+
+export const UPLOAD_APPROVED_ITEM_IMAGE = gql`
+  mutation uploadApprovedCuratedCorpusItemImage($image: Upload!) {
+    uploadApprovedCuratedCorpusItemImage(data: $image) {
+      url
+    }
+  }
+`;

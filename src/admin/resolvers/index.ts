@@ -1,4 +1,5 @@
 import { DateResolver } from 'graphql-scalars';
+
 import { UnixTimestampResolver } from './fields/UnixTimestamp';
 import { getApprovedItems } from './queries/ApprovedItem';
 import { getRejectedItems } from './queries/RejectedItem';
@@ -6,13 +7,17 @@ import { getScheduledItems } from './queries/ScheduledItem';
 import {
   createApprovedItem,
   updateApprovedItem,
+  uploadApprovedItemImage,
 } from './mutations/ApprovedItem';
 import {
   createScheduledItem,
   deleteScheduledItem,
 } from './mutations/ScheduledItem';
+import { GraphQLUpload } from 'graphql-upload';
 
 export const resolvers = {
+  // Map the Upload scalar to graphql-upload
+  Upload: GraphQLUpload,
   // The custom scalars from GraphQL-Scalars that we find useful.
   Date: DateResolver,
   // Our own entities that need timestamp conversion, hence field resolvers
@@ -44,5 +49,6 @@ export const resolvers = {
     updateApprovedCuratedCorpusItem: updateApprovedItem,
     createScheduledCuratedCorpusItem: createScheduledItem,
     deleteScheduledCuratedCorpusItem: deleteScheduledItem,
+    uploadApprovedCuratedCorpusItemImage: uploadApprovedItemImage,
   },
 };
