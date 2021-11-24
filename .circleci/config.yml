@@ -129,9 +129,9 @@ jobs:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
         environment:
-          - NODE_ENV=test
-          - AWS_XRAY_LOG_LEVEL=silent
-          - AWS_XRAY_CONTEXT_MISSING=LOG_ERROR
+          NODE_ENV: test
+          AWS_XRAY_LOG_LEVEL: silent
+          AWS_XRAY_CONTEXT_MISSING: LOG_ERROR
       - image: mysql:5.7
         auth:
           username: $DOCKERHUB_USERNAME
@@ -151,6 +151,10 @@ jobs:
           EXTRA_CORS_EXPOSE_HEADERS: ETag
           HOSTNAME_EXTERNAL: localstack
           PORT_WEB_UI: 8081
+      - image: pocket/snowplow-micro:latest
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
       - restore_cache:
@@ -189,6 +193,7 @@ workflows:
       - test_integrations:
           <<: *not_main
           name: test_integrations
+          context: pocket
           command: 'npm run test-integrations'
 
       - build
