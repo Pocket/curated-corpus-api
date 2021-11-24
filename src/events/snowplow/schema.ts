@@ -21,6 +21,7 @@ export type CuratedCorpusItemUpdate = {
     | 'reviewed_corpus_item_rejected' // Item is added to the rejected corpus
     | 'scheduled_corpus_item_added' // Item is added to the new tab schedule
     | 'scheduled_corpus_item_removed'; // Item is removed from the new tab schedule
+  object: 'reviewed_corpus_item' | 'scheduled_corpus_item';
 };
 
 /**
@@ -47,6 +48,11 @@ export type ReviewedCorpusItem = {
    */
   rejected_corpus_item_external_id?: string;
   /**
+   * The identifier for the curation prospect, used to join with the dataset
+   * that describes the prospect.
+   */
+  prospect_id?: string;
+  /**
    * The URL of the reviewed corpus item.
    */
   url: string;
@@ -58,7 +64,7 @@ export type ReviewedCorpusItem = {
    * The list of reasons a curator rejected the item (if the item has
    * a "rejected" status).
    */
-  rejection_reasons?: RejectionReason[];
+  rejection_reasons?: string[];
   /**
    * The title of the reviewed corpus item.
    */

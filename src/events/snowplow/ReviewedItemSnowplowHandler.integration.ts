@@ -1,108 +1,150 @@
-import fetch from 'node-fetch';
 import { expect } from 'chai';
+import {
+  ApprovedItem,
+  CuratedStatus,
+  RejectedCuratedCorpusItem,
+} from '@prisma/client';
+import {
+  assertValidSnowplowObjectUpdateEvents,
+  getAllSnowplowEvents,
+  getGoodSnowplowEvents,
+  parseSnowplowData,
+  resetSnowplowEvents,
+} from '../../test/helpers/snowplow';
 import config from '../../config';
-import { ReviewedCorpusItemEventType } from '../types';
-import { CuratedCorpusItemUpdate } from '../../events/snowplow/schema';
+import {
+  ReviewedCorpusItemEventType,
+  ReviewedCorpusItemPayload,
+} from '../types';
+import { CorpusReviewStatus, ObjectVersion } from './schema';
 import { ReviewedItemSnowplowHandler } from './ReviewedItemSnowplowHandler';
-import { tracker } from '../../events/snowplow/tracker';
+import { tracker } from './tracker';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
+import { getUnixTimestamp } from '../../shared/utils';
+import { Topics } from '../../shared/types';
 
-async function snowplowRequest(path: string, post = false): Promise<any> {
-  const response = await fetch(`http://${config.snowplow.endpoint}${path}`, {
-    method: post ? 'POST' : 'GET',
-  });
-  return await response.json();
-}
+/**
+ * Use a simple mock item instead of using DB helpers
+ * so that these tests can be run in the IDE
+ */
+const approvedItem: ApprovedItem = {
+  id: 123,
+  externalId: '123-abc',
+  prospectId: '456-dfg',
+  url: 'https://test.com/a-story',
+  status: CuratedStatus.RECOMMENDATION,
+  title: 'Everything you need to know about React',
+  excerpt: 'Something here',
+  publisher: 'Octopus Publishing House',
+  imageUrl: 'https://test.com/image.png',
+  language: 'en',
+  topic: Topics.EDUCATION,
+  isCollection: false,
+  isSyndicated: false,
+  isShortLived: false,
+  createdAt: new Date(),
+  createdBy: 'Amy',
+  updatedAt: new Date(),
+  updatedBy: 'Amy',
+};
 
-async function resetSnowplowEvents(): Promise<void> {
-  await snowplowRequest('/micro/reset', true);
-}
+const rejectedItem: RejectedCuratedCorpusItem = {
+  id: 123,
+  externalId: '123-abc',
+  prospectId: '456-dfg',
+  url: 'https://test.com/a-story',
+  title: 'Everything you need to know about React',
+  publisher: 'Octopus Publishing House',
+  language: 'en',
+  topic: Topics.EDUCATION,
+  reason: 'PAYWALL,OTHER',
+  createdAt: new Date(),
+  createdBy: 'Amy',
+};
 
-async function getAllSnowplowEvents(): Promise<{ [key: string]: any }> {
-  return snowplowRequest('/micro/all');
-}
+const approvedEventData: ReviewedCorpusItemPayload = {
+  reviewedCorpusItem: approvedItem,
+};
 
-async function getGoodSnowplowEvents(): Promise<{ [key: string]: any }> {
-  return snowplowRequest('/micro/good');
-}
+const rejectedEventData: ReviewedCorpusItemPayload = {
+  reviewedCorpusItem: rejectedItem,
+};
 
-function parseSnowplowData(data: string): { [key: string]: any } {
-  return JSON.parse(Buffer.from(data, 'base64').toString());
-}
+function assertValidSnowplowApprovedItemEvents(data) {
+  const eventContext = parseSnowplowData(data);
 
-function assertValidSnowplowObjectUpdateEvents(
-  events,
-  triggers: CuratedCorpusItemUpdate['trigger'][]
-) {
-  const parsedEvents = events
-    .map(parseSnowplowData)
-    .map((parsedEvent) => parsedEvent.data);
-
-  expect(parsedEvents).to.include.deep.members(
-    triggers.map((trigger) => ({
-      schema: config.snowplow.schemas.objectUpdate,
-      data: { trigger: trigger, object: 'reviewed_corpus_item' },
-    }))
-  );
-}
-
-function assertApiAndUserSchema(eventContext: { [p: string]: any }) {
   expect(eventContext.data).to.include.deep.members([
     {
-      schema: config.snowplow.schemas.user,
+      schema: config.snowplow.schemas.reviewedCorpusItem,
       data: {
-        user_id: parseInt(eventData.user.id),
-        hashed_user_id: testAccountData.hashedId,
+        object_version: ObjectVersion.NEW,
+        approved_corpus_item_external_id: approvedItem.externalId,
+        prospect_id: approvedItem.prospectId,
+        corpus_review_status: CorpusReviewStatus.RECOMMENDATION,
+        url: approvedItem.url,
+        title: approvedItem.title,
+        excerpt: approvedItem.excerpt,
+        image_url: approvedItem.imageUrl,
+        language: approvedItem.language,
+        topic: approvedItem.topic,
+        is_collection: approvedItem.isCollection,
+        is_short_lived: approvedItem.isShortLived,
+        is_syndicated: approvedItem.isSyndicated,
+        created_at: getUnixTimestamp(approvedItem.createdAt),
+        created_by: approvedItem.createdBy,
+        updated_at: getUnixTimestamp(approvedItem.updatedAt),
+        updated_by: approvedItem.updatedBy,
       },
-    },
-    {
-      schema: config.snowplow.schemas.apiUser,
-      data: { api_id: parseInt(eventData.apiUser.apiId) },
     },
   ]);
 }
 
-function assertValidSnowplowEventContext(data) {
+function assertValidSnowplowRejectedItemEvents(data) {
   const eventContext = parseSnowplowData(data);
-  assertApiAndUserSchema(eventContext);
+
+  expect(eventContext.data).to.include.deep.members([
+    {
+      schema: config.snowplow.schemas.reviewedCorpusItem,
+      data: {
+        object_version: ObjectVersion.NEW,
+        rejected_corpus_item_external_id: rejectedItem.externalId,
+        prospect_id: rejectedItem.prospectId,
+        corpus_review_status: CorpusReviewStatus.REJECTED,
+        url: rejectedItem.url,
+        title: rejectedItem.title,
+        language: rejectedItem.language,
+        topic: rejectedItem.topic,
+        rejection_reasons: ['PAYWALL', 'OTHER'],
+        created_at: getUnixTimestamp(rejectedItem.createdAt),
+        created_by: rejectedItem.createdBy,
+      },
+    },
+  ]);
 }
-
-const testAccountData = {
-  id: '1',
-  hashedId: 'sfddads',
-  emailAliases: ['test@pocket.com'],
-  ssoServices: [SsoService.GOOGLE, SsoService.FIREFOX],
-  isPremium: false,
-  isSaveDigestSubscriber: false,
-  isProductUpdatesSubscriber: false,
-  createdAt: 16564364,
-};
-
-const eventData = {
-  user: {
-    ...testAccountData,
-  },
-  apiUser: { apiId: '1' },
-};
 
 describe('ReviewedItemSnowplowHandler', () => {
   beforeEach(async () => {
     await resetSnowplowEvents();
   });
 
-  it('should send good events to snowplow', async () => {
+  it('should send good events to Snowplow on approved items', async () => {
     const emitter = new CuratedCorpusEventEmitter();
     new ReviewedItemSnowplowHandler(emitter, tracker, [
-      ReviewedCorpusItemEventType.ACCOUNT_DELETE,
-      ReviewedCorpusItemEventType.ACCOUNT_EMAIL_UPDATED,
+      ReviewedCorpusItemEventType.ADD_ITEM,
+      ReviewedCorpusItemEventType.UPDATE_ITEM,
+      ReviewedCorpusItemEventType.REMOVE_ITEM,
     ]);
-    emitter.emit(ReviewedCorpusItemEventType.ACCOUNT_DELETE, {
-      ...eventData,
-      eventType: ReviewedCorpusItemEventType.ACCOUNT_DELETE,
+    emitter.emit(ReviewedCorpusItemEventType.ADD_ITEM, {
+      ...approvedEventData,
+      eventType: ReviewedCorpusItemEventType.ADD_ITEM,
     });
-    emitter.emit(ReviewedCorpusItemEventType.ACCOUNT_EMAIL_UPDATED, {
-      ...eventData,
-      eventType: ReviewedCorpusItemEventType.ACCOUNT_EMAIL_UPDATED,
+    emitter.emit(ReviewedCorpusItemEventType.UPDATE_ITEM, {
+      ...approvedEventData,
+      eventType: ReviewedCorpusItemEventType.UPDATE_ITEM,
+    });
+    emitter.emit(ReviewedCorpusItemEventType.REMOVE_ITEM, {
+      ...approvedEventData,
+      eventType: ReviewedCorpusItemEventType.REMOVE_ITEM,
     });
 
     // wait a sec * 3
@@ -110,17 +152,53 @@ describe('ReviewedItemSnowplowHandler', () => {
 
     // make sure we only have good events
     const allEvents = await getAllSnowplowEvents();
-    expect(allEvents.total).to.equal(2);
-    expect(allEvents.good).to.equal(2);
+    expect(allEvents.total).to.equal(3);
+    expect(allEvents.good).to.equal(3);
     expect(allEvents.bad).to.equal(0);
 
     const goodEvents = await getGoodSnowplowEvents();
 
-    assertValidSnowplowEventContext(goodEvents[0].rawEvent.parameters.cx);
-    assertValidSnowplowEventContext(goodEvents[1].rawEvent.parameters.cx);
+    assertValidSnowplowApprovedItemEvents(goodEvents[0].rawEvent.parameters.cx);
+    assertValidSnowplowApprovedItemEvents(goodEvents[1].rawEvent.parameters.cx);
+    assertValidSnowplowApprovedItemEvents(goodEvents[2].rawEvent.parameters.cx);
+
     assertValidSnowplowObjectUpdateEvents(
       goodEvents.map((goodEvent) => goodEvent.rawEvent.parameters.ue_px),
-      ['account_delete', 'account_email_updated']
+      [
+        'reviewed_corpus_item_added',
+        'reviewed_corpus_item_updated',
+        'reviewed_corpus_item_removed',
+      ],
+      'reviewed_corpus_item'
+    );
+  });
+
+  it('should send good events to Snowplow on rejected items', async () => {
+    const emitter = new CuratedCorpusEventEmitter();
+    new ReviewedItemSnowplowHandler(emitter, tracker, [
+      ReviewedCorpusItemEventType.REJECT_ITEM,
+    ]);
+    emitter.emit(ReviewedCorpusItemEventType.REJECT_ITEM, {
+      ...rejectedEventData,
+      eventType: ReviewedCorpusItemEventType.REJECT_ITEM,
+    });
+
+    // wait a sec * 3
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    // make sure we only have good events
+    const allEvents = await getAllSnowplowEvents();
+    expect(allEvents.total).to.equal(1);
+    expect(allEvents.good).to.equal(1);
+    expect(allEvents.bad).to.equal(0);
+
+    const goodEvents = await getGoodSnowplowEvents();
+
+    assertValidSnowplowRejectedItemEvents(goodEvents[0].rawEvent.parameters.cx);
+    assertValidSnowplowObjectUpdateEvents(
+      goodEvents.map((goodEvent) => goodEvent.rawEvent.parameters.ue_px),
+      ['reviewed_corpus_item_rejected'],
+      'reviewed_corpus_item'
     );
   });
 });

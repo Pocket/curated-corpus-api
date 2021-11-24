@@ -1,6 +1,6 @@
-import { CuratedCorpusSnowplowHandler } from './snowplowHandler';
+import { CuratedCorpusSnowplowHandler } from './CuratedCorpusSnowplowHandler';
 import { BaseEventData, ScheduledCorpusItemPayload } from '../types';
-import { buildSelfDescribingEvent } from '@snowplow/node-tracker';
+import { buildSelfDescribingEvent, Tracker } from '@snowplow/node-tracker';
 import { SelfDescribingJson } from '@snowplow/tracker-core';
 import config from '../../config';
 import { ScheduledItemSnowplowEventMap } from './types';
@@ -11,6 +11,7 @@ import {
 } from './schema';
 import { getUnixTimestamp } from '../../shared/utils';
 import { getNewTabByGuid } from '../../shared/types';
+import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 
 type CuratedCorpusItemUpdateEvent = Omit<SelfDescribingJson, 'data'> & {
   data: CuratedCorpusItemUpdate;
@@ -21,6 +22,14 @@ type ScheduledCorpusItemContext = Omit<SelfDescribingJson, 'data'> & {
 };
 
 export class ScheduledItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
+  constructor(
+    protected emitter: CuratedCorpusEventEmitter,
+    protected tracker: Tracker,
+    events: string[]
+  ) {
+    super(emitter, tracker, events);
+  }
+
   /**
    * @param data
    */
@@ -52,6 +61,7 @@ export class ScheduledItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       schema: config.snowplow.schemas.objectUpdate,
       data: {
         trigger: ScheduledItemSnowplowEventMap[data.eventType],
+        object: 'scheduled_corpus_item',
       },
     };
   }

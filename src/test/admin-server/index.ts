@@ -3,6 +3,7 @@ import { buildSubgraphSchema } from '@apollo/federation';
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginInlineTraceDisabled,
+  ApolloServerPluginUsageReportingDisabled,
 } from 'apollo-server-core';
 import { typeDefsAdmin } from '../../typeDefs';
 import { resolvers as adminResolvers } from '../../admin/resolvers';
@@ -34,6 +35,7 @@ export const getServer = (eventEmitter: CuratedCorpusEventEmitter) => {
     plugins: [
       ApolloServerPluginLandingPageDisabled(),
       ApolloServerPluginInlineTraceDisabled(),
+      ApolloServerPluginUsageReportingDisabled(),
     ],
   });
 };

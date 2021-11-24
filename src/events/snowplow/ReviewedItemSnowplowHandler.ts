@@ -1,6 +1,6 @@
-import { CuratedCorpusSnowplowHandler } from './snowplowHandler';
+import { CuratedCorpusSnowplowHandler } from './CuratedCorpusSnowplowHandler';
 import { BaseEventData, ReviewedCorpusItemPayload } from '../types';
-import { buildSelfDescribingEvent } from '@snowplow/node-tracker';
+import { buildSelfDescribingEvent, Tracker } from '@snowplow/node-tracker';
 import { SelfDescribingJson } from '@snowplow/tracker-core';
 import config from '../../config';
 import { ReviewedItemSnowplowEventMap } from './types';
@@ -11,7 +11,12 @@ import {
   ReviewedCorpusItem,
 } from './schema';
 import { getUnixTimestamp } from '../../shared/utils';
-import { ApprovedItem, RejectedCuratedCorpusItem } from '@prisma/client';
+import {
+  ApprovedItem,
+  CuratedStatus,
+  RejectedCuratedCorpusItem,
+} from '@prisma/client';
+import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 
 type CuratedCorpusItemUpdateEvent = Omit<SelfDescribingJson, 'data'> & {
   data: CuratedCorpusItemUpdate;
@@ -22,6 +27,14 @@ type ReviewedCorpusItemContext = Omit<SelfDescribingJson, 'data'> & {
 };
 
 export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
+  constructor(
+    protected emitter: CuratedCorpusEventEmitter,
+    protected tracker: Tracker,
+    events: string[]
+  ) {
+    super(emitter, tracker, events);
+  }
+
   /**
    * @param data
    */
@@ -53,6 +66,7 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       schema: config.snowplow.schemas.objectUpdate,
       data: {
         trigger: ReviewedItemSnowplowEventMap[data.eventType],
+        object: 'reviewed_corpus_item',
       },
     };
   }
@@ -73,7 +87,10 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
     let corpusReviewStatus: CorpusReviewStatus;
 
     if (item['status']) {
-      corpusReviewStatus = item['status'];
+      corpusReviewStatus =
+        item['status'] === CuratedStatus.RECOMMENDATION
+          ? CorpusReviewStatus.RECOMMENDATION
+          : CorpusReviewStatus.CORPUS;
       isApprovedItem = true;
     } else {
       corpusReviewStatus = CorpusReviewStatus.REJECTED;
@@ -86,6 +103,7 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
         object_version: ObjectVersion.NEW,
         url: item.url,
         corpus_review_status: corpusReviewStatus,
+        prospect_id: item.prospectId,
         title: item.title,
         language: item.language,
         topic: item.topic,
@@ -136,9 +154,7 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
     context.data = {
       ...context.data,
       rejected_corpus_item_external_id: item.externalId,
-      rejection_reasons: item.reason.split(',').map((reason) => {
-        return { reason };
-      }),
+      rejection_reasons: item.reason.split(','),
     };
 
     return context;
