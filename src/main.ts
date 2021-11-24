@@ -4,6 +4,7 @@ import AWSXRay from 'aws-xray-sdk-core';
 import xrayExpress from 'aws-xray-sdk-express';
 import express from 'express';
 import https from 'https';
+import { graphqlUploadExpress } from 'graphql-upload';
 import { server as publicServer } from './public/server';
 import { startServer as startAdminServer } from './admin/server';
 import { getContext } from './admin/context';
@@ -45,6 +46,13 @@ AWSXRay.middleware.enableDynamicNaming('*');
 
 //Make sure the express app has the xray close segment handler
 app.use(xrayExpress.closeSegment());
+
+app.use(
+  graphqlUploadExpress({
+    maxFileSize: config.app.upload.maxSize,
+    maxFiles: config.app.upload.maxFiles,
+  })
+);
 
 async function startServers() {
   // Start the admin server first, or `/admin` will not be accessible.

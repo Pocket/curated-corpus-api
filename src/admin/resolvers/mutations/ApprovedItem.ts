@@ -4,11 +4,15 @@ import {
   updateApprovedItem as dbUpdateApprovedItem,
   createScheduledItem,
 } from '../../../database/mutations';
-import { newTabAllowedValues } from '../../../shared/types';
 import {
   ReviewedCorpusItemEventType,
   ScheduledCorpusItemEventType,
 } from '../../../events/types';
+import { uploadImageToS3 } from '../../aws/upload';
+import {
+  newTabAllowedValues,
+  ApprovedItemS3ImageUrl,
+} from '../../../shared/types';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -16,6 +20,7 @@ import {
  *
  * @param parent
  * @param data
+ * @param context
  * @param db
  */
 export async function createApprovedItem(
@@ -66,6 +71,7 @@ export async function createApprovedItem(
  *
  * @param parent
  * @param data
+ * @param context
  * @param db
  */
 export async function updateApprovedItem(
@@ -81,4 +87,21 @@ export async function updateApprovedItem(
   );
 
   return approvedItem;
+}
+
+/**
+ * Uploads an image to the S3 bucket for an
+ * Approved Curated item
+ *
+ * @param parent
+ * @param data
+ * @param s3
+ */
+export async function uploadApprovedItemImage(
+  parent,
+  { data },
+  { s3 }
+): Promise<ApprovedItemS3ImageUrl> {
+  const image = await data;
+  return await uploadImageToS3(s3, image);
 }

@@ -1,9 +1,10 @@
-import { client } from '../database/client';
+import { S3 } from 'aws-sdk';
 import {
   ApprovedItem,
   PrismaClient,
   RejectedCuratedCorpusItem,
 } from '@prisma/client';
+import { client } from '../database/client';
 import { ScheduledItem } from '../database/types';
 import { CuratedCorpusEventEmitter } from '../events/curatedCorpusEventEmitter';
 import {
@@ -12,11 +13,13 @@ import {
   ReviewedCorpusItemPayload,
   ScheduledCorpusItemPayload,
 } from '../events/types';
+import s3 from './aws/s3';
 
 // Context interface
 export interface IContext {
   db: PrismaClient;
   eventEmitter: CuratedCorpusEventEmitter;
+  s3: S3;
 
   emitReviewedCorpusItemEvent(
     event: ReviewedCorpusItemEventType,
@@ -34,12 +37,17 @@ export class ContextManager implements IContext {
     private config: {
       request: any;
       db: PrismaClient;
+      s3: S3;
       eventEmitter: CuratedCorpusEventEmitter;
     }
   ) {}
 
   get db(): IContext['db'] {
     return this.config.db;
+  }
+
+  get s3(): IContext['s3'] {
+    return this.config.s3;
   }
 
   get eventEmitter(): CuratedCorpusEventEmitter {
@@ -79,6 +87,7 @@ export function getContext(
   return new ContextManager({
     request: request,
     db: client(),
+    s3,
     eventEmitter: emitter,
   });
 }
