@@ -1,5 +1,6 @@
-import chai from 'chai';
-import { db, server } from '../../../test/admin-server';
+import { expect } from 'chai';
+import sinon from 'sinon';
+import { db, getServer } from '../../../test/admin-server';
 import {
   clearDb,
   createApprovedItemHelper,
@@ -14,8 +15,13 @@ import {
   DeleteScheduledItemInput,
 } from '../../../database/types';
 import { getUnixTimestamp } from '../fields/UnixTimestamp';
+import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
+import { ScheduledCorpusItemEventType } from '../../../events/types';
 
 describe('mutations: NewTabFeedSchedule', () => {
+  const eventEmitter = new CuratedCorpusEventEmitter();
+  const server = getServer(eventEmitter);
+
   beforeAll(async () => {
     await server.start();
   });
@@ -31,6 +37,10 @@ describe('mutations: NewTabFeedSchedule', () => {
 
   describe('createScheduledCuratedCorpusItem mutation', () => {
     it('should fail on invalid New Tab Feed ID', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ScheduledCorpusItemEventType.ADD_SCHEDULE, eventTracker);
+
       const approvedItem = await createApprovedItemHelper(db, {
         title: 'A test story',
       });
@@ -45,18 +55,25 @@ describe('mutations: NewTabFeedSchedule', () => {
         variables: input,
       });
 
-      expect(result.data).toBeNull();
-      expect(result.errors).not.toBeNull();
+      expect(result.data).to.be.null;
+      expect(result.errors).not.to.be.null;
 
       // And there is the correct error from the resolvers
       if (result.errors) {
-        expect(result.errors[0].message).toMatch(
+        expect(result.errors[0].message).to.equal(
           `Cannot create a scheduled entry with New Tab GUID of "RECSAPI".`
         );
       }
+
+      // Check that the ADD_SCHEDULE event was not fired
+      expect(eventTracker.callCount).to.equal(0);
     });
 
     it('should fail on invalid Approved Item ID', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ScheduledCorpusItemEventType.ADD_SCHEDULE, eventTracker);
+
       const input: CreateScheduledItemInput = {
         approvedItemExternalId: 'not-a-valid-id-at-all',
         newTabGuid: 'EN_US',
@@ -68,17 +85,24 @@ describe('mutations: NewTabFeedSchedule', () => {
         variables: input,
       });
 
-      expect(result.data).toBeNull();
+      expect(result.data).to.be.null;
 
       // And there is the correct error from the resolvers
       if (result.errors) {
-        expect(result.errors[0].message).toMatch(
+        expect(result.errors[0].message).to.equal(
           `Cannot create a scheduled entry: Approved Item with id "not-a-valid-id-at-all" does not exist.`
         );
       }
+
+      // Check that the ADD_SCHEDULE event was not fired
+      expect(eventTracker.callCount).to.equal(0);
     });
 
     it('should create an entry and return data (including Approved Item)', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ScheduledCorpusItemEventType.ADD_SCHEDULE, eventTracker);
+
       const approvedItem = await createApprovedItemHelper(db, {
         title: 'A test story',
       });
@@ -97,12 +121,12 @@ describe('mutations: NewTabFeedSchedule', () => {
       const scheduledItem = data?.createScheduledCuratedCorpusItem;
 
       // Expect these fields to return valid values
-      expect(scheduledItem.externalId).toBeTruthy();
-      expect(scheduledItem.createdAt).toBeTruthy();
-      expect(scheduledItem.updatedAt).toBeTruthy();
+      expect(scheduledItem.externalId).to.not.be.null;
+      expect(scheduledItem.createdAt).to.not.be.null;
+      expect(scheduledItem.updatedAt).to.not.be.null;
 
       // Expect these to match the input values
-      expect(new Date(scheduledItem.scheduledDate)).toMatchObject(
+      expect(new Date(scheduledItem.scheduledDate)).to.deep.equal(
         new Date(input.scheduledDate)
       );
 
@@ -116,16 +140,35 @@ describe('mutations: NewTabFeedSchedule', () => {
         updatedAt: updatedAtReturned,
         ...otherReturnedApprovedItemProps
       } = scheduledItem.approvedItem;
-      chai.expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
-      chai.expect(getUnixTimestamp(updatedAt)).to.equal(updatedAtReturned);
-      chai
-        .expect(otherApprovedItemProps)
-        .to.deep.include(otherReturnedApprovedItemProps);
+      expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
+      expect(getUnixTimestamp(updatedAt)).to.equal(updatedAtReturned);
+      expect(otherApprovedItemProps).to.deep.include(
+        otherReturnedApprovedItemProps
+      );
+
+      // Check that the ADD_SCHEDULE event was fired successfully:
+      // 1 - Event was fired once!
+      expect(eventTracker.callCount).to.equal(1);
+      // 2 - Event has the right type.
+      expect(await eventTracker.getCall(0).args[0].eventType).to.equal(
+        ScheduledCorpusItemEventType.ADD_SCHEDULE
+      );
+      // 3- Event has the right entity passed to it.
+      expect(
+        await eventTracker.getCall(0).args[0].scheduledCorpusItem.externalId
+      ).to.equal(scheduledItem.externalId);
     });
   });
 
   describe('deleteScheduledCuratedCorpusItem mutation', () => {
     it('should fail on invalid external ID', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(
+        ScheduledCorpusItemEventType.REMOVE_SCHEDULE,
+        eventTracker
+      );
+
       const input: DeleteScheduledItemInput = {
         externalId: 'not-a-valid-ID-string',
       };
@@ -135,17 +178,27 @@ describe('mutations: NewTabFeedSchedule', () => {
         variables: input,
       });
 
-      expect(result.data).toBeNull();
+      expect(result.data).to.be.null;
 
       // And there is the correct error from the resolvers
       if (result.errors) {
-        expect(result.errors[0].message).toMatch(
+        expect(result.errors[0].message).to.equal(
           `Item with ID of '${input.externalId}' could not be found.`
         );
       }
+
+      // Check that the REMOVE_SCHEDULE event was not fired
+      expect(eventTracker.callCount).to.equal(0);
     });
 
     it('should delete an item scheduled for New Tab and return deleted data', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(
+        ScheduledCorpusItemEventType.REMOVE_SCHEDULE,
+        eventTracker
+      );
+
       const approvedItem = await createApprovedItemHelper(db, {
         title: 'This is a test',
       });
@@ -166,18 +219,18 @@ describe('mutations: NewTabFeedSchedule', () => {
       // of the right shape (if it's ever implemented), laborious property-by-property
       // comparison is the go.
       const returnedItem = data?.deleteScheduledCuratedCorpusItem;
-      expect(returnedItem.externalId).toBe(scheduledItem.externalId);
-      expect(returnedItem.createdBy).toBe(scheduledItem.createdBy);
-      expect(returnedItem.updatedBy).toBe(scheduledItem.updatedBy);
+      expect(returnedItem.externalId).to.equal(scheduledItem.externalId);
+      expect(returnedItem.createdBy).to.equal(scheduledItem.createdBy);
+      expect(returnedItem.updatedBy).to.equal(scheduledItem.updatedBy);
 
-      chai
-        .expect(returnedItem.createdAt)
-        .to.equal(getUnixTimestamp(scheduledItem.createdAt));
-      chai
-        .expect(returnedItem.updatedAt)
-        .to.equal(getUnixTimestamp(scheduledItem.updatedAt));
+      expect(returnedItem.createdAt).to.equal(
+        getUnixTimestamp(scheduledItem.createdAt)
+      );
+      expect(returnedItem.updatedAt).to.equal(
+        getUnixTimestamp(scheduledItem.updatedAt)
+      );
 
-      expect(new Date(returnedItem.scheduledDate)).toMatchObject(
+      expect(new Date(returnedItem.scheduledDate)).to.deep.equal(
         scheduledItem.scheduledDate
       );
 
@@ -191,11 +244,23 @@ describe('mutations: NewTabFeedSchedule', () => {
         updatedAt: updatedAtReturned,
         ...otherReturnedApprovedItemProps
       } = returnedItem.approvedItem;
-      chai.expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
-      chai.expect(getUnixTimestamp(updatedAt)).to.equal(updatedAtReturned);
-      chai
-        .expect(otherApprovedItemProps)
-        .to.deep.include(otherReturnedApprovedItemProps);
+      expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
+      expect(getUnixTimestamp(updatedAt)).to.equal(updatedAtReturned);
+      expect(otherApprovedItemProps).to.deep.include(
+        otherReturnedApprovedItemProps
+      );
+
+      // Check that the REMOVE_SCHEDULE event was fired successfully:
+      // 1 - Event was fired once!
+      expect(eventTracker.callCount).to.equal(1);
+      // 2 - Event has the right type.
+      expect(await eventTracker.getCall(0).args[0].eventType).to.equal(
+        ScheduledCorpusItemEventType.REMOVE_SCHEDULE
+      );
+      // 3- Event has the right entity passed to it.
+      expect(
+        await eventTracker.getCall(0).args[0].scheduledCorpusItem.externalId
+      ).to.equal(scheduledItem.externalId);
     });
   });
 });

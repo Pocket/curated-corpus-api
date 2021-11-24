@@ -39,3 +39,25 @@ export const NewTabs: NewTab[] = [
 export const newTabAllowedValues = NewTabs.map((newTab) => {
   return newTab.guid;
 });
+
+export const getNewTabByGuid = (guid: string): NewTab | undefined => {
+  return NewTabs.find((newTab: NewTab) => newTab.guid === guid);
+};
+
+export enum Topics {
+  BUSINESS = 'BUSINESS',
+  CAREER = 'CAREER',
+  EDUCATION = 'EDUCATION',
+  ENTERTAINMENT = 'ENTERTAINMENT',
+  FOOD = 'FOOD',
+  GAMING = 'GAMING',
+  HEALTH_FITNESS = 'HEALTH_FITNESS',
+  PARENTING = 'PARENTING',
+  PERSONAL_FINANCE = 'PERSONAL_FINANCE',
+  POLITICS = 'POLITICS',
+  SCIENCE = 'SCIENCE',
+  SELF_IMPROVEMENT = 'SELF_IMPROVEMENT',
+  SPORTS = 'SPORTS',
+  TECHNOLOGY = 'TECHNOLOGY',
+  TRAVEL = 'TRAVEL',
+}

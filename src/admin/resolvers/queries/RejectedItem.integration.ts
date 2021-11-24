@@ -1,13 +1,16 @@
 import { expect } from 'chai';
 import { RejectedCuratedCorpusItem as dbRejectedCuratedCorpusItem } from '@prisma/client';
-import { db, server } from '../../../test/admin-server';
+import { db, getServer } from '../../../test/admin-server';
 import {
   clearDb,
   createRejectedCuratedCorpusItemHelper,
 } from '../../../test/helpers';
 import { GET_REJECTED_ITEMS } from '../../../test/admin-server/queries.gql';
+import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 
 describe('queries: RejectedCuratedCorpusItem', () => {
+  const server = getServer(new CuratedCorpusEventEmitter());
+
   beforeAll(async () => {
     await clearDb(db);
     await server.start();

@@ -6,7 +6,16 @@ import express from 'express';
 import https from 'https';
 import { graphqlUploadExpress } from 'graphql-upload';
 import { server as publicServer } from './public/server';
-import { server as adminServer } from './admin/server';
+import { startServer as startAdminServer } from './admin/server';
+import { getContext } from './admin/context';
+import {
+  curatedCorpusEventEmitter,
+  initItemEventHandlers,
+} from './events/init';
+import {
+  corpusItemSnowplowEventHandler,
+  corpusScheduleSnowplowEventHandler,
+} from './events/eventHandlers';
 const serviceName = 'CurationCorpusAPI';
 
 //Set XRAY to just log if the context is missing instead of a runtime error
@@ -47,7 +56,19 @@ app.use(
 
 async function startServers() {
   // Start the admin server first, or `/admin` will not be accessible.
-  await adminServer.start();
+
+  // Initialize event handlers
+  initItemEventHandlers(curatedCorpusEventEmitter, [
+    corpusItemSnowplowEventHandler,
+    corpusScheduleSnowplowEventHandler,
+  ]);
+
+  // Inject initialized event emittters to create context factory function
+  const contextFactory = (req: express.Request) => {
+    return getContext(req, curatedCorpusEventEmitter);
+  };
+
+  const adminServer = await startAdminServer(contextFactory);
   // Apply the admin graphql (This is not part of the federated graph i.e. Client API).
   adminServer.applyMiddleware({ app, path: '/admin' });
 

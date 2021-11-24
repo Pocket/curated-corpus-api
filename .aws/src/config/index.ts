@@ -10,6 +10,9 @@ const domain = isDev
 const githubConnectionArn = isDev
   ? 'arn:aws:codestar-connections:us-east-1:410318598490:connection/7426c139-1aa0-49e2-aabc-5aef11092032'
   : 'arn:aws:codestar-connections:us-east-1:996905175585:connection/5fa5aa2b-a2d2-43e3-ab5a-72ececfc1870';
+const snowplowEndpoint = isDev
+  ? 'com-getpocket-prod1.mini.snplow.net'
+  : 'com-getpocket-prod1.collector.snplow.net';
 
 const rds = {
   minCapacity: 1,
@@ -33,6 +36,9 @@ export const config = {
     githubConnectionArn,
     repository: 'pocket/curated-corpus-api',
     branch,
+  },
+  envVars: {
+    snowplowEndpoint,
   },
   healthCheck: {
     command: [

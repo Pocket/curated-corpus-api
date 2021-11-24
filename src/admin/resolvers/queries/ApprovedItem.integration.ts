@@ -1,10 +1,13 @@
 import { expect } from 'chai';
 import { CuratedStatus } from '@prisma/client';
-import { db, server } from '../../../test/admin-server';
+import { db, getServer } from '../../../test/admin-server';
 import { clearDb, createApprovedItemHelper } from '../../../test/helpers';
 import { GET_APPROVED_ITEMS } from '../../../test/admin-server/queries.gql';
+import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 
 describe('queries: ApprovedCuratedCorpusItem', () => {
+  const server = getServer(new CuratedCorpusEventEmitter());
+
   beforeAll(async () => {
     await clearDb(db);
     await server.start();

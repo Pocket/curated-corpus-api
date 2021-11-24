@@ -206,6 +206,10 @@ class CuratedCorpusAPI extends TerraformStack {
               name: 'AWS_S3_BUCKET',
               value: s3.id,
             },
+            {
+              name: 'SNOWPLOW_ENDPOINT',
+              value: config.envVars.snowplowEndpoint,
+            },
           ],
           secretEnvVars: [
             {
