@@ -70,9 +70,17 @@ const rejectedEventData: ReviewedCorpusItemPayload = {
   reviewedCorpusItem: rejectedItem,
 };
 
-function assertValidSnowplowApprovedItemEvents(data) {
+function assertValidSnowplowReviewedItemEvents(data) {
   const eventContext = parseSnowplowData(data);
 
+  if (eventContext.data[0].data.approved_corpus_item_external_id) {
+    assertValidSnowplowApprovedItemEvents(eventContext);
+  } else {
+    assertValidSnowplowRejectedItemEvents(eventContext);
+  }
+}
+
+function assertValidSnowplowApprovedItemEvents(eventContext) {
   expect(eventContext.data).to.include.deep.members([
     {
       schema: config.snowplow.schemas.reviewedCorpusItem,
@@ -99,9 +107,7 @@ function assertValidSnowplowApprovedItemEvents(data) {
   ]);
 }
 
-function assertValidSnowplowRejectedItemEvents(data) {
-  const eventContext = parseSnowplowData(data);
-
+function assertValidSnowplowRejectedItemEvents(eventContext) {
   expect(eventContext.data).to.include.deep.members([
     {
       schema: config.snowplow.schemas.reviewedCorpusItem,
@@ -127,13 +133,15 @@ describe('ReviewedItemSnowplowHandler', () => {
     await resetSnowplowEvents();
   });
 
-  it('should send good events to Snowplow on approved items', async () => {
+  it('should send good events to Snowplow', async () => {
     const emitter = new CuratedCorpusEventEmitter();
     new ReviewedItemSnowplowHandler(emitter, tracker, [
       ReviewedCorpusItemEventType.ADD_ITEM,
       ReviewedCorpusItemEventType.UPDATE_ITEM,
       ReviewedCorpusItemEventType.REMOVE_ITEM,
+      ReviewedCorpusItemEventType.REJECT_ITEM,
     ]);
+    // Emit all the events that are relevant for approved curated items
     emitter.emit(ReviewedCorpusItemEventType.ADD_ITEM, {
       ...approvedEventData,
       eventType: ReviewedCorpusItemEventType.ADD_ITEM,
@@ -146,38 +154,7 @@ describe('ReviewedItemSnowplowHandler', () => {
       ...approvedEventData,
       eventType: ReviewedCorpusItemEventType.REMOVE_ITEM,
     });
-
-    // wait a sec * 3
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    // make sure we only have good events
-    const allEvents = await getAllSnowplowEvents();
-    expect(allEvents.total).to.equal(3);
-    expect(allEvents.good).to.equal(3);
-    expect(allEvents.bad).to.equal(0);
-
-    const goodEvents = await getGoodSnowplowEvents();
-
-    assertValidSnowplowApprovedItemEvents(goodEvents[0].rawEvent.parameters.cx);
-    assertValidSnowplowApprovedItemEvents(goodEvents[1].rawEvent.parameters.cx);
-    assertValidSnowplowApprovedItemEvents(goodEvents[2].rawEvent.parameters.cx);
-
-    assertValidSnowplowObjectUpdateEvents(
-      goodEvents.map((goodEvent) => goodEvent.rawEvent.parameters.ue_px),
-      [
-        'reviewed_corpus_item_added',
-        'reviewed_corpus_item_updated',
-        'reviewed_corpus_item_removed',
-      ],
-      'reviewed_corpus_item'
-    );
-  });
-
-  it('should send good events to Snowplow on rejected items', async () => {
-    const emitter = new CuratedCorpusEventEmitter();
-    new ReviewedItemSnowplowHandler(emitter, tracker, [
-      ReviewedCorpusItemEventType.REJECT_ITEM,
-    ]);
+    // Emit the rejected item event
     emitter.emit(ReviewedCorpusItemEventType.REJECT_ITEM, {
       ...rejectedEventData,
       eventType: ReviewedCorpusItemEventType.REJECT_ITEM,
@@ -188,16 +165,24 @@ describe('ReviewedItemSnowplowHandler', () => {
 
     // make sure we only have good events
     const allEvents = await getAllSnowplowEvents();
-    expect(allEvents.total).to.equal(1);
-    expect(allEvents.good).to.equal(1);
+    expect(allEvents.total).to.equal(4);
+    expect(allEvents.good).to.equal(4);
     expect(allEvents.bad).to.equal(0);
 
     const goodEvents = await getGoodSnowplowEvents();
 
-    assertValidSnowplowRejectedItemEvents(goodEvents[0].rawEvent.parameters.cx);
+    goodEvents.forEach((event) => {
+      assertValidSnowplowReviewedItemEvents(event.rawEvent.parameters.cx);
+    });
+
     assertValidSnowplowObjectUpdateEvents(
       goodEvents.map((goodEvent) => goodEvent.rawEvent.parameters.ue_px),
-      ['reviewed_corpus_item_rejected'],
+      [
+        'reviewed_corpus_item_added',
+        'reviewed_corpus_item_updated',
+        'reviewed_corpus_item_removed',
+        'reviewed_corpus_item_rejected',
+      ],
       'reviewed_corpus_item'
     );
   });
