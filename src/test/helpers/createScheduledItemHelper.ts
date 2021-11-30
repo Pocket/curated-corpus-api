@@ -37,7 +37,10 @@ export async function createScheduledItemHelper(
   const creatScheduledItemDefaults = {
     createdAt: faker.date.recent(14),
     createdBy: faker.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
-    scheduledDate: faker.date.soon(7).toISOString(),
+    scheduledDate: faker.random.arrayElement([
+      faker.date.soon(7).toISOString(),
+      faker.date.recent(7).toISOString(),
+    ]),
     newTabGuid: 'EN_US',
   };
 
