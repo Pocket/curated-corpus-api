@@ -13,7 +13,9 @@ async function main() {
   // several pages
   const approvedItemTitles: string[] = [];
 
-  for (let i = 0; i < 170; i++) {
+  // We need so many to be able to generate enough scheduled entries
+  // for the +/-7 day period around the date the seed script is run.
+  for (let i = 0; i < 500; i++) {
     approvedItemTitles.push(faker.lorem.sentence());
   }
 
