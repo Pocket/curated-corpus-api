@@ -1,5 +1,4 @@
 import { DateResolver } from 'graphql-scalars';
-
 import { UnixTimestampResolver } from './fields/UnixTimestamp';
 import { getApprovedItems } from './queries/ApprovedItem';
 import { getRejectedItems } from './queries/RejectedItem';
@@ -9,6 +8,7 @@ import {
   updateApprovedItem,
   uploadApprovedItemImage,
 } from './mutations/ApprovedItem';
+import { createRejectedItem } from './mutations/RejectedItem';
 import {
   createScheduledItem,
   deleteScheduledItem,
@@ -47,6 +47,7 @@ export const resolvers = {
   Mutation: {
     createApprovedCuratedCorpusItem: createApprovedItem,
     updateApprovedCuratedCorpusItem: updateApprovedItem,
+    createRejectedCuratedCorpusItem: createRejectedItem,
     createScheduledCuratedCorpusItem: createScheduledItem,
     deleteScheduledCuratedCorpusItem: deleteScheduledItem,
     uploadApprovedCuratedCorpusItemImage: uploadApprovedItemImage,

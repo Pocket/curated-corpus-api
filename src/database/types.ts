@@ -54,6 +54,16 @@ export type UpdateApprovedItemInput = {
   externalId: string;
 } & ApprovedItemRequiredInput;
 
+export type CreateRejectedItemInput = {
+  prospectId: string;
+  url: string;
+  title: string;
+  topic: string;
+  language: string;
+  publisher: string;
+  reason: string;
+};
+
 export type ScheduledItem = ScheduledItemModel & {
   approvedItem: ApprovedItem;
 };

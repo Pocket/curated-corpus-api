@@ -508,6 +508,41 @@ input UpdateApprovedCuratedCorpusItemInput {
 }
 
 """
+Input data for creating a Rejected Item.
+"""
+input CreateRejectedCuratedCorpusItemInput {
+    """
+    The GUID of the corresponding Prospect ID.
+    """
+    prospectId: ID!
+    """
+    The URL of the Approved Item.
+    """
+    url: Url!
+    """
+    The title of the Approved Item.
+    """
+    title: String!
+    """
+    A topic this story best fits in.
+    Temporarily a string value that will be provided by Prospect API, possibly an enum in the future.
+    """
+    topic: String!
+    """
+    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    """
+    language: String!
+    """
+    The name of the online publication that published this story.
+    """
+    publisher: String!
+    """
+    A comma-separated list of rejection reasons.
+    """
+    reason: String!
+}
+
+"""
 Input data for creating a scheduled entry for an Approved Item on a New Tab Feed.
 """
 input CreateScheduledCuratedCorpusItemInput {
@@ -571,6 +606,13 @@ type Mutation {
     createApprovedCuratedCorpusItem(
         data: CreateApprovedCuratedCorpusItemInput!
     ): ApprovedCuratedCorpusItem!
+
+    """
+    Creates a Rejected Item.
+    """
+    createRejectedCuratedCorpusItem(
+        data: CreateRejectedCuratedCorpusItemInput!
+    ): RejectedCuratedCorpusItem!
 
     """
     Updates an Approved Item.
