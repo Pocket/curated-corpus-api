@@ -51,10 +51,10 @@ model RejectedCuratedCorpusItem {
   externalId String   @default(uuid()) @db.VarChar(255)
   prospectId String   @db.VarChar(255)
   url        String   @db.VarChar(500)
-  title      String   @db.VarChar(255)
+  title      String?  @db.VarChar(255)
   topic      String   @db.VarChar(255)
-  language   String   @db.VarChar(2)
-  publisher  String   @db.VarChar(255)
+  language   String?  @db.VarChar(2)
+  publisher  String?  @db.VarChar(255)
   // Can be multiple reasons. For the MVP, Snowplow and the frontend
   // will be the only consumers of this data.
   // Will be likely stored either as comma-separated values or JSON.

@@ -1,5 +1,5 @@
 import { gql } from 'apollo-server';
-import { CuratedItemData } from './fragments.gql';
+import { CuratedItemData, RejectedItemData } from './fragments.gql';
 
 /**
  * Sample mutations for Apollo Server integration tests as used in
@@ -83,6 +83,33 @@ export const UPDATE_APPROVED_ITEM = gql`
     }
   }
   ${CuratedItemData}
+`;
+
+export const CREATE_REJECTED_ITEM = gql`
+  mutation createRejectedItem(
+    $prospectId: ID!
+    $url: Url!
+    $title: String
+    $topic: String!
+    $language: String
+    $publisher: String
+    $reason: String!
+  ) {
+    createRejectedCuratedCorpusItem(
+      data: {
+        prospectId: $prospectId
+        url: $url
+        title: $title
+        topic: $topic
+        language: $language
+        publisher: $publisher
+        reason: $reason
+      }
+    ) {
+      ...RejectedItemData
+    }
+  }
+  ${RejectedItemData}
 `;
 
 export const CREATE_SCHEDULED_ITEM = gql`

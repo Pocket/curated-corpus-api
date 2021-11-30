@@ -104,8 +104,6 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
         url: item.url,
         corpus_review_status: corpusReviewStatus,
         prospect_id: item.prospectId,
-        title: item.title,
-        language: item.language,
         topic: item.topic,
         created_at: getUnixTimestamp(item.createdAt),
         created_by: item.createdBy,
@@ -134,6 +132,8 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
   ): ReviewedCorpusItemContext {
     context.data = {
       ...context.data,
+      title: item.title,
+      language: item.language,
       excerpt: item.excerpt,
       image_url: item.imageUrl,
       is_collection: item.isCollection,
@@ -156,6 +156,18 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       rejected_corpus_item_external_id: item.externalId,
       rejection_reasons: item.reason.split(','),
     };
+
+    // Curators are not required to fill in the `title` field if it's missing
+    // from the prospects stream (e.g., the Parser hasn't supplied it when parsing
+    // the URL), so we only send it to Snowplow if the data is there.
+    if (item.title) {
+      context.data = { ...context.data, title: item.title };
+    }
+
+    // And we do the exact same thing for the `language` field.
+    if (item.language) {
+      context.data = { ...context.data, language: item.language };
+    }
 
     return context;
   }
