@@ -57,10 +57,10 @@ export type UpdateApprovedItemInput = {
 export type CreateRejectedItemInput = {
   prospectId: string;
   url: string;
-  title: string;
+  title?: string;
   topic: string;
-  language: string;
-  publisher: string;
+  language?: string;
+  publisher?: string;
   reason: string;
 };
 

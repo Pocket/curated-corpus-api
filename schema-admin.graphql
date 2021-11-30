@@ -516,13 +516,13 @@ input CreateRejectedCuratedCorpusItemInput {
     """
     prospectId: ID!
     """
-    The URL of the Approved Item.
+    The URL of the Rejected Item.
     """
     url: Url!
     """
-    The title of the Approved Item.
+    The title of the Rejected Item.
     """
-    title: String!
+    title: String
     """
     A topic this story best fits in.
     Temporarily a string value that will be provided by Prospect API, possibly an enum in the future.
@@ -531,11 +531,11 @@ input CreateRejectedCuratedCorpusItemInput {
     """
     What language this item is in. This is a two-letter code, for example, 'en' for English.
     """
-    language: String!
+    language: String
     """
     The name of the online publication that published this story.
     """
-    publisher: String!
+    publisher: String
     """
     A comma-separated list of rejection reasons.
     """

@@ -89,10 +89,10 @@ export const CREATE_REJECTED_ITEM = gql`
   mutation createRejectedItem(
     $prospectId: ID!
     $url: Url!
-    $title: String!
+    $title: String
     $topic: String!
-    $language: String!
-    $publisher: String!
+    $language: String
+    $publisher: String
     $reason: String!
   ) {
     createRejectedCuratedCorpusItem(
