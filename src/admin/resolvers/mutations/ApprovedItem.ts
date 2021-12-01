@@ -13,6 +13,7 @@ import {
   newTabAllowedValues,
   ApprovedItemS3ImageUrl,
 } from '../../../shared/types';
+import { UserInputError } from 'apollo-server';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -35,7 +36,7 @@ export async function createApprovedItem(
     newTabGuid &&
     !newTabAllowedValues.includes(newTabGuid)
   ) {
-    throw new Error(
+    throw new UserInputError(
       `Cannot create a scheduled entry with New Tab GUID of "${data.newTabGuid}".`
     );
   }
