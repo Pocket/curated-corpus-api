@@ -1,5 +1,6 @@
 import { PrismaClient, RejectedCuratedCorpusItem } from '@prisma/client';
 import { CreateRejectedItemInput } from '../types';
+import { UserInputError } from 'apollo-server';
 
 /**
  * This mutation creates a rejected item with the data provided.
@@ -17,7 +18,7 @@ export async function createRejectedItem(
   });
 
   if (urlExists) {
-    throw new Error(
+    throw new UserInputError(
       `A rejected item with the URL "${data.url}" already exists`
     );
   }

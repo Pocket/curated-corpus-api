@@ -1,5 +1,6 @@
 import { PrismaClient, ApprovedItem } from '@prisma/client';
 import { CreateApprovedItemInput, UpdateApprovedItemInput } from '../types';
+import { UserInputError } from 'apollo-server';
 
 /**
  * This mutation creates an approved curated item.
@@ -17,7 +18,7 @@ export async function createApprovedItem(
   });
 
   if (urlExists) {
-    throw new Error(
+    throw new UserInputError(
       `An approved item with the URL "${data.url}" already exists`
     );
   }
@@ -42,7 +43,7 @@ export async function updateApprovedItem(
   data: UpdateApprovedItemInput
 ): Promise<ApprovedItem> {
   if (!data.externalId) {
-    throw new Error('externalId must be provided.');
+    throw new UserInputError('externalId must be provided.');
   }
 
   // Check if the URL is unique.
@@ -51,7 +52,7 @@ export async function updateApprovedItem(
   });
 
   if (urlExists) {
-    throw new Error(
+    throw new UserInputError(
       `An approved item with the URL "${data.url}" already exists`
     );
   }

@@ -4,6 +4,8 @@ import {
   DeleteScheduledItemInput,
   ScheduledItem,
 } from '../types';
+import { NotFoundError } from '@pocket-tools/apollo-utils';
+import { UserInputError } from 'apollo-server';
 
 /**
  * This mutation adds a scheduled entry for a New Tab.
@@ -22,7 +24,7 @@ export async function createScheduledItem(
   });
 
   if (!approvedItem) {
-    throw new Error(
+    throw new NotFoundError(
       `Cannot create a scheduled entry: Approved Item with id "${approvedItemExternalId}" does not exist.`
     );
   }
@@ -52,7 +54,7 @@ export async function deleteScheduledItem(
   data: DeleteScheduledItemInput
 ): Promise<ScheduledItem> {
   if (!data.externalId) {
-    throw new Error('externalId must be provided.');
+    throw new UserInputError('externalId must be provided.');
   }
 
   // Get the item to return with the mutation
@@ -71,7 +73,9 @@ export async function deleteScheduledItem(
       },
     });
   } else {
-    throw new Error(`Item with ID of '${data.externalId}' could not be found.`);
+    throw new NotFoundError(
+      `Item with ID of '${data.externalId}' could not be found.`
+    );
   }
 
   return scheduledItem;
