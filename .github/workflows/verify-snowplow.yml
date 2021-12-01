@@ -1,0 +1,30 @@
+name: Verify Snowplow Schema Dependencies
+
+####################################
+# Start the job on all PRs to main #
+####################################
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  data-structures-check:
+    runs-on: ubuntu-latest
+    steps:
+      ##########################
+      # Checkout the code base #
+      ##########################
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      ##########################
+      # Run the Snowplow check #
+      ##########################
+      - name: Run Snowplow's Data Structures CI
+        uses: snowplow-product/msc-schema-ci-action/check@v0.3.4
+        with:
+          manifest-path: '.github/workflows/snowplow/schemas.json'
+          username: ${{ secrets.SNOWPLOW_AUTH_USER }}
+          password: ${{ secrets.SNOWPLOW_AUTH_PASSWORD }}
+          environment: PRODUCTION
