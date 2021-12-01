@@ -1,5 +1,6 @@
 import { PrismaClient, ApprovedItem } from '@prisma/client';
 import { CreateApprovedItemInput, UpdateApprovedItemInput } from '../types';
+import { UserInputError } from 'apollo-server-express';
 
 /**
  * This mutation creates an approved curated item.
@@ -32,7 +33,7 @@ export async function createApprovedItem(
 }
 
 /**
- * This mutation updates an approve curated item.
+ * This mutation updates an approved curated item.
  *
  * @param db
  * @param data
@@ -64,4 +65,39 @@ export async function updateApprovedItem(
       createdBy: 'sso-user',
     },
   });
+}
+
+export async function deleteApprovedItem(
+  db: PrismaClient,
+  externalId: string
+): Promise<ApprovedItem> {
+  // Retrieve the Approved Item first as it needs to be
+  // returned to the resolver as the result of the mutation.
+  const approvedItem = await db.approvedItem.findUnique({
+    where: { externalId },
+  });
+
+  // Fail early if item wasn't found.
+  if (!approvedItem) {
+    throw new UserInputError(
+      `Could not find an approved item with external id of ${externalId}.`
+    );
+  }
+
+  // Check for scheduled entries for this approved item
+  const scheduledItems = await db.scheduledItem.findMany({
+    where: { approvedItemId: approvedItem.id },
+  });
+  if (scheduledItems.length > 0) {
+    throw new Error(
+      `Cannot remove item from approved corpus - scheduled entries exist.`
+    );
+  }
+
+  // Hard delete the Approved Item if we got past this point.
+  await db.approvedItem.delete({
+    where: { externalId },
+  });
+
+  return approvedItem;
 }

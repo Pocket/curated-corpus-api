@@ -5,6 +5,7 @@ import { getRejectedItems } from './queries/RejectedItem';
 import { getScheduledItems } from './queries/ScheduledItem';
 import {
   createApprovedItem,
+  rejectApprovedItem,
   updateApprovedItem,
   uploadApprovedItemImage,
 } from './mutations/ApprovedItem';
@@ -46,6 +47,7 @@ export const resolvers = {
   // Mutations that we need in the admin interface
   Mutation: {
     createApprovedCuratedCorpusItem: createApprovedItem,
+    rejectApprovedCuratedCorpusItem: rejectApprovedItem,
     updateApprovedCuratedCorpusItem: updateApprovedItem,
     createRejectedCuratedCorpusItem: createRejectedItem,
     createScheduledCuratedCorpusItem: createScheduledItem,

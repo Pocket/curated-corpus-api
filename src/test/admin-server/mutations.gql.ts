@@ -85,6 +85,15 @@ export const UPDATE_APPROVED_ITEM = gql`
   ${CuratedItemData}
 `;
 
+export const REJECT_APPROVED_ITEM = gql`
+  mutation rejectApprovedItem($data: RejectApprovedCuratedCorpusItemInput!) {
+    rejectApprovedCuratedCorpusItem(data: $data) {
+      ...CuratedItemData
+    }
+  }
+  ${CuratedItemData}
+`;
+
 export const CREATE_REJECTED_ITEM = gql`
   mutation createRejectedItem(
     $prospectId: ID!
