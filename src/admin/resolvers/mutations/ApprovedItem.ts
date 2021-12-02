@@ -97,16 +97,7 @@ export async function rejectApprovedItem(
   { data },
   context
 ): Promise<ApprovedItem> {
-  const approvedItem = await dbDeleteApprovedItem(context.db, data.externalId);
-
-  // Should we update the approved item object manually with the latest
-  // updatedAt + updatedBy values before sending data to Snowplow?
-
-  // Let Snowplow know we've deleted something from the curated corpus.
-  context.emitReviewedCorpusItemEvent(
-    ReviewedCorpusItemEventType.REMOVE_ITEM,
-    approvedItem
-  );
+  let approvedItem = await dbDeleteApprovedItem(context.db, data.externalId);
 
   // From our thoughtfully saved before deletion Approved Item, construct
   // input data for a Rejected Item entry.
@@ -122,7 +113,22 @@ export async function rejectApprovedItem(
   // Create a Rejected Item. The Prisma function will handle URL uniqueness checks
   const rejectedItem = await createRejectedItem(context.db, input);
 
-  // Let Snowplow know that an entry was added to the Rejected Items table
+  // Let Snowplow know we've deleted something from the curated corpus.
+  // Before that, we need to update the values for the `updatedAt` and `updatedBy`
+  // fields for the deleted approved item. Let's take these values from
+  // the newly created Rejected Item.
+  approvedItem = {
+    ...approvedItem,
+    updatedAt: rejectedItem.createdAt,
+    updatedBy: rejectedItem.createdBy,
+  };
+  // Now emit the event with the updated Approved Item data.
+  context.emitReviewedCorpusItemEvent(
+    ReviewedCorpusItemEventType.REMOVE_ITEM,
+    approvedItem
+  );
+
+  // Let Snowplow know that an entry was added to the Rejected Items table.
   context.emitReviewedCorpusItemEvent(
     ReviewedCorpusItemEventType.REJECT_ITEM,
     rejectedItem

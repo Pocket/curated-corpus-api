@@ -3,14 +3,20 @@ import { CuratedStatus } from '@prisma/client';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { db, getServer } from '../../../test/admin-server';
-import { clearDb, createApprovedItemHelper } from '../../../test/helpers';
+import {
+  clearDb,
+  createApprovedItemHelper,
+  createScheduledItemHelper,
+} from '../../../test/helpers';
 import {
   CREATE_APPROVED_ITEM,
+  REJECT_APPROVED_ITEM,
   UPDATE_APPROVED_ITEM,
   UPLOAD_APPROVED_ITEM_IMAGE,
 } from '../../../test/admin-server/mutations.gql';
 import {
   CreateApprovedItemInput,
+  RejectApprovedItemInput,
   UpdateApprovedItemInput,
 } from '../../../database/types';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
@@ -20,6 +26,7 @@ import {
 } from '../../../events/types';
 import { Upload } from 'graphql-upload';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
+import { GET_REJECTED_ITEMS } from '../../../test/admin-server/queries.gql';
 
 describe('mutations: ApprovedItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
@@ -206,7 +213,7 @@ describe('mutations: ApprovedItem', () => {
     });
   });
 
-  describe('updateCuratedItem mutation', () => {
+  describe('updateApprovedCuratedCorpusItem mutation', () => {
     it('updates an approved item when required variables are supplied', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
@@ -307,6 +314,142 @@ describe('mutations: ApprovedItem', () => {
       }
 
       // Check that the UPDATE_ITEM event was not fired
+      expect(eventTracker.callCount).to.equal(0);
+    });
+  });
+
+  describe('rejectApprovedCuratedCorpusItem mutation', () => {
+    it('moves a corpus item from the approved corpus to the rejection pile', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.REMOVE_ITEM, eventTracker);
+      eventEmitter.on(ReviewedCorpusItemEventType.REJECT_ITEM, eventTracker);
+
+      const item = await createApprovedItemHelper(db, {
+        title: '15 Unheard Ways To Achieve Greater Terraform',
+        status: CuratedStatus.RECOMMENDATION,
+        language: 'en',
+      });
+
+      const input: RejectApprovedItemInput = {
+        externalId: item.externalId,
+        reason: 'MISINFORMATION,OTHER',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
+
+      // On success, mutation should return the deleted approved item.
+      // Let's verify the id.
+      expect(result.data?.rejectApprovedCuratedCorpusItem.externalId).to.equal(
+        item.externalId
+      );
+
+      // There should be a rejected item created. Since we always truncate
+      // the database before every test, it is safe to assume that the
+      // `getRejectedCuratedCorpusItems` query will contain the one item
+      // that was created by this mutation.
+      const { data: queryData } = await server.executeOperation({
+        query: GET_REJECTED_ITEMS,
+      });
+      // There should be one rejected item in there...
+      expect(queryData?.getRejectedCuratedCorpusItems.totalCount).to.equal(1);
+      // ...and its URL should match that of the deleted Approved Item.
+      expect(
+        queryData?.getRejectedCuratedCorpusItems.edges[0].node.url
+      ).to.equal(item.url);
+
+      // Check that the REMOVE_ITEM and REJECT_ITEM events were fired successfully.
+      expect(eventTracker.callCount).to.equal(2);
+
+      // The REMOVE_ITEM event sends up-to-date info on the Approved Item.
+      expect(await eventTracker.getCall(0).args[0].eventType).to.equal(
+        ReviewedCorpusItemEventType.REMOVE_ITEM
+      );
+      expect(
+        await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
+      ).to.equal(result.data?.rejectApprovedCuratedCorpusItem.externalId);
+
+      // The REJECT_ITEM event sends through the newly created Rejected Item.
+      expect(await eventTracker.getCall(1).args[0].eventType).to.equal(
+        ReviewedCorpusItemEventType.REJECT_ITEM
+      );
+      expect(
+        await eventTracker.getCall(0).args[0].reviewedCorpusItem.url
+      ).to.equal(queryData?.getRejectedCuratedCorpusItems.edges[0].node.url);
+    });
+
+    it('should fail if externalId of approved item is not valid', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.REMOVE_ITEM, eventTracker);
+      eventEmitter.on(ReviewedCorpusItemEventType.REJECT_ITEM, eventTracker);
+
+      const input: RejectApprovedItemInput = {
+        externalId: 'this-id-does-not-exist',
+        reason: 'MISINFORMATION,OTHER',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.null;
+
+      if (result.errors) {
+        expect(result.errors[0].message).to.equal(
+          `Could not find an approved item with external id of "${input.externalId}".`
+        );
+      }
+
+      // Check that the events were not fired
+      expect(eventTracker.callCount).to.equal(0);
+    });
+
+    it('should fail if approved item has New Tab scheduled entries', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.REMOVE_ITEM, eventTracker);
+      eventEmitter.on(ReviewedCorpusItemEventType.REJECT_ITEM, eventTracker);
+
+      const item = await createApprovedItemHelper(db, {
+        title: 'More Unheard Ways To Achieve Greater Terraform',
+        status: CuratedStatus.CORPUS,
+        language: 'en',
+      });
+
+      // Add an entry to a New Tab - approved item now can't be deleted
+      // for data integrity reasons.
+      await createScheduledItemHelper(db, {
+        approvedItem: item,
+        newTabGuid: 'EN_US',
+      });
+
+      const input: RejectApprovedItemInput = {
+        externalId: item.externalId,
+        reason: 'MISINFORMATION,OTHER',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.null;
+
+      if (result.errors) {
+        expect(result.errors[0].message).to.equal(
+          `Cannot remove item from approved corpus - scheduled entries exist.`
+        );
+      }
+
+      // Check that the events were not fired
       expect(eventTracker.callCount).to.equal(0);
     });
   });

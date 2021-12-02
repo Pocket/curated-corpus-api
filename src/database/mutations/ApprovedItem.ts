@@ -80,7 +80,7 @@ export async function deleteApprovedItem(
   // Fail early if item wasn't found.
   if (!approvedItem) {
     throw new UserInputError(
-      `Could not find an approved item with external id of ${externalId}.`
+      `Could not find an approved item with external id of "${externalId}".`
     );
   }
 
