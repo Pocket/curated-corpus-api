@@ -5,6 +5,7 @@ import {
 import { ScheduledItem } from '../../../database/types';
 import { newTabAllowedValues } from '../../../shared/types';
 import { ScheduledCorpusItemEventType } from '../../../events/types';
+import { UserInputError } from 'apollo-server';
 
 /**
  * Deletes an item from the New Tab schedule.
@@ -34,7 +35,7 @@ export async function createScheduledItem(
   context
 ): Promise<ScheduledItem> {
   if (!newTabAllowedValues.includes(data.newTabGuid)) {
-    throw new Error(
+    throw new UserInputError(
       `Cannot create a scheduled entry with New Tab GUID of "${data.newTabGuid}".`
     );
   }

@@ -116,9 +116,10 @@ describe('mutations: ApprovedItem', () => {
 
       // And there is the right error from the resolvers
       if (result.errors) {
-        expect(result.errors[0].message).to.equal(
+        expect(result.errors[0].message).to.contain(
           `An approved item with the URL "${input.url}" already exists`
         );
+        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
       }
 
       // Check that the ADD_ITEM event was not fired
@@ -203,9 +204,10 @@ describe('mutations: ApprovedItem', () => {
 
       // And there is the right error from the resolvers
       if (result.errors) {
-        expect(result.errors[0].message).to.equal(
+        expect(result.errors[0].message).to.contain(
           `Cannot create a scheduled entry with New Tab GUID of "${input.newTabGuid}".`
         );
+        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
       }
 
       // Check that the ADD_ITEM event was not fired
@@ -308,9 +310,10 @@ describe('mutations: ApprovedItem', () => {
 
       // And there is the right error from the resolvers
       if (result.errors) {
-        expect(result.errors[0].message).to.equal(
+        expect(result.errors[0].message).to.contain(
           `An approved item with the URL "${input.url}" already exists`
         );
+        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
       }
 
       // Check that the UPDATE_ITEM event was not fired

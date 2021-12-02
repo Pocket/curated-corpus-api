@@ -1,3 +1,4 @@
+import { UserInputError } from 'apollo-server';
 import { ApprovedItem } from '@prisma/client';
 import {
   createApprovedItem as dbCreateApprovedItem,
@@ -38,7 +39,7 @@ export async function createApprovedItem(
     newTabGuid &&
     !newTabAllowedValues.includes(newTabGuid)
   ) {
-    throw new Error(
+    throw new UserInputError(
       `Cannot create a scheduled entry with New Tab GUID of "${data.newTabGuid}".`
     );
   }
@@ -92,6 +93,14 @@ export async function updateApprovedItem(
   return approvedItem;
 }
 
+/**
+ * Removes an approved item from the corpus and adds its data to the rejected item
+ * table.
+ *
+ * @param parent
+ * @param data
+ * @param context
+ */
 export async function rejectApprovedItem(
   parent,
   { data },

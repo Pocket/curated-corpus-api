@@ -5,7 +5,7 @@ import { typeDefsAdmin } from '../typeDefs';
 import { resolvers as resolversAdmin } from './resolvers';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
 import { GraphQLRequestContext } from 'apollo-server-types';
-import { sentryPlugin } from '@pocket-tools/apollo-utils';
+import { sentryPlugin, errorHandler } from '@pocket-tools/apollo-utils';
 import { ContextManager } from './context';
 import {
   ApolloServerPluginLandingPageDisabled,
@@ -28,6 +28,7 @@ export function getServer(contextFactory: ContextFactory): ApolloServer {
     schema: buildSubgraphSchema([
       { typeDefs: typeDefsAdmin, resolvers: resolversAdmin },
     ]),
+    formatError: errorHandler,
     plugins: [
       //Copied from Apollo docs, the sessionID signifies if we should separate out caches by user.
       responseCachePlugin({

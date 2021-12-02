@@ -18,7 +18,7 @@ import { getUnixTimestamp } from '../fields/UnixTimestamp';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import { ScheduledCorpusItemEventType } from '../../../events/types';
 
-describe('mutations: NewTabFeedSchedule', () => {
+describe('mutations: ScheduledItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
   const server = getServer(eventEmitter);
 
@@ -60,9 +60,10 @@ describe('mutations: NewTabFeedSchedule', () => {
 
       // And there is the correct error from the resolvers
       if (result.errors) {
-        expect(result.errors[0].message).to.equal(
+        expect(result.errors[0].message).to.contain(
           `Cannot create a scheduled entry with New Tab GUID of "RECSAPI".`
         );
+        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
       }
 
       // Check that the ADD_SCHEDULE event was not fired
@@ -89,8 +90,11 @@ describe('mutations: NewTabFeedSchedule', () => {
 
       // And there is the correct error from the resolvers
       if (result.errors) {
-        expect(result.errors[0].message).to.equal(
+        expect(result.errors[0].message).to.contain(
           `Cannot create a scheduled entry: Approved Item with id "not-a-valid-id-at-all" does not exist.`
+        );
+        expect(result.errors[0].extensions?.code).to.equal(
+          'INTERNAL_SERVER_ERROR'
         );
       }
 
@@ -182,8 +186,11 @@ describe('mutations: NewTabFeedSchedule', () => {
 
       // And there is the correct error from the resolvers
       if (result.errors) {
-        expect(result.errors[0].message).to.equal(
+        expect(result.errors[0].message).to.contain(
           `Item with ID of '${input.externalId}' could not be found.`
+        );
+        expect(result.errors[0].extensions?.code).to.equal(
+          'INTERNAL_SERVER_ERROR'
         );
       }
 
