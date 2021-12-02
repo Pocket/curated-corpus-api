@@ -67,6 +67,12 @@ export async function updateApprovedItem(
   });
 }
 
+/**
+ * This mutation deletes an approved item.
+ *
+ * @param db
+ * @param externalId
+ */
 export async function deleteApprovedItem(
   db: PrismaClient,
   externalId: string

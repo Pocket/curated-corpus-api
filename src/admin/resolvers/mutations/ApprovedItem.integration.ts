@@ -409,6 +409,7 @@ describe('mutations: ApprovedItem', () => {
         expect(result.errors[0].message).to.equal(
           `Could not find an approved item with external id of "${input.externalId}".`
         );
+        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
       }
 
       // Check that the events were not fired
@@ -449,6 +450,9 @@ describe('mutations: ApprovedItem', () => {
       if (result.errors) {
         expect(result.errors[0].message).to.equal(
           `Cannot remove item from approved corpus - scheduled entries exist.`
+        );
+        expect(result.errors[0].extensions?.code).to.equal(
+          'INTERNAL_SERVER_ERROR'
         );
       }
 
