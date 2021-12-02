@@ -9,7 +9,6 @@ export async function getScheduledItems(
   parent,
   { filters },
   { db }
-): Promise<ScheduledItemsResult> {
-  const items = await dbGetScheduledItems(db, filters);
-  return { items };
+): Promise<ScheduledItemsResult[]> {
+  return await dbGetScheduledItems(db, filters);
 }

@@ -69,6 +69,9 @@ export type ScheduledItem = ScheduledItemModel & {
 };
 
 export type ScheduledItemsResult = {
+  scheduledDate: string;
+  totalCount: number;
+  syndicatedCount: number;
   items: ScheduledItem[];
 };
 
