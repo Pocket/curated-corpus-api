@@ -27,4 +27,4 @@ jobs:
           manifest-path: '.github/workflows/snowplow/schemas.json'
           username: ${{ secrets.SNOWPLOW_AUTH_USER }}
           password: ${{ secrets.SNOWPLOW_AUTH_PASSWORD }}
-          environment: PRODUCTION
+          environment: prod1
