@@ -519,6 +519,20 @@ input UpdateApprovedCuratedCorpusItemInput {
 }
 
 """
+Input data for rejecting an Approved Item.
+"""
+input RejectApprovedCuratedCorpusItemInput {
+    """
+    Approved Item ID.
+    """
+    externalId: ID!
+    """
+    A comma-separated list of rejection reasons.
+    """
+    reason: String!
+}
+
+"""
 Input data for creating a Rejected Item.
 """
 input CreateRejectedCuratedCorpusItemInput {
@@ -630,6 +644,13 @@ type Mutation {
     """
     updateApprovedCuratedCorpusItem(
         data: UpdateApprovedCuratedCorpusItemInput!
+    ): ApprovedCuratedCorpusItem!
+
+    """
+    Rejects an Approved Item: deletes it from the corpus and creates a Rejected Item instead.
+    """
+    rejectApprovedCuratedCorpusItem(
+        data: RejectApprovedCuratedCorpusItemInput!
     ): ApprovedCuratedCorpusItem!
 
     """

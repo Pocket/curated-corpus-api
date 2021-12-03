@@ -54,6 +54,11 @@ export type UpdateApprovedItemInput = {
   externalId: string;
 } & ApprovedItemRequiredInput;
 
+export type RejectApprovedItemInput = {
+  externalId: string;
+  reason: string;
+};
+
 export type CreateRejectedItemInput = {
   prospectId: string;
   url: string;
