@@ -56,6 +56,9 @@ export const GET_REJECTED_ITEMS = gql`
 export const GET_SCHEDULED_ITEMS = gql`
   query getScheduledItems($filters: ScheduledCuratedCorpusItemsFilterInput!) {
     getScheduledCuratedCorpusItems(filters: $filters) {
+      totalCount
+      syndicatedCount
+      scheduledDate
       items {
         externalId
         createdAt

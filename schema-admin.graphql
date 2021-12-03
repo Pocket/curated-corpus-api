@@ -310,11 +310,22 @@ The shape of the result returned by the getScheduledCuratedCorpusItems query.
 """
 type ScheduledCuratedCorpusItemsResult {
     """
+    The date items are scheduled for, in YYYY-MM-DD format.
+    """
+    scheduledDate: Date!
+    """
+    The total number of items for the scheduled date.
+    """
+    totalCount: Int!
+    """
+    The number of syndicated articles for the scheduled date.
+    """
+    syndicatedCount: Int!
+    """
     An array of items for a given New Tab Feed
     """
     items: [ScheduledCuratedCorpusItem!]!
 }
-
 """
 Available fields for filtering ApprovedCuratedCorpusItems.
 """
@@ -610,7 +621,7 @@ type Query {
         between the supplied start and end dates.
         """
         filters: ScheduledCuratedCorpusItemsFilterInput!
-    ): ScheduledCuratedCorpusItemsResult!
+    ): [ScheduledCuratedCorpusItemsResult!]!
 }
 
 type Mutation {
