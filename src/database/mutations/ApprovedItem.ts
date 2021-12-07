@@ -1,6 +1,6 @@
 import { PrismaClient, ApprovedItem } from '@prisma/client';
 import { CreateApprovedItemInput, UpdateApprovedItemInput } from '../types';
-import { UserInputError } from 'apollo-server-express';
+import { ApolloError, UserInputError } from 'apollo-server';
 
 /**
  * This mutation creates an approved curated item.
@@ -53,7 +53,7 @@ export async function updateApprovedItem(
 
   if (urlExists) {
     throw new UserInputError(
-      `An approved item with the URL "${data.url}" already exists`
+      `An approved item with the URL "${data.url}" already exists.`
     );
   }
 
@@ -95,7 +95,7 @@ export async function deleteApprovedItem(
     where: { approvedItemId: approvedItem.id },
   });
   if (scheduledItems.length > 0) {
-    throw new Error(
+    throw new ApolloError(
       `Cannot remove item from approved corpus - scheduled entries exist.`
     );
   }
