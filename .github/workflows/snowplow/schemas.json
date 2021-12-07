@@ -6,23 +6,17 @@
         "vendor": "com.pocket",
         "name": "object_update",
         "format": "jsonschema",
-        "version": "1-0-4"
+        "version": "1-0-5"
       },
       {
         "vendor": "com.pocket",
-        "name": "account",
-        "format": "jsonschema",
-        "version": "1-0-1"
-      },
-      {
-        "vendor": "com.pocket",
-        "name": "user",
+        "name": "reviewed_corpus_item",
         "format": "jsonschema",
         "version": "1-0-0"
       },
       {
         "vendor": "com.pocket",
-        "name": "api_user",
+        "name": "scheduled_corpus_item",
         "format": "jsonschema",
         "version": "1-0-0"
       }
