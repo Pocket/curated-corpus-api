@@ -88,8 +88,9 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       const resultArray = result.data?.getScheduledCuratedCorpusItems;
 
       // Check the first group of scheduled items
-      expect(resultArray[0].totalCount).not.to.be.null;
+      expect(resultArray[0].collectionCount).not.to.be.null;
       expect(resultArray[0].syndicatedCount).not.to.be.null;
+      expect(resultArray[0].totalCount).not.to.be.null;
       expect(resultArray[0].scheduledDate).not.to.be.null;
 
       // Check the first item in the first group

@@ -33,8 +33,7 @@ export async function getScheduledItems(
   });
 
   // Group scheduled items into an array of arrays.
-  const groupByScheduledDate = groupBy('scheduledDate');
-  const groupedItems = groupByScheduledDate(items);
+  const groupedItems = groupBy(items, 'scheduledDate');
 
   // Transform the grouped scheduled items into the return result
   // of the right shape.
@@ -48,10 +47,13 @@ export async function getScheduledItems(
 
       return {
         scheduledDate,
-        totalCount: items.length,
+        collectionCount: items.filter(
+          (item) => item.approvedItem.isCollection === true
+        ).length,
         syndicatedCount: items.filter(
           (item) => item.approvedItem.isSyndicated === true
         ).length,
+        totalCount: items.length,
         items: items,
       };
     }
