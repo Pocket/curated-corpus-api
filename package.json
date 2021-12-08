@@ -67,7 +67,7 @@
     "luxon": "^2.1.1"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.22",
+    "@types/chai": "^4.3.0",
     "@types/faker": "^5.5.9",
     "@types/graphql-upload": "^8.0.7",
     "@types/jest": "^27.0.3",
