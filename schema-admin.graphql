@@ -314,13 +314,17 @@ type ScheduledCuratedCorpusItemsResult {
     """
     scheduledDate: Date!
     """
-    The total number of items for the scheduled date.
+    The number of curated items that are collections for the scheduled date.
     """
-    totalCount: Int!
+    collectionCount: Int!
     """
     The number of syndicated articles for the scheduled date.
     """
     syndicatedCount: Int!
+    """
+    The total number of items for the scheduled date.
+    """
+    totalCount: Int!
     """
     An array of items for a given New Tab Feed
     """
