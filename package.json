@@ -44,7 +44,7 @@
     "@devoxa/prisma-relay-cursor-connection": "^2.0.3",
     "@pocket-tools/apollo-utils": "^2.0.0",
     "@prisma/client": "^3.6.0",
-    "@sentry/node": "^6.16.0",
+    "@sentry/node": "^6.16.1",
     "@sentry/tracing": "^6.16.1",
     "@snowplow/node-tracker": "^3.1.6",
     "@types/luxon": "^2.0.7",
