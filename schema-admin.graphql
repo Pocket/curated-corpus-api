@@ -75,6 +75,28 @@ enum ProspectType {
 }
 
 """
+A New Tab, including its associated Prospect Types.
+"""
+type NewTab {
+    """
+    The GUID of the New Tab. Example: 'EN_US'.
+    """
+    guid: String!
+    """
+    The display name of the New Tab. Example 'en-US'.
+    """
+    name: String!
+    """
+    The UTC offset of the New Tab's scheduling day, represented in HMM numeric format.
+    """
+    utcOffset: Int!
+    """
+    An array of associated ProspectTypes.
+    """
+    prospectTypes: [ProspectType!]!
+}
+
+"""
 A prospective story that has been reviewed by the curators and saved to the curated corpus.
 """
 type ApprovedCuratedCorpusItem {
@@ -330,6 +352,7 @@ type ScheduledCuratedCorpusItemsResult {
     """
     items: [ScheduledCuratedCorpusItem!]!
 }
+
 """
 Available fields for filtering ApprovedCuratedCorpusItems.
 """
@@ -617,7 +640,7 @@ type Query {
     ): RejectedCuratedCorpusItemConnection!
 
     """
-    Retrieves a list of Approved Items that are scheduled to appear on New Tab
+    Retrieves a list of Approved Items that are scheduled to appear on New Tab.
     """
     getScheduledCuratedCorpusItems(
         """
@@ -636,6 +659,11 @@ type Query {
         """
         url: String!
     ): ApprovedCuratedCorpusItem!
+
+    """
+    Retrieves all NewTabs available to the given SSO user.
+    """
+    getNewTabsForUser(token: String!): [NewTab!]!
 }
 
 type Mutation {

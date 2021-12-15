@@ -20,7 +20,7 @@ export const NewTabs: NewTab[] = [
   {
     name: 'en-US',
     guid: 'EN_US',
-    utcOffset: -4000,
+    utcOffset: -500,
     prospectTypes: [
       ProspectType.GLOBAL,
       ProspectType.TIMESPENT,
@@ -30,7 +30,7 @@ export const NewTabs: NewTab[] = [
   {
     name: 'de-DE',
     guid: 'DE_DE',
-    utcOffset: 1000,
+    utcOffset: 100,
     prospectTypes: [ProspectType.GLOBAL],
   },
 ];
