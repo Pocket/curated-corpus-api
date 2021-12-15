@@ -1,6 +1,7 @@
 import { PrismaClient, ApprovedItem } from '@prisma/client';
 import { CreateApprovedItemInput, UpdateApprovedItemInput } from '../types';
 import { ApolloError, UserInputError } from 'apollo-server';
+import { checkCorpusUrl } from '../helpers/checkCorpusUrl';
 
 /**
  * This mutation creates an approved curated item.
@@ -12,16 +13,8 @@ export async function createApprovedItem(
   db: PrismaClient,
   data: CreateApprovedItemInput
 ): Promise<ApprovedItem> {
-  // Check if the URL is unique.
-  const urlExists = await db.approvedItem.count({
-    where: { url: data.url },
-  });
-
-  if (urlExists) {
-    throw new UserInputError(
-      `An approved item with the URL "${data.url}" already exists`
-    );
-  }
+  // Check if an item with this URL has already been created in the Curated Corpus.
+  await checkCorpusUrl(db, data.url);
 
   return db.approvedItem.create({
     data: {
@@ -46,16 +39,9 @@ export async function updateApprovedItem(
     throw new UserInputError('externalId must be provided.');
   }
 
-  // Check if the URL is unique.
-  const urlExists = await db.approvedItem.count({
-    where: { url: data.url, externalId: { not: data.externalId } },
-  });
-
-  if (urlExists) {
-    throw new UserInputError(
-      `An approved item with the URL "${data.url}" already exists.`
-    );
-  }
+  // If the URL has been updated, we need to check if there's a pre-existing
+  // corpus item with the same URL and disallow the update if needed.
+  await checkCorpusUrl(db, data.url);
 
   return db.approvedItem.update({
     where: { externalId: data.externalId },
