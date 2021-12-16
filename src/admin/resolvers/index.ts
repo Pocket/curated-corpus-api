@@ -1,6 +1,6 @@
 import { DateResolver } from 'graphql-scalars';
 import { UnixTimestampResolver } from './fields/UnixTimestamp';
-import { getApprovedItems } from './queries/ApprovedItem';
+import { getApprovedItems, getApprovedItemByUrl } from './queries/ApprovedItem';
 import { getRejectedItems } from './queries/RejectedItem';
 import { getScheduledItems } from './queries/ScheduledItem';
 import {
@@ -43,6 +43,7 @@ export const resolvers = {
     getApprovedCuratedCorpusItems: getApprovedItems,
     getRejectedCuratedCorpusItems: getRejectedItems,
     getScheduledCuratedCorpusItems: getScheduledItems,
+    getApprovedCuratedCorpusItemByUrl: getApprovedItemByUrl,
   },
   // Mutations that we need in the admin interface
   Mutation: {

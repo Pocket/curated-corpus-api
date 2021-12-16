@@ -75,3 +75,12 @@ export const GET_SCHEDULED_ITEMS = gql`
   }
   ${CuratedItemData}
 `;
+
+export const GET_APPROVED_ITEM_BY_URL = gql`
+  query getApprovedCuratedCorpusItemByUrl($url: String!) {
+    getApprovedCuratedCorpusItemByUrl(url: $url) {
+      ...CuratedItemData
+    }
+  }
+  ${CuratedItemData}
+`;

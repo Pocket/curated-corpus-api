@@ -626,6 +626,16 @@ type Query {
         """
         filters: ScheduledCuratedCorpusItemsFilterInput!
     ): [ScheduledCuratedCorpusItemsResult!]!
+
+    """
+    Retrieves an approved curated item with the given URL.
+    """
+    getApprovedCuratedCorpusItemByUrl(
+        """
+        The URL of the approved item.
+        """
+        url: String!
+    ): ApprovedCuratedCorpusItem!
 }
 
 type Mutation {
