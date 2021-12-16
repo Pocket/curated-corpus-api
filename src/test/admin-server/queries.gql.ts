@@ -84,3 +84,14 @@ export const GET_APPROVED_ITEM_BY_URL = gql`
   }
   ${CuratedItemData}
 `;
+
+export const GET_NEW_TABS_FOR_USER = gql`
+  query getNewTabsForUser($token: String!) {
+    getNewTabsForUser(token: $token) {
+      guid
+      name
+      utcOffset
+      prospectTypes
+    }
+  }
+`;
