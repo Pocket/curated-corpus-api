@@ -16,13 +16,8 @@ describe('queries: NewTab', () => {
 
   describe('getNewTabsForUser query', () => {
     it('should get all newtabs until we enable SSO', async () => {
-      // the token below is the example from https://jwt.io/
       const { data } = await server.executeOperation({
         query: GET_NEW_TABS_FOR_USER,
-        variables: {
-          token:
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
-        },
       });
 
       const newTabs = data?.getNewTabsForUser;

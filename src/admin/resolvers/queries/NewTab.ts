@@ -7,8 +7,9 @@ import { NewTab, NewTabs } from '../../../shared/types';
  * @param args
  * @param db
  */
-export function getNewTabsForUser(parent, args, _): NewTab[] {
-  // const token = { args };
+export function getNewTabsForUser(parent, args, { token }): NewTab[] {
+  // token comes from the context - see admin/context.ts
+  // console.log(token);
 
   // TODO: when implementing SSO, decrypt token, validate signature and check
   // groups, which will contain new tab guid values.

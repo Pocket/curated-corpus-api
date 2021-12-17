@@ -86,8 +86,8 @@ export const GET_APPROVED_ITEM_BY_URL = gql`
 `;
 
 export const GET_NEW_TABS_FOR_USER = gql`
-  query getNewTabsForUser($token: String!) {
-    getNewTabsForUser(token: $token) {
+  query getNewTabsForUser {
+    getNewTabsForUser {
       guid
       name
       utcOffset
