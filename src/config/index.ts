@@ -3,14 +3,16 @@ import {
   ScheduledCorpusItemEventType,
 } from '../events/types';
 
+// Work out the AWS/localstack endpoint
 const awsEnvironments = ['production', 'development'];
-
 let localEndpoint;
-let snowplowHttpProtocol = 'https';
 if (!awsEnvironments.includes(process.env.NODE_ENV ?? '')) {
   localEndpoint = process.env.AWS_S3_ENDPOINT || 'http://localhost:4566';
-  snowplowHttpProtocol = 'http';
 }
+
+// Work out the Snowplow HTTP protocol.
+const snowplowHttpProtocol =
+  process.env.NODE_ENV === 'production' ? 'https' : 'http';
 
 // Environment variables below are set in .aws/src/main.ts
 export default {
