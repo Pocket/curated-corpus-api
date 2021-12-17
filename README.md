@@ -52,13 +52,11 @@ cd curated-corpus-api
 ```
 
 Generate the Prisma types (they will live in your `node_modules` folder):
-
 ```bash
 npx prisma generate
 ```
 
 Start Docker:
-
 ```bash
 docker compose up
 ```
@@ -68,7 +66,6 @@ Once all the Docker containers are up and running, you should be able to reach
 - the admin API at `http://localhost:4025/admin`
 
 Out of the box, the local installation doesn't have any actual data for you to fetch or manipulate through the API. To seed some sample data for your local dev environment, run
-
 ```bash
 docker compose exec app npx prisma migrate reset
 ```
@@ -79,11 +76,26 @@ Note that the above command will not be adding to any data you may have added to
 
 So far we only have integration tests in this repository, and these wipe the database on each run, which means it's ~really tricky~ impossible as yet to have them running in the background in watch mode while you code.
 
-The command to run integration tests is
-
+To run integration tests inside Docker, execute the following command:
 ```bash
 docker compose exec app npm run test-integrations
 ```
+
+To run these tests in watch mode, use
+```bash
+docker compose exec app npm run test-integration:watch
+```
+
+If you'd like to be able to run and debug integration tests directly in your IDE, run the following command (note that it may prompt you for your `sudo` password to modify your `/etc/hosts` file):
+```bash
+npm run test-setup
+```
+
+Thereafter, you can use 
+```bash
+npm run test-integrations
+```
+on the command line or use your IDE to debug individual tests and test suites.
 
 ## Making changes to the Prisma schema
 
