@@ -1,9 +1,13 @@
-import { gql } from 'apollo-server-express';
-import { CuratedItemData, RejectedItemData } from './fragments.gql';
+import { gql } from 'apollo-server';
+import {
+  CuratedItemData,
+  RejectedItemData,
+  ScheduledItemData,
+} from '../../../shared/fragments.gql';
 
 /**
  * Sample queries for Apollo Server integration tests as used in
- * Curation Admin Tools Frontend
+ * Curation Admin Tools Frontend and this repository's integration tests.
  */
 export const GET_APPROVED_ITEMS = gql`
   query getApprovedItems(
@@ -61,19 +65,11 @@ export const GET_SCHEDULED_ITEMS = gql`
       syndicatedCount
       scheduledDate
       items {
-        externalId
-        createdAt
-        createdBy
-        updatedAt
-        updatedBy
-        scheduledDate
-        approvedItem {
-          ...CuratedItemData
-        }
+        ...ScheduledItemData
       }
     }
   }
-  ${CuratedItemData}
+  ${ScheduledItemData}
 `;
 
 export const GET_APPROVED_ITEM_BY_URL = gql`

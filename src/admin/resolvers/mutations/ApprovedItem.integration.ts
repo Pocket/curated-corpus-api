@@ -14,7 +14,7 @@ import {
   REJECT_APPROVED_ITEM,
   UPDATE_APPROVED_ITEM,
   UPLOAD_APPROVED_ITEM_IMAGE,
-} from '../../../test/admin-server/mutations.gql';
+} from './sample-mutations.gql';
 import {
   CreateApprovedItemInput,
   RejectApprovedItemInput,
@@ -27,7 +27,7 @@ import {
 } from '../../../events/types';
 import { Upload } from 'graphql-upload';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
-import { GET_REJECTED_ITEMS } from '../../../test/admin-server/queries.gql';
+import { GET_REJECTED_ITEMS } from '../queries/sample-queries.gql';
 
 describe('mutations: ApprovedItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
@@ -70,7 +70,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       expect(result.errors).to.be.undefined;
@@ -109,7 +109,7 @@ describe('mutations: ApprovedItem', () => {
       // Attempt to create another item with the same URL
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       // ...without success. There is no data
@@ -141,7 +141,7 @@ describe('mutations: ApprovedItem', () => {
       // Attempt to create another item with the same URL
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       // ...without success. There is no data
@@ -171,7 +171,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       expect(result.errors).to.be.undefined;
@@ -228,7 +228,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       // ...without success. There is no data
@@ -278,7 +278,7 @@ describe('mutations: ApprovedItem', () => {
 
       const { data } = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       // External ID should be unchanged
@@ -335,7 +335,7 @@ describe('mutations: ApprovedItem', () => {
       // Attempt to update the second item with a duplicate URL...
       const result = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       // ...without success. There is no data
@@ -386,7 +386,7 @@ describe('mutations: ApprovedItem', () => {
       // Attempt to update the second item with a duplicate URL...
       const result = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       // ...without success. There is no data

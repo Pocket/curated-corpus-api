@@ -5,7 +5,7 @@ import { clearDb, createApprovedItemHelper } from '../../../test/helpers';
 import {
   GET_APPROVED_ITEM_BY_URL,
   GET_APPROVED_ITEMS,
-} from '../../../test/admin-server/queries.gql';
+} from './sample-queries.gql';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 
 describe('queries: ApprovedCuratedCorpusItem', () => {

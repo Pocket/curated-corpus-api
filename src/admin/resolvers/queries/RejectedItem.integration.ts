@@ -5,7 +5,7 @@ import {
   clearDb,
   createRejectedCuratedCorpusItemHelper,
 } from '../../../test/helpers';
-import { GET_REJECTED_ITEMS } from '../../../test/admin-server/queries.gql';
+import { GET_REJECTED_ITEMS } from './sample-queries.gql';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 
 describe('queries: RejectedCuratedCorpusItem', () => {
