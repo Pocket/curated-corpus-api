@@ -661,9 +661,9 @@ type Query {
     ): ApprovedCuratedCorpusItem!
 
     """
-    Retrieves all NewTabs available to the given SSO user.
+    Retrieves all NewTabs available to the given SSO user. Requires an Authorization header.
     """
-    getNewTabsForUser(token: String!): [NewTab!]!
+    getNewTabsForUser: [NewTab!]!
 }
 
 type Mutation {

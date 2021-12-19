@@ -20,6 +20,7 @@ export interface IContext {
   db: PrismaClient;
   eventEmitter: CuratedCorpusEventEmitter;
   s3: S3;
+  token?: string;
 
   emitReviewedCorpusItemEvent(
     event: ReviewedCorpusItemEventType,
@@ -54,6 +55,12 @@ export class ContextManager implements IContext {
     return this.config.eventEmitter;
   }
 
+  get token(): IContext['token'] {
+    const authHeader = this.config.request.headers.authorization ?? undefined;
+
+    return authHeader ? getTokenFromAuthorizationHeader(authHeader) : undefined;
+  }
+
   emitReviewedCorpusItemEvent(
     event: ReviewedCorpusItemEventType,
     reviewedCorpusItem: ApprovedItem | RejectedCuratedCorpusItem
@@ -72,6 +79,29 @@ export class ContextManager implements IContext {
     });
   }
 }
+
+export const getTokenFromAuthorizationHeader = (
+  authHeader: string
+): string | undefined => {
+  let token: string | undefined = undefined;
+
+  if (authHeader) {
+    // if present, header should be in the form of `Bearer tokenvalueshere`,
+    // so we try to split on the first (and ostensibly only) space
+    const parts = authHeader.split(' ');
+
+    // if the token has two parts - `Bearer` and `tokenvalue`, return the
+    // token value
+    if (parts.length === 2) {
+      token = parts[1];
+    }
+
+    // TODO: should we log something to sentry if `parts` above isn't as
+    // expected? or just fail silently for security purposes?
+  }
+
+  return token;
+};
 
 /**
  * Context factory function. Creates a new context upon
