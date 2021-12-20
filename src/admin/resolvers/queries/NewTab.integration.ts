@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { getServer } from '../../../test/admin-server';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
-import { GET_NEW_TABS_FOR_USER } from '../../../test/admin-server/queries.gql';
+import { GET_NEW_TABS_FOR_USER } from './sample-queries.gql';
 
 describe('queries: NewTab', () => {
   const server = getServer(new CuratedCorpusEventEmitter());

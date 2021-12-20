@@ -5,7 +5,7 @@ import {
   createScheduledItemHelper,
 } from '../../../test/helpers';
 import { db, getServer } from '../../../test/admin-server';
-import { GET_SCHEDULED_ITEMS } from '../../../test/admin-server/queries.gql';
+import { GET_SCHEDULED_ITEMS } from './sample-queries.gql';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 
 describe('queries: ScheduledCuratedCorpusItem', () => {

@@ -6,7 +6,7 @@ import {
   createApprovedItemHelper,
   createRejectedCuratedCorpusItemHelper,
 } from '../../../test/helpers';
-import { CREATE_REJECTED_ITEM } from '../../../test/admin-server/mutations.gql';
+import { CREATE_REJECTED_ITEM } from './sample-mutations.gql';
 import { CreateRejectedItemInput } from '../../../database/types';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import { ReviewedCorpusItemEventType } from '../../../events/types';
@@ -47,7 +47,7 @@ describe('mutations: RejectedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_REJECTED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       expect(result.errors).to.be.undefined;
@@ -86,7 +86,7 @@ describe('mutations: RejectedItem', () => {
       // Attempt to create another item with the same URL
       const result = await server.executeOperation({
         query: CREATE_REJECTED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       // ...without success. There is no data
@@ -118,7 +118,7 @@ describe('mutations: RejectedItem', () => {
       // Attempt to create another item with the same URL
       const result = await server.executeOperation({
         query: CREATE_REJECTED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       // ...without success. There is no data

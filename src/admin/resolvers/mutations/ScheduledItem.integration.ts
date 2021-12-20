@@ -8,8 +8,8 @@ import {
 } from '../../../test/helpers';
 import {
   CREATE_SCHEDULED_ITEM,
-  DELETE_SCHEDULE_ITEM,
-} from '../../../test/admin-server/mutations.gql';
+  DELETE_SCHEDULED_ITEM,
+} from './sample-mutations.gql';
 import {
   CreateScheduledItemInput,
   DeleteScheduledItemInput,
@@ -52,7 +52,7 @@ describe('mutations: ScheduledItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_SCHEDULED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       expect(result.data).to.be.null;
@@ -83,7 +83,7 @@ describe('mutations: ScheduledItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_SCHEDULED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       expect(result.data).to.be.null;
@@ -119,7 +119,7 @@ describe('mutations: ScheduledItem', () => {
 
       const { data } = await server.executeOperation({
         query: CREATE_SCHEDULED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       const scheduledItem = data?.createScheduledCuratedCorpusItem;
@@ -178,8 +178,8 @@ describe('mutations: ScheduledItem', () => {
       };
 
       const result = await server.executeOperation({
-        query: DELETE_SCHEDULE_ITEM,
-        variables: input,
+        query: DELETE_SCHEDULED_ITEM,
+        variables: { data: input },
       });
 
       expect(result.data).to.be.null;
@@ -216,8 +216,8 @@ describe('mutations: ScheduledItem', () => {
       });
 
       const { data } = await server.executeOperation({
-        query: DELETE_SCHEDULE_ITEM,
-        variables: { externalId: scheduledItem.externalId },
+        query: DELETE_SCHEDULED_ITEM,
+        variables: { data: { externalId: scheduledItem.externalId } },
       });
 
       // The shape of the Prisma objects the above helpers return doesn't quite match
