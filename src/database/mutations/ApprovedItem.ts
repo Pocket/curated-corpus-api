@@ -41,7 +41,7 @@ export async function updateApprovedItem(
 
   // If the URL has been updated, we need to check if there's a pre-existing
   // corpus item with the same URL and disallow the update if needed.
-  await checkCorpusUrl(db, data.url);
+  await checkCorpusUrl(db, data.url, data.externalId);
 
   return db.approvedItem.update({
     where: { externalId: data.externalId },
