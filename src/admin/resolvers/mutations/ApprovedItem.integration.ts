@@ -264,7 +264,6 @@ describe('mutations: ApprovedItem', () => {
         externalId: item.externalId,
         prospectId: '123-abc',
         title: 'Anything but LEGO',
-        url: 'https://test.com/lego',
         excerpt: 'Updated excerpt',
         status: CuratedStatus.CORPUS,
         imageUrl: 'https://test.com/image.png',
@@ -300,108 +299,6 @@ describe('mutations: ApprovedItem', () => {
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
       ).to.equal(data?.updateApprovedCuratedCorpusItem.externalId);
-    });
-
-    it('should fail to update an approved item with a duplicate URL', async () => {
-      // Set up event tracking
-      const eventTracker = sinon.fake();
-      eventEmitter.on(ReviewedCorpusItemEventType.UPDATE_ITEM, eventTracker);
-
-      await createApprovedItemHelper(db, {
-        title: 'I was here first',
-        url: 'https://test.com/first',
-      });
-      const item = await createApprovedItemHelper(db, {
-        title: "3 Things Everyone Knows About LEGO That You Don't",
-        url: 'https://sample.com/three-things',
-      });
-
-      const input: UpdateApprovedItemInput = {
-        externalId: item.externalId,
-        prospectId: '456-qwe',
-        title: 'Anything but LEGO',
-        url: 'https://test.com/first',
-        excerpt: 'Updated excerpt',
-        status: CuratedStatus.RECOMMENDATION,
-        imageUrl: 'https://test.com/image.png',
-        language: 'de',
-        publisher: 'Brick Cloud',
-        topic: 'Business',
-        isCollection: true,
-        isShortLived: true,
-        isSyndicated: false,
-      };
-
-      // Attempt to update the second item with a duplicate URL...
-      const result = await server.executeOperation({
-        query: UPDATE_APPROVED_ITEM,
-        variables: { data: input },
-      });
-
-      // ...without success. There is no data
-      expect(result.data).to.be.null;
-
-      // And there is the correct error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `An approved item with the URL "${input.url}" already exists`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
-
-      // Check that the UPDATE_ITEM event was not fired
-      expect(eventTracker.callCount).to.equal(0);
-    });
-
-    it('should fail to update an approved item if a rejected item with the same URL exists', async () => {
-      // Set up event tracking
-      const eventTracker = sinon.fake();
-      eventEmitter.on(ReviewedCorpusItemEventType.UPDATE_ITEM, eventTracker);
-
-      await createRejectedCuratedCorpusItemHelper(db, {
-        title: 'I was here first',
-        url: 'https://test.com/first',
-      });
-      const item = await createApprovedItemHelper(db, {
-        title: "3 Things Everyone Knows About LEGO That You Don't",
-        url: 'https://sample.com/three-things',
-      });
-
-      const input: UpdateApprovedItemInput = {
-        externalId: item.externalId,
-        prospectId: '456-qwe',
-        title: 'Anything but LEGO',
-        url: 'https://test.com/first',
-        excerpt: 'Updated excerpt',
-        status: CuratedStatus.RECOMMENDATION,
-        imageUrl: 'https://test.com/image.png',
-        language: 'de',
-        publisher: 'Brick Cloud',
-        topic: 'Business',
-        isCollection: true,
-        isShortLived: true,
-        isSyndicated: false,
-      };
-
-      // Attempt to update the second item with a duplicate URL...
-      const result = await server.executeOperation({
-        query: UPDATE_APPROVED_ITEM,
-        variables: { data: input },
-      });
-
-      // ...without success. There is no data
-      expect(result.data).to.be.null;
-
-      // And there is the correct error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `A rejected item with the URL "${input.url}" already exists`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
-
-      // Check that the UPDATE_ITEM event was not fired
-      expect(eventTracker.callCount).to.equal(0);
     });
   });
 

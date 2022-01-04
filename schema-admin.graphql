@@ -498,10 +498,6 @@ input UpdateApprovedCuratedCorpusItemInput {
     """
     prospectId: ID!
     """
-    The URL of the Approved Item.
-    """
-    url: Url!
-    """
     The title of the Approved Item.
     """
     title: String!
