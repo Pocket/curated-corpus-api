@@ -32,7 +32,6 @@ export type RejectedCuratedCorpusItemFilter = {
  */
 type ApprovedItemRequiredInput = {
   prospectId: string;
-  url: string;
   title: string;
   excerpt: string;
   status: CuratedStatus;
@@ -46,6 +45,7 @@ type ApprovedItemRequiredInput = {
 };
 
 export type CreateApprovedItemInput = ApprovedItemRequiredInput & {
+  url: string;
   scheduledDate?: string;
   newTabGuid?: string;
 };

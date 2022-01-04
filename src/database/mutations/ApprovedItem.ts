@@ -38,11 +38,6 @@ export async function updateApprovedItem(
   if (!data.externalId) {
     throw new UserInputError('externalId must be provided.');
   }
-
-  // If the URL has been updated, we need to check if there's a pre-existing
-  // corpus item with the same URL and disallow the update if needed.
-  await checkCorpusUrl(db, data.url);
-
   return db.approvedItem.update({
     where: { externalId: data.externalId },
     data: {
