@@ -22,7 +22,7 @@ interface CreateApprovedItemHelperOptionalInput {
   createdBy?: string;
   topic?: string;
   isCollection?: boolean;
-  isShortLived?: boolean;
+  isTimeSensitive?: boolean;
   isSyndicated?: boolean;
 }
 
@@ -81,7 +81,7 @@ export async function createApprovedItemHelper(
       'TRAVEL',
     ]),
     isCollection: faker.datatype.boolean(),
-    isShortLived: faker.datatype.boolean(),
+    isTimeSensitive: faker.datatype.boolean(),
     isSyndicated: faker.datatype.boolean(),
     createdAt: faker.date.recent(14),
     createdBy: faker.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id

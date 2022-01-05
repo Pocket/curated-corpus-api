@@ -13,7 +13,7 @@ export const CuratedItemData = gql`
     status
     topic
     isCollection
-    isShortLived
+    isTimeSensitive
     isSyndicated
     createdBy
     createdAt

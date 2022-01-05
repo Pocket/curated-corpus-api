@@ -40,7 +40,7 @@ type ApprovedItemRequiredInput = {
   imageUrl: string;
   topic: string;
   isCollection: boolean;
-  isShortLived: boolean;
+  isTimeSensitive: boolean;
   isSyndicated: boolean;
 };
 

@@ -59,7 +59,7 @@ describe('mutations: ApprovedItem', () => {
       publisher: 'Convective Cloud',
       topic: 'Technology',
       isCollection: false,
-      isShortLived: true,
+      isTimeSensitive: true,
       isSyndicated: false,
     };
 
@@ -271,7 +271,7 @@ describe('mutations: ApprovedItem', () => {
         publisher: 'Cloud Factory',
         topic: 'Business',
         isCollection: true,
-        isShortLived: true,
+        isTimeSensitive: true,
         isSyndicated: false,
       };
 

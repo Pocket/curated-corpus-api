@@ -133,7 +133,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       expect(firstItem.status).to.be.not.undefined;
       expect(firstItem.topic).to.be.not.undefined;
       expect(firstItem.isCollection).to.be.a('boolean');
-      expect(firstItem.isShortLived).to.be.a('boolean');
+      expect(firstItem.isTimeSensitive).to.be.a('boolean');
       expect(firstItem.isSyndicated).to.be.a('boolean');
     });
 
@@ -350,7 +350,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       expect(item.status).to.be.not.undefined;
       expect(item.topic).to.be.not.undefined;
       expect(item.isCollection).to.be.a('boolean');
-      expect(item.isShortLived).to.be.a('boolean');
+      expect(item.isTimeSensitive).to.be.a('boolean');
       expect(item.isSyndicated).to.be.a('boolean');
     });
 
