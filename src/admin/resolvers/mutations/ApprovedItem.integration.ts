@@ -270,9 +270,7 @@ describe('mutations: ApprovedItem', () => {
         language: 'de',
         publisher: 'Cloud Factory',
         topic: 'Business',
-        isCollection: true,
         isShortLived: true,
-        isSyndicated: false,
       };
 
       const { data } = await server.executeOperation({
