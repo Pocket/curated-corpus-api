@@ -5,14 +5,11 @@ import {
   RemoteBackend,
   TerraformStack,
 } from 'cdktf';
+import { AwsProvider } from '@cdktf/provider-aws';
 import {
-  AwsProvider,
   DataAwsCallerIdentity,
-  DataAwsKmsAlias,
   DataAwsRegion,
-  DataAwsSnsTopic,
-  S3Bucket,
-} from '@cdktf/provider-aws';
+} from '@cdktf/provider-aws/lib/datasources';
 import { config } from './config';
 import {
   ApplicationRDSCluster,
@@ -24,6 +21,9 @@ import {
 import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
 import { LocalProvider } from '@cdktf/provider-local';
 import { NullProvider } from '@cdktf/provider-null';
+import { DataAwsSnsTopic } from '@cdktf/provider-aws/lib/sns';
+import { DataAwsKmsAlias } from '@cdktf/provider-aws/lib/kms';
+import { S3Bucket } from '@cdktf/provider-aws/lib/s3';
 
 class CuratedCorpusAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
@@ -103,13 +103,11 @@ class CuratedCorpusAPI extends TerraformStack {
         masterUsername: 'pkt_curation_corpus',
         engine: 'aurora-mysql',
         engineMode: 'serverless',
-        scalingConfiguration: [
-          {
-            minCapacity: config.rds.minCapacity,
-            maxCapacity: config.rds.maxCapacity,
-            autoPause: false,
-          },
-        ],
+        scalingConfiguration: {
+          minCapacity: config.rds.minCapacity,
+          maxCapacity: config.rds.maxCapacity,
+          autoPause: false,
+        },
       },
 
       tags: config.tags,
