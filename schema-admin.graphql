@@ -527,10 +527,6 @@ input UpdateApprovedCuratedCorpusItemInput {
     """
     topic: String!
     """
-    Whether this story is a Pocket Collection.
-    """
-    isCollection: Boolean!
-    """
     A flag to ML to not recommend this item long term after it is added to the corpus.
     Example: a story covering an election, or "The best of 202x" collection.
     """

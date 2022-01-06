@@ -39,13 +39,17 @@ type ApprovedItemRequiredInput = {
   publisher: string;
   imageUrl: string;
   topic: string;
-  isCollection: boolean;
   isTimeSensitive: boolean;
-  isSyndicated: boolean;
 };
 
 export type CreateApprovedItemInput = ApprovedItemRequiredInput & {
+  // These required properties are set once only at creation time
+  // and never changed, so they're not part of the shared input type above.
   url: string;
+  isCollection: boolean;
+  isSyndicated: boolean;
+  // These are optional properties for approving AND scheduling the item
+  // on New Tab at the same time.
   scheduledDate?: string;
   newTabGuid?: string;
 };

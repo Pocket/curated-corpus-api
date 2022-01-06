@@ -270,7 +270,6 @@ describe('mutations: ApprovedItem', () => {
         language: 'de',
         publisher: 'Cloud Factory',
         topic: 'Business',
-        isCollection: true,
         isTimeSensitive: true,
         isSyndicated: false,
       };
