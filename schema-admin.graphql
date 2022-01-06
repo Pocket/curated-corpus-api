@@ -531,10 +531,6 @@ input UpdateApprovedCuratedCorpusItemInput {
     Example: a story covering an election, or "The best of 202x" collection.
     """
     isTimeSensitive: Boolean!
-    """
-    Whether this item is a syndicated article.
-    """
-    isSyndicated: Boolean!
 }
 
 """

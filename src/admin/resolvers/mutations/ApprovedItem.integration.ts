@@ -271,7 +271,6 @@ describe('mutations: ApprovedItem', () => {
         publisher: 'Cloud Factory',
         topic: 'Business',
         isTimeSensitive: true,
-        isSyndicated: false,
       };
 
       const { data } = await server.executeOperation({
