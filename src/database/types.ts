@@ -39,7 +39,7 @@ type ApprovedItemRequiredInput = {
   publisher: string;
   imageUrl: string;
   topic: string;
-  isShortLived: boolean;
+  isTimeSensitive: boolean;
 };
 
 export type CreateApprovedItemInput = ApprovedItemRequiredInput & {

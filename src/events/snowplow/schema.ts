@@ -97,7 +97,7 @@ export type ReviewedCorpusItem = {
    * Indicates whether the reviewed corpus item is only relevant
    * for a short period of time (e.g. news).
    */
-  is_short_lived?: boolean;
+  is_time_sensitive?: boolean;
   /**
    * The UTC unix timestamp (in seconds) for when the reviewed corpus item
    * was created.

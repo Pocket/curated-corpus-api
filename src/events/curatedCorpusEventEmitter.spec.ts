@@ -43,7 +43,7 @@ describe('CuratedCorpusEventEmitter', () => {
     imageUrl: 'https://test.com/image.png',
     topic: Topics.EDUCATION,
     isCollection: false,
-    isShortLived: false,
+    isTimeSensitive: false,
     isSyndicated: false,
     createdAt: new Date(),
     createdBy: 'Anyone',
