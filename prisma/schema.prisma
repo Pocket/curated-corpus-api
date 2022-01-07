@@ -85,4 +85,6 @@ model ScheduledItem {
 
   // indexes
   @@unique([externalId])
+  // Prevent scheduling the same item on the same new tab for the same day multiple times.
+  @@unique([approvedItemId, newTabGuid, scheduledDate], name: "ItemNewTabDate")
 }

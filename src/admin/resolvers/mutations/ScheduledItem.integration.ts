@@ -17,6 +17,7 @@ import {
 import { getUnixTimestamp } from '../fields/UnixTimestamp';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import { ScheduledCorpusItemEventType } from '../../../events/types';
+import { DateTime } from 'luxon';
 
 describe('mutations: ScheduledItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
@@ -96,6 +97,60 @@ describe('mutations: ScheduledItem', () => {
         expect(result.errors[0].extensions?.code).to.equal(
           'INTERNAL_SERVER_ERROR'
         );
+      }
+
+      // Check that the ADD_SCHEDULE event was not fired
+      expect(eventTracker.callCount).to.equal(0);
+    });
+
+    it('should fail if story is already scheduled for given New Tab/date combination', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ScheduledCorpusItemEventType.ADD_SCHEDULE, eventTracker);
+
+      // create a sample curated item
+      const item = await createApprovedItemHelper(db, {
+        title: 'A test story',
+      });
+
+      // create a scheduled entry for this item
+      const existingScheduledEntry = await createScheduledItemHelper(db, {
+        approvedItem: item,
+        newTabGuid: 'EN_US',
+      });
+
+      // This is the date format for the GraphQL mutation.
+      const scheduledDate = DateTime.fromJSDate(
+        existingScheduledEntry.scheduledDate
+      ).toFormat('yyyy-MM-dd');
+
+      // And this human-readable (and cross-locale understandable) format
+      // is used in the error message we're anticipating to get.
+      const displayDate = DateTime.fromJSDate(
+        existingScheduledEntry.scheduledDate
+      ).toFormat('MMM d, y');
+
+      // Set up the input for the mutation that contains the exact same values
+      // as the scheduled entry created above.
+      const input: CreateScheduledItemInput = {
+        approvedItemExternalId: item.externalId,
+        newTabGuid: existingScheduledEntry.newTabGuid,
+        scheduledDate,
+      };
+
+      const result = await server.executeOperation({
+        query: CREATE_SCHEDULED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.data).to.be.null;
+
+      // Expecting to see a custom error message from the resolver
+      if (result.errors) {
+        expect(result.errors[0].message).to.contain(
+          `This story is already scheduled to appear on EN_US on ${displayDate}.`
+        );
+        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
       }
 
       // Check that the ADD_SCHEDULE event was not fired

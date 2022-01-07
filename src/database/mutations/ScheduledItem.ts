@@ -5,7 +5,6 @@ import {
   ScheduledItem,
 } from '../types';
 import { NotFoundError } from '@pocket-tools/apollo-utils';
-import { UserInputError } from 'apollo-server';
 
 /**
  * This mutation adds a scheduled entry for a New Tab.
@@ -53,10 +52,6 @@ export async function deleteScheduledItem(
   db: PrismaClient,
   data: DeleteScheduledItemInput
 ): Promise<ScheduledItem> {
-  if (!data.externalId) {
-    throw new UserInputError('externalId must be provided.');
-  }
-
   // Get the item to return with the mutation
   const scheduledItem = await db.scheduledItem.findUnique({
     where: { externalId: data.externalId },
