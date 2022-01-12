@@ -12,7 +12,7 @@
         "vendor": "com.pocket",
         "name": "reviewed_corpus_item",
         "format": "jsonschema",
-        "version": "1-0-0"
+        "version": "1-0-1"
       },
       {
         "vendor": "com.pocket",
