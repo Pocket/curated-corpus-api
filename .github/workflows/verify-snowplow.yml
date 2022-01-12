@@ -22,9 +22,9 @@ jobs:
       # Run the Snowplow check #
       ##########################
       - name: Run Snowplow's Data Structures CI
-        uses: snowplow-product/msc-schema-ci-action/check@v0.3.4
+        uses: snowplow-product/msc-schema-ci-action/check@v1
         with:
+          organization-id: ${{ secrets.SNOWPLOW_ORG_ID }}
+          api-key: ${{ secrets.SNOWPLOW_API_KEY }}
           manifest-path: '.github/workflows/snowplow/schemas.json'
-          username: ${{ secrets.SNOWPLOW_AUTH_USER }}
-          password: ${{ secrets.SNOWPLOW_AUTH_PASSWORD }}
-          environment: prod1
+          environment: production
