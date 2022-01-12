@@ -32,7 +32,6 @@ export type RejectedCuratedCorpusItemFilter = {
  */
 type ApprovedItemRequiredInput = {
   prospectId: string;
-  url: string;
   title: string;
   excerpt: string;
   status: CuratedStatus;
@@ -40,12 +39,17 @@ type ApprovedItemRequiredInput = {
   publisher: string;
   imageUrl: string;
   topic: string;
-  isCollection: boolean;
-  isShortLived: boolean;
-  isSyndicated: boolean;
+  isTimeSensitive: boolean;
 };
 
 export type CreateApprovedItemInput = ApprovedItemRequiredInput & {
+  // These required properties are set once only at creation time
+  // and never changed, so they're not part of the shared input type above.
+  url: string;
+  isCollection: boolean;
+  isSyndicated: boolean;
+  // These are optional properties for approving AND scheduling the item
+  // on New Tab at the same time.
   scheduledDate?: string;
   newTabGuid?: string;
 };
@@ -53,6 +57,11 @@ export type CreateApprovedItemInput = ApprovedItemRequiredInput & {
 export type UpdateApprovedItemInput = {
   externalId: string;
 } & ApprovedItemRequiredInput;
+
+export type RejectApprovedItemInput = {
+  externalId: string;
+  reason: string;
+};
 
 export type CreateRejectedItemInput = {
   prospectId: string;
@@ -69,6 +78,10 @@ export type ScheduledItem = ScheduledItemModel & {
 };
 
 export type ScheduledItemsResult = {
+  scheduledDate: string;
+  collectionCount: number;
+  syndicatedCount: number;
+  totalCount: number;
   items: ScheduledItem[];
 };
 

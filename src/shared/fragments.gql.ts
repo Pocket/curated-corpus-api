@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server-express';
+import { gql } from 'apollo-server';
 
 export const CuratedItemData = gql`
   fragment CuratedItemData on ApprovedCuratedCorpusItem {
@@ -13,7 +13,7 @@ export const CuratedItemData = gql`
     status
     topic
     isCollection
-    isShortLived
+    isTimeSensitive
     isSyndicated
     createdBy
     createdAt
@@ -35,4 +35,19 @@ export const RejectedItemData = gql`
     createdBy
     createdAt
   }
+`;
+
+export const ScheduledItemData = gql`
+  fragment ScheduledItemData on ScheduledCuratedCorpusItem {
+    externalId
+    createdAt
+    createdBy
+    updatedAt
+    updatedBy
+    scheduledDate
+    approvedItem {
+      ...CuratedItemData
+    }
+  }
+  ${CuratedItemData}
 `;

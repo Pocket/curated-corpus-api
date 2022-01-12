@@ -5,12 +5,12 @@ import {
   ApolloServerPluginInlineTraceDisabled,
   ApolloServerPluginUsageReportingDisabled,
 } from 'apollo-server-core';
-import { typeDefsAdmin } from '../../typeDefs';
-import { resolvers as adminResolvers } from '../../admin/resolvers';
-import { client } from '../../database/client';
-import { CuratedCorpusEventEmitter } from '../../events/curatedCorpusEventEmitter';
-import { ContextManager } from '../../admin/context';
-import s3 from '../../admin/aws/s3';
+import { typeDefsAdmin } from '../typeDefs';
+import { resolvers as adminResolvers } from '../admin/resolvers';
+import { client } from '../database/client';
+import { CuratedCorpusEventEmitter } from '../events/curatedCorpusEventEmitter';
+import { ContextManager } from '../admin/context';
+import s3 from '../admin/aws/s3';
 
 // Export this separately so that it can be used in Apollo integration tests
 export const db = client();

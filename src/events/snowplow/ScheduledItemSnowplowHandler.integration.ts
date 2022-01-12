@@ -49,7 +49,7 @@ const scheduledCorpusItem: ScheduledItem = {
     topic: Topics.EDUCATION,
     isCollection: false,
     isSyndicated: false,
-    isShortLived: false,
+    isTimeSensitive: false,
     createdAt: new Date(),
     createdBy: 'Amy',
     updatedAt: new Date(),

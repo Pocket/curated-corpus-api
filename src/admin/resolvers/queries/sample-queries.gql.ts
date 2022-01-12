@@ -1,9 +1,13 @@
-import { gql } from 'apollo-server-express';
-import { CuratedItemData, RejectedItemData } from './fragments.gql';
+import { gql } from 'apollo-server';
+import {
+  CuratedItemData,
+  RejectedItemData,
+  ScheduledItemData,
+} from '../../../shared/fragments.gql';
 
 /**
  * Sample queries for Apollo Server integration tests as used in
- * Curation Admin Tools Frontend
+ * Curation Admin Tools Frontend and this repository's integration tests.
  */
 export const GET_APPROVED_ITEMS = gql`
   query getApprovedItems(
@@ -56,18 +60,34 @@ export const GET_REJECTED_ITEMS = gql`
 export const GET_SCHEDULED_ITEMS = gql`
   query getScheduledItems($filters: ScheduledCuratedCorpusItemsFilterInput!) {
     getScheduledCuratedCorpusItems(filters: $filters) {
+      totalCount
+      collectionCount
+      syndicatedCount
+      scheduledDate
       items {
-        externalId
-        createdAt
-        createdBy
-        updatedAt
-        updatedBy
-        scheduledDate
-        approvedItem {
-          ...CuratedItemData
-        }
+        ...ScheduledItemData
       }
     }
   }
+  ${ScheduledItemData}
+`;
+
+export const GET_APPROVED_ITEM_BY_URL = gql`
+  query getApprovedCuratedCorpusItemByUrl($url: String!) {
+    getApprovedCuratedCorpusItemByUrl(url: $url) {
+      ...CuratedItemData
+    }
+  }
   ${CuratedItemData}
+`;
+
+export const GET_NEW_TABS_FOR_USER = gql`
+  query getNewTabsForUser {
+    getNewTabsForUser {
+      guid
+      name
+      utcOffset
+      prospectTypes
+    }
+  }
 `;

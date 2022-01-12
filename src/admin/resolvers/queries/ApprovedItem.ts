@@ -1,7 +1,10 @@
 import { Connection } from '@devoxa/prisma-relay-cursor-connection';
 import { ApprovedItem } from '@prisma/client';
 import config from '../../../config';
-import { getApprovedItem as dbGetApprovedItems } from '../../../database/queries';
+import {
+  getApprovedItems as dbGetApprovedItems,
+  getApprovedItemByUrl as dbGetApprovedItemByUrl,
+} from '../../../database/queries';
 
 /**
  * This query retrieves approved items from the database.
@@ -36,4 +39,21 @@ export async function getApprovedItems(
   }
 
   return await dbGetApprovedItems(db, pagination, args.filters);
+}
+
+/**
+ * This query returns an approved item with a given URL if it finds one
+ * in the Curated Corpus (among approved items only), or throws
+ * a User Input error otherwise.
+ *
+ * @param parent
+ * @param args
+ * @param db
+ */
+export async function getApprovedItemByUrl(
+  parent,
+  args,
+  { db }
+): Promise<ApprovedItem> {
+  return await dbGetApprovedItemByUrl(db, args.url);
 }

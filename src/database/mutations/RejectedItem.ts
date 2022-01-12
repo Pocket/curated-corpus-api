@@ -1,6 +1,6 @@
 import { PrismaClient, RejectedCuratedCorpusItem } from '@prisma/client';
 import { CreateRejectedItemInput } from '../types';
-import { UserInputError } from 'apollo-server';
+import { checkCorpusUrl } from '../helpers/checkCorpusUrl';
 
 /**
  * This mutation creates a rejected item with the data provided.
@@ -12,16 +12,8 @@ export async function createRejectedItem(
   db: PrismaClient,
   data: CreateRejectedItemInput
 ): Promise<RejectedCuratedCorpusItem> {
-  // Check if the URL is unique.
-  const urlExists = await db.rejectedCuratedCorpusItem.count({
-    where: { url: data.url },
-  });
-
-  if (urlExists) {
-    throw new UserInputError(
-      `A rejected item with the URL "${data.url}" already exists`
-    );
-  }
+  // Check if an item with this URL has already been created in the Curated Corpus.
+  await checkCorpusUrl(db, data.url);
 
   return db.rejectedCuratedCorpusItem.create({
     data: {

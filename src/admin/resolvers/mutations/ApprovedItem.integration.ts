@@ -3,14 +3,21 @@ import { CuratedStatus } from '@prisma/client';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { db, getServer } from '../../../test/admin-server';
-import { clearDb, createApprovedItemHelper } from '../../../test/helpers';
+import {
+  clearDb,
+  createApprovedItemHelper,
+  createRejectedCuratedCorpusItemHelper,
+  createScheduledItemHelper,
+} from '../../../test/helpers';
 import {
   CREATE_APPROVED_ITEM,
+  REJECT_APPROVED_ITEM,
   UPDATE_APPROVED_ITEM,
   UPLOAD_APPROVED_ITEM_IMAGE,
-} from '../../../test/admin-server/mutations.gql';
+} from './sample-mutations.gql';
 import {
   CreateApprovedItemInput,
+  RejectApprovedItemInput,
   UpdateApprovedItemInput,
 } from '../../../database/types';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
@@ -20,6 +27,7 @@ import {
 } from '../../../events/types';
 import { Upload } from 'graphql-upload';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
+import { GET_REJECTED_ITEMS } from '../queries/sample-queries.gql';
 
 describe('mutations: ApprovedItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
@@ -51,7 +59,7 @@ describe('mutations: ApprovedItem', () => {
       publisher: 'Convective Cloud',
       topic: 'Technology',
       isCollection: false,
-      isShortLived: true,
+      isTimeSensitive: true,
       isSyndicated: false,
     };
 
@@ -62,7 +70,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       expect(result.errors).to.be.undefined;
@@ -92,7 +100,7 @@ describe('mutations: ApprovedItem', () => {
       const eventTracker = sinon.fake();
       eventEmitter.on(ReviewedCorpusItemEventType.ADD_ITEM, eventTracker);
 
-      // Create a approved item with a set URL
+      // Create an approved item with a set URL
       await createApprovedItemHelper(db, {
         title: 'I was here first!',
         url: 'https://test.com/docker',
@@ -101,16 +109,48 @@ describe('mutations: ApprovedItem', () => {
       // Attempt to create another item with the same URL
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       // ...without success. There is no data
       expect(result.errors).not.to.be.null;
 
-      // And there is the right error from the resolvers
+      // And there is the correct error from the resolvers
       if (result.errors) {
         expect(result.errors[0].message).to.contain(
           `An approved item with the URL "${input.url}" already exists`
+        );
+        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
+      }
+
+      // Check that the ADD_ITEM event was not fired
+      expect(eventTracker.callCount).to.equal(0);
+    });
+
+    it('should fail to create an approved item if a rejected item with the same URL exists', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.ADD_ITEM, eventTracker);
+
+      // Create an approved item with a set URL
+      await createRejectedCuratedCorpusItemHelper(db, {
+        title: 'I was here first!',
+        url: 'https://test.com/docker',
+      });
+
+      // Attempt to create another item with the same URL
+      const result = await server.executeOperation({
+        query: CREATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      // ...without success. There is no data
+      expect(result.errors).not.to.be.null;
+
+      // And there is the correct error from the resolvers
+      if (result.errors) {
+        expect(result.errors[0].message).to.contain(
+          `A rejected item with the URL "${input.url}" already exists`
         );
         expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
       }
@@ -131,7 +171,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       expect(result.errors).to.be.undefined;
@@ -188,7 +228,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       // ...without success. There is no data
@@ -208,7 +248,7 @@ describe('mutations: ApprovedItem', () => {
     });
   });
 
-  describe('updateCuratedItem mutation', () => {
+  describe('updateApprovedCuratedCorpusItem mutation', () => {
     it('updates an approved item when required variables are supplied', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
@@ -224,21 +264,18 @@ describe('mutations: ApprovedItem', () => {
         externalId: item.externalId,
         prospectId: '123-abc',
         title: 'Anything but LEGO',
-        url: 'https://test.com/lego',
         excerpt: 'Updated excerpt',
         status: CuratedStatus.CORPUS,
         imageUrl: 'https://test.com/image.png',
         language: 'de',
         publisher: 'Cloud Factory',
         topic: 'Business',
-        isCollection: true,
-        isShortLived: true,
-        isSyndicated: false,
+        isTimeSensitive: true,
       };
 
       const { data } = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       // External ID should be unchanged
@@ -261,55 +298,144 @@ describe('mutations: ApprovedItem', () => {
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
       ).to.equal(data?.updateApprovedCuratedCorpusItem.externalId);
     });
+  });
 
-    it('should fail to update an approved item with a duplicate URL', async () => {
+  describe('rejectApprovedCuratedCorpusItem mutation', () => {
+    it('moves a corpus item from the approved corpus to the rejection pile', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
-      eventEmitter.on(ReviewedCorpusItemEventType.UPDATE_ITEM, eventTracker);
+      eventEmitter.on(ReviewedCorpusItemEventType.REMOVE_ITEM, eventTracker);
+      eventEmitter.on(ReviewedCorpusItemEventType.REJECT_ITEM, eventTracker);
 
-      await createApprovedItemHelper(db, {
-        title: 'I was here first',
-        url: 'https://test.com/first',
-      });
       const item = await createApprovedItemHelper(db, {
-        title: "3 Things Everyone Knows About LEGO That You Don't",
-        url: 'https://sample.com/three-things',
+        title: '15 Unheard Ways To Achieve Greater Terraform',
+        status: CuratedStatus.RECOMMENDATION,
+        language: 'en',
       });
 
-      const input: UpdateApprovedItemInput = {
+      const input: RejectApprovedItemInput = {
         externalId: item.externalId,
-        prospectId: '456-qwe',
-        title: 'Anything but LEGO',
-        url: 'https://test.com/first',
-        excerpt: 'Updated excerpt',
-        status: CuratedStatus.RECOMMENDATION,
-        imageUrl: 'https://test.com/image.png',
-        language: 'de',
-        publisher: 'Brick Cloud',
-        topic: 'Business',
-        isCollection: true,
-        isShortLived: true,
-        isSyndicated: false,
+        reason: 'MISINFORMATION,OTHER',
       };
 
-      // Attempt to update the second item with a duplicate URL...
       const result = await server.executeOperation({
-        query: UPDATE_APPROVED_ITEM,
-        variables: input,
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
       });
 
-      // ...without success. There is no data
-      expect(result.data).to.be.null;
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
 
-      // And there is the right error from the resolvers
+      // On success, mutation should return the deleted approved item.
+      // Let's verify the id.
+      expect(result.data?.rejectApprovedCuratedCorpusItem.externalId).to.equal(
+        item.externalId
+      );
+
+      // There should be a rejected item created. Since we always truncate
+      // the database before every test, it is safe to assume that the
+      // `getRejectedCuratedCorpusItems` query will contain the one item
+      // that was created by this mutation.
+      const { data: queryData } = await server.executeOperation({
+        query: GET_REJECTED_ITEMS,
+      });
+      // There should be one rejected item in there...
+      expect(queryData?.getRejectedCuratedCorpusItems.totalCount).to.equal(1);
+      // ...and its URL should match that of the deleted Approved Item.
+      expect(
+        queryData?.getRejectedCuratedCorpusItems.edges[0].node.url
+      ).to.equal(item.url);
+
+      // Check that the REMOVE_ITEM and REJECT_ITEM events were fired successfully.
+      expect(eventTracker.callCount).to.equal(2);
+
+      // The REMOVE_ITEM event sends up-to-date info on the Approved Item.
+      expect(await eventTracker.getCall(0).args[0].eventType).to.equal(
+        ReviewedCorpusItemEventType.REMOVE_ITEM
+      );
+      expect(
+        await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
+      ).to.equal(result.data?.rejectApprovedCuratedCorpusItem.externalId);
+
+      // The REJECT_ITEM event sends through the newly created Rejected Item.
+      expect(await eventTracker.getCall(1).args[0].eventType).to.equal(
+        ReviewedCorpusItemEventType.REJECT_ITEM
+      );
+      expect(
+        await eventTracker.getCall(0).args[0].reviewedCorpusItem.url
+      ).to.equal(queryData?.getRejectedCuratedCorpusItems.edges[0].node.url);
+    });
+
+    it('should fail if externalId of approved item is not valid', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.REMOVE_ITEM, eventTracker);
+      eventEmitter.on(ReviewedCorpusItemEventType.REJECT_ITEM, eventTracker);
+
+      const input: RejectApprovedItemInput = {
+        externalId: 'this-id-does-not-exist',
+        reason: 'MISINFORMATION,OTHER',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.null;
+
       if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `An approved item with the URL "${input.url}" already exists`
+        expect(result.errors[0].message).to.equal(
+          `Could not find an approved item with external id of "${input.externalId}".`
         );
         expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
       }
 
-      // Check that the UPDATE_ITEM event was not fired
+      // Check that the events were not fired
+      expect(eventTracker.callCount).to.equal(0);
+    });
+
+    it('should fail if approved item has New Tab scheduled entries', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.REMOVE_ITEM, eventTracker);
+      eventEmitter.on(ReviewedCorpusItemEventType.REJECT_ITEM, eventTracker);
+
+      const item = await createApprovedItemHelper(db, {
+        title: 'More Unheard Ways To Achieve Greater Terraform',
+        status: CuratedStatus.CORPUS,
+        language: 'en',
+      });
+
+      // Add an entry to a New Tab - approved item now can't be deleted
+      // for data integrity reasons.
+      await createScheduledItemHelper(db, {
+        approvedItem: item,
+        newTabGuid: 'EN_US',
+      });
+
+      const input: RejectApprovedItemInput = {
+        externalId: item.externalId,
+        reason: 'MISINFORMATION,OTHER',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.null;
+
+      if (result.errors) {
+        expect(result.errors[0].message).to.equal(
+          `Cannot remove item from approved corpus - scheduled entries exist.`
+        );
+        expect(result.errors[0].extensions?.code).to.equal(
+          'INTERNAL_SERVER_ERROR'
+        );
+      }
+
+      // Check that the events were not fired
       expect(eventTracker.callCount).to.equal(0);
     });
   });

@@ -138,7 +138,7 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       image_url: item.imageUrl,
       is_collection: item.isCollection,
       is_syndicated: item.isSyndicated,
-      is_short_lived: item.isShortLived,
+      is_time_sensitive: item.isTimeSensitive,
       approved_corpus_item_external_id: item.externalId,
       updated_at: getUnixTimestamp(item.updatedAt),
       updated_by: item.updatedBy ?? undefined,

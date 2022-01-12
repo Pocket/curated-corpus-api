@@ -3,9 +3,10 @@ import sinon from 'sinon';
 import { db, getServer } from '../../../test/admin-server';
 import {
   clearDb,
+  createApprovedItemHelper,
   createRejectedCuratedCorpusItemHelper,
 } from '../../../test/helpers';
-import { CREATE_REJECTED_ITEM } from '../../../test/admin-server/mutations.gql';
+import { CREATE_REJECTED_ITEM } from './sample-mutations.gql';
 import { CreateRejectedItemInput } from '../../../database/types';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import { ReviewedCorpusItemEventType } from '../../../events/types';
@@ -46,7 +47,7 @@ describe('mutations: RejectedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_REJECTED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       expect(result.errors).to.be.undefined;
@@ -71,12 +72,12 @@ describe('mutations: RejectedItem', () => {
       ).to.equal(result.data?.createRejectedCuratedCorpusItem.externalId);
     });
 
-    it('should fail to create an approved item with a duplicate URL', async () => {
+    it('should fail to create a rejected item with a duplicate URL', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
       eventEmitter.on(ReviewedCorpusItemEventType.REJECT_ITEM, eventTracker);
 
-      // Create a approved item with a set URL
+      // Create a rejected item with a set URL
       await createRejectedCuratedCorpusItemHelper(db, {
         title: 'I was here first!',
         url: 'https://test.com/docker',
@@ -85,16 +86,48 @@ describe('mutations: RejectedItem', () => {
       // Attempt to create another item with the same URL
       const result = await server.executeOperation({
         query: CREATE_REJECTED_ITEM,
-        variables: input,
+        variables: { data: input },
       });
 
       // ...without success. There is no data
       expect(result.errors).not.to.be.null;
 
-      // And there is the right error from the resolvers
+      // And there is the correct error from the resolvers
       if (result.errors) {
         expect(result.errors[0].message).to.contain(
-          `A rejected item with the URL "${input.url}" already exists`
+          `A rejected item with the URL "${input.url}" already exists.`
+        );
+        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
+      }
+
+      // Check that the REJECT_ITEM event was not fired
+      expect(eventTracker.callCount).to.equal(0);
+    });
+
+    it('should fail to create a rejected item if URL is in approved corpus', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.REJECT_ITEM, eventTracker);
+
+      // Create an approved item with a set URL
+      await createApprovedItemHelper(db, {
+        title: 'I was here first!',
+        url: 'https://test.com/docker',
+      });
+
+      // Attempt to create another item with the same URL
+      const result = await server.executeOperation({
+        query: CREATE_REJECTED_ITEM,
+        variables: { data: input },
+      });
+
+      // ...without success. There is no data
+      expect(result.errors).not.to.be.null;
+
+      // And there is the correct error from the resolvers
+      if (result.errors) {
+        expect(result.errors[0].message).to.contain(
+          `An approved item with the URL "${input.url}" already exists.`
         );
         expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
       }

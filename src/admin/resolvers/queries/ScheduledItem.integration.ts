@@ -1,13 +1,14 @@
+import { expect } from 'chai';
 import {
   clearDb,
   createApprovedItemHelper,
   createScheduledItemHelper,
 } from '../../../test/helpers';
 import { db, getServer } from '../../../test/admin-server';
-import { GET_SCHEDULED_ITEMS } from '../../../test/admin-server/queries.gql';
+import { GET_SCHEDULED_ITEMS } from './sample-queries.gql';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 
-describe('queries: NewTabFeedSchedule', () => {
+describe('queries: ScheduledCuratedCorpusItem', () => {
   const server = getServer(new CuratedCorpusEventEmitter());
 
   beforeAll(async () => {
@@ -20,29 +21,35 @@ describe('queries: NewTabFeedSchedule', () => {
     await server.stop();
   });
 
-  describe('getNewTabScheduledItems query', () => {
+  describe('getScheduledCuratedCorpusItems query', () => {
     beforeAll(async () => {
-      // Create some approved items
-      const storyTitles = [
-        "Here's A Quick Way To Solve A Problem with Node",
-        'Proof That Node Really Works',
-        'How To Quit Node In 5 Days',
-        'Node: The Samurai Way',
-        '10 Unforgivable Sins Of Node',
-      ];
-
-      // And schedule them for the near future
-      for (const title of storyTitles) {
-        const approvedItem = await createApprovedItemHelper(db, { title });
+      // Create some approved items and schedule them for a date in the future
+      for (let i = 0; i < 5; i++) {
+        const approvedItem = await createApprovedItemHelper(db, {
+          title: `Batch 1, Story #${i + 1}`,
+        });
         await createScheduledItemHelper(db, {
           newTabGuid: 'EN_US',
           approvedItem,
+          scheduledDate: new Date('2050-01-01').toISOString(),
+        });
+      }
+
+      // Create more approved items for a different scheduled date
+      for (let i = 0; i < 10; i++) {
+        const approvedItem = await createApprovedItemHelper(db, {
+          title: `Batch 2, Story #${i + 1}`,
+        });
+        await createScheduledItemHelper(db, {
+          newTabGuid: 'EN_US',
+          approvedItem,
+          scheduledDate: new Date('2025-05-05').toISOString(),
         });
       }
     });
 
-    it('should get all requested items', async () => {
-      const { data } = await server.executeOperation({
+    it('should return all requested items', async () => {
+      const result = await server.executeOperation({
         query: GET_SCHEDULED_ITEMS,
         variables: {
           filters: {
@@ -53,16 +60,18 @@ describe('queries: NewTabFeedSchedule', () => {
         },
       });
 
-      expect(data?.getScheduledCuratedCorpusItems.items).toHaveLength(5);
+      // Good to check this here before we get into actual return values
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
 
-      // Check default sorting - createdAt.DESC
-      const firstItem = data?.getScheduledCuratedCorpusItems.items[0];
-      const secondItem = data?.getScheduledCuratedCorpusItems.items[1];
-      expect(firstItem.createdAt > secondItem.createdAt).toBeTruthy();
+      const resultArray = result.data?.getScheduledCuratedCorpusItems;
+      expect(resultArray).to.have.lengthOf(2);
+      expect(resultArray[0].totalCount).to.equal(10);
+      expect(resultArray[0].items).to.have.lengthOf(10);
     });
 
     it('should return all expected properties', async () => {
-      const { data } = await server.executeOperation({
+      const result = await server.executeOperation({
         query: GET_SCHEDULED_ITEMS,
         variables: {
           filters: {
@@ -73,23 +82,61 @@ describe('queries: NewTabFeedSchedule', () => {
         },
       });
 
-      const firstItem = data?.getScheduledCuratedCorpusItems.items[0];
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
+
+      const resultArray = result.data?.getScheduledCuratedCorpusItems;
+
+      // Check the first group of scheduled items
+      expect(resultArray[0].collectionCount).not.to.be.null;
+      expect(resultArray[0].syndicatedCount).not.to.be.null;
+      expect(resultArray[0].totalCount).not.to.be.null;
+      expect(resultArray[0].scheduledDate).not.to.be.null;
+
+      // Check the first item in the first group
+      const firstItem = resultArray[0].items[0];
 
       // Scalar properties
-      expect(firstItem.externalId).toBeTruthy();
-      expect(firstItem.createdAt).toBeTruthy();
-      expect(firstItem.createdBy).toBeTruthy();
-      expect(firstItem.updatedAt).toBeTruthy();
-      expect(firstItem.updatedBy).toBeNull();
-      expect(firstItem.scheduledDate).toBeTruthy();
+      expect(firstItem.externalId).not.to.be.null;
+      expect(firstItem.createdAt).not.to.be.null;
+      expect(firstItem.createdBy).not.to.be.null;
+      expect(firstItem.updatedAt).not.to.be.null;
+      expect(firstItem.updatedBy).to.be.null;
+      expect(firstItem.scheduledDate).not.to.be.null;
 
       // The underlying Approved Item
-      expect(firstItem.approvedItem.externalId).toBeTruthy();
-      expect(firstItem.approvedItem.title).toBeTruthy();
-      expect(firstItem.approvedItem.url).toBeTruthy();
-      expect(firstItem.approvedItem.excerpt).toBeTruthy();
-      expect(firstItem.approvedItem.imageUrl).toBeTruthy();
-      expect(firstItem.approvedItem.createdBy).toBeTruthy();
+      expect(firstItem.approvedItem.externalId).not.to.be.null;
+      expect(firstItem.approvedItem.title).not.to.be.null;
+      expect(firstItem.approvedItem.url).not.to.be.null;
+      expect(firstItem.approvedItem.excerpt).not.to.be.null;
+      expect(firstItem.approvedItem.imageUrl).not.to.be.null;
+      expect(firstItem.approvedItem.createdBy).not.to.be.null;
+    });
+
+    it('should group scheduled items by date', async () => {
+      const result = await server.executeOperation({
+        query: GET_SCHEDULED_ITEMS,
+        variables: {
+          filters: {
+            newTabGuid: 'EN_US',
+            startDate: '2000-01-01',
+            endDate: '2050-12-31',
+          },
+        },
+      });
+
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
+
+      const resultArray = result.data?.getScheduledCuratedCorpusItems;
+
+      expect(resultArray[0].totalCount).to.equal(10);
+      expect(resultArray[0].items).to.have.lengthOf(10);
+      expect(resultArray[0].scheduledDate).to.equal('2025-05-05');
+
+      expect(resultArray[1].totalCount).to.equal(5);
+      expect(resultArray[1].items).to.have.lengthOf(5);
+      expect(resultArray[1].scheduledDate).to.equal('2050-01-01');
     });
 
     it('should fail on non-existent New Tab ID', async () => {
@@ -107,8 +154,8 @@ describe('queries: NewTabFeedSchedule', () => {
       });
 
       // Expect to see no data returned, and no errors either
-      expect(result.data?.getScheduledCuratedCorpusItems.items).toHaveLength(0);
-      expect(result.errors).toBeUndefined();
+      expect(result.errors).to.be.undefined;
+      expect(result.data?.getScheduledCuratedCorpusItems).to.have.lengthOf(0);
     });
   });
 });

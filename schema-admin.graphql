@@ -75,6 +75,28 @@ enum ProspectType {
 }
 
 """
+A New Tab, including its associated Prospect Types.
+"""
+type NewTab {
+    """
+    The GUID of the New Tab. Example: 'EN_US'.
+    """
+    guid: String!
+    """
+    The display name of the New Tab. Example 'en-US'.
+    """
+    name: String!
+    """
+    The UTC offset of the New Tab's scheduling day, represented in HMM numeric format.
+    """
+    utcOffset: Int!
+    """
+    An array of associated ProspectTypes.
+    """
+    prospectTypes: [ProspectType!]!
+}
+
+"""
 A prospective story that has been reviewed by the curators and saved to the curated corpus.
 """
 type ApprovedCuratedCorpusItem {
@@ -126,9 +148,9 @@ type ApprovedCuratedCorpusItem {
     isCollection: Boolean!
     """
     A flag to ML to not recommend this item long term after it is added to the corpus.
-    Example: a story covering an election.
+    Example: a story covering an election, or "The best of 202x" collection.
     """
-    isShortLived: Boolean!
+    isTimeSensitive: Boolean!
     """
     Whether this item is a syndicated article.
     """
@@ -310,6 +332,22 @@ The shape of the result returned by the getScheduledCuratedCorpusItems query.
 """
 type ScheduledCuratedCorpusItemsResult {
     """
+    The date items are scheduled for, in YYYY-MM-DD format.
+    """
+    scheduledDate: Date!
+    """
+    The number of curated items that are collections for the scheduled date.
+    """
+    collectionCount: Int!
+    """
+    The number of syndicated articles for the scheduled date.
+    """
+    syndicatedCount: Int!
+    """
+    The total number of items for the scheduled date.
+    """
+    totalCount: Int!
+    """
     An array of items for a given New Tab Feed
     """
     items: [ScheduledCuratedCorpusItem!]!
@@ -430,9 +468,9 @@ input CreateApprovedCuratedCorpusItemInput {
     isCollection: Boolean!
     """
     A flag to ML to not recommend this item long term after it is added to the corpus.
-    Example: a story covering an election.
+    Example: a story covering an election, or "The best of 202x" collection.
     """
-    isShortLived: Boolean!
+    isTimeSensitive: Boolean!
     """
     Whether this item is a syndicated article.
     """
@@ -459,10 +497,6 @@ input UpdateApprovedCuratedCorpusItemInput {
     The GUID of the corresponding Prospect ID.
     """
     prospectId: ID!
-    """
-    The URL of the Approved Item.
-    """
-    url: Url!
     """
     The title of the Approved Item.
     """
@@ -493,18 +527,24 @@ input UpdateApprovedCuratedCorpusItemInput {
     """
     topic: String!
     """
-    Whether this story is a Pocket Collection.
-    """
-    isCollection: Boolean!
-    """
     A flag to ML to not recommend this item long term after it is added to the corpus.
-    Example: a story covering an election.
+    Example: a story covering an election, or "The best of 202x" collection.
     """
-    isShortLived: Boolean!
+    isTimeSensitive: Boolean!
+}
+
+"""
+Input data for rejecting an Approved Item.
+"""
+input RejectApprovedCuratedCorpusItemInput {
     """
-    Whether this item is a syndicated article.
+    Approved Item ID.
     """
-    isSyndicated: Boolean!
+    externalId: ID!
+    """
+    A comma-separated list of rejection reasons.
+    """
+    reason: String!
 }
 
 """
@@ -588,7 +628,7 @@ type Query {
     ): RejectedCuratedCorpusItemConnection!
 
     """
-    Retrieves a list of Approved Items that are scheduled to appear on New Tab
+    Retrieves a list of Approved Items that are scheduled to appear on New Tab.
     """
     getScheduledCuratedCorpusItems(
         """
@@ -596,7 +636,22 @@ type Query {
         between the supplied start and end dates.
         """
         filters: ScheduledCuratedCorpusItemsFilterInput!
-    ): ScheduledCuratedCorpusItemsResult!
+    ): [ScheduledCuratedCorpusItemsResult!]!
+
+    """
+    Retrieves an approved curated item with the given URL.
+    """
+    getApprovedCuratedCorpusItemByUrl(
+        """
+        The URL of the approved item.
+        """
+        url: String!
+    ): ApprovedCuratedCorpusItem!
+
+    """
+    Retrieves all NewTabs available to the given SSO user. Requires an Authorization header.
+    """
+    getNewTabsForUser: [NewTab!]!
 }
 
 type Mutation {
@@ -619,6 +674,13 @@ type Mutation {
     """
     updateApprovedCuratedCorpusItem(
         data: UpdateApprovedCuratedCorpusItemInput!
+    ): ApprovedCuratedCorpusItem!
+
+    """
+    Rejects an Approved Item: deletes it from the corpus and creates a Rejected Item instead.
+    """
+    rejectApprovedCuratedCorpusItem(
+        data: RejectApprovedCuratedCorpusItemInput!
     ): ApprovedCuratedCorpusItem!
 
     """

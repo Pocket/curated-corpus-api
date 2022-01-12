@@ -22,7 +22,7 @@ interface CreateApprovedItemHelperOptionalInput {
   createdBy?: string;
   topic?: string;
   isCollection?: boolean;
-  isShortLived?: boolean;
+  isTimeSensitive?: boolean;
   isSyndicated?: boolean;
 }
 
@@ -65,22 +65,23 @@ export async function createApprovedItemHelper(
     topic: faker.random.arrayElement([
       'BUSINESS',
       'CAREER',
+      'CORONAVIRUS',
       'EDUCATION',
       'ENTERTAINMENT',
       'FOOD',
       'GAMING',
-      'HEALTH & FITNESS',
+      'HEALTH_FITNESS',
       'PARENTING',
-      'PERSONAL FINANCE',
+      'PERSONAL_FINANCE',
       'POLITICS',
       'SCIENCE',
-      'SELF IMPROVEMENT',
+      'SELF_IMPROVEMENT',
       'SPORTS',
       'TECHNOLOGY',
       'TRAVEL',
     ]),
     isCollection: faker.datatype.boolean(),
-    isShortLived: faker.datatype.boolean(),
+    isTimeSensitive: faker.datatype.boolean(),
     isSyndicated: faker.datatype.boolean(),
     createdAt: faker.date.recent(14),
     createdBy: faker.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
