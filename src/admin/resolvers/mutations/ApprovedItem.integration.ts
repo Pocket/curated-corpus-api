@@ -59,7 +59,7 @@ describe('mutations: ApprovedItem', () => {
       publisher: 'Convective Cloud',
       topic: 'Technology',
       isCollection: false,
-      isShortLived: true,
+      isTimeSensitive: true,
       isSyndicated: false,
     };
 
@@ -270,7 +270,7 @@ describe('mutations: ApprovedItem', () => {
         language: 'de',
         publisher: 'Cloud Factory',
         topic: 'Business',
-        isShortLived: true,
+        isTimeSensitive: true,
       };
 
       const { data } = await server.executeOperation({

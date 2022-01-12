@@ -148,9 +148,9 @@ type ApprovedCuratedCorpusItem {
     isCollection: Boolean!
     """
     A flag to ML to not recommend this item long term after it is added to the corpus.
-    Example: a story covering an election.
+    Example: a story covering an election, or "The best of 202x" collection.
     """
-    isShortLived: Boolean!
+    isTimeSensitive: Boolean!
     """
     Whether this item is a syndicated article.
     """
@@ -468,9 +468,9 @@ input CreateApprovedCuratedCorpusItemInput {
     isCollection: Boolean!
     """
     A flag to ML to not recommend this item long term after it is added to the corpus.
-    Example: a story covering an election.
+    Example: a story covering an election, or "The best of 202x" collection.
     """
-    isShortLived: Boolean!
+    isTimeSensitive: Boolean!
     """
     Whether this item is a syndicated article.
     """
@@ -528,9 +528,9 @@ input UpdateApprovedCuratedCorpusItemInput {
     topic: String!
     """
     A flag to ML to not recommend this item long term after it is added to the corpus.
-    Example: a story covering an election.
+    Example: a story covering an election, or "The best of 202x" collection.
     """
-    isShortLived: Boolean!
+    isTimeSensitive: Boolean!
 }
 
 """

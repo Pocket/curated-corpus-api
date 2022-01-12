@@ -37,7 +37,7 @@ describe('createApprovedItemHelper', () => {
     expect(item.status).to.be.not.undefined;
     expect(item.topic).to.be.not.undefined;
     expect(item.isCollection).to.be.a('boolean');
-    expect(item.isShortLived).to.be.a('boolean');
+    expect(item.isTimeSensitive).to.be.a('boolean');
     expect(item.isSyndicated).to.be.a('boolean');
   });
 
@@ -52,7 +52,7 @@ describe('createApprovedItemHelper', () => {
       createdBy: 'big-company|name.surname@example.com',
       topic: 'Business',
       isCollection: false,
-      isShortLived: false,
+      isTimeSensitive: false,
       isSyndicated: true,
     };
 
