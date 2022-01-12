@@ -187,9 +187,10 @@ jobs:
 workflows:
   all:
     jobs:
-      #- pocket/node_mocha_ts_test:
-      #    <<: *not_main
-      #    name: test
+      - pocket/node_mocha_ts_test:
+          <<: *not_main
+          name: test
+
       - test_integrations:
           <<: *not_main
           name: test_integrations
