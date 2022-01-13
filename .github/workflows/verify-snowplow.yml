@@ -27,4 +27,4 @@ jobs:
           organization-id: ${{ secrets.SNOWPLOW_ORG_ID }}
           api-key: ${{ secrets.SNOWPLOW_API_KEY }}
           manifest-path: '.github/workflows/snowplow/schemas.json'
-          environment: production
+          environment: PROD
