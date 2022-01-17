@@ -1,0 +1,25 @@
+{
+  "schema": "iglu:com.snowplowanalytics.insights/data_structures_dependencies/jsonschema/1-0-0",
+  "data": {
+    "schemas": [
+      {
+        "vendor": "com.pocket",
+        "name": "object_update",
+        "format": "jsonschema",
+        "version": "1-0-5"
+      },
+      {
+        "vendor": "com.pocket",
+        "name": "reviewed_corpus_item",
+        "format": "jsonschema",
+        "version": "1-0-1"
+      },
+      {
+        "vendor": "com.pocket",
+        "name": "scheduled_corpus_item",
+        "format": "jsonschema",
+        "version": "1-0-0"
+      }
+    ]
+  }
+}
