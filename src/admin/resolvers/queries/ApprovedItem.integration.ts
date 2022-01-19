@@ -354,8 +354,8 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       expect(item.isSyndicated).to.be.a('boolean');
     });
 
-    it('should return a user-friendly error if no item is found', async () => {
-      const inputUrl = 'https://www.test.com/story-five';
+    it('should return null when no url is found', async () => {
+      const inputUrl = 'https://www.test-no-url-found.com/story-five';
 
       const result = await server.executeOperation({
         query: GET_APPROVED_ITEM_BY_URL,
@@ -364,19 +364,13 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
         },
       });
 
+      expect(result.data).to.have.property('getApprovedCuratedCorpusItemByUrl');
+
       // There should be no data returned
-      expect(result.data).to.be.null;
+      expect(result.data?.getApprovedCuratedCorpusItemByUrl).to.be.null;
 
-      // There should be errors
-      expect(result.errors).not.to.be.null;
-
-      // And the error thrown should be the one set in the resolver
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `Could not find a curated item with the following URL: "${inputUrl}".`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
+      // There should be no errors
+      expect(result.errors).to.be.undefined;
     });
   });
 });
