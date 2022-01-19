@@ -43,8 +43,8 @@ export async function getApprovedItems(
 
 /**
  * This query returns an approved item with a given URL if it finds one
- * in the Curated Corpus (among approved items only), or throws
- * a User Input error otherwise.
+ * in the Curated Corpus (among approved items only), or
+ * return null if the url is not found
  *
  * @param parent
  * @param args
@@ -54,6 +54,6 @@ export async function getApprovedItemByUrl(
   parent,
   args,
   { db }
-): Promise<ApprovedItem> {
+): Promise<ApprovedItem | null> {
   return await dbGetApprovedItemByUrl(db, args.url);
 }

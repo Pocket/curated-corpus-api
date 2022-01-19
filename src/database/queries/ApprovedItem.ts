@@ -6,7 +6,6 @@ import {
   Connection,
 } from '@devoxa/prisma-relay-cursor-connection';
 import { ApprovedItemFilter, PaginationInput } from '../types';
-import { UserInputError } from 'apollo-server';
 
 /**
  * A dedicated type for the unique cursor value used in the getCuratedItems query.
@@ -73,7 +72,8 @@ export async function getApprovedItems(
 }
 
 /**
- * Return an approved item with the given URL if found in the Curated Corpus.
+ * Return an approved item with the given URL if found in the Curated Corpus or
+ * return null if the url is not found
  *
  * @param db
  * @param url
@@ -81,16 +81,8 @@ export async function getApprovedItems(
 export async function getApprovedItemByUrl(
   db: PrismaClient,
   url: string
-): Promise<ApprovedItem> {
-  const approvedItem = await db.approvedItem.findUnique({ where: { url } });
-
-  if (!approvedItem) {
-    throw new UserInputError(
-      `Could not find a curated item with the following URL: "${url}".`
-    );
-  }
-
-  return approvedItem;
+): Promise<ApprovedItem | null> {
+  return db.approvedItem.findUnique({ where: { url } });
 }
 
 /**
