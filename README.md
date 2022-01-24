@@ -107,7 +107,10 @@ docker compose exec app npx prisma migrate dev --name some_meaningful_migration_
 
 This will create a migration script in `prisma/migrations` and will automatically run the new migration. This will also re-create your Prisma Typescript types.
 
-## Deploying to Dev
+
+## Testing on Dev
+
+### Deploying to Dev
 
 The Dev checkout is available at [https://curated-corpus-api.getpocket.dev/](https://curated-corpus-api.getpocket.dev/).
 
@@ -122,3 +125,14 @@ To push changes from a particular branch to Dev, use the name of the branch inst
 ```bash
 git push -f origin your-branch-name:dev
 ```
+
+### Reseeding the database on Dev
+
+At the initial deployment, and also from time to time as the API evolves, it is necessary to seed some sample data in the Dev database. Note that this operation wipes all the existing data and replaces it with the reseeded data. The steps to take are the following:
+
+- Make sure you've run `npm ci` locally (outside of Docker). 
+- Log in to AWS to find the Dev database connection URL. Look in the Secrets Manager for the Curated Corpus API.
+- Put that connection in your local environment file (`PATH_TO_REPOSITORY/.env`).
+- Authenticate to Dev AWS in your terminal using `$(maws)`.
+- Run `npx prisma migrate reset` in your local terminal. This should use the Dev database connection URL as the target.
+- Log out of all the things.
