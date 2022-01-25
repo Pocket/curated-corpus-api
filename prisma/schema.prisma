@@ -20,7 +20,7 @@ model ApprovedItem {
   // fields
   id              Int           @id @default(autoincrement())
   externalId      String        @default(uuid()) @db.VarChar(255)
-  prospectId      String        @db.VarChar(255)
+  prospectId      String?       @db.VarChar(255)
   url             String        @db.VarChar(500)
   title           String        @db.VarChar(255)
   excerpt         String        @db.Text
@@ -49,7 +49,7 @@ model RejectedCuratedCorpusItem {
   // fields
   id         Int      @id @default(autoincrement())
   externalId String   @default(uuid()) @db.VarChar(255)
-  prospectId String   @db.VarChar(255)
+  prospectId String?  @db.VarChar(255)
   url        String   @db.VarChar(500)
   title      String?  @db.VarChar(255)
   topic      String   @db.VarChar(255)

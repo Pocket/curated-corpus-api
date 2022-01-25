@@ -95,6 +95,44 @@ describe('mutations: ApprovedItem', () => {
       ).to.equal(result.data?.createApprovedCuratedCorpusItem.externalId);
     });
 
+    it('creates an approved item without a prospectId', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.ADD_ITEM, eventTracker);
+
+      // clone the input
+      const inputWithoutProspectId = { ...input };
+
+      // delete the prospectId (as it will not be sent from the frontend for manually added items)
+      delete inputWithoutProspectId.prospectId;
+
+      const result = await server.executeOperation({
+        query: CREATE_APPROVED_ITEM,
+        variables: { data: inputWithoutProspectId },
+      });
+
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
+
+      // Expect to see all the input data we supplied in the Approved Item
+      // returned by the mutation
+      expect(result.data?.createApprovedCuratedCorpusItem).to.deep.include(
+        inputWithoutProspectId
+      );
+
+      // Check that the ADD_ITEM event was fired successfully:
+      // 1 - Event was fired once!
+      expect(eventTracker.callCount).to.equal(1);
+      // 2 - Event has the right type.
+      expect(await eventTracker.getCall(0).args[0].eventType).to.equal(
+        ReviewedCorpusItemEventType.ADD_ITEM
+      );
+      // 3- Event has the right entity passed to it.
+      expect(
+        await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
+      ).to.equal(result.data?.createApprovedCuratedCorpusItem.externalId);
+    });
+
     it('should fail to create an approved item with a duplicate URL', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
@@ -262,7 +300,6 @@ describe('mutations: ApprovedItem', () => {
 
       const input: UpdateApprovedItemInput = {
         externalId: item.externalId,
-        prospectId: '123-abc',
         title: 'Anything but LEGO',
         excerpt: 'Updated excerpt',
         status: CuratedStatus.CORPUS,

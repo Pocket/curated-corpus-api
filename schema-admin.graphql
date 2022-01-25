@@ -105,9 +105,9 @@ type ApprovedCuratedCorpusItem {
     """
     externalId: ID!
     """
-    The GUID of the corresponding Prospect ID.
+    The GUID of the corresponding Prospect ID. Will be empty if the item was manually added.
     """
-    prospectId: ID!
+    prospectId: ID
     """
     The URL of the story.
     """
@@ -182,9 +182,9 @@ type RejectedCuratedCorpusItem {
     """
     externalId: ID!
     """
-    The GUID of the corresponding Prospect ID.
+    The GUID of the corresponding Prospect ID. Will be empty if the item was manually added.
     """
-    prospectId: ID!
+    prospectId: ID
     """
     The URL of the story.
     """
@@ -426,9 +426,9 @@ Input data for creating an Approved Item and optionally scheduling this item to 
 """
 input CreateApprovedCuratedCorpusItemInput {
     """
-    The GUID of the corresponding Prospect ID.
+    The GUID of the corresponding Prospect ID. Will be empty for manually added items.
     """
-    prospectId: ID!
+    prospectId: ID
     """
     The URL of the Approved Item.
     """
@@ -494,10 +494,6 @@ input UpdateApprovedCuratedCorpusItemInput {
     """
     externalId: ID!
     """
-    The GUID of the corresponding Prospect ID.
-    """
-    prospectId: ID!
-    """
     The title of the Approved Item.
     """
     title: String!
@@ -552,9 +548,9 @@ Input data for creating a Rejected Item.
 """
 input CreateRejectedCuratedCorpusItemInput {
     """
-    The GUID of the corresponding Prospect ID.
+    The GUID of the corresponding Prospect ID. Will be empty for manually added item.
     """
-    prospectId: ID!
+    prospectId: ID
     """
     The URL of the Rejected Item.
     """

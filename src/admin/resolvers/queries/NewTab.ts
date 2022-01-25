@@ -18,7 +18,7 @@ export function getNewTabsForUser(parent, args, { token }): NewTab[] {
   // the groups. we'll cross that bridge when we come to it.
 
   // until SSO is set up, just return all new tabs
-  const userGroups = ['EN_US', 'DE_DE'];
+  const userGroups = ['EN_US', 'DE_DE', 'EN_GB', 'EN_INTL'];
 
   return NewTabs.filter((newTab) => {
     return userGroups.includes(newTab.guid);

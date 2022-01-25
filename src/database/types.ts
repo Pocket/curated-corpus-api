@@ -31,7 +31,7 @@ export type RejectedCuratedCorpusItemFilter = {
  * mutations.
  */
 type ApprovedItemRequiredInput = {
-  prospectId: string;
+  prospectId?: string;
   title: string;
   excerpt: string;
   status: CuratedStatus;
@@ -54,9 +54,12 @@ export type CreateApprovedItemInput = ApprovedItemRequiredInput & {
   newTabGuid?: string;
 };
 
-export type UpdateApprovedItemInput = {
+export type UpdateApprovedItemInput = Omit<
+  ApprovedItemRequiredInput,
+  'prospectId'
+> & {
   externalId: string;
-} & ApprovedItemRequiredInput;
+};
 
 export type RejectApprovedItemInput = {
   externalId: string;
@@ -64,7 +67,7 @@ export type RejectApprovedItemInput = {
 };
 
 export type CreateRejectedItemInput = {
-  prospectId: string;
+  prospectId?: string;
   url: string;
   title?: string;
   topic: string;

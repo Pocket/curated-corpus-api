@@ -72,6 +72,41 @@ describe('mutations: RejectedItem', () => {
       ).to.equal(result.data?.createRejectedCuratedCorpusItem.externalId);
     });
 
+    it('creates a rejected item without a prospectId', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.REJECT_ITEM, eventTracker);
+
+      const inputWithoutProspectId = { ...input };
+      delete inputWithoutProspectId.prospectId;
+
+      const result = await server.executeOperation({
+        query: CREATE_REJECTED_ITEM,
+        variables: { data: inputWithoutProspectId },
+      });
+
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
+
+      // Expect to see all the input data we supplied in the Approved Item
+      // returned by the mutation
+      expect(result.data?.createRejectedCuratedCorpusItem).to.deep.include(
+        inputWithoutProspectId
+      );
+
+      // Check that the REJECT_ITEM event was fired successfully:
+      // 1 - Event was fired once.
+      expect(eventTracker.callCount).to.equal(1);
+      // 2 - Event has the right type.
+      expect(await eventTracker.getCall(0).args[0].eventType).to.equal(
+        ReviewedCorpusItemEventType.REJECT_ITEM
+      );
+      // 3- Event has the right entity passed to it.
+      expect(
+        await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
+      ).to.equal(result.data?.createRejectedCuratedCorpusItem.externalId);
+    });
+
     it('should fail to create a rejected item with a duplicate URL', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
