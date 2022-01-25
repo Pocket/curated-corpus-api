@@ -23,7 +23,7 @@ describe('queries: NewTab', () => {
       const newTabs = data?.getNewTabsForUser;
 
       // we currently have two available new tabs
-      expect(newTabs.length).to.equal(2);
+      expect(newTabs.length).to.equal(4);
 
       newTabs.forEach((newTab) => {
         expect(newTab.guid).not.to.be.undefined;

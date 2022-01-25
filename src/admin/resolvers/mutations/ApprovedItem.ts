@@ -111,7 +111,8 @@ export async function rejectApprovedItem(
   // From our thoughtfully saved before deletion Approved Item, construct
   // input data for a Rejected Item entry.
   const input: CreateRejectedItemInput = {
-    prospectId: approvedItem.prospectId,
+    // manually added items do not have a prospectId
+    prospectId: approvedItem.prospectId || undefined,
     url: approvedItem.url,
     title: approvedItem.title,
     topic: approvedItem.topic,

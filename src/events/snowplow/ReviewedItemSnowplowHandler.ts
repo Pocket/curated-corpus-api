@@ -103,7 +103,8 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
         object_version: ObjectVersion.NEW,
         url: item.url,
         corpus_review_status: corpusReviewStatus,
-        prospect_id: item.prospectId,
+        // manually added items do not have a prospectId
+        prospect_id: item.prospectId || undefined,
         topic: item.topic,
         created_at: getUnixTimestamp(item.createdAt),
         created_by: item.createdBy,
