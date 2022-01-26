@@ -71,8 +71,11 @@ jobs:
             equal: [main, << pipeline.git.branch >>]
           steps:
             - run:
-                name: push service
+                name: push service to client api
                 command: rover subgraph publish pocket-client-api@current --schema ./schema.graphql --routing-url https://curated-corpus-api.readitlater.com/ --name=curated-corpus
+            - run:
+                name: push service to admin api
+                command: rover subgraph publish pocket-admin-api@current --schema ./schema.graphql --routing-url https://curated-corpus-api.readitlater.com/ --name=curated-corpus
 
   build:
     docker:
