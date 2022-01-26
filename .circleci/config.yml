@@ -72,7 +72,7 @@ jobs:
           name: check admin schema
           command: |
             export APOLLO_KEY=$ADMIN_APOLLO_KEY
-            rover subgraph check pocket-client-api@current --schema ./schema.graphql --name=curated-corpus
+            rover subgraph check pocket-admin-api@current --schema ./schema.graphql --name=curated-corpus
 
       - when:
           condition:
