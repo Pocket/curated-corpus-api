@@ -64,6 +64,11 @@ jobs:
           # to the public schema before pushing up to apollo studio (this happens in the next step)
           command: cat schema-shared.graphql schema-public.graphql > schema.graphql
       - run:
+          name: build admin schema
+          # We have to send one file for the federated schema which means we have to concat our shared scheme
+          # to the public schema before pushing up to apollo studio (this happens in the next step)
+          command: cat schema-shared.graphql schema-admin.graphql > schema-admin-api.graphql
+      - run:
           name: check client schema
           command: |
             export APOLLO_KEY=$ADMIN_APOLLO_KEY
@@ -72,7 +77,7 @@ jobs:
           name: check admin schema
           command: |
             export APOLLO_KEY=$ADMIN_APOLLO_KEY
-            rover subgraph check pocket-admin-api@current --schema ./schema.graphql --name=curated-corpus
+            rover subgraph check pocket-admin-api@current --schema ./schema-admin-api.graphql --name=curated-corpus
 
       - when:
           condition:
@@ -85,7 +90,7 @@ jobs:
                 name: push service to admin api
                 command: |
                   export APOLLO_KEY=$ADMIN_APOLLO_KEY
-                  rover subgraph publish pocket-admin-api@current --schema ./schema.graphql --routing-url https://curated-corpus-api.readitlater.com/ --name=curated-corpus
+                  rover subgraph publish pocket-admin-api@current --schema ./schema-admin-api.graphql --routing-url https://curated-corpus-api.readitlater.com/ --name=curated-corpus
 
   build:
     docker:
