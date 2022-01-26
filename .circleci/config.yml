@@ -83,7 +83,7 @@ jobs:
                 command: rover subgraph publish pocket-client-api@current --schema ./schema.graphql --routing-url https://curated-corpus-api.readitlater.com/ --name=curated-corpus
             - run:
                 name: push service to admin api
-                command: | 
+                command: |
                   export APOLLO_KEY=$ADMIN_APOLLO_KEY
                   rover subgraph publish pocket-admin-api@current --schema ./schema.graphql --routing-url https://curated-corpus-api.readitlater.com/ --name=curated-corpus
 
