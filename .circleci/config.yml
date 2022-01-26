@@ -64,10 +64,16 @@ jobs:
           # to the public schema before pushing up to apollo studio (this happens in the next step)
           command: cat schema-shared.graphql schema-public.graphql > schema.graphql
       - run:
-          name: check service
+          name: check client schema
           command: |
             export APOLLO_KEY=$ADMIN_APOLLO_KEY
             rover subgraph check pocket-client-api@current --schema ./schema.graphql --name=curated-corpus
+      - run:
+          name: check admin schema
+          command: |
+            export APOLLO_KEY=$ADMIN_APOLLO_KEY
+            rover subgraph check pocket-client-api@current --schema ./schema.graphql --name=curated-corpus
+
       - when:
           condition:
             equal: [main, << pipeline.git.branch >>]
