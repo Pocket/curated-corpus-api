@@ -88,7 +88,7 @@ jobs:
                 name: push service to prod admin api
                 command: |
                   export APOLLO_KEY=$ADMIN_APOLLO_KEY
-                  rover subgraph publish pocket-admin-api@current --schema ./schema-admin-api.graphql --routing-url https://curated-corpus-api.readitlater.com/ --name=curated-corpus
+                  rover subgraph publish pocket-admin-api@current --schema ./schema-admin-api.graphql --routing-url https://curated-corpus-api.readitlater.com/admin --name=curated-corpus
       - when:
           condition:
             equal: [dev, << pipeline.git.branch >>]
@@ -100,7 +100,7 @@ jobs:
                 name: push service to dev admin api
                 command: |
                   export APOLLO_KEY=$ADMIN_APOLLO_KEY
-                  rover subgraph publish pocket-admin-api@development --schema ./schema-admin-api.graphql --routing-url https://curated-corpus-api.getpocket.dev/ --name=curated-corpus
+                  rover subgraph publish pocket-admin-api@development --schema ./schema-admin-api.graphql --routing-url https://curated-corpus-api.getpocket.dev/admin --name=curated-corpus
 
 
   build:
