@@ -70,9 +70,7 @@ jobs:
           command: cat schema-shared.graphql schema-admin.graphql > schema-admin-api.graphql
       - run:
           name: check client schema
-          command: |
-            export APOLLO_KEY=$ADMIN_APOLLO_KEY
-            rover subgraph check pocket-client-api@current --schema ./schema.graphql --name=curated-corpus
+          command: rover subgraph check pocket-client-api@current --schema ./schema.graphql --name=curated-corpus
       - run:
           name: check admin schema
           command: |
