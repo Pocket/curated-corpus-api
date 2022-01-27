@@ -130,9 +130,13 @@ git push -f origin your-branch-name:dev
 
 At the initial deployment, and also from time to time as the API evolves, it is necessary to seed some sample data in the Dev database. Note that this operation wipes all the existing data and replaces it with the reseeded data. The steps to take are the following:
 
-- Make sure you've run `npm ci` locally (outside of Docker). 
-- Log in to AWS to find the Dev database connection URL. Look in the Secrets Manager for the Curated Corpus API.
-- Put that connection in your local environment file (`PATH_TO_REPOSITORY/.env`).
+- Make sure you've run `npm ci` locally (outside of Docker).
+- Log in to AWS to find the Dev database connection URL. Look in the Secrets Manager - there will be the full DB URL stored there alongside individual DB connection parameters such as username and password.
+- Put that connection in your local environment file (`PATH_TO_REPOSITORY/.env`) as
+```dotenv
+DATABASE_URL=[DB_URL_FROM_SECRETS_MANAGER]
+```
 - Authenticate to Dev AWS in your terminal using `$(maws)`.
+- Connect to Pocket VPN Dev.
 - Run `npx prisma migrate reset` in your local terminal. This should use the Dev database connection URL as the target.
-- Log out of all the things.
+- Log out of all the things/disconnect the VPN.
