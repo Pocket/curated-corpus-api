@@ -82,9 +82,9 @@ extend type Recomendation @key(fields: "item { givenUrl }") {
     """
     url: Url! @external
 
-    "TODO: Should this only ever be on a Recomendation object from RecsAPI intead?"
-
-    "If the item is in our corups with metadata lets define it"
+    """
+    If the item is in our corups with metadata lets define it, this would replace the older curatedInfo object.
+     """
     curatedMetadata: CuratedCorpusMetadata
 }
 
