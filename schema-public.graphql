@@ -1,6 +1,121 @@
+"""
+A scheduled entry for an Item to appear on a New Tab Feed.
+For example, a story that is scheduled to appear on December 31st, 2021 on the New Tab in Firefox for the US audience.
+"""
+type ScheduledCuratedCorpusItem {
+    """
+    The URL of the Approved Item.
+    """
+    url: Url!
+    """
+    The title of the Approved Item.
+    """
+    title: String!
+    """
+    The excerpt of the Approved Item.
+    """
+    excerpt: String!
+    """
+    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    """
+    language: String!
+    """
+    The name of the online publication that published this story.
+    """
+    publisher: String!
+    """
+    The image URL for this item's accompanying picture.
+    """
+    imageUrl: Url!
+
+    """
+    Maps to a Item that the parser will resolve if we need these fields.
+    """
+    item: Item! @external
+}
+
+extend type Item @key(fields: "givenUrl") {
+    """
+    The Item entity is owned by the Parser service.
+    We only extend it in this service to make this service's schema valid.
+    The key for this entity is the 'givenUrl'
+    """
+
+    givenUrl: String! @external
+}
+
+type CuratedCorpusMetadata {
+    """
+    The URL of the Approved Item.
+    """
+    url: Url!
+    """
+    The title of the Approved Item.
+    """
+    title: String!
+    """
+    The excerpt of the Approved Item.
+    """
+    excerpt: String!
+    """
+    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    """
+    language: String!
+    """
+    The name of the online publication that published this story.
+    """
+    publisher: String!
+    """
+    The image URL for this item's accompanying picture.
+    """
+    imageUrl: Url!
+}
+
+"""
+The Recommendation entity is owned by the Recommendation API service.
+We extend it in this service to add an extra field ('curatedMetadata') to the Recommendation entity.
+The key for this entity is the 'givenUrl' found within the Item entity which is owned by the Parser service.
+"""
+extend type Recomendation @key(fields: "item { givenUrl }") {
+    """
+    key field to identify the Item entity in the RecsAPI service
+    """
+    url: Url! @external
+
+    "TODO: Should this only ever be on a Recomendation object from RecsAPI intead?"
+
+    "If the item is in our corups with metadata lets define it"
+    curatedMetadata: CuratedCorpusMetadata
+}
+
+
+
+
+
+"""
+Available fields for filtering scheduled items for a given New Tab.
+"""
+input ScheduledCuratedCorpusItemsFilterInput {
+    """
+    The GUID of the New Tab. Example: 'EN_US'.
+    """
+    newTabGuid: ID!
+    """
+    Which day to show scheduled items from. Expects a date in YYYY-MM-DD format.
+    """
+    date: Date!
+}
+
+
 type Query {
     """
-    Test Prospect Curation API
+    Retrieves a list of Approved Items that are scheduled to appear on New Tab.
     """
-    helloProspectCuration: PCTest!
+    getScheduledCuratedCorpusItems(
+        """
+        Required arguments to narrow down scheduled items to a specific New Tab Feed
+        between the supplied start and end dates.
+        """
+        filters: ScheduledCuratedCorpusItemsFilterInput!
+    ): [ScheduledCuratedCorpusItem!]!
 }
