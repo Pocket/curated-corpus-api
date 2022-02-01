@@ -3,35 +3,13 @@ A scheduled entry for an Item to appear on a New Tab Feed.
 For example, a story that is scheduled to appear on December 31st, 2021 on the New Tab in Firefox for the US audience.
 """
 type ScheduledCuratedCorpusItem {
-    """
-    The URL of the Approved Item.
-    """
-    url: Url!
-    """
-    The title of the Approved Item.
-    """
-    title: String!
-    """
-    The excerpt of the Approved Item.
-    """
-    excerpt: String!
-    """
-    What language this item is in. This is a two-letter code, for example, 'en' for English.
-    """
-    language: String!
-    """
-    The name of the online publication that published this story.
-    """
-    publisher: String!
-    """
-    The image URL for this item's accompanying picture.
-    """
-    imageUrl: Url!
-
-    """
-    Maps to a Item that the parser will resolve if we need these fields.
-    """
-    item: Item! @external
+    id: ID!
+    
+    newTabGUID: ID!
+    
+    scheduledDate: Date!
+    
+    curatedCorpusMetadata: CuratedCorpusMetadata
 }
 
 extend type Item @key(fields: "givenUrl") {
@@ -45,6 +23,8 @@ extend type Item @key(fields: "givenUrl") {
 }
 
 type CuratedCorpusMetadata {
+   id: ID!
+
     """
     The URL of the Approved Item.
     """
@@ -76,7 +56,7 @@ The Recommendation entity is owned by the Recommendation API service.
 We extend it in this service to add an extra field ('curatedMetadata') to the Recommendation entity.
 The key for this entity is the 'givenUrl' found within the Item entity which is owned by the Parser service.
 """
-extend type Recomendation @key(fields: "item { givenUrl }") {
+extend type Recomendation @key(fields: "curatedMetadataId") {
     """
     key field to identify the Item entity in the RecsAPI service
     """
@@ -84,11 +64,9 @@ extend type Recomendation @key(fields: "item { givenUrl }") {
 
     """
     If the item is in our corups with metadata lets define it, this would replace the older curatedInfo object.
-     """
+    """
     curatedMetadata: CuratedCorpusMetadata
 }
-
-
 
 
 
@@ -111,11 +89,12 @@ type Query {
     """
     Retrieves a list of Approved Items that are scheduled to appear on New Tab.
     """
-    getScheduledCuratedCorpusItems(
+    scheduledCuratedCorpusItems(
         """
         Required arguments to narrow down scheduled items to a specific New Tab Feed
         between the supplied start and end dates.
         """
         filters: ScheduledCuratedCorpusItemsFilterInput!
     ): [ScheduledCuratedCorpusItem!]!
+ 
 }
