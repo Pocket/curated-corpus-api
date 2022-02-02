@@ -12,6 +12,13 @@ type ScheduledSurfaceItem {
     curatedItem: CuratedItem!
 }
 
+"""
+Union type to reference a surface
+--
+This is a future improvement, not needed now.
+"""
+union Surface = ScheduledSurface
+
 type CuratedItem {
    id: ID!
 
@@ -43,11 +50,17 @@ type CuratedItem {
 
 type ScheduledSurface {
     id: ID!
+    name: String!
     items(date: Date!): [ScheduledSurfaceItem!]!
 }
 
 type Query {
     scheduledSurface(id: ID!): ScheduledSurface!
+
+    """
+    This is a future improvement, not needed now.
+    """
+    surface(id: ID!): Surface!
 }
 
 """
