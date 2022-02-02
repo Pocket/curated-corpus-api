@@ -41,9 +41,18 @@ type CuratedItem {
     imageUrl: Url!
 }
 
+type ScheduledSurface {
+    id: ID!
+    items(date: Date!): [ScheduledSurfaceItem!]!
+}
+
+type Query {
+    scheduledSurface(id: ID!): ScheduledSurface!
+}
+
 """
 The Recommendation entity is owned by the Recommendation API service.
-We extend it in this service to add an extra field ('curatedItem') to the Recommendation entity.
+We extend it in this service to add an extra curatedItem to the Recommendation entity.
 """
 extend type Recomendation @key(fields: "curatedItem { id }") {
     """
@@ -55,13 +64,4 @@ extend type Recomendation @key(fields: "curatedItem { id }") {
     If the item is in our corups with metadata lets define it, this would replace the older curatedInfo object.
     """
     curatedItem: CuratedItem
-}
-
-type ScheduledSurface {
-    id: ID!
-    items(date: Date!): [ScheduledSurfaceItem!]!
-}
-
-type Query {
-    scheduledSurface(id: ID!): ScheduledSurface!
 }
