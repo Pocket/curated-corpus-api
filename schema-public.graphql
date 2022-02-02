@@ -1,28 +1,18 @@
 """
-A scheduled entry for an Item to appear on a New Tab Feed.
-For example, a story that is scheduled to appear on December 31st, 2021 on the New Tab in Firefox for the US audience.
+A scheduled entry for an Item to appear on a Scheduled Surface.
+For example, a story that is scheduled to appear on December 31st, 2021 on the Scheduled Surface in Firefox for the US audience.
 """
-type ScheduledCuratedCorpusItem {
+type ScheduledSurfaceItem {
     id: ID!
     
-    newTabGUID: ID!
+    surfaceId: ID!
     
     scheduledDate: Date!
     
-    curatedCorpusMetadata: CuratedCorpusMetadata
+    curatedItem: CuratedItem!
 }
 
-extend type Item @key(fields: "givenUrl") {
-    """
-    The Item entity is owned by the Parser service.
-    We only extend it in this service to make this service's schema valid.
-    The key for this entity is the 'givenUrl'
-    """
-
-    givenUrl: String! @external
-}
-
-type CuratedCorpusMetadata {
+type CuratedItem {
    id: ID!
 
     """
@@ -53,10 +43,9 @@ type CuratedCorpusMetadata {
 
 """
 The Recommendation entity is owned by the Recommendation API service.
-We extend it in this service to add an extra field ('curatedMetadata') to the Recommendation entity.
-The key for this entity is the 'givenUrl' found within the Item entity which is owned by the Parser service.
+We extend it in this service to add an extra field ('curatedItem') to the Recommendation entity.
 """
-extend type Recomendation @key(fields: "curatedMetadataId") {
+extend type Recomendation @key(fields: "curatedItem { id }") {
     """
     key field to identify the Item entity in the RecsAPI service
     """
@@ -65,36 +54,14 @@ extend type Recomendation @key(fields: "curatedMetadataId") {
     """
     If the item is in our corups with metadata lets define it, this would replace the older curatedInfo object.
     """
-    curatedMetadata: CuratedCorpusMetadata
+    curatedItem: CuratedItem
 }
 
-
-
-"""
-Available fields for filtering scheduled items for a given New Tab.
-"""
-input ScheduledCuratedCorpusItemsFilterInput {
-    """
-    The GUID of the New Tab. Example: 'EN_US'.
-    """
-    newTabGuid: ID!
-    """
-    Which day to show scheduled items from. Expects a date in YYYY-MM-DD format.
-    """
-    date: Date!
+type ScheduledSurface {
+    id: ID!
+    items(date: Date!): [ScheduledSurfaceItem!]!
 }
-
 
 type Query {
-    """
-    Retrieves a list of Approved Items that are scheduled to appear on New Tab.
-    """
-    scheduledCuratedCorpusItems(
-        """
-        Required arguments to narrow down scheduled items to a specific New Tab Feed
-        between the supplied start and end dates.
-        """
-        filters: ScheduledCuratedCorpusItemsFilterInput!
-    ): [ScheduledCuratedCorpusItem!]!
- 
+    scheduledSurface(id: ID!): ScheduledSurface!
 }
