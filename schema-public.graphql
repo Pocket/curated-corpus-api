@@ -1,26 +1,37 @@
 """
-A scheduled entry for an Item to appear on a Scheduled Surface.
+A scheduled entry for an CuratedItem to appear on a Scheduled Surface.
 For example, a story that is scheduled to appear on December 31st, 2021 on the Scheduled Surface in Firefox for the US audience.
 """
 type ScheduledSurfaceItem {
+    """
+    A backend GUID that represents this scheduled run
+    """
     id: ID!
-    
+
+    """
+    Agreed on GUID that is from our shared data pocket confluence
+    """
     surfaceId: ID!
-    
+
+    """
+    The date the item should run at
+    """
     scheduledDate: Date!
-    
+
+    """
+    The curated item that should run
+    """
     curatedItem: CuratedItem!
 }
 
 """
-Union type to reference a surface
---
-This is a future improvement, not needed now.
+Represents an item that is in the Corpus and it's associated manually edited metadata.
 """
-union Surface = ScheduledSurface
-
-type CuratedItem {
-   id: ID!
+type CuratedItem @key(fields: "id") {
+    """
+    The GUID that is stored on an approved corpus item
+    """
+    id: ID!
 
     """
     The URL of the Approved Item.
@@ -48,11 +59,31 @@ type CuratedItem {
     imageUrl: Url!
 }
 
+"""
+Represents a surface that has scheduled items by day
+"""
 type ScheduledSurface {
+    """
+    Agreed on GUID that is from our shared data pocket confluence
+    """
     id: ID!
+
+    """
+    Internal name of the surface
+    """
     name: String!
+
+    """
+    Subquery to get the ScheduledSurfaceItems to display to a user for a given date
+    """
     items(date: Date!): [ScheduledSurfaceItem!]!
 }
+
+"""
+Union type to reference a surface
+This is a future improvement, not needed now.
+"""
+union Surface = ScheduledSurface
 
 type Query {
     scheduledSurface(id: ID!): ScheduledSurface!
@@ -63,18 +94,15 @@ type Query {
     surface(id: ID!): Surface!
 }
 
-"""
-The Recommendation entity is owned by the Recommendation API service.
-We extend it in this service to add an extra curatedItem to the Recommendation entity.
-"""
-extend type Recomendation @key(fields: "curatedItem { id }") {
-    """
-    key field to identify the Item entity in the RecsAPI service
-    """
-    url: Url! @external
-
-    """
-    If the item is in our corups with metadata lets define it, this would replace the older curatedInfo object.
-    """
-    curatedItem: CuratedItem
-}
+# Commented out until RecsAPI implements the fields that lets us extend Recommendation
+#extend type Recommendation  @key(fields: "curatedItemId") {
+#    """
+#    key field to identify the CuratedItem entity in the RecsAPI service
+#    """
+#    curatedItemId: ID! @external
+#
+#    """
+#    If the item is in our corpus with metadata lets define it, this would replace the older curatedInfo object.
+#    """
+#    curatedItem: CuratedItem @requires(fields: "curatedItemId")
+#}
