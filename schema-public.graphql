@@ -1,5 +1,5 @@
 """
-A scheduled entry for an CuratedItem to appear on a Scheduled Surface.
+A scheduled entry for an CorpusItem to appear on a Scheduled Surface.
 For example, a story that is scheduled to appear on December 31st, 2021 on the Scheduled Surface in Firefox for the US audience.
 """
 type ScheduledSurfaceItem {
@@ -21,13 +21,13 @@ type ScheduledSurfaceItem {
     """
     The curated item that should run
     """
-    curatedItem: CuratedItem!
+    corpusItem: CorpusItem!
 }
 
 """
 Represents an item that is in the Corpus and it's associated manually edited metadata.
 """
-type CuratedItem @key(fields: "id") {
+type CorpusItem @key(fields: "id") {
     """
     The GUID that is stored on an approved corpus item
     """
@@ -95,14 +95,14 @@ type Query {
 }
 
 # Commented out until RecsAPI implements the fields that lets us extend Recommendation
-#extend type Recommendation  @key(fields: "curatedItemId") {
+#extend type Recommendation  @key(fields: "corpusItemId") {
 #    """
-#    key field to identify the CuratedItem entity in the RecsAPI service
+#    key field to identify the CorpusItem entity in the RecsAPI service
 #    """
-#    curatedItemId: ID! @external
+#    corpusItemId: ID! @external
 #
 #    """
 #    If the item is in our corpus with metadata lets define it, this would replace the older curatedInfo object.
 #    """
-#    curatedItem: CuratedItem @requires(fields: "curatedItemId")
+#    corpusItem: CorpusItem @requires(fields: "corpusItemId")
 #}
