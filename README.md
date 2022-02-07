@@ -1,6 +1,16 @@
 # Curated Corpus API
 
-??? Need a good, short description
+The Curated Corpus API serves three primary functions:
+
+1. Allow our editorial team to manage both an approved corpus and a rejected corpus.
+2. Allow our editorial team to schedule approved corpus items across a number of Firefox New Tabs.
+3. Allow the ML team access to approved corpus items for eventual display on Pocket surfaces.
+
+The corpus is managed by editors through our [curation admin tools](https://github.com/Pocket/curation-admin-tools). These tools allow editors to customize meta information about approved items - title, excerpt, image, etc. The approved corpus is the authoritative source for this meta information (_not_ the [Parser](https://github.com/Pocket/Parser)).
+
+In its current form, approved items come primarily from ML prospecting jobs - though editors have final say on which prospects are approved. Items can also be manually added to the approved corpus by editors.
+
+Items in the approved corpus are available to be recommended across Pocket surfaces. Items in the rejected corpus will be prevented from ever displaying on Pocket surfaces.
 
 ## Application Overview
 
