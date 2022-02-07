@@ -25,14 +25,13 @@ type ScheduledSurfaceItem {
 }
 
 """
-Represents an item that is in the Corpus and it's associated manually edited metadata.
+Represents an item that is in the Corpus and its associated manually edited metadata.
 """
 type CorpusItem @key(fields: "id") {
     """
     The GUID that is stored on an approved corpus item
     """
     id: ID!
-
     """
     The URL of the Approved Item.
     """
@@ -87,7 +86,6 @@ union Surface = ScheduledSurface
 
 type Query {
     scheduledSurface(id: ID!): ScheduledSurface!
-
     """
     This is a future improvement, not needed now.
     """
