@@ -1,9 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { DateTime } from 'luxon';
 import {
-  ScheduledItemsResult,
-  ScheduledItemFilterInput,
   ScheduledItem,
+  ScheduledItemFilterInput,
+  ScheduledItemsResult,
+  ScheduledSurfaceItem,
 } from '../types';
 import { groupBy } from '../../shared/utils';
 
@@ -60,4 +61,51 @@ export async function getScheduledItems(
   );
 
   return results;
+}
+
+/**
+ * Gets a list of scheduled items for a combination of a given scheduled surface
+ * (e.g., New Tab) and a date in YYYY-MM-DD format.
+ *
+ * @param db
+ * @param id
+ * @param date
+ */
+export async function getItemsForScheduledSurface(
+  db: PrismaClient,
+  id: string,
+  date: string
+): Promise<ScheduledSurfaceItem[]> {
+  // Get a flat array of scheduled items from Prisma
+  const items = await db.scheduledItem.findMany({
+    where: {
+      newTabGuid: { equals: id },
+      scheduledDate: date,
+    },
+    include: {
+      approvedItem: true,
+    },
+  });
+
+  // Convert these items into the expected query result:
+  // ScheduledSurfaceItem & CorpusItem
+  return items.map((scheduledItem) => {
+    const item: ScheduledSurfaceItem = {
+      id: scheduledItem.externalId,
+      surfaceId: scheduledItem.newTabGuid,
+      scheduledDate: DateTime.fromJSDate(scheduledItem.scheduledDate).toFormat(
+        'yyyy-MM-dd'
+      ),
+      corpusItem: {
+        id: scheduledItem.approvedItem.externalId,
+        url: scheduledItem.approvedItem.url,
+        title: scheduledItem.approvedItem.title,
+        excerpt: scheduledItem.approvedItem.excerpt,
+        language: scheduledItem.approvedItem.language,
+        publisher: scheduledItem.approvedItem.publisher,
+        imageUrl: scheduledItem.approvedItem.imageUrl,
+      },
+    };
+    return item;
+  });
 }
