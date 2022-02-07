@@ -103,3 +103,27 @@ export type CreateScheduledItemInput = {
   newTabGuid: string;
   scheduledDate: string;
 };
+
+// Types for the public `scheduledSurface` query.
+export type CorpusItem = {
+  id: string;
+  url: string;
+  title: string;
+  excerpt: string;
+  language: string;
+  publisher: string;
+  imageUrl: string;
+};
+
+export type ScheduledSurfaceItem = {
+  id: string;
+  surfaceId: string;
+  scheduledDate: string;
+  corpusItem: CorpusItem;
+};
+
+export type ScheduledSurface = {
+  id: string;
+  name: string;
+  items?: ScheduledSurfaceItem[];
+};
