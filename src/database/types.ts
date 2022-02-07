@@ -117,7 +117,7 @@ export type CorpusItem = {
 };
 
 export type ScheduledSurfaceItem = {
-  // This is `newTabGuid` in the DB schema and Admin API
+  // This is `externalId` in the DB schema and Admin API
   id: string;
   surfaceId: string;
   scheduledDate: string;
@@ -125,7 +125,7 @@ export type ScheduledSurfaceItem = {
 };
 
 export type ScheduledSurface = {
-  // This is `externalId` in the DB schema and Admin API
+  // This is `newTabGuid` in the DB schema and Admin API
   id: string;
   name: string;
   items?: ScheduledSurfaceItem[];
