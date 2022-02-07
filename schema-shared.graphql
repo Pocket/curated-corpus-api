@@ -1,7 +1,3 @@
-"""
-This is a temporary return type for a test query on the public API.
-"""
-scalar PCTest
 
 """
 A URL - usually, for an interesting story on the internet that's worth saving to Pocket.

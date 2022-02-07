@@ -1,6 +1,106 @@
-type Query {
+"""
+A scheduled entry for an CorpusItem to appear on a Scheduled Surface.
+For example, a story that is scheduled to appear on December 31st, 2021 on the Scheduled Surface in Firefox for the US audience.
+"""
+type ScheduledSurfaceItem {
     """
-    Test Prospect Curation API
+    A backend GUID that represents this scheduled run
     """
-    helloProspectCuration: PCTest!
+    id: ID!
+
+    """
+    Agreed on GUID that is from our shared data pocket confluence
+    """
+    surfaceId: ID!
+
+    """
+    The date the item should run at
+    """
+    scheduledDate: Date!
+
+    """
+    The curated item that should run
+    """
+    corpusItem: CorpusItem!
 }
+
+"""
+Represents an item that is in the Corpus and its associated manually edited metadata.
+"""
+type CorpusItem @key(fields: "id") {
+    """
+    The GUID that is stored on an approved corpus item
+    """
+    id: ID!
+    """
+    The URL of the Approved Item.
+    """
+    url: Url!
+    """
+    The title of the Approved Item.
+    """
+    title: String!
+    """
+    The excerpt of the Approved Item.
+    """
+    excerpt: String!
+    """
+    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    """
+    language: String!
+    """
+    The name of the online publication that published this story.
+    """
+    publisher: String!
+    """
+    The image URL for this item's accompanying picture.
+    """
+    imageUrl: Url!
+}
+
+"""
+Represents a surface that has scheduled items by day
+"""
+type ScheduledSurface {
+    """
+    Agreed on GUID that is from our shared data pocket confluence
+    """
+    id: ID!
+
+    """
+    Internal name of the surface
+    """
+    name: String!
+
+    """
+    Subquery to get the ScheduledSurfaceItems to display to a user for a given date
+    """
+    items(date: Date!): [ScheduledSurfaceItem!]!
+}
+
+"""
+Union type to reference a surface
+This is a future improvement, not needed now.
+"""
+union Surface = ScheduledSurface
+
+type Query {
+    scheduledSurface(id: ID!): ScheduledSurface!
+    """
+    This is a future improvement, not needed now.
+    """
+    surface(id: ID!): Surface!
+}
+
+# Commented out until RecsAPI implements the fields that lets us extend Recommendation
+#extend type Recommendation  @key(fields: "corpusItemId") {
+#    """
+#    key field to identify the CorpusItem entity in the RecsAPI service
+#    """
+#    corpusItemId: ID! @external
+#
+#    """
+#    If the item is in our corpus with metadata lets define it, this would replace the older curatedInfo object.
+#    """
+#    corpusItem: CorpusItem @requires(fields: "corpusItemId")
+#}
