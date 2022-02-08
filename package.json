@@ -41,7 +41,7 @@
   },
   "homepage": "https://github.com/Pocket/curated-corpus-api#readme",
   "dependencies": {
-    "@apollo/federation": "^0.33.9",
+    "@apollo/federation": "^0.34.0",
     "@devoxa/prisma-relay-cursor-connection": "^2.1.0",
     "@pocket-tools/apollo-utils": "^2.2.0",
     "@prisma/client": "^3.9.1",
