@@ -1,4 +1,5 @@
 import { S3 } from 'aws-sdk';
+import { IncomingHttpHeaders } from 'http';
 import {
   ApprovedItem,
   PrismaClient,
@@ -15,12 +16,20 @@ import {
 } from '../events/types';
 import s3 from './aws/s3';
 
+// Custom properties we get from Admin API for the authenticated user
+export interface AdminAPIUser {
+  name: string;
+  groups: string[];
+  username: string;
+}
+
 // Context interface
 export interface IContext {
   db: PrismaClient;
+  headers: IncomingHttpHeaders;
   eventEmitter: CuratedCorpusEventEmitter;
   s3: S3;
-  token?: string;
+  authenticatedUser: AdminAPIUser;
 
   emitReviewedCorpusItemEvent(
     event: ReviewedCorpusItemEventType,
@@ -47,18 +56,25 @@ export class ContextManager implements IContext {
     return this.config.db;
   }
 
+  get headers(): { [key: string]: any } {
+    return this.config.request.headers;
+  }
+
   get s3(): IContext['s3'] {
     return this.config.s3;
   }
 
-  get eventEmitter(): CuratedCorpusEventEmitter {
-    return this.config.eventEmitter;
+  get authenticatedUser(): AdminAPIUser {
+    const accessGroups = this.config.request.headers.groups.split(',');
+    return {
+      name: this.config.request.headers.name,
+      username: this.config.request.headers.username,
+      groups: accessGroups,
+    };
   }
 
-  get token(): IContext['token'] {
-    const authHeader = this.config.request.headers.authorization ?? undefined;
-
-    return authHeader ? getTokenFromAuthorizationHeader(authHeader) : undefined;
+  get eventEmitter(): CuratedCorpusEventEmitter {
+    return this.config.eventEmitter;
   }
 
   emitReviewedCorpusItemEvent(
@@ -79,29 +95,6 @@ export class ContextManager implements IContext {
     });
   }
 }
-
-export const getTokenFromAuthorizationHeader = (
-  authHeader: string
-): string | undefined => {
-  let token: string | undefined = undefined;
-
-  if (authHeader) {
-    // if present, header should be in the form of `Bearer tokenvalueshere`,
-    // so we try to split on the first (and ostensibly only) space
-    const parts = authHeader.split(' ');
-
-    // if the token has two parts - `Bearer` and `tokenvalue`, return the
-    // token value
-    if (parts.length === 2) {
-      token = parts[1];
-    }
-
-    // TODO: should we log something to sentry if `parts` above isn't as
-    // expected? or just fail silently for security purposes?
-  }
-
-  return token;
-};
 
 /**
  * Context factory function. Creates a new context upon

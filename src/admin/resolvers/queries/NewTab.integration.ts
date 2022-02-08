@@ -1,36 +1,130 @@
 import { expect } from 'chai';
-import { getServer } from '../../../test/admin-server';
-import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
-import { GET_NEW_TABS_FOR_USER } from './sample-queries.gql';
+import { getServerWithMockedHeaders } from '../../../test/helpers';
+import { GET_SCHEDULED_SURFACES_FOR_USER } from './sample-queries.gql';
+import { MozillaAccessGroup } from '../../../shared/types';
 
-describe('queries: NewTab', () => {
-  const server = getServer(new CuratedCorpusEventEmitter());
-
-  beforeAll(async () => {
-    await server.start();
-  });
-
-  afterAll(async () => {
-    await server.stop();
-  });
-
+describe('queries: ScheduledSurface', () => {
   describe('getNewTabsForUser query', () => {
-    it('should get all newtabs until we enable SSO', async () => {
+    it('should return all available surfaces for read-only users', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
       const { data } = await server.executeOperation({
-        query: GET_NEW_TABS_FOR_USER,
+        query: GET_SCHEDULED_SURFACES_FOR_USER,
       });
 
-      const newTabs = data?.getNewTabsForUser;
+      const scheduledSurfaces = data?.getNewTabsForUser;
 
-      // we currently have two available new tabs
-      expect(newTabs.length).to.equal(4);
+      expect(scheduledSurfaces).to.have.lengthOf(4);
 
-      newTabs.forEach((newTab) => {
-        expect(newTab.guid).not.to.be.undefined;
-        expect(newTab.name).not.to.be.undefined;
-        expect(newTab.utcOffset).not.to.be.undefined;
-        expect(newTab.prospectTypes).not.to.be.undefined;
+      scheduledSurfaces.forEach((scheduledSurface) => {
+        expect(scheduledSurface.guid).not.to.be.undefined;
+        expect(scheduledSurface.name).not.to.be.undefined;
+        expect(scheduledSurface.utcOffset).not.to.be.undefined;
+        expect(scheduledSurface.prospectTypes).not.to.be.undefined;
       });
+
+      await server.stop();
+    });
+
+    it('should return all available surfaces for users with full access', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const { data } = await server.executeOperation({
+        query: GET_SCHEDULED_SURFACES_FOR_USER,
+      });
+
+      const scheduledSurfaces = data?.getNewTabsForUser;
+
+      expect(scheduledSurfaces).to.have.lengthOf(4);
+
+      scheduledSurfaces.forEach((scheduledSurface) => {
+        expect(scheduledSurface.guid).not.to.be.undefined;
+        expect(scheduledSurface.name).not.to.be.undefined;
+        expect(scheduledSurface.utcOffset).not.to.be.undefined;
+        expect(scheduledSurface.prospectTypes).not.to.be.undefined;
+      });
+
+      await server.stop();
+    });
+
+    it('should return a single new tab for users with access to one new tab', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const { data } = await server.executeOperation({
+        query: GET_SCHEDULED_SURFACES_FOR_USER,
+      });
+
+      const scheduledSurfaces = data?.getNewTabsForUser;
+
+      expect(scheduledSurfaces).to.have.lengthOf(1);
+      expect(scheduledSurfaces[0].guid).to.equal('EN_US');
+
+      await server.stop();
+    });
+
+    it('should return a limited set of new tabs for users with limited new tab access', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS},${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const { data } = await server.executeOperation({
+        query: GET_SCHEDULED_SURFACES_FOR_USER,
+      });
+
+      const scheduledSurfaces = data?.getNewTabsForUser;
+
+      expect(scheduledSurfaces).to.have.lengthOf(2);
+      expect(scheduledSurfaces[0].guid).to.equal('EN_US');
+      expect(scheduledSurfaces[1].guid).to.equal('DE_DE');
+
+      await server.stop();
+    });
+
+    it('should return no scheduled surfaces for users with no access', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,group3`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const { data } = await server.executeOperation({
+        query: GET_SCHEDULED_SURFACES_FOR_USER,
+      });
+
+      const scheduledSurfaces = data?.getNewTabsForUser;
+
+      expect(scheduledSurfaces).to.have.lengthOf(0);
+
+      await server.stop();
     });
   });
 });

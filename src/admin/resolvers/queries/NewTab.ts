@@ -1,4 +1,9 @@
-import { NewTab, NewTabs } from '../../../shared/types';
+import {
+  AccessGroupToScheduledSurfaceMap,
+  MozillaAccessGroup,
+  NewTab,
+  NewTabs,
+} from '../../../shared/types';
 
 /**
  * This query retrieves new tabs available to the given SSO user
@@ -7,20 +12,35 @@ import { NewTab, NewTabs } from '../../../shared/types';
  * @param args
  * @param db
  */
-export function getNewTabsForUser(parent, args, { token }): NewTab[] {
-  // token comes from the context - see admin/context.ts
-  // console.log(token);
+export function getNewTabsForUser(
+  parent,
+  args,
+  { authenticatedUser }
+): NewTab[] {
+  let scheduledSurfaces: NewTab[] = [];
 
-  // TODO: when implementing SSO, decrypt token, validate signature and check
-  // groups, which will contain new tab guid values.
+  // Return all scheduled surfaces for users with full access to the tool
+  // and read-only users (otherwise the latter won't see anything???)
+  if (
+    authenticatedUser.groups.includes(
+      MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL
+    ) ||
+    authenticatedUser.groups.includes(MozillaAccessGroup.READONLY)
+  ) {
+    // Somehow it doesn't seem right to be returning the entire shared data array
+    // without assigning it to a variable first
+    scheduledSurfaces = NewTabs;
+    // Return early - there is no need for extra access checks.
+    return scheduledSurfaces;
+  }
 
-  // we may want a separate helper function to parse the token and retrieve
-  // the groups. we'll cross that bridge when we come to it.
-
-  // until SSO is set up, just return all new tabs
-  const userGroups = ['EN_US', 'DE_DE', 'EN_GB', 'EN_INTL'];
-
-  return NewTabs.filter((newTab) => {
-    return userGroups.includes(newTab.guid);
+  // Iterate through groups that give permission to one surface only
+  // and add these to the return value
+  authenticatedUser.groups.forEach((group: MozillaAccessGroup) => {
+    if (group in AccessGroupToScheduledSurfaceMap) {
+      scheduledSurfaces.push(AccessGroupToScheduledSurfaceMap[group]!);
+    }
   });
+
+  return scheduledSurfaces;
 }
