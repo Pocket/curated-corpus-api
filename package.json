@@ -50,7 +50,7 @@
     "@snowplow/node-tracker": "^3.3.0",
     "@types/luxon": "^2.0.9",
     "apollo-datasource-rest": "^3.5.0",
-    "apollo-server": "^3.6.2",
+    "apollo-server": "^3.6.3",
     "apollo-server-cache-redis": "^3.3.1",
     "apollo-server-core": "^3.6.3",
     "apollo-server-express": "^3.6.2",
