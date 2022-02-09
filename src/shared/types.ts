@@ -56,6 +56,27 @@ export const getNewTabByGuid = (guid: string): NewTab | undefined => {
   return NewTabs.find((newTab: NewTab) => newTab.guid === guid);
 };
 
+export enum MozillaAccessGroup {
+  READONLY = 'team_pocket', // Read only access to all curation tools
+  COLLECTION_CURATOR_FULL = 'mozilliansorg_pocket_collection_curator_full', // Access to full collection tool
+  SCHEDULED_SURFACE_CURATOR_FULL = 'mozilliansorg_pocket_scheduled_surface_curator_full', // Access to full corpus tool, implies they have access to all scheduled surfaces.
+  NEW_TAB_CURATOR_ENUS = 'mozilliansorg_pocket_new_tab_curator_enus', // Access to en-us new tab in the corpus tool.
+  NEW_TAB_CURATOR_DEDE = 'mozilliansorg_pocket_new_tab_curator_dede', // Access to de-de new tab in corpus tool.
+  NEW_TAB_CURATOR_ENGB = 'mozilliansorg_pocket_new_tab_curator_engb', // Access to en-gb new tab in corpus tool.
+  NEW_TAB_CURATOR_ENINTL = 'mozilliansorg_pocket_new_tab_curator_enintl', // Access to en-intl new tab in corpus tool.
+  POCKET_HITS_CURATOR_ENUS = 'mozilliansorg_pocket_pocket_hits_curator_enus', // Access to en us Pocket Hits in the corpus tool.
+  POCKET_HITS_CURATOR_DEDE = 'mozilliansorg_pocket_pocket_hits_curator_dede', // Access to de de Pocket Hits in the corpus tool.
+}
+
+export const AccessGroupToScheduledSurfaceMap: {
+  [key in MozillaAccessGroup]?: NewTab;
+} = {
+  [MozillaAccessGroup.NEW_TAB_CURATOR_ENUS]: getNewTabByGuid('EN_US'),
+  [MozillaAccessGroup.NEW_TAB_CURATOR_DEDE]: getNewTabByGuid('DE_DE'),
+  [MozillaAccessGroup.NEW_TAB_CURATOR_ENGB]: getNewTabByGuid('EN_GB'),
+  [MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL]: getNewTabByGuid('EN_INTL'),
+};
+
 export enum Topics {
   BUSINESS = 'BUSINESS',
   CAREER = 'CAREER',

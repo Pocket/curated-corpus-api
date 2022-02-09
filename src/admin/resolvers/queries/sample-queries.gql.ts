@@ -81,8 +81,8 @@ export const GET_APPROVED_ITEM_BY_URL = gql`
   ${CuratedItemData}
 `;
 
-export const GET_NEW_TABS_FOR_USER = gql`
-  query getNewTabsForUser {
+export const GET_SCHEDULED_SURFACES_FOR_USER = gql`
+  query getScheduledSurfacesForUser {
     getNewTabsForUser {
       guid
       name
