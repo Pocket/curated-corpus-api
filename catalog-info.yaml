@@ -1,0 +1,80 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: curated-corpus-api
+  description: Manages the corpus of recommended stories across Pocket
+  annotations:
+    github.com/project-slug: pocket/curated-corpus-api
+    github.com/team-slug: Pocket/backend
+    circleci.com/project-slug: github/pocket/curated-corpus-api
+    sentry.io/project-slug: curated-corpus-api
+spec:
+  type: service
+  owner: backend
+  lifecycle: production
+  dependsOn:
+    - resource:curated-corpus-db
+    - resource:curated-corpus-s3-bucket
+  providesApis:
+    - curated-corpus
+    - curated-corpus-admin
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: curated-corpus
+  description: External facing API for serving scheduled curated corpus items.
+spec:
+  type: graphql
+  owner: backend
+  definition: |
+    #TODO: Add in graphql api spec
+  lifecycle: production
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: curated-corpus-admin
+  description: Internal facing API for managing curated corpus items.
+spec:
+  type: graphql
+  owner: backend
+  definition: |
+    #TODO: Add in graphql api spec
+  lifecycle: production
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: curated-corpus-db
+  description: Serverless database that holds the curated corpus
+  links:
+    - url: https://console.aws.amazon.com/rds/home?region=us-east-1#database:id=curatedcorpusapi-prod20210927235441510200000001;is-cluster=true
+      title: Amazon RDS
+      icon: dashboard
+spec:
+  type: database
+  owner: backend
+  lifecycle: production
+
+---
+
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: curated-corpus-s3-bucket
+  description: S3 bucket to hold images for the curated corpus
+  links:
+    - url: https://s3.console.aws.amazon.com/s3/buckets/pocket-curatedcorpusapi-prod-images?region=us-east-1&tab=objects
+      title: Amazon S3
+      icon: dashboard
+spec:
+  type: s3
+  owner: backend
+  lifecycle: production
