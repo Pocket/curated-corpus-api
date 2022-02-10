@@ -6,7 +6,7 @@ import {
 } from '@prisma/client';
 import faker from 'faker';
 
-// the data required to create a scheduled item that goes onto new tab
+// the data required to create a scheduled item that goes onto a scheduled surface
 interface CreateScheduledItemHelperRequiredInput {
   approvedItem: ApprovedItem;
 }
@@ -14,7 +14,7 @@ interface CreateScheduledItemHelperRequiredInput {
 // optional information you can provide when creating a scheduled item
 interface CreateScheduledItemHelperOptionalInput {
   createdBy?: string;
-  newTabGuid?: string;
+  scheduledSurfaceGuid?: string;
   scheduledDate?: string;
 }
 
@@ -24,7 +24,7 @@ export type CreateScheduledItemHelperInput =
     CreateScheduledItemHelperOptionalInput;
 
 /**
- * A helper function that creates a sample scheduled item to go onto new tab
+ * A helper function that creates a sample scheduled item to go onto a scheduled surface
  * for testing or local development.
  * @param prisma
  * @param data
@@ -41,7 +41,7 @@ export async function createScheduledItemHelper(
       faker.date.soon(7).toISOString(),
       faker.date.recent(7).toISOString(),
     ]),
-    newTabGuid: 'EN_US',
+    scheduledSurfaceGuid: 'NEW_TAB_EN_US',
   };
 
   const inputs: Prisma.ScheduledItemCreateInput = {

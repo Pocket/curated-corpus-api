@@ -15,7 +15,7 @@ enum CuratedStatus {
 }
 
 // A prospect that is deemed good enough for saving in the corpus
-// and (optionally) making it to New Tab.
+// and (optionally) making it to a Scheduled Surface.
 model ApprovedItem {
   // fields
   id              Int           @id @default(autoincrement())
@@ -67,24 +67,24 @@ model RejectedCuratedCorpusItem {
   @@unique([url])
 }
 
-// A curated item that's been scheduled to go on to one or more New Tabs
+// A curated item that's been scheduled to go on to one or more Scheduled Surfaces
 model ScheduledItem {
   // fields
-  id             Int      @id @default(autoincrement())
-  externalId     String   @default(uuid()) @db.VarChar(255)
-  approvedItemId Int
-  newTabGuid     String   @db.VarChar(10)
-  createdAt      DateTime @default(now())
-  createdBy      String   @db.VarChar(255)
-  updatedAt      DateTime @updatedAt
-  updatedBy      String?  @db.VarChar(255)
-  scheduledDate  DateTime @db.Date
+  id                       Int      @id @default(autoincrement())
+  externalId               String   @default(uuid()) @db.VarChar(255)
+  approvedItemId           Int
+  scheduledSurfaceGuid     String   @db.VarChar(50)
+  createdAt                DateTime @default(now())
+  createdBy                String   @db.VarChar(255)
+  updatedAt                DateTime @updatedAt
+  updatedBy                String?  @db.VarChar(255)
+  scheduledDate            DateTime @db.Date
 
   // associated entities
   approvedItem ApprovedItem @relation(fields: [approvedItemId], references: [id])
 
   // indexes
   @@unique([externalId])
-  // Prevent scheduling the same item on the same new tab for the same day multiple times.
-  @@unique([approvedItemId, newTabGuid, scheduledDate], name: "ItemNewTabDate")
+  // Prevent scheduling the same item on the same Scheduled Surface for the same day multiple times.
+  @@unique([approvedItemId, scheduledSurfaceGuid, scheduledDate], name: "ItemScheduledSurfaceDate")
 }

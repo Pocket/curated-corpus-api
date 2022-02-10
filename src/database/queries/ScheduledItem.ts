@@ -16,13 +16,13 @@ export async function getScheduledItems(
   db: PrismaClient,
   filters: ScheduledItemFilterInput
 ): Promise<ScheduledItemsResult[]> {
-  const { newTabGuid, startDate, endDate } = filters;
+  const { scheduledSurfaceGuid, startDate, endDate } = filters;
 
   // Get a flat array of scheduled items from Prisma
   const items = await db.scheduledItem.findMany({
     orderBy: { scheduledDate: 'asc' },
     where: {
-      newTabGuid: { equals: newTabGuid },
+      scheduledSurfaceGuid: { equals: scheduledSurfaceGuid },
       scheduledDate: {
         gte: new Date(startDate),
         lte: new Date(endDate),
@@ -79,7 +79,7 @@ export async function getItemsForScheduledSurface(
   // Get a flat array of scheduled items from Prisma
   const items = await db.scheduledItem.findMany({
     where: {
-      newTabGuid: { equals: id },
+      scheduledSurfaceGuid: { equals: id },
       scheduledDate: date,
     },
     include: {
@@ -92,7 +92,7 @@ export async function getItemsForScheduledSurface(
   return items.map((scheduledItem) => {
     const item: ScheduledSurfaceItem = {
       id: scheduledItem.externalId,
-      surfaceId: scheduledItem.newTabGuid,
+      surfaceId: scheduledItem.scheduledSurfaceGuid,
       scheduledDate: DateTime.fromJSDate(scheduledItem.scheduledDate).toFormat(
         'yyyy-MM-dd'
       ),

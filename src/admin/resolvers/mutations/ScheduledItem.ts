@@ -3,13 +3,13 @@ import {
   createScheduledItem as dbCreateScheduledItem,
 } from '../../../database/mutations';
 import { ScheduledItem } from '../../../database/types';
-import { newTabAllowedValues } from '../../../shared/types';
+import { scheduledSurfaceAllowedValues } from '../../../shared/types';
 import { ScheduledCorpusItemEventType } from '../../../events/types';
 import { UserInputError } from 'apollo-server';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 
 /**
- * Deletes an item from the New Tab schedule.
+ * Deletes an item from the Scheduled Surface schedule.
  *
  * @param parent
  * @param data
@@ -35,9 +35,9 @@ export async function createScheduledItem(
   { data },
   context
 ): Promise<ScheduledItem> {
-  if (!newTabAllowedValues.includes(data.newTabGuid)) {
+  if (!scheduledSurfaceAllowedValues.includes(data.scheduledSurfaceGuid)) {
     throw new UserInputError(
-      `Cannot create a scheduled entry with New Tab GUID of "${data.newTabGuid}".`
+      `Cannot create a scheduled entry with Scheduled Surface GUID of "${data.scheduledSurfaceGuid}".`
     );
   }
 
@@ -59,7 +59,7 @@ export async function createScheduledItem(
     ) {
       throw new UserInputError(
         `This story is already scheduled to appear on ${
-          data.newTabGuid
+          data.scheduledSurfaceGuid
         } on ${data.scheduledDate.toLocaleString('en-US', {
           dateStyle: 'medium',
         })}.`

@@ -2,7 +2,7 @@ import { ScheduledSurfaceItem } from '../../../database/types';
 import { getItemsForScheduledSurface as dbGetItemsForScheduledSurface } from '../../../database/queries';
 
 /**
- * Pulls in scheduled items for a given date and surface (e.g., EN_US New Tab).
+ * Pulls in scheduled items for a given date and surface (e.g., NEW_TAB_EN_US).
  *
  * @param parent
  * @param args

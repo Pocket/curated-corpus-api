@@ -15,14 +15,14 @@ describe('queries: ScheduledSurface', () => {
   });
 
   describe('scheduledSurface query', () => {
-    it('should get New Tab metadata for a given GUID', async () => {
+    it('should get Scheduled Surface metadata for a given GUID', async () => {
       const { data } = await server.executeOperation({
         query: GET_SCHEDULED_SURFACE,
-        variables: { id: 'EN_GB' },
+        variables: { id: 'NEW_TAB_EN_GB' },
       });
 
-      expect(data?.scheduledSurface.id).to.equal('EN_GB');
-      expect(data?.scheduledSurface.name).to.equal('en-GB');
+      expect(data?.scheduledSurface.id).to.equal('NEW_TAB_EN_GB');
+      expect(data?.scheduledSurface.name).to.equal('New Tab (en-GB)');
     });
   });
 

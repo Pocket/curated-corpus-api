@@ -11,7 +11,7 @@ const db = new PrismaClient();
 
 describe('createScheduledItemHelper', () => {
   let approvedItem: ApprovedItem;
-  let newTabGuid: string;
+  let scheduledSurfaceGuid: string;
 
   beforeEach(async () => {
     await clearDb(db);
@@ -19,7 +19,7 @@ describe('createScheduledItemHelper', () => {
     approvedItem = await createApprovedItemHelper(db, {
       title: 'What even is time?',
     });
-    newTabGuid = 'DE_DE';
+    scheduledSurfaceGuid = 'NEW_TAB_DE_DE';
   });
 
   afterAll(async () => {
@@ -29,14 +29,14 @@ describe('createScheduledItemHelper', () => {
   it('should create a scheduled item with required props supplied', async () => {
     const data: CreateScheduledItemHelperInput = {
       approvedItem,
-      newTabGuid,
+      scheduledSurfaceGuid: scheduledSurfaceGuid,
     };
 
     const item: ScheduledItem = await createScheduledItemHelper(db, data);
 
     // Expect to see the data we passed to the helper
     expect(item.approvedItemId).toBe(approvedItem.id);
-    expect(item.newTabGuid).toBe(newTabGuid);
+    expect(item.scheduledSurfaceGuid).toBe(scheduledSurfaceGuid);
 
     // Expect to see the remaining fields filled in for us
     expect(item.createdBy).toBeTruthy();
@@ -48,14 +48,14 @@ describe('createScheduledItemHelper', () => {
       createdBy: faker.fake('auth-provider|test@example.com'),
       scheduledDate: '2022-01-01T00:00:00.000Z',
       approvedItem,
-      newTabGuid,
+      scheduledSurfaceGuid: scheduledSurfaceGuid,
     };
 
     const item: ScheduledItem = await createScheduledItemHelper(db, data);
 
     // Expect to see everything as specified to the helper
     expect(item.approvedItemId).toBe(approvedItem.id);
-    expect(item.newTabGuid).toBe(newTabGuid);
+    expect(item.scheduledSurfaceGuid).toBe(scheduledSurfaceGuid);
     expect(item.createdBy).toBe(data.createdBy);
     expect(item.scheduledDate.toISOString()).toBe(data.scheduledDate);
   });

@@ -37,7 +37,7 @@ describe('mutations: ScheduledItem', () => {
   });
 
   describe('createScheduledCuratedCorpusItem mutation', () => {
-    it('should fail on invalid New Tab Feed ID', async () => {
+    it('should fail on invalid Scheduled Surface GUID', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
       eventEmitter.on(ScheduledCorpusItemEventType.ADD_SCHEDULE, eventTracker);
@@ -47,7 +47,7 @@ describe('mutations: ScheduledItem', () => {
       });
       const input: CreateScheduledItemInput = {
         approvedItemExternalId: approvedItem.externalId,
-        newTabGuid: 'RECSAPI',
+        scheduledSurfaceGuid: 'RECSAPI',
         scheduledDate: '2100-01-01',
       };
 
@@ -62,7 +62,7 @@ describe('mutations: ScheduledItem', () => {
       // And there is the correct error from the resolvers
       if (result.errors) {
         expect(result.errors[0].message).to.contain(
-          `Cannot create a scheduled entry with New Tab GUID of "RECSAPI".`
+          `Cannot create a scheduled entry with Scheduled Surface GUID of "RECSAPI".`
         );
         expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
       }
@@ -78,7 +78,7 @@ describe('mutations: ScheduledItem', () => {
 
       const input: CreateScheduledItemInput = {
         approvedItemExternalId: 'not-a-valid-id-at-all',
-        newTabGuid: 'EN_US',
+        scheduledSurfaceGuid: 'NEW_TAB_EN_US',
         scheduledDate: '2100-01-01',
       };
 
@@ -103,7 +103,7 @@ describe('mutations: ScheduledItem', () => {
       expect(eventTracker.callCount).to.equal(0);
     });
 
-    it('should fail if story is already scheduled for given New Tab/date combination', async () => {
+    it('should fail if story is already scheduled for given Scheduled Surface/date combination', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
       eventEmitter.on(ScheduledCorpusItemEventType.ADD_SCHEDULE, eventTracker);
@@ -116,7 +116,7 @@ describe('mutations: ScheduledItem', () => {
       // create a scheduled entry for this item
       const existingScheduledEntry = await createScheduledItemHelper(db, {
         approvedItem: item,
-        newTabGuid: 'EN_US',
+        scheduledSurfaceGuid: 'NEW_TAB_EN_US',
       });
 
       // This is the date format for the GraphQL mutation.
@@ -134,7 +134,7 @@ describe('mutations: ScheduledItem', () => {
       // as the scheduled entry created above.
       const input: CreateScheduledItemInput = {
         approvedItemExternalId: item.externalId,
-        newTabGuid: existingScheduledEntry.newTabGuid,
+        scheduledSurfaceGuid: existingScheduledEntry.scheduledSurfaceGuid,
         scheduledDate,
       };
 
@@ -148,7 +148,7 @@ describe('mutations: ScheduledItem', () => {
       // Expecting to see a custom error message from the resolver
       if (result.errors) {
         expect(result.errors[0].message).to.contain(
-          `This story is already scheduled to appear on EN_US on ${displayDate}.`
+          `This story is already scheduled to appear on NEW_TAB_EN_US on ${displayDate}.`
         );
         expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
       }
@@ -168,7 +168,7 @@ describe('mutations: ScheduledItem', () => {
 
       const input: CreateScheduledItemInput = {
         approvedItemExternalId: approvedItem.externalId,
-        newTabGuid: 'EN_US',
+        scheduledSurfaceGuid: 'NEW_TAB_EN_US',
         scheduledDate: '2100-01-01',
       };
 
@@ -253,7 +253,7 @@ describe('mutations: ScheduledItem', () => {
       expect(eventTracker.callCount).to.equal(0);
     });
 
-    it('should delete an item scheduled for New Tab and return deleted data', async () => {
+    it('should delete an item scheduled for a Scheduled Surface and return deleted data', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
       eventEmitter.on(
@@ -266,7 +266,7 @@ describe('mutations: ScheduledItem', () => {
       });
 
       const scheduledItem = await createScheduledItemHelper(db, {
-        newTabGuid: 'EN_US',
+        scheduledSurfaceGuid: 'NEW_TAB_EN_US',
         approvedItem,
       });
 

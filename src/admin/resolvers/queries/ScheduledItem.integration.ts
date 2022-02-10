@@ -29,7 +29,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
           title: `Batch 1, Story #${i + 1}`,
         });
         await createScheduledItemHelper(db, {
-          newTabGuid: 'EN_US',
+          scheduledSurfaceGuid: 'NEW_TAB_EN_US',
           approvedItem,
           scheduledDate: new Date('2050-01-01').toISOString(),
         });
@@ -41,7 +41,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
           title: `Batch 2, Story #${i + 1}`,
         });
         await createScheduledItemHelper(db, {
-          newTabGuid: 'EN_US',
+          scheduledSurfaceGuid: 'NEW_TAB_EN_US',
           approvedItem,
           scheduledDate: new Date('2025-05-05').toISOString(),
         });
@@ -53,7 +53,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
         query: GET_SCHEDULED_ITEMS,
         variables: {
           filters: {
-            newTabGuid: 'EN_US',
+            scheduledSurfaceGuid: 'NEW_TAB_EN_US',
             startDate: '2000-01-01',
             endDate: '2050-12-31',
           },
@@ -75,7 +75,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
         query: GET_SCHEDULED_ITEMS,
         variables: {
           filters: {
-            newTabGuid: 'EN_US',
+            scheduledSurfaceGuid: 'NEW_TAB_EN_US',
             startDate: '2000-01-01',
             endDate: '2050-12-31',
           },
@@ -118,7 +118,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
         query: GET_SCHEDULED_ITEMS,
         variables: {
           filters: {
-            newTabGuid: 'EN_US',
+            scheduledSurfaceGuid: 'NEW_TAB_EN_US',
             startDate: '2000-01-01',
             endDate: '2050-12-31',
           },
@@ -139,14 +139,14 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       expect(resultArray[1].scheduledDate).to.equal('2050-01-01');
     });
 
-    it('should fail on non-existent New Tab ID', async () => {
+    it('should fail on non-existent Scheduled Surface GUID', async () => {
       const invalidId = 'not-a-valid-id-by-any-means';
 
       const result = await server.executeOperation({
         query: GET_SCHEDULED_ITEMS,
         variables: {
           filters: {
-            newTabGuid: invalidId,
+            scheduledSurfaceGuid: invalidId,
             startDate: '2000-01-01',
             endDate: '2050-12-31',
           },

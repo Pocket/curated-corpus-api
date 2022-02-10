@@ -17,7 +17,7 @@ import { ScheduledItemSnowplowHandler } from './ScheduledItemSnowplowHandler';
 import { tracker } from './tracker';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 import { getUnixTimestamp } from '../../shared/utils';
-import { getNewTabByGuid, Topics } from '../../shared/types';
+import { getScheduledSurfaceByGuid, Topics } from '../../shared/types';
 import { ScheduledItem } from '../../database/types';
 
 /**
@@ -28,7 +28,7 @@ const scheduledCorpusItem: ScheduledItem = {
   id: 789,
   externalId: '789-xyz',
   approvedItemId: 123,
-  newTabGuid: 'EN_US',
+  scheduledSurfaceGuid: 'NEW_TAB_EN_US',
   scheduledDate: new Date('2030-01-01'),
   createdAt: new Date(),
   createdBy: 'Amy',
@@ -75,10 +75,12 @@ function assertValidSnowplowScheduledItemEvents(data) {
         url: scheduledCorpusItem.approvedItem.url,
 
         scheduled_at: getUnixTimestamp(scheduledCorpusItem.scheduledDate),
-        new_tab_id: scheduledCorpusItem.newTabGuid,
-        new_tab_name: getNewTabByGuid(scheduledCorpusItem.newTabGuid)?.name,
-        new_tab_feed_utc_offset: getNewTabByGuid(
-          scheduledCorpusItem.newTabGuid
+        new_tab_id: scheduledCorpusItem.scheduledSurfaceGuid,
+        new_tab_name: getScheduledSurfaceByGuid(
+          scheduledCorpusItem.scheduledSurfaceGuid
+        )?.name,
+        new_tab_feed_utc_offset: getScheduledSurfaceByGuid(
+          scheduledCorpusItem.scheduledSurfaceGuid
         )?.utcOffset.toString(),
         created_at: getUnixTimestamp(scheduledCorpusItem.createdAt),
         created_by: scheduledCorpusItem.createdBy,

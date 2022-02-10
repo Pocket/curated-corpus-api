@@ -33,7 +33,7 @@ export type ReviewedCorpusItemPayload = {
   reviewedCorpusItem: ApprovedItem | RejectedCuratedCorpusItem;
 };
 
-// Data for the events that are fired on updates to New Tab schedule
+// Data for the events that are fired on updates to Scheduled Surface schedule
 export type ScheduledCorpusItemPayload = {
   scheduledCorpusItem: ScheduledItem;
 };
