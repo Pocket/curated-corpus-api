@@ -29,7 +29,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
           title: `Batch 1, Story #${i + 1}`,
         });
         await createScheduledItemHelper(db, {
-          newTabGuid: 'EN_US',
+          scheduledSurfaceGuid: 'NEW_TAB_EN_US',
           approvedItem,
           scheduledDate: new Date('2050-01-01').toISOString(),
         });
@@ -41,7 +41,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
           title: `Batch 2, Story #${i + 1}`,
         });
         await createScheduledItemHelper(db, {
-          newTabGuid: 'EN_US',
+          scheduledSurfaceGuid: 'NEW_TAB_EN_US',
           approvedItem,
           scheduledDate: new Date('2025-05-05').toISOString(),
         });
@@ -52,7 +52,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       const result = await server.executeOperation({
         query: GET_SCHEDULED_SURFACE_WITH_ITEMS,
         variables: {
-          id: 'EN_US',
+          id: 'NEW_TAB_EN_US',
           date: '2050-01-01',
         },
       });
@@ -68,7 +68,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       const result = await server.executeOperation({
         query: GET_SCHEDULED_SURFACE_WITH_ITEMS,
         variables: {
-          id: 'EN_US',
+          id: 'NEW_TAB_EN_US',
           date: '2025-05-05',
         },
       });
@@ -81,7 +81,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
 
       // Scalar properties of the first item
       expect(item.id).not.to.be.null;
-      expect(item.surfaceId).to.equal('EN_US');
+      expect(item.surfaceId).to.equal('NEW_TAB_EN_US');
       expect(item.scheduledDate).to.equal('2025-05-05');
 
       // The underlying Corpus Item
@@ -98,7 +98,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       const result = await server.executeOperation({
         query: GET_SCHEDULED_SURFACE_WITH_ITEMS,
         variables: {
-          id: 'EN_US',
+          id: 'NEW_TAB_EN_US',
           date: '2100-02-02',
         },
       });

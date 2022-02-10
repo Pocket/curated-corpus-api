@@ -1,5 +1,5 @@
 import { ScheduledSurface } from '../../../database/types';
-import { NewTabs } from '../../../shared/types';
+import { ScheduledSurfaces } from '../../../shared/types';
 import { UserInputError } from 'apollo-server';
 
 /**
@@ -13,19 +13,19 @@ export async function getScheduledSurface(
   const { id } = args;
 
   // Data retrieval is super simple here given that we store shared data,
-  // such as New Tab values, as hardcoded values at the moment.
-  const newTab = NewTabs.find((newTab) => {
-    return newTab.guid === id;
+  // such as Scheduled Surface values, as hardcoded values at the moment.
+  const surface = ScheduledSurfaces.find((surface) => {
+    return surface.guid === id;
   });
 
-  if (!newTab) {
+  if (!surface) {
     throw new UserInputError(
       `Could not find Scheduled Surface with id of "${id}".`
     );
   }
 
   return {
-    id: newTab.guid,
-    name: newTab.name,
+    id: surface.guid,
+    name: surface.name,
   };
 }

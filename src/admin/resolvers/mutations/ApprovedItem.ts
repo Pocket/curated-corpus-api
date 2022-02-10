@@ -13,14 +13,14 @@ import {
 } from '../../../events/types';
 import { uploadImageToS3 } from '../../aws/upload';
 import {
-  newTabAllowedValues,
+  scheduledSurfaceAllowedValues,
   ApprovedItemS3ImageUrl,
 } from '../../../shared/types';
 import { CreateRejectedItemInput } from '../../../database/types';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
- * created item to go onto New Tab for the date provided.
+ * created item to go onto Scheduled Surface for the date provided.
  *
  * @param parent
  * @param data
@@ -32,15 +32,15 @@ export async function createApprovedItem(
   { data },
   context
 ): Promise<ApprovedItem> {
-  const { scheduledDate, newTabGuid, ...approvedItemData } = data;
+  const { scheduledDate, scheduledSurfaceGuid, ...approvedItemData } = data;
 
   if (
     scheduledDate &&
-    newTabGuid &&
-    !newTabAllowedValues.includes(newTabGuid)
+    scheduledSurfaceGuid &&
+    !scheduledSurfaceAllowedValues.includes(scheduledSurfaceGuid)
   ) {
     throw new UserInputError(
-      `Cannot create a scheduled entry with New Tab GUID of "${data.newTabGuid}".`
+      `Cannot create a scheduled entry with Scheduled Surface GUID of "${data.scheduledSurfaceGuid}".`
     );
   }
 
@@ -51,13 +51,13 @@ export async function createApprovedItem(
     approvedItem
   );
 
-  if (scheduledDate && newTabGuid) {
+  if (scheduledDate && scheduledSurfaceGuid) {
     // Note that we create a scheduled item but don't return it
     // in the mutation response. Need to evaluate if we do need to return it
     // alongside the approved item.
     const scheduledItem = await createScheduledItem(context.db, {
       approvedItemExternalId: approvedItem.externalId,
-      newTabGuid,
+      scheduledSurfaceGuid,
       scheduledDate,
     });
 

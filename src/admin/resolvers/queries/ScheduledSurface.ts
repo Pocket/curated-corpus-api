@@ -1,23 +1,23 @@
 import {
   AccessGroupToScheduledSurfaceMap,
   MozillaAccessGroup,
-  NewTab,
-  NewTabs,
+  ScheduledSurface,
+  ScheduledSurfaces,
 } from '../../../shared/types';
 
 /**
- * This query retrieves new tabs available to the given SSO user
+ * This query retrieves Scheduled Surfaces available to the given SSO user
  *
  * @param parent
  * @param args
  * @param db
  */
-export function getNewTabsForUser(
+export function getScheduledSurfacesForUser(
   parent,
   args,
   { authenticatedUser }
-): NewTab[] {
-  let scheduledSurfaces: NewTab[] = [];
+): ScheduledSurface[] {
+  let scheduledSurfaces: ScheduledSurface[] = [];
 
   // Return all scheduled surfaces for users with full access to the tool
   // and read-only users (otherwise the latter won't see anything???)
@@ -29,7 +29,7 @@ export function getNewTabsForUser(
   ) {
     // Somehow it doesn't seem right to be returning the entire shared data array
     // without assigning it to a variable first
-    scheduledSurfaces = NewTabs;
+    scheduledSurfaces = ScheduledSurfaces;
     // Return early - there is no need for extra access checks.
     return scheduledSurfaces;
   }

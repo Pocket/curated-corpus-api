@@ -205,7 +205,7 @@ describe('mutations: ApprovedItem', () => {
 
       // extra inputs
       input.scheduledDate = '2100-01-01';
-      input.newTabGuid = 'EN_US';
+      input.scheduledSurfaceGuid = 'NEW_TAB_EN_US';
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
@@ -221,7 +221,7 @@ describe('mutations: ApprovedItem', () => {
       // We only return the approved item here, so need to purge the scheduling
       // input values from the input before comparison.
       delete input.scheduledDate;
-      delete input.newTabGuid;
+      delete input.scheduledSurfaceGuid;
       expect(result.data?.createApprovedCuratedCorpusItem).to.deep.include(
         input
       );
@@ -255,14 +255,14 @@ describe('mutations: ApprovedItem', () => {
       ).to.not.be.null;
     });
 
-    it('should not create a scheduled entry for an approved item with invalid New Tab id supplied', async () => {
+    it('should not create a scheduled entry for an approved item with invalid Scheduled Surface GUID supplied', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
       eventEmitter.on(ReviewedCorpusItemEventType.ADD_ITEM, eventTracker);
 
       // extra inputs
       input.scheduledDate = '2100-01-01';
-      input.newTabGuid = 'RECSAPI';
+      input.scheduledSurfaceGuid = 'RECSAPI';
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
@@ -276,7 +276,7 @@ describe('mutations: ApprovedItem', () => {
       // And there is the right error from the resolvers
       if (result.errors) {
         expect(result.errors[0].message).to.contain(
-          `Cannot create a scheduled entry with New Tab GUID of "${input.newTabGuid}".`
+          `Cannot create a scheduled entry with Scheduled Surface GUID of "${input.scheduledSurfaceGuid}".`
         );
         expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
       }
@@ -432,7 +432,7 @@ describe('mutations: ApprovedItem', () => {
       expect(eventTracker.callCount).to.equal(0);
     });
 
-    it('should fail if approved item has New Tab scheduled entries', async () => {
+    it('should fail if approved item has Scheduled Surface scheduled entries', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
       eventEmitter.on(ReviewedCorpusItemEventType.REMOVE_ITEM, eventTracker);
@@ -444,11 +444,11 @@ describe('mutations: ApprovedItem', () => {
         language: 'en',
       });
 
-      // Add an entry to a New Tab - approved item now can't be deleted
+      // Add an entry to a Scheduled Surface - approved item now can't be deleted
       // for data integrity reasons.
       await createScheduledItemHelper(db, {
         approvedItem: item,
-        newTabGuid: 'EN_US',
+        scheduledSurfaceGuid: 'NEW_TAB_EN_US',
       });
 
       const input: RejectApprovedItemInput = {

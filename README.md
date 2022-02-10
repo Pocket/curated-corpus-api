@@ -3,7 +3,7 @@
 The Curated Corpus API serves three primary functions:
 
 1. Allow our editorial team to manage both an approved corpus and a rejected corpus.
-2. Allow our editorial team to schedule approved corpus items across a number of Firefox New Tabs.
+2. Allow our editorial team to schedule approved corpus items across a number of Scheduled Surfaces (e.g. Firefox New Tab).
 3. Allow the ML team access to approved corpus items for eventual display on Pocket surfaces.
 
 The corpus is managed by editors through our [curation admin tools](https://github.com/Pocket/curation-admin-tools). These tools allow editors to customize meta information about approved items - title, excerpt, image, etc. The approved corpus is the authoritative source for this meta information (_not_ the [Parser](https://github.com/Pocket/Parser)).
@@ -15,12 +15,12 @@ Items in the approved corpus are available to be recommended across Pocket surfa
 ## Application Overview
 
 This app is a GraphQL API written in TypeScript. To serve the API, the following packages are used:
+
 - [Express](https://expressjs.com/) and [Apollo Server](https://www.apollographql.com/docs/apollo-server/),
 - [Prisma](https://www.prisma.io/) as an ORM to a MySQL relational database,
 - [prisma-relay-cursor-connection](https://github.com/devoxa/prisma-relay-cursor-connection) for Relay-style pagination,
 - S3 for image storage,
 - [Jest](https://jestjs.io/) and [Chai](https://www.chaijs.com/) for integration and unit testing.
-
 
 ### GraphQL Schemas
 
@@ -36,7 +36,7 @@ Having two schemas means we need two GraphQL endpoints, meaning two Apollo Serve
 
 ### Pagination
 
-This API implements [Relay-style pagination](https://relay.dev/graphql/connections.htm) with the assistance of the [prisma-relay-cursor-connection](https://github.com/devoxa/prisma-relay-cursor-connection) package. 
+This API implements [Relay-style pagination](https://relay.dev/graphql/connections.htm) with the assistance of the [prisma-relay-cursor-connection](https://github.com/devoxa/prisma-relay-cursor-connection) package.
 
 It is important that the `PageInfo` type and the `PaginationInput` in the shared GraphQL schema do not deviate from implementations in our other federated APIs. In other words, please leave them exactly as they were initially implemented (this includes accompanying comments) to avoid schema composition errors.
 
@@ -62,20 +62,24 @@ cd curated-corpus-api
 ```
 
 Generate the Prisma types (they will live in your `node_modules` folder):
+
 ```bash
 npx prisma generate
 ```
 
 Start Docker:
+
 ```bash
 docker compose up
 ```
 
 Once all the Docker containers are up and running, you should be able to reach
+
 - the public API at `http://localhost:4025/`
 - the admin API at `http://localhost:4025/admin`
 
 Out of the box, the local installation doesn't have any actual data for you to fetch or manipulate through the API. To seed some sample data for your local dev environment, run
+
 ```bash
 docker compose exec app npx prisma migrate reset
 ```
@@ -87,24 +91,29 @@ Note that the above command will not be adding to any data you may have added to
 So far we only have integration tests in this repository, and these wipe the database on each run, which means it's ~really tricky~ impossible as yet to have them running in the background in watch mode while you code.
 
 To run integration tests inside Docker, execute the following command:
+
 ```bash
 docker compose exec app npm run test-integrations
 ```
 
 To run these tests in watch mode, use
+
 ```bash
 docker compose exec app npm run test-integration:watch
 ```
 
 If you'd like to be able to run and debug integration tests directly in your IDE, run the following command (note that it may prompt you for your `sudo` password to modify your `/etc/hosts` file):
+
 ```bash
 npm run test-setup
 ```
 
-Thereafter, you can use 
+Thereafter, you can use
+
 ```bash
 npm run test-integrations
 ```
+
 on the command line or use your IDE to debug individual tests and test suites.
 
 ## Making changes to the Prisma schema
@@ -116,7 +125,6 @@ docker compose exec app npx prisma migrate dev --name some_meaningful_migration_
 ```
 
 This will create a migration script in `prisma/migrations` and will automatically run the new migration. This will also re-create your Prisma Typescript types.
-
 
 ## Testing on Dev
 
@@ -143,9 +151,11 @@ At the initial deployment, and also from time to time as the API evolves, it is 
 - Make sure you've run `npm ci` locally (outside of Docker).
 - Log in to AWS to find the Dev database connection URL. Look in the Secrets Manager - there will be the full DB URL stored there alongside individual DB connection parameters such as username and password.
 - Put that connection in your local environment file (`PATH_TO_REPOSITORY/.env`) as
+
 ```dotenv
 DATABASE_URL=[DB_URL_FROM_SECRETS_MANAGER]
 ```
+
 - Authenticate to Dev AWS in your terminal using `$(maws)`.
 - Connect to Pocket VPN Dev.
 - Run `npx prisma migrate reset` in your local terminal. This should use the Dev database connection URL as the target.

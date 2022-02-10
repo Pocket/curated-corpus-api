@@ -3,9 +3,10 @@ export enum ProspectType {
   GLOBAL = 'GLOBAL',
   ORGANIC_TIMESPENT = 'ORGANIC_TIMESPENT',
   SYNDICATED = 'SYNDICATED',
+  TOP_SAVED = 'TOP_SAVED',
 }
 
-export type NewTab = {
+export type ScheduledSurface = {
   name: string;
   guid: string;
   utcOffset: number;
@@ -16,10 +17,10 @@ export type ApprovedItemS3ImageUrl = {
   url: string;
 };
 
-export const NewTabs: NewTab[] = [
+export const ScheduledSurfaces: ScheduledSurface[] = [
   {
-    name: 'en-US',
-    guid: 'EN_US',
+    name: 'New Tab (en-US)',
+    guid: 'NEW_TAB_EN_US',
     utcOffset: -500,
     prospectTypes: [
       ProspectType.GLOBAL,
@@ -28,32 +29,50 @@ export const NewTabs: NewTab[] = [
     ],
   },
   {
-    name: 'de-DE',
-    guid: 'DE_DE',
+    name: 'New Tab (de-DE)',
+    guid: 'NEW_TAB_DE_DE',
     utcOffset: 100,
     prospectTypes: [ProspectType.GLOBAL, ProspectType.ORGANIC_TIMESPENT],
   },
   {
-    name: 'en-GB',
-    guid: 'EN_GB',
+    name: 'New Tab (en-GB)',
+    guid: 'NEW_TAB_EN_GB',
     utcOffset: 0,
     prospectTypes: [ProspectType.GLOBAL, ProspectType.ORGANIC_TIMESPENT],
   },
   {
-    name: 'en-INTL',
-    guid: 'EN_INTL',
+    name: 'New Tab (en-INTL)',
+    guid: 'NEW_TAB_EN_INTL',
     utcOffset: 530,
     prospectTypes: [ProspectType.GLOBAL, ProspectType.ORGANIC_TIMESPENT],
+  },
+  {
+    name: 'Pocket Hits (en-US)',
+    guid: 'POCKET_HITS_EN_US',
+    utcOffset: -500,
+    prospectTypes: [ProspectType.TOP_SAVED],
+  },
+  {
+    name: 'Pocket Hits (de-DE)',
+    guid: 'POCKET_HITS_DE_DE',
+    utcOffset: 100,
+    prospectTypes: [ProspectType.TOP_SAVED],
   },
 ];
 
 // Useful, cut down versions of the above
-export const newTabAllowedValues = NewTabs.map((newTab) => {
-  return newTab.guid;
-});
+export const scheduledSurfaceAllowedValues = ScheduledSurfaces.map(
+  (surface) => {
+    return surface.guid;
+  }
+);
 
-export const getNewTabByGuid = (guid: string): NewTab | undefined => {
-  return NewTabs.find((newTab: NewTab) => newTab.guid === guid);
+export const getScheduledSurfaceByGuid = (
+  guid: string
+): ScheduledSurface | undefined => {
+  return ScheduledSurfaces.find(
+    (surface: ScheduledSurface) => surface.guid === guid
+  );
 };
 
 export enum MozillaAccessGroup {
@@ -69,12 +88,26 @@ export enum MozillaAccessGroup {
 }
 
 export const AccessGroupToScheduledSurfaceMap: {
-  [key in MozillaAccessGroup]?: NewTab;
+  [key in MozillaAccessGroup]?: ScheduledSurface;
 } = {
-  [MozillaAccessGroup.NEW_TAB_CURATOR_ENUS]: getNewTabByGuid('EN_US'),
-  [MozillaAccessGroup.NEW_TAB_CURATOR_DEDE]: getNewTabByGuid('DE_DE'),
-  [MozillaAccessGroup.NEW_TAB_CURATOR_ENGB]: getNewTabByGuid('EN_GB'),
-  [MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL]: getNewTabByGuid('EN_INTL'),
+  [MozillaAccessGroup.NEW_TAB_CURATOR_ENUS]:
+    getScheduledSurfaceByGuid('NEW_TAB_EN_US'),
+  [MozillaAccessGroup.NEW_TAB_CURATOR_DEDE]:
+    getScheduledSurfaceByGuid('NEW_TAB_DE_DE'),
+  [MozillaAccessGroup.NEW_TAB_CURATOR_ENGB]:
+    getScheduledSurfaceByGuid('NEW_TAB_EN_GB'),
+  [MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL]:
+    getScheduledSurfaceByGuid('NEW_TAB_EN_INTL'),
+  [MozillaAccessGroup.NEW_TAB_CURATOR_ENGB]:
+    getScheduledSurfaceByGuid('NEW_TAB_EN_GB'),
+  [MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL]:
+    getScheduledSurfaceByGuid('NEW_TAB_EN_INTL'),
+  [MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE]: getScheduledSurfaceByGuid(
+    'POCKET_HITS_CURATOR_DEDE'
+  ),
+  [MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS]: getScheduledSurfaceByGuid(
+    'POCKET_HITS_CURATOR_ENUS'
+  ),
 };
 
 export enum Topics {

@@ -23,7 +23,10 @@ async function main() {
     const approvedItem = await createApprovedItemHelper(prisma, { title });
 
     await createScheduledItemHelper(prisma, {
-      newTabGuid: faker.random.arrayElement(['EN_US', 'DE_DE']),
+      scheduledSurfaceGuid: faker.random.arrayElement([
+        'NEW_TAB_EN_US',
+        'NEW_TAB_DE_DE',
+      ]),
       approvedItem,
     }).catch(console.error);
   }

@@ -4,7 +4,7 @@ import { GET_SCHEDULED_SURFACES_FOR_USER } from './sample-queries.gql';
 import { MozillaAccessGroup } from '../../../shared/types';
 
 describe('queries: ScheduledSurface', () => {
-  describe('getNewTabsForUser query', () => {
+  describe('getScheduledSurfacesForUser query', () => {
     it('should return all available surfaces for read-only users', async () => {
       const headers = {
         name: 'Test User',
@@ -19,9 +19,9 @@ describe('queries: ScheduledSurface', () => {
         query: GET_SCHEDULED_SURFACES_FOR_USER,
       });
 
-      const scheduledSurfaces = data?.getNewTabsForUser;
+      const scheduledSurfaces = data?.getScheduledSurfacesForUser;
 
-      expect(scheduledSurfaces).to.have.lengthOf(4);
+      expect(scheduledSurfaces).to.have.lengthOf(6);
 
       scheduledSurfaces.forEach((scheduledSurface) => {
         expect(scheduledSurface.guid).not.to.be.undefined;
@@ -47,9 +47,9 @@ describe('queries: ScheduledSurface', () => {
         query: GET_SCHEDULED_SURFACES_FOR_USER,
       });
 
-      const scheduledSurfaces = data?.getNewTabsForUser;
+      const scheduledSurfaces = data?.getScheduledSurfacesForUser;
 
-      expect(scheduledSurfaces).to.have.lengthOf(4);
+      expect(scheduledSurfaces).to.have.lengthOf(6);
 
       scheduledSurfaces.forEach((scheduledSurface) => {
         expect(scheduledSurface.guid).not.to.be.undefined;
@@ -61,7 +61,7 @@ describe('queries: ScheduledSurface', () => {
       await server.stop();
     });
 
-    it('should return a single new tab for users with access to one new tab', async () => {
+    it('should return a single surface for users with access to one scheduled surface', async () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
@@ -75,15 +75,15 @@ describe('queries: ScheduledSurface', () => {
         query: GET_SCHEDULED_SURFACES_FOR_USER,
       });
 
-      const scheduledSurfaces = data?.getNewTabsForUser;
+      const scheduledSurfaces = data?.getScheduledSurfacesForUser;
 
       expect(scheduledSurfaces).to.have.lengthOf(1);
-      expect(scheduledSurfaces[0].guid).to.equal('EN_US');
+      expect(scheduledSurfaces[0].guid).to.equal('NEW_TAB_EN_US');
 
       await server.stop();
     });
 
-    it('should return a limited set of new tabs for users with limited new tab access', async () => {
+    it('should return a limited set of scheduled surfaces for users with limited scheduled surface access', async () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
@@ -97,11 +97,11 @@ describe('queries: ScheduledSurface', () => {
         query: GET_SCHEDULED_SURFACES_FOR_USER,
       });
 
-      const scheduledSurfaces = data?.getNewTabsForUser;
+      const scheduledSurfaces = data?.getScheduledSurfacesForUser;
 
       expect(scheduledSurfaces).to.have.lengthOf(2);
-      expect(scheduledSurfaces[0].guid).to.equal('EN_US');
-      expect(scheduledSurfaces[1].guid).to.equal('DE_DE');
+      expect(scheduledSurfaces[0].guid).to.equal('NEW_TAB_EN_US');
+      expect(scheduledSurfaces[1].guid).to.equal('NEW_TAB_DE_DE');
 
       await server.stop();
     });
@@ -120,7 +120,7 @@ describe('queries: ScheduledSurface', () => {
         query: GET_SCHEDULED_SURFACES_FOR_USER,
       });
 
-      const scheduledSurfaces = data?.getNewTabsForUser;
+      const scheduledSurfaces = data?.getScheduledSurfacesForUser;
 
       expect(scheduledSurfaces).to.have.lengthOf(0);
 

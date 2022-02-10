@@ -2,7 +2,7 @@ import { getScheduledItems as dbGetScheduledItems } from '../../../database/quer
 import { ScheduledItemsResult } from '../../../database/types';
 
 /**
- * Retrieves a list of Approved Items that are scheduled to appear on New Tab
+ * Retrieves a list of Approved Items that are scheduled to appear on a Scheduled Surface
  *
  */
 export async function getScheduledItems(

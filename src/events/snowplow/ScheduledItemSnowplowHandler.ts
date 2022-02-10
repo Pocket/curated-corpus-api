@@ -10,7 +10,7 @@ import {
   ScheduledCorpusItem,
 } from './schema';
 import { getUnixTimestamp } from '../../shared/utils';
-import { getNewTabByGuid } from '../../shared/types';
+import { getScheduledSurfaceByGuid } from '../../shared/types';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 
 type CuratedCorpusItemUpdateEvent = Omit<SelfDescribingJson, 'data'> & {
@@ -85,7 +85,7 @@ export class ScheduledItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
         scheduled_at: getUnixTimestamp(item.scheduledDate),
         url: item.approvedItem.url,
         approved_corpus_item_external_id: item.approvedItem.externalId,
-        new_tab_id: item.newTabGuid,
+        new_tab_id: item.scheduledSurfaceGuid,
         created_at: getUnixTimestamp(item.createdAt),
         created_by: item.createdBy,
         updated_at: getUnixTimestamp(item.updatedAt),
@@ -93,14 +93,16 @@ export class ScheduledItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       },
     };
 
-    // Get the NewTab info
-    const newTab = getNewTabByGuid(item.newTabGuid);
+    // Get the ScheduledSurface info
+    const scheduledSurface = getScheduledSurfaceByGuid(
+      item.scheduledSurfaceGuid
+    );
 
-    if (newTab) {
+    if (scheduledSurface) {
       context.data = {
         ...context.data,
-        new_tab_name: newTab.name,
-        new_tab_feed_utc_offset: newTab.utcOffset.toString(),
+        new_tab_name: scheduledSurface.name,
+        new_tab_feed_utc_offset: scheduledSurface.utcOffset.toString(),
       };
     }
 

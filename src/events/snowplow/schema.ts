@@ -1,3 +1,6 @@
+// TODO: ask kenny/d&l to update schema to reference scheduled surface instead of new tab,
+// then come back and update this file (and other related files, probably)
+
 // Helper types and enums used in the schema
 export type RejectionReason = { reason: string };
 
@@ -19,8 +22,8 @@ export type CuratedCorpusItemUpdate = {
     | 'reviewed_corpus_item_updated' // Item is updated in the corpus
     | 'reviewed_corpus_item_removed' // Item is removed from the approved corpus
     | 'reviewed_corpus_item_rejected' // Item is added to the rejected corpus
-    | 'scheduled_corpus_item_added' // Item is added to the new tab schedule
-    | 'scheduled_corpus_item_removed'; // Item is removed from the new tab schedule
+    | 'scheduled_corpus_item_added' // Item is added to the scheduled surface schedule
+    | 'scheduled_corpus_item_removed'; // Item is removed from the scheduled surface schedule
   object: 'reviewed_corpus_item' | 'scheduled_corpus_item';
 };
 
@@ -119,7 +122,7 @@ export type ReviewedCorpusItem = {
 };
 
 /**
- * A scheduled run in the new tab of a reviewed corpus item.
+ * A scheduled run in the scheduled surface of a reviewed corpus item.
  */
 export type ScheduledCorpusItem = {
   /**
@@ -128,8 +131,8 @@ export type ScheduledCorpusItem = {
    */
   object_version: ObjectVersion;
   /**
-   * A guid that identifies the new tab feed schedule, sometimes referred to
-   * as the new tab feed schedule's external_id.
+   * A guid that identifies the scheduled surface schedule, sometimes referred to
+   * as the scheduled surface schedule's external_id.
    */
   scheduled_corpus_item_external_id: string;
   /**
@@ -153,33 +156,33 @@ export type ScheduledCorpusItem = {
    */
   approved_corpus_item_external_id: string;
   /**
-   * A guid that identifies the new tab, e.g. 'EN_US'.
+   * A guid that identifies the scheduled surface, e.g. 'NEW_TAB_EN_US'.
    */
   new_tab_id: string;
   /**
-   * The name of the new tab feed.
+   * The name of the scheduled surface.
    */
   new_tab_name?: string;
   /**
-   * The time that the new tab feed is offset from UTC time.
+   * The time that the scheduled surface feed is offset from UTC time.
    */
   new_tab_feed_utc_offset?: string;
   /**
-   * The UTC unix timestamp (in seconds) for when the new tab feed schedule
+   * The UTC unix timestamp (in seconds) for when the scheduled surface schedule
    * was created.
    */
   created_at?: number;
   /**
-   * The curator who created the new tab feed schedule.
+   * The curator who created the scheduled surface schedule.
    */
   created_by?: string;
   /**
-   * The UTC unix timestamp (in seconds) for when the new tab feed schedule
+   * The UTC unix timestamp (in seconds) for when the scheduled surface schedule
    * was last updated.
    */
   updated_at?: number;
   /**
-   * The curator who most recently updated the new tab feed schedule.
+   * The curator who most recently updated the scheduled surface feed schedule.
    */
   updated_by?: string;
 };

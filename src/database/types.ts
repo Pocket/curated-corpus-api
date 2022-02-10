@@ -49,9 +49,9 @@ export type CreateApprovedItemInput = ApprovedItemRequiredInput & {
   isCollection: boolean;
   isSyndicated: boolean;
   // These are optional properties for approving AND scheduling the item
-  // on New Tab at the same time.
+  // on a Scheduled Surface at the same time.
   scheduledDate?: string;
-  newTabGuid?: string;
+  scheduledSurfaceGuid?: string;
 };
 
 export type UpdateApprovedItemInput = Omit<
@@ -89,7 +89,7 @@ export type ScheduledItemsResult = {
 };
 
 export type ScheduledItemFilterInput = {
-  newTabGuid: string;
+  scheduledSurfaceGuid: string;
   startDate: string;
   endDate: string;
 };
@@ -100,7 +100,7 @@ export type DeleteScheduledItemInput = {
 
 export type CreateScheduledItemInput = {
   approvedItemExternalId: string;
-  newTabGuid: string;
+  scheduledSurfaceGuid: string;
   scheduledDate: string;
 };
 
@@ -125,7 +125,7 @@ export type ScheduledSurfaceItem = {
 };
 
 export type ScheduledSurface = {
-  // This is `newTabGuid` in the DB schema and Admin API
+  // This is `scheduledSurfaceGuid` in the DB schema and Admin API
   id: string;
   name: string;
   items?: ScheduledSurfaceItem[];

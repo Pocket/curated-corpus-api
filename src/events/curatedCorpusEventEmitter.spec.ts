@@ -62,7 +62,7 @@ describe('CuratedCorpusEventEmitter', () => {
       id: 1234,
       externalId: '1234-abc',
       approvedItemId: 123,
-      newTabGuid: 'EN-US',
+      scheduledSurfaceGuid: 'NEW_TAB_EN_US',
       createdAt: new Date(),
       createdBy: '',
       updatedAt: new Date(),

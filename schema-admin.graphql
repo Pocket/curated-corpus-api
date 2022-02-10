@@ -72,22 +72,23 @@ enum ProspectType {
     GLOBAL
     ORGANIC_TIMESPENT
     SYNDICATED
+    TOP_SAVED
 }
 
 """
-A New Tab, including its associated Prospect Types.
+A Scheduled Surface, including its associated Prospect Types.
 """
-type NewTab {
+type ScheduledSurface {
     """
-    The GUID of the New Tab. Example: 'EN_US'.
+    The GUID of the Scheduled Surface. Example: 'NEW_TAB_EN_US'.
     """
     guid: String!
     """
-    The display name of the New Tab. Example 'en-US'.
+    The display name of the Scheduled Surface. Example 'New Tab (en-US)'.
     """
     name: String!
     """
-    The UTC offset of the New Tab's scheduling day, represented in HMM numeric format.
+    The UTC offset of the Scheduled Surface's scheduling day, represented in HMM numeric format.
     """
     utcOffset: Int!
     """
@@ -292,7 +293,7 @@ type RejectedCuratedCorpusItemConnection {
 }
 
 """
-A scheduled entry for an Approved Item to appear on a New Tab Feed.
+A scheduled entry for an Approved Item to appear on a Scheduled Surface.
 For example, a story that is scheduled to appear on December 31st, 2021 on the New Tab in Firefox for the US audience.
 """
 type ScheduledCuratedCorpusItem {
@@ -317,8 +318,8 @@ type ScheduledCuratedCorpusItem {
     """
     updatedBy: String
     """
-    The date the associated Approved Item is scheduled to appear on New Tab.
-    This date is relative to the time zone of the New Tab. Format: YYYY-MM-DD.
+    The date the associated Approved Item is scheduled to appear on a Scheduled Surface.
+    This date is relative to the time zone of the Scheduled Surface. Format: YYYY-MM-DD.
     """
     scheduledDate: Date!
     """
@@ -348,7 +349,7 @@ type ScheduledCuratedCorpusItemsResult {
     """
     totalCount: Int!
     """
-    An array of items for a given New Tab Feed
+    An array of items for a given Scheduled Surface
     """
     items: [ScheduledCuratedCorpusItem!]!
 }
@@ -404,13 +405,13 @@ input RejectedCuratedCorpusItemFilter {
 }
 
 """
-Available fields for filtering scheduled items for a given New Tab.
+Available fields for filtering scheduled items for a given Scheduled Surface.
 """
 input ScheduledCuratedCorpusItemsFilterInput {
     """
-    The GUID of the New Tab. Example: 'EN_US'.
+    The GUID of the Scheduled Surface. Example: 'NEW_TAB_EN_US'.
     """
-    newTabGuid: ID!
+    scheduledSurfaceGuid: ID!
     """
     Which day to show scheduled items from. Expects a date in YYYY-MM-DD format.
     """
@@ -422,7 +423,7 @@ input ScheduledCuratedCorpusItemsFilterInput {
 }
 
 """
-Input data for creating an Approved Item and optionally scheduling this item to appear on New Tab.
+Input data for creating an Approved Item and optionally scheduling this item to appear on a Scheduled Surface.
 """
 input CreateApprovedCuratedCorpusItemInput {
     """
@@ -476,13 +477,13 @@ input CreateApprovedCuratedCorpusItemInput {
     """
     isSyndicated: Boolean!
     """
-    Optionally, specify the date this item should be appearing on New Tab. Format: YYYY-MM-DD
+    Optionally, specify the date this item should be appearing on a Scheduled Surface. Format: YYYY-MM-DD
     """
     scheduledDate: Date
     """
-    Optionally, specify the GUID of the New Tab this item should be scheduled for.
+    Optionally, specify the GUID of the Scheduled Surface this item should be scheduled for.
     """
-    newTabGuid: ID
+    scheduledSurfaceGuid: ID
 }
 
 """
@@ -579,7 +580,7 @@ input CreateRejectedCuratedCorpusItemInput {
 }
 
 """
-Input data for creating a scheduled entry for an Approved Item on a New Tab Feed.
+Input data for creating a scheduled entry for an Approved Item on a Scheduled Surface.
 """
 input CreateScheduledCuratedCorpusItemInput {
     """
@@ -587,17 +588,17 @@ input CreateScheduledCuratedCorpusItemInput {
     """
     approvedItemExternalId: ID!
     """
-    The GUID of the New Tab Feed the Approved Item is going to appear on. Example: 'EN_US'.
+    The GUID of the Scheduled Surface the Approved Item is going to appear on. Example: 'NEW_TAB_EN_US'.
     """
-    newTabGuid: ID!
+    scheduledSurfaceGuid: ID!
     """
-    The date the associated Approved Item is scheduled to appear on New Tab. Format: YYYY-MM-DD.
+    The date the associated Approved Item is scheduled to appear on a Scheduled Surface. Format: YYYY-MM-DD.
     """
     scheduledDate: Date!
 }
 
 """
-Input data for deleting a scheduled item for a New Tab Feed.
+Input data for deleting a scheduled item for a Scheduled Surface.
 """
 input DeleteScheduledCuratedCorpusItemInput {
     """
@@ -624,11 +625,11 @@ type Query {
     ): RejectedCuratedCorpusItemConnection!
 
     """
-    Retrieves a list of Approved Items that are scheduled to appear on New Tab.
+    Retrieves a list of Approved Items that are scheduled to appear on a Scheduled Surface.
     """
     getScheduledCuratedCorpusItems(
         """
-        Required arguments to narrow down scheduled items to a specific New Tab Feed
+        Required arguments to narrow down scheduled items to a specific Scheduled Surface
         between the supplied start and end dates.
         """
         filters: ScheduledCuratedCorpusItemsFilterInput!
@@ -645,14 +646,14 @@ type Query {
     ): ApprovedCuratedCorpusItem
 
     """
-    Retrieves all NewTabs available to the given SSO user. Requires an Authorization header.
+    Retrieves all ScheduledSurfaces available to the given SSO user. Requires an Authorization header.
     """
-    getNewTabsForUser: [NewTab!]!
+    getScheduledSurfacesForUser: [ScheduledSurface!]!
 }
 
 type Mutation {
     """
-    Creates an Approved Item and optionally schedules it to appear on New Tab.
+    Creates an Approved Item and optionally schedules it to appear on a Scheduled Surface.
     """
     createApprovedCuratedCorpusItem(
         data: CreateApprovedCuratedCorpusItemInput!
@@ -680,14 +681,14 @@ type Mutation {
     ): ApprovedCuratedCorpusItem!
 
     """
-    Creates a New Tab Scheduled Item.
+    Creates a Scheduled Surface Scheduled Item.
     """
     createScheduledCuratedCorpusItem(
         data: CreateScheduledCuratedCorpusItemInput!
     ): ScheduledCuratedCorpusItem!
 
     """
-    Deletes an item from New Tab Schedule.
+    Deletes an item from a Scheduled Surface.
     """
     deleteScheduledCuratedCorpusItem(
         data: DeleteScheduledCuratedCorpusItemInput!

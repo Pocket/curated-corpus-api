@@ -7,7 +7,7 @@ import {
 import { NotFoundError } from '@pocket-tools/apollo-utils';
 
 /**
- * This mutation adds a scheduled entry for a New Tab.
+ * This mutation adds a scheduled entry for a Scheduled Surface.
  *
  * @param db
  * @param data
@@ -16,7 +16,7 @@ export async function createScheduledItem(
   db: PrismaClient,
   data: CreateScheduledItemInput
 ): Promise<ScheduledItem> {
-  const { approvedItemExternalId, newTabGuid, scheduledDate } = data;
+  const { approvedItemExternalId, scheduledSurfaceGuid, scheduledDate } = data;
 
   const approvedItem = await db.approvedItem.findUnique({
     where: { externalId: approvedItemExternalId },
@@ -31,7 +31,7 @@ export async function createScheduledItem(
   return await db.scheduledItem.create({
     data: {
       approvedItemId: approvedItem.id,
-      newTabGuid,
+      scheduledSurfaceGuid,
       scheduledDate,
       // TODO: pass an actual user ID that comes from auth/JWT
       createdBy: 'sso-user',
@@ -43,7 +43,7 @@ export async function createScheduledItem(
 }
 
 /**
- * This mutation deletes a scheduled entry for a New Tab.
+ * This mutation deletes a scheduled entry for a Scheduled Surface.
  *
  * @param db
  * @param data

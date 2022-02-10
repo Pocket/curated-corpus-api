@@ -83,7 +83,7 @@ export const GET_APPROVED_ITEM_BY_URL = gql`
 
 export const GET_SCHEDULED_SURFACES_FOR_USER = gql`
   query getScheduledSurfacesForUser {
-    getNewTabsForUser {
+    getScheduledSurfacesForUser {
       guid
       name
       utcOffset
