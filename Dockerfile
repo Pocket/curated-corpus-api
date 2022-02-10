@@ -1,4 +1,4 @@
-FROM node:17
+FROM node:17@sha256:88becea956ea5ec0262b8aac011a234f95310e5cacc38cc9d2468a836d67ffc9
 
 WORKDIR /usr/src/app
 

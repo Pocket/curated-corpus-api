@@ -46,7 +46,7 @@ only_dev: &only_dev
 jobs:
   apollo:
     docker:
-      - image: cimg/node:current
+      - image: cimg/node:current@sha256:d0de8213ec02383a0ed94b04e092aaa2aa5a384297ff7b8417a71c4f12a65a44
     steps:
       - checkout
       - run:
@@ -105,7 +105,7 @@ jobs:
 
   build:
     docker:
-      - image: cimg/node:current
+      - image: cimg/node:current@sha256:d0de8213ec02383a0ed94b04e092aaa2aa5a384297ff7b8417a71c4f12a65a44
     steps:
       - checkout
       # Define the working directory for this job
@@ -153,7 +153,7 @@ jobs:
         description: 'Integration tests'
         type: string
     docker:
-      - image: cimg/node:current
+      - image: cimg/node:current@sha256:d0de8213ec02383a0ed94b04e092aaa2aa5a384297ff7b8417a71c4f12a65a44
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -161,14 +161,14 @@ jobs:
           NODE_ENV: test
           AWS_XRAY_LOG_LEVEL: silent
           AWS_XRAY_CONTEXT_MISSING: LOG_ERROR
-      - image: mysql:5.7
+      - image: mysql:5.7@sha256:afc453de0d675083ac00d0538521f8a9a67d1cce180d70fab9925ebcc87a0eba
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           TZ: 'UTC'
-      - image: localstack/localstack
+      - image: localstack/localstack@sha256:718ffdfb9121948d72226500184f83409ca39107e58edee726648ab5c788d0a6
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
