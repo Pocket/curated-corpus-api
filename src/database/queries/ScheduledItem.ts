@@ -6,6 +6,7 @@ import {
   ScheduledItemsResult,
   ScheduledSurfaceItem,
 } from '../types';
+import { scheduledSurfaceAllowedValues } from '../../shared/types';
 import { groupBy } from '../../shared/utils';
 
 /**
@@ -17,6 +18,13 @@ export async function getScheduledItems(
   filters: ScheduledItemFilterInput
 ): Promise<ScheduledItemsResult[]> {
   const { scheduledSurfaceGuid, startDate, endDate } = filters;
+
+  // validate scheduledSurfaceGuid
+  if (!scheduledSurfaceAllowedValues.includes(scheduledSurfaceGuid)) {
+    throw new Error(
+      `${scheduledSurfaceGuid} is not a valid Scheduled Surface GUID`
+    );
+  }
 
   // Get a flat array of scheduled items from Prisma
   const items = await db.scheduledItem.findMany({

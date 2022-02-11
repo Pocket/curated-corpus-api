@@ -139,7 +139,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       expect(resultArray[1].scheduledDate).to.equal('2050-01-01');
     });
 
-    it('should fail on non-existent Scheduled Surface GUID', async () => {
+    it('should fail on invalid Scheduled Surface GUID', async () => {
       const invalidId = 'not-a-valid-id-by-any-means';
 
       const result = await server.executeOperation({
@@ -153,9 +153,41 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
         },
       });
 
-      // Expect to see no data returned, and no errors either
-      expect(result.errors).to.be.undefined;
-      expect(result.data?.getScheduledCuratedCorpusItems).to.have.lengthOf(0);
+      expect(result.errors).not.to.be.null;
+
+      // typescript needs this check bc result.errors _could_ be empty
+      // (we check above to ensure it is not)
+      if (result.errors) {
+        expect(result.errors.length).to.equal(1);
+        expect(result.errors[0].message).to.equal(
+          'not-a-valid-id-by-any-means is not a valid Scheduled Surface GUID'
+        );
+      }
+    });
+
+    it('should fail on non-existent Scheduled Surface GUID', async () => {
+      const result = await server.executeOperation({
+        query: GET_SCHEDULED_ITEMS,
+        variables: {
+          filters: {
+            // can't believe graphql lets you pass an empty string for a required parameter
+            scheduledSurfaceGuid: '',
+            startDate: '2000-01-01',
+            endDate: '2050-12-31',
+          },
+        },
+      });
+
+      expect(result.errors).not.to.be.null;
+
+      // typescript needs this check bc result.errors _could_ be empty
+      // (we check above to ensure it is not)
+      if (result.errors) {
+        expect(result.errors.length).to.equal(1);
+        expect(result.errors[0].message).to.equal(
+          ' is not a valid Scheduled Surface GUID'
+        );
+      }
     });
   });
 });
