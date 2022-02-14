@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { db, getServer } from '../../../test/admin-server';
+import { db } from '../../../test/admin-server';
 import {
   clearDb,
   createApprovedItemHelper,
@@ -18,10 +18,18 @@ import { getUnixTimestamp } from '../fields/UnixTimestamp';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import { ScheduledCorpusItemEventType } from '../../../events/types';
 import { DateTime } from 'luxon';
+import { getServerWithMockedHeaders } from '../../../test/helpers';
+import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
 
 describe('mutations: ScheduledItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
-  const server = getServer(eventEmitter);
+
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
+  };
+  const server = getServerWithMockedHeaders(headers, eventEmitter);
 
   beforeAll(async () => {
     await server.start();
@@ -217,6 +225,116 @@ describe('mutations: ScheduledItem', () => {
         await eventTracker.getCall(0).args[0].scheduledCorpusItem.externalId
       ).to.equal(scheduledItem.externalId);
     });
+
+    it('should fail if user has read-only access', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,no-access-for-you`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const approvedItem = await createApprovedItemHelper(db, {
+        title: 'A test story',
+      });
+
+      const input: CreateScheduledItemInput = {
+        approvedItemExternalId: approvedItem.externalId,
+        scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+        scheduledDate: '2100-01-01',
+      };
+
+      const result = await server.executeOperation({
+        query: CREATE_SCHEDULED_ITEM,
+        variables: { data: input },
+      });
+
+      // ...without success. There is no data
+      expect(result.data).to.be.null;
+
+      expect(result.errors).not.to.be.null;
+
+      if (result.errors) {
+        // And there is an access denied error
+        expect(result.errors[0].message).to.contain(ACCESS_DENIED_ERROR);
+      }
+
+      await server.stop();
+    });
+
+    it("should fail if user doesn't have access to specified scheduled surface", async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const approvedItem = await createApprovedItemHelper(db, {
+        title: 'A test story',
+      });
+
+      const input: CreateScheduledItemInput = {
+        approvedItemExternalId: approvedItem.externalId,
+        scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+        scheduledDate: '2100-01-01',
+      };
+
+      const result = await server.executeOperation({
+        query: CREATE_SCHEDULED_ITEM,
+        variables: { data: input },
+      });
+
+      // ...without success. There is no data
+      expect(result.data).to.be.null;
+
+      expect(result.errors).not.to.be.null;
+
+      if (result.errors) {
+        // And there is an access denied error
+        expect(result.errors[0].message).to.contain(ACCESS_DENIED_ERROR);
+      }
+
+      await server.stop();
+    });
+
+    it('should succeed if user has access to specified scheduled surface', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const approvedItem = await createApprovedItemHelper(db, {
+        title: 'A test story',
+      });
+
+      const input: CreateScheduledItemInput = {
+        approvedItemExternalId: approvedItem.externalId,
+        scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+        scheduledDate: '2100-01-01',
+      };
+
+      const result = await server.executeOperation({
+        query: CREATE_SCHEDULED_ITEM,
+        variables: { data: input },
+      });
+
+      // Hooray! There is data
+      expect(result.data).not.to.be.null;
+
+      // And no errors, too!
+      expect(result.errors).to.be.undefined;
+
+      await server.stop();
+    });
   });
 
   describe('deleteScheduledCuratedCorpusItem mutation', () => {
@@ -277,7 +395,7 @@ describe('mutations: ScheduledItem', () => {
 
       // The shape of the Prisma objects the above helpers return doesn't quite match
       // the type we return in GraphQL (for example, IDs stay internal, we attach an
-      // ApprovedItem, so until there is a query to retrieve the scheduled item
+      // ApprovedItem), so until there is a query to retrieve the scheduled item
       // of the right shape (if it's ever implemented), laborious property-by-property
       // comparison is the go.
       const returnedItem = data?.deleteScheduledCuratedCorpusItem;
@@ -323,6 +441,113 @@ describe('mutations: ScheduledItem', () => {
       expect(
         await eventTracker.getCall(0).args[0].scheduledCorpusItem.externalId
       ).to.equal(scheduledItem.externalId);
+    });
+
+    it('should fail if user has read-only access', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,no-access-for-you`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const approvedItem = await createApprovedItemHelper(db, {
+        title: 'This is a test',
+      });
+
+      const scheduledItem = await createScheduledItemHelper(db, {
+        scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+        approvedItem,
+      });
+
+      const result = await server.executeOperation({
+        query: DELETE_SCHEDULED_ITEM,
+        variables: { data: { externalId: scheduledItem.externalId } },
+      });
+
+      // ...without success. There is no data
+      expect(result.data).to.be.null;
+
+      expect(result.errors).not.to.be.null;
+
+      if (result.errors) {
+        // And there is an access denied error
+        expect(result.errors[0].message).to.contain(ACCESS_DENIED_ERROR);
+      }
+
+      await server.stop();
+    });
+
+    it("should fail if user doesn't have access to specified scheduled surface", async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const approvedItem = await createApprovedItemHelper(db, {
+        title: 'This is a test',
+      });
+
+      const scheduledItem = await createScheduledItemHelper(db, {
+        scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+        approvedItem,
+      });
+
+      const result = await server.executeOperation({
+        query: DELETE_SCHEDULED_ITEM,
+        variables: { data: { externalId: scheduledItem.externalId } },
+      });
+
+      // ...without success. There is no data
+      expect(result.data).to.be.null;
+
+      expect(result.errors).not.to.be.null;
+
+      if (result.errors) {
+        // And there is an access denied error
+        expect(result.errors[0].message).to.contain(ACCESS_DENIED_ERROR);
+      }
+
+      await server.stop();
+    });
+
+    it('should succeed if user has access to specified scheduled surface', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const approvedItem = await createApprovedItemHelper(db, {
+        title: 'This is a test',
+      });
+
+      const scheduledItem = await createScheduledItemHelper(db, {
+        scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+        approvedItem,
+      });
+
+      const result = await server.executeOperation({
+        query: DELETE_SCHEDULED_ITEM,
+        variables: { data: { externalId: scheduledItem.externalId } },
+      });
+
+      // Hooray! There is data
+      expect(result.data).not.to.be.null;
+
+      // And no errors, too!
+      expect(result.errors).to.be.undefined;
+
+      await server.stop();
     });
   });
 });

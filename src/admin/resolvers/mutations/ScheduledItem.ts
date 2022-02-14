@@ -3,23 +3,41 @@ import {
   createScheduledItem as dbCreateScheduledItem,
 } from '../../../database/mutations';
 import { ScheduledItem } from '../../../database/types';
-import { scheduledSurfaceAllowedValues } from '../../../shared/types';
+import {
+  ACCESS_DENIED_ERROR,
+  scheduledSurfaceAllowedValues,
+} from '../../../shared/types';
 import { ScheduledCorpusItemEventType } from '../../../events/types';
 import { UserInputError } from 'apollo-server';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { AuthenticationError } from 'apollo-server-errors';
+import { IContext } from '../../context';
 
 /**
  * Deletes an item from the Scheduled Surface schedule.
  *
  * @param parent
  * @param data
- * @param db
+ * @param context
  */
 export async function deleteScheduledItem(
   parent,
   { data },
-  context
+  context: IContext
 ): Promise<ScheduledItem> {
+  // Need to fetch the item first to check access privileges.
+  // Could we make it easier/not hit the DB by passing the Scheduled Surface GUID
+  // as a required input to the delete mutation?
+  const item = await context.db.scheduledItem.findUnique({
+    where: { externalId: data.externalId },
+  });
+
+  // Check if the user can execute this mutation.
+  if (item && !context.authenticatedUser.canWrite(item.scheduledSurfaceGuid)) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
+  // Access allowed, proceed as normal from this point on.
   const scheduledItem = await dbDeleteScheduledItem(context.db, data);
 
   context.emitScheduledCorpusItemEvent(
@@ -30,11 +48,24 @@ export async function deleteScheduledItem(
   return scheduledItem;
 }
 
+/**
+ * Adds a curated item to a scheduled surface for a given date.
+ *
+ * @param parent
+ * @param data
+ * @param context
+ */
 export async function createScheduledItem(
   parent,
   { data },
-  context
+  context: IContext
 ): Promise<ScheduledItem> {
+  // Check if the user can execute this mutation.
+  if (!context.authenticatedUser.canWrite(data.scheduledSurfaceGuid)) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
+  // Check if the specified Scheduled Surface GUID actually exists.
   if (!scheduledSurfaceAllowedValues.includes(data.scheduledSurfaceGuid)) {
     throw new UserInputError(
       `Cannot create a scheduled entry with Scheduled Surface GUID of "${data.scheduledSurfaceGuid}".`

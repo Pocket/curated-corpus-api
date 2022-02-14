@@ -2,12 +2,13 @@ import config from '../../../config';
 import { CuratedStatus } from '@prisma/client';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { db, getServer } from '../../../test/admin-server';
+import { db } from '../../../test/admin-server';
 import {
   clearDb,
   createApprovedItemHelper,
   createRejectedCuratedCorpusItemHelper,
   createScheduledItemHelper,
+  getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import {
   CREATE_APPROVED_ITEM,
@@ -28,10 +29,17 @@ import {
 import { Upload } from 'graphql-upload';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import { GET_REJECTED_ITEMS } from '../queries/sample-queries.gql';
+import { MozillaAccessGroup } from '../../../shared/types';
 
 describe('mutations: ApprovedItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
-  const server = getServer(eventEmitter);
+
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
+  };
+  const server = getServerWithMockedHeaders(headers, eventEmitter);
 
   beforeAll(async () => {
     await server.start();

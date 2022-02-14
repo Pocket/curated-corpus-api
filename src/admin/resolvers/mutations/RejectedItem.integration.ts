@@ -1,19 +1,27 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { db, getServer } from '../../../test/admin-server';
+import { db } from '../../../test/admin-server';
 import {
   clearDb,
   createApprovedItemHelper,
   createRejectedCuratedCorpusItemHelper,
+  getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import { CREATE_REJECTED_ITEM } from './sample-mutations.gql';
 import { CreateRejectedItemInput } from '../../../database/types';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import { ReviewedCorpusItemEventType } from '../../../events/types';
+import { MozillaAccessGroup } from '../../../shared/types';
 
 describe('mutations: RejectedItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
-  const server = getServer(eventEmitter);
+
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
+  };
+  const server = getServerWithMockedHeaders(headers, eventEmitter);
 
   beforeAll(async () => {
     await server.start();
