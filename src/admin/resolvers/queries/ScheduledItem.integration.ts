@@ -155,14 +155,10 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
 
       expect(result.errors).not.to.be.null;
 
-      // typescript needs this check bc result.errors _could_ be empty
-      // (we check above to ensure it is not)
-      if (result.errors) {
-        expect(result.errors.length).to.equal(1);
-        expect(result.errors[0].message).to.equal(
-          'not-a-valid-id-by-any-means is not a valid Scheduled Surface GUID'
-        );
-      }
+      expect(result.errors?.length).to.equal(1);
+      expect(result.errors?.[0].message).to.equal(
+        'not-a-valid-id-by-any-means is not a valid Scheduled Surface GUID'
+      );
     });
 
     it('should fail on non-existent Scheduled Surface GUID', async () => {
@@ -180,14 +176,10 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
 
       expect(result.errors).not.to.be.null;
 
-      // typescript needs this check bc result.errors _could_ be empty
-      // (we check above to ensure it is not)
-      if (result.errors) {
-        expect(result.errors.length).to.equal(1);
-        expect(result.errors[0].message).to.equal(
-          ' is not a valid Scheduled Surface GUID'
-        );
-      }
+      expect(result.errors?.length).to.equal(1);
+      expect(result.errors?.[0].message).to.equal(
+        ' is not a valid Scheduled Surface GUID'
+      );
     });
   });
 });

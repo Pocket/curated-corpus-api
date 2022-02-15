@@ -1,19 +1,27 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { db, getServer } from '../../../test/admin-server';
+import { db } from '../../../test/admin-server';
 import {
   clearDb,
   createApprovedItemHelper,
   createRejectedCuratedCorpusItemHelper,
+  getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import { CREATE_REJECTED_ITEM } from './sample-mutations.gql';
 import { CreateRejectedItemInput } from '../../../database/types';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import { ReviewedCorpusItemEventType } from '../../../events/types';
+import { MozillaAccessGroup } from '../../../shared/types';
 
 describe('mutations: RejectedItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
-  const server = getServer(eventEmitter);
+
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
+  };
+  const server = getServerWithMockedHeaders(headers, eventEmitter);
 
   beforeAll(async () => {
     await server.start();
@@ -128,12 +136,10 @@ describe('mutations: RejectedItem', () => {
       expect(result.errors).not.to.be.null;
 
       // And there is the correct error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `A rejected item with the URL "${input.url}" already exists.`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
+      expect(result.errors?.[0].message).to.contain(
+        `A rejected item with the URL "${input.url}" already exists.`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
 
       // Check that the REJECT_ITEM event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -160,12 +166,10 @@ describe('mutations: RejectedItem', () => {
       expect(result.errors).not.to.be.null;
 
       // And there is the correct error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `An approved item with the URL "${input.url}" already exists.`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
+      expect(result.errors?.[0].message).to.contain(
+        `An approved item with the URL "${input.url}" already exists.`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
 
       // Check that the REJECT_ITEM event was not fired
       expect(eventTracker.callCount).to.equal(0);
