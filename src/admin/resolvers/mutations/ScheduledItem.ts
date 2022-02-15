@@ -12,7 +12,6 @@ import { UserInputError } from 'apollo-server';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { AuthenticationError } from 'apollo-server-errors';
 import { IContext } from '../../context';
-import { NotFoundError } from '@pocket-tools/apollo-utils';
 
 /**
  * Deletes an item from the Scheduled Surface schedule.
