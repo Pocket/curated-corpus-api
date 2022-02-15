@@ -4,6 +4,7 @@ export enum ProspectType {
   ORGANIC_TIMESPENT = 'ORGANIC_TIMESPENT',
   SYNDICATED = 'SYNDICATED',
   TOP_SAVED = 'TOP_SAVED',
+  DOMAIN_ALLOWLIST = 'DOMAIN_ALLOWLIST',
 }
 
 export type ScheduledSurface = {
@@ -32,7 +33,11 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
     name: 'New Tab (de-DE)',
     guid: 'NEW_TAB_DE_DE',
     utcOffset: 100,
-    prospectTypes: [ProspectType.GLOBAL, ProspectType.ORGANIC_TIMESPENT],
+    prospectTypes: [
+      ProspectType.GLOBAL,
+      ProspectType.ORGANIC_TIMESPENT,
+      ProspectType.DOMAIN_ALLOWLIST,
+    ],
   },
   {
     name: 'New Tab (en-GB)',
