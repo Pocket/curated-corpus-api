@@ -136,12 +136,10 @@ describe('mutations: RejectedItem', () => {
       expect(result.errors).not.to.be.null;
 
       // And there is the correct error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `A rejected item with the URL "${input.url}" already exists.`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
+      expect(result.errors?.[0].message).to.contain(
+        `A rejected item with the URL "${input.url}" already exists.`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
 
       // Check that the REJECT_ITEM event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -168,12 +166,10 @@ describe('mutations: RejectedItem', () => {
       expect(result.errors).not.to.be.null;
 
       // And there is the correct error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `An approved item with the URL "${input.url}" already exists.`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
+      expect(result.errors?.[0].message).to.contain(
+        `An approved item with the URL "${input.url}" already exists.`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
 
       // Check that the REJECT_ITEM event was not fired
       expect(eventTracker.callCount).to.equal(0);

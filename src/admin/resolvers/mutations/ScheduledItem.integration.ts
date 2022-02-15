@@ -68,12 +68,10 @@ describe('mutations: ScheduledItem', () => {
       expect(result.errors).not.to.be.null;
 
       // And there is the correct error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `Cannot create a scheduled entry with Scheduled Surface GUID of "RECSAPI".`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
+      expect(result.errors?.[0].message).to.contain(
+        `Cannot create a scheduled entry with Scheduled Surface GUID of "RECSAPI".`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
 
       // Check that the ADD_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -98,14 +96,12 @@ describe('mutations: ScheduledItem', () => {
       expect(result.data).to.be.null;
 
       // And there is the correct error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `Cannot create a scheduled entry: Approved Item with id "not-a-valid-id-at-all" does not exist.`
-        );
-        expect(result.errors[0].extensions?.code).to.equal(
-          'INTERNAL_SERVER_ERROR'
-        );
-      }
+      expect(result.errors?.[0].message).to.contain(
+        `Cannot create a scheduled entry: Approved Item with id "not-a-valid-id-at-all" does not exist.`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal(
+        'INTERNAL_SERVER_ERROR'
+      );
 
       // Check that the ADD_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -154,12 +150,10 @@ describe('mutations: ScheduledItem', () => {
       expect(result.data).to.be.null;
 
       // Expecting to see a custom error message from the resolver
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `This story is already scheduled to appear on NEW_TAB_EN_US on ${displayDate}.`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
+      expect(result.errors?.[0].message).to.contain(
+        `This story is already scheduled to appear on NEW_TAB_EN_US on ${displayDate}.`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
 
       // Check that the ADD_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -230,7 +224,7 @@ describe('mutations: ScheduledItem', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: `group1,group2,no-access-for-you`,
+        groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
       };
 
       const server = getServerWithMockedHeaders(headers);
@@ -256,10 +250,8 @@ describe('mutations: ScheduledItem', () => {
 
       expect(result.errors).not.to.be.null;
 
-      if (result.errors) {
-        // And there is an access denied error
-        expect(result.errors[0].message).to.contain(ACCESS_DENIED_ERROR);
-      }
+      // And there is an access denied error
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
 
       await server.stop();
     });
@@ -294,10 +286,8 @@ describe('mutations: ScheduledItem', () => {
 
       expect(result.errors).not.to.be.null;
 
-      if (result.errors) {
-        // And there is an access denied error
-        expect(result.errors[0].message).to.contain(ACCESS_DENIED_ERROR);
-      }
+      // And there is an access denied error
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
 
       await server.stop();
     });
@@ -358,14 +348,12 @@ describe('mutations: ScheduledItem', () => {
       expect(result.data).to.be.null;
 
       // And there is the correct error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `Item with ID of '${input.externalId}' could not be found.`
-        );
-        expect(result.errors[0].extensions?.code).to.equal(
-          'INTERNAL_SERVER_ERROR'
-        );
-      }
+      expect(result.errors?.[0].message).to.contain(
+        `Item with ID of '${input.externalId}' could not be found.`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal(
+        'INTERNAL_SERVER_ERROR'
+      );
 
       // Check that the REMOVE_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -447,7 +435,7 @@ describe('mutations: ScheduledItem', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: `group1,group2,no-access-for-you`,
+        groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
       };
 
       const server = getServerWithMockedHeaders(headers);
@@ -472,10 +460,8 @@ describe('mutations: ScheduledItem', () => {
 
       expect(result.errors).not.to.be.null;
 
-      if (result.errors) {
-        // And there is an access denied error
-        expect(result.errors[0].message).to.contain(ACCESS_DENIED_ERROR);
-      }
+      // And there is an access denied error
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
 
       await server.stop();
     });
@@ -509,10 +495,8 @@ describe('mutations: ScheduledItem', () => {
 
       expect(result.errors).not.to.be.null;
 
-      if (result.errors) {
-        // And there is an access denied error
-        expect(result.errors[0].message).to.contain(ACCESS_DENIED_ERROR);
-      }
+      // And there is an access denied error
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
 
       await server.stop();
     });

@@ -12,6 +12,7 @@ import { UserInputError } from 'apollo-server';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { AuthenticationError } from 'apollo-server-errors';
 import { IContext } from '../../context';
+import { NotFoundError } from '@pocket-tools/apollo-utils';
 
 /**
  * Deletes an item from the Scheduled Surface schedule.
@@ -26,8 +27,8 @@ export async function deleteScheduledItem(
   context: IContext
 ): Promise<ScheduledItem> {
   // Need to fetch the item first to check access privileges.
-  // Could we make it easier/not hit the DB by passing the Scheduled Surface GUID
-  // as a required input to the delete mutation?
+  // Note that we do not worry here about an extra hit to the DB
+  // as load on this service will be low.
   const item = await context.db.scheduledItem.findUnique({
     where: { externalId: data.externalId },
   });
