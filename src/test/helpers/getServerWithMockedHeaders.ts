@@ -4,13 +4,10 @@ import { ContextManager } from '../../admin/context';
 import { client } from '../../database/client';
 import s3 from '../../admin/aws/s3';
 
-const eventEmitter = new CuratedCorpusEventEmitter();
-
 const sharedConfigContext = {
   request: { headers: {} },
   db: client(),
   s3,
-  eventEmitter,
 };
 
 /**
@@ -18,14 +15,19 @@ const sharedConfigContext = {
  * within resolvers.
  *
  * @param headers
+ * @param eventEmitter
  */
-export const getServerWithMockedHeaders = (headers: {
-  name: string;
-  username: string;
-  groups: string;
-}) => {
+export const getServerWithMockedHeaders = (
+  headers: {
+    name: string;
+    username: string;
+    groups: string;
+  },
+  eventEmitter: CuratedCorpusEventEmitter = new CuratedCorpusEventEmitter()
+) => {
   const contextManager = new ContextManager({
     ...sharedConfigContext,
+    eventEmitter,
     request: {
       headers,
     },

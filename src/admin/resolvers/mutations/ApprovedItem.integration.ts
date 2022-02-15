@@ -2,12 +2,13 @@ import config from '../../../config';
 import { CuratedStatus } from '@prisma/client';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { db, getServer } from '../../../test/admin-server';
+import { db } from '../../../test/admin-server';
 import {
   clearDb,
   createApprovedItemHelper,
   createRejectedCuratedCorpusItemHelper,
   createScheduledItemHelper,
+  getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import {
   CREATE_APPROVED_ITEM,
@@ -28,10 +29,17 @@ import {
 import { Upload } from 'graphql-upload';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import { GET_REJECTED_ITEMS } from '../queries/sample-queries.gql';
+import { MozillaAccessGroup } from '../../../shared/types';
 
 describe('mutations: ApprovedItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
-  const server = getServer(eventEmitter);
+
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
+  };
+  const server = getServerWithMockedHeaders(headers, eventEmitter);
 
   beforeAll(async () => {
     await server.start();
@@ -154,12 +162,10 @@ describe('mutations: ApprovedItem', () => {
       expect(result.errors).not.to.be.null;
 
       // And there is the correct error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `An approved item with the URL "${input.url}" already exists`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
+      expect(result.errors?.[0].message).to.contain(
+        `An approved item with the URL "${input.url}" already exists`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
 
       // Check that the ADD_ITEM event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -186,12 +192,10 @@ describe('mutations: ApprovedItem', () => {
       expect(result.errors).not.to.be.null;
 
       // And there is the correct error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `A rejected item with the URL "${input.url}" already exists`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
+      expect(result.errors?.[0].message).to.contain(
+        `A rejected item with the URL "${input.url}" already exists`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
 
       // Check that the ADD_ITEM event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -274,12 +278,10 @@ describe('mutations: ApprovedItem', () => {
       expect(result.errors).not.to.be.null;
 
       // And there is the right error from the resolvers
-      if (result.errors) {
-        expect(result.errors[0].message).to.contain(
-          `Cannot create a scheduled entry with Scheduled Surface GUID of "${input.scheduledSurfaceGuid}".`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
+      expect(result.errors?.[0].message).to.contain(
+        `Cannot create a scheduled entry with Scheduled Surface GUID of "${input.scheduledSurfaceGuid}".`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
 
       // Check that the ADD_ITEM event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -421,12 +423,10 @@ describe('mutations: ApprovedItem', () => {
 
       expect(result.errors).not.to.be.null;
 
-      if (result.errors) {
-        expect(result.errors[0].message).to.equal(
-          `Could not find an approved item with external id of "${input.externalId}".`
-        );
-        expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      }
+      expect(result.errors?.[0].message).to.equal(
+        `Could not find an approved item with external id of "${input.externalId}".`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
 
       // Check that the events were not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -463,14 +463,12 @@ describe('mutations: ApprovedItem', () => {
 
       expect(result.errors).not.to.be.null;
 
-      if (result.errors) {
-        expect(result.errors[0].message).to.equal(
-          `Cannot remove item from approved corpus - scheduled entries exist.`
-        );
-        expect(result.errors[0].extensions?.code).to.equal(
-          'INTERNAL_SERVER_ERROR'
-        );
-      }
+      expect(result.errors?.[0].message).to.equal(
+        `Cannot remove item from approved corpus - scheduled entries exist.`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal(
+        'INTERNAL_SERVER_ERROR'
+      );
 
       // Check that the events were not fired
       expect(eventTracker.callCount).to.equal(0);

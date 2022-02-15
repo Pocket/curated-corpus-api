@@ -35,11 +35,9 @@ describe('queries: ScheduledSurface', () => {
     // There should be errors
     expect(result.errors).not.to.be.null;
 
-    if (result.errors) {
-      expect(result.errors[0].message).to.contain(
-        `Could not find Scheduled Surface with id of "ABRACADABRA"`
-      );
-      expect(result.errors[0].extensions?.code).to.equal('BAD_USER_INPUT');
-    }
+    expect(result.errors?.[0].message).to.contain(
+      `Could not find Scheduled Surface with id of "ABRACADABRA"`
+    );
+    expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
   });
 });

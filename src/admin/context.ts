@@ -15,12 +15,22 @@ import {
   ScheduledCorpusItemPayload,
 } from '../events/types';
 import s3 from './aws/s3';
+import {
+  MozillaAccessGroup,
+  ScheduledSurfaceGuidToMozillaAccessGroup,
+} from '../shared/types';
 
 // Custom properties we get from Admin API for the authenticated user
 export interface AdminAPIUser {
   name: string;
   groups: string[];
   username: string;
+  // and extra convenience props to cut down on checking actual Mozilla access
+  // groups within resolvers
+  hasFullAccess: boolean;
+  hasReadOnly: boolean;
+  canRead: (scheduledSurfaceGuid: string) => boolean;
+  canWrite: (scheduledSurfaceGuid: string) => boolean;
 }
 
 // Context interface
@@ -66,11 +76,36 @@ export class ContextManager implements IContext {
 
   get authenticatedUser(): AdminAPIUser {
     const accessGroups = this.config.request.headers.groups.split(',');
-    return {
+
+    const hasFullAccess = accessGroups.includes(
+      MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL
+    );
+    const hasReadOnly = accessGroups.includes(MozillaAccessGroup.READONLY);
+
+    const user: AdminAPIUser = {
       name: this.config.request.headers.name,
       username: this.config.request.headers.username,
       groups: accessGroups,
+      hasFullAccess,
+      hasReadOnly,
+      // Whether the authenticated user can run queries for a given Scheduled Surface
+      canRead: (scheduledSurfaceGuid: string): boolean =>
+        hasReadOnly || user.canWrite(scheduledSurfaceGuid),
+
+      // Whether the authenticated user can execute mutations for a given Scheduled Surface
+      canWrite: (scheduledSurfaceGuid: string): boolean => {
+        if (hasFullAccess) {
+          return true;
+        }
+
+        const authGroupForScheduledSurface =
+          ScheduledSurfaceGuidToMozillaAccessGroup[scheduledSurfaceGuid];
+
+        return accessGroups.includes(authGroupForScheduledSurface);
+      },
     };
+
+    return user;
   }
 
   get eventEmitter(): CuratedCorpusEventEmitter {
