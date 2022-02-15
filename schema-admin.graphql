@@ -73,6 +73,7 @@ enum ProspectType {
     ORGANIC_TIMESPENT
     SYNDICATED
     TOP_SAVED
+    DOMAIN_ALLOWLIST
 }
 
 """
