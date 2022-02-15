@@ -19,9 +19,9 @@ const sharedConfigContext = {
  */
 export const getServerWithMockedHeaders = (
   headers: {
-    name: string;
-    username: string;
-    groups: string;
+    name?: string;
+    username?: string;
+    groups?: string;
   },
   eventEmitter: CuratedCorpusEventEmitter = new CuratedCorpusEventEmitter()
 ) => {

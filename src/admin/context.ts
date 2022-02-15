@@ -75,7 +75,8 @@ export class ContextManager implements IContext {
   }
 
   get authenticatedUser(): AdminAPIUser {
-    const accessGroups = this.config.request.headers.groups.split(',');
+    const groups = this.config.request.headers.groups as string;
+    const accessGroups = groups ? groups.split(',') : [];
 
     const hasFullAccess = accessGroups.includes(
       MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL
@@ -83,8 +84,8 @@ export class ContextManager implements IContext {
     const hasReadOnly = accessGroups.includes(MozillaAccessGroup.READONLY);
 
     const user: AdminAPIUser = {
-      name: this.config.request.headers.name,
-      username: this.config.request.headers.username,
+      name: this.config.request.headers.name as string,
+      username: this.config.request.headers.username as string,
       groups: accessGroups,
       hasFullAccess,
       hasReadOnly,
