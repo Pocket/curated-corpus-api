@@ -85,7 +85,7 @@ export class ScheduledItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
         scheduled_at: getUnixTimestamp(item.scheduledDate),
         url: item.approvedItem.url,
         approved_corpus_item_external_id: item.approvedItem.externalId,
-        new_tab_id: item.scheduledSurfaceGuid,
+        scheduled_surface_id: item.scheduledSurfaceGuid,
         created_at: getUnixTimestamp(item.createdAt),
         created_by: item.createdBy,
         updated_at: getUnixTimestamp(item.updatedAt),
@@ -101,8 +101,8 @@ export class ScheduledItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
     if (scheduledSurface) {
       context.data = {
         ...context.data,
-        new_tab_name: scheduledSurface.name,
-        new_tab_feed_utc_offset: scheduledSurface.utcOffset.toString(),
+        scheduled_surface_name: scheduledSurface.name,
+        scheduled_surface_utc_offset: scheduledSurface.utcOffset.toString(),
       };
     }
 
