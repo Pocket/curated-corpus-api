@@ -10,8 +10,8 @@ import { ScheduledItem } from '../database/types';
 import { CuratedCorpusEventEmitter } from '../events/curatedCorpusEventEmitter';
 import {
   ReviewedCorpusItemEventType,
-  ScheduledCorpusItemEventType,
   ReviewedCorpusItemPayload,
+  ScheduledCorpusItemEventType,
   ScheduledCorpusItemPayload,
 } from '../events/types';
 import s3 from './aws/s3';
@@ -30,7 +30,8 @@ export interface AdminAPIUser {
   hasFullAccess: boolean;
   hasReadOnly: boolean;
   canRead: (scheduledSurfaceGuid: string) => boolean;
-  canWrite: (scheduledSurfaceGuid: string) => boolean;
+  canWriteToCorpus: () => boolean;
+  canWriteToSurface: (scheduledSurfaceGuid: string) => boolean;
 }
 
 // Context interface
@@ -75,7 +76,10 @@ export class ContextManager implements IContext {
   }
 
   get authenticatedUser(): AdminAPIUser {
-    const accessGroups = this.config.request.headers.groups.split(',');
+    // If anyone decides to work with/test the subgraph directly,
+    // make sure we cater for undefined headers.
+    const groups = this.config.request.headers.groups as string;
+    const accessGroups = groups ? groups.split(',') : [];
 
     const hasFullAccess = accessGroups.includes(
       MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL
@@ -83,21 +87,50 @@ export class ContextManager implements IContext {
     const hasReadOnly = accessGroups.includes(MozillaAccessGroup.READONLY);
 
     const user: AdminAPIUser = {
-      name: this.config.request.headers.name,
-      username: this.config.request.headers.username,
+      name: this.config.request.headers.name as string,
+      username: this.config.request.headers.username as string,
       groups: accessGroups,
       hasFullAccess,
       hasReadOnly,
-      // Whether the authenticated user can run queries for a given Scheduled Surface
+      // Whether the authenticated user can run queries for a given scheduled surface
       canRead: (scheduledSurfaceGuid: string): boolean =>
-        hasReadOnly || user.canWrite(scheduledSurfaceGuid),
+        hasReadOnly || user.canWriteToSurface(scheduledSurfaceGuid),
 
-      // Whether the authenticated user can execute mutations for a given Scheduled Surface
-      canWrite: (scheduledSurfaceGuid: string): boolean => {
+      // Whether the authenticated user can execute mutations for corpus entities
+      canWriteToCorpus: (): boolean => {
+        // Full access to everything is an automatic "Yes".
         if (hasFullAccess) {
           return true;
         }
 
+        // As long as the user has access to a specific scheduled surface,
+        // they can create/edit/delete corpus items, too.
+        const scheduledSurfaceAccessGroups = [
+          MozillaAccessGroup.NEW_TAB_CURATOR_ENUS as string, // Oh, TypeScript!
+          MozillaAccessGroup.NEW_TAB_CURATOR_ENGB as string,
+          MozillaAccessGroup.NEW_TAB_CURATOR_DEDE as string,
+          MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL as string,
+          MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS as string,
+          MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE as string,
+        ];
+
+        return (
+          accessGroups.filter((element) => {
+            return scheduledSurfaceAccessGroups.includes(element);
+          }).length > 0
+        );
+      },
+      // Whether the authenticated user can execute mutations for a given
+      // scheduled surface
+      canWriteToSurface: (scheduledSurfaceGuid: string): boolean => {
+        // Full access to everything is an automatic "Yes".
+        if (hasFullAccess) {
+          return true;
+        }
+
+        // Access to one or more scheduled surface means the user can create
+        // and modify entities tied to that scheduled surface, such as prospects
+        // or scheduled corpus items.
         const authGroupForScheduledSurface =
           ScheduledSurfaceGuidToMozillaAccessGroup[scheduledSurfaceGuid];
 
