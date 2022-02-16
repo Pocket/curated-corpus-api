@@ -15,8 +15,10 @@ import { uploadImageToS3 } from '../../aws/upload';
 import {
   scheduledSurfaceAllowedValues,
   ApprovedItemS3ImageUrl,
+  ACCESS_DENIED_ERROR,
 } from '../../../shared/types';
 import { CreateRejectedItemInput } from '../../../database/types';
+import { AuthenticationError } from 'apollo-server-errors';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -83,6 +85,11 @@ export async function updateApprovedItem(
   { data },
   context
 ): Promise<ApprovedItem> {
+  // Check if the user can perform this mutation
+  if (!context.authenticatedUser.canWriteToCorpus()) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
   const approvedItem = await dbUpdateApprovedItem(context.db, data);
 
   context.emitReviewedCorpusItemEvent(
