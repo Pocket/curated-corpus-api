@@ -36,6 +36,20 @@ export async function createApprovedItem(
 ): Promise<ApprovedItem> {
   const { scheduledDate, scheduledSurfaceGuid, ...approvedItemData } = data;
 
+  // If this item is being created and scheduled at the same time,
+  // the user needs write access to the relevant scheduled surface.
+  if (
+    scheduledSurfaceGuid &&
+    !context.authenticatedUser.canWriteToSurface(scheduledSurfaceGuid)
+  ) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
+  // If there is no optional scheduling, check if the user can write to the corpus.
+  if (!context.authenticatedUser.canWriteToCorpus()) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
   if (
     scheduledDate &&
     scheduledSurfaceGuid &&
