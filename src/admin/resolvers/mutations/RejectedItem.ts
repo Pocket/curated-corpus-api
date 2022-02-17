@@ -2,7 +2,7 @@ import { RejectedCuratedCorpusItem } from '@prisma/client';
 import { AuthenticationError } from 'apollo-server-core';
 import { createRejectedItem as dbCreateRejectedItem } from '../../../database/mutations';
 import { ReviewedCorpusItemEventType } from '../../../events/types';
-import { ACCESS_DENIED_ERROR } from '../../../shared/types';
+import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
 import { IContext } from '../../context';
 
 /**
@@ -18,6 +18,21 @@ export async function createRejectedItem(
   { data },
   context: IContext
 ): Promise<RejectedCuratedCorpusItem> {
+  const mozPermArray = Object.values(MozillaAccessGroup).map(
+    (mozGroup) => mozGroup as string
+  );
+
+  let canAccess = false;
+
+  for (const perm of mozPermArray) {
+    canAccess = context.authenticatedUser.groups.some((group) => {
+      return group === perm;
+    });
+    if (canAccess) break;
+  }
+
+  console.log('**********', canAccess);
+
   // check if user is not authorized to reject an item
   if (!context.authenticatedUser.hasFullAccess) {
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
