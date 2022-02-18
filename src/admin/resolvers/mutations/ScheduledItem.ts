@@ -43,6 +43,13 @@ export async function deleteScheduledItem(
   // Access allowed, proceed as normal from this point on.
   const scheduledItem = await dbDeleteScheduledItem(context.db, data);
 
+  // Before we send the event to Snowplow, update the `updatedBy` and `updatedAt` fields
+  // as the object returned from the database resolver will have the details
+  // of the previous update and not the final one (aka the hard delete).
+  scheduledItem.updatedBy = context.authenticatedUser.username;
+  // Do we need the date in UTC here?
+  scheduledItem.updatedAt = new Date();
+
   context.emitScheduledCorpusItemEvent(
     ScheduledCorpusItemEventType.REMOVE_SCHEDULE,
     scheduledItem
@@ -76,7 +83,11 @@ export async function createScheduledItem(
   }
 
   try {
-    const scheduledItem = await dbCreateScheduledItem(context.db, data);
+    const scheduledItem = await dbCreateScheduledItem(
+      context.db,
+      data,
+      context.authenticatedUser.username
+    );
 
     context.emitScheduledCorpusItemEvent(
       ScheduledCorpusItemEventType.ADD_SCHEDULE,

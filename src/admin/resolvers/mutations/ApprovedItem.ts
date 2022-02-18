@@ -19,6 +19,7 @@ import {
 } from '../../../shared/types';
 import { CreateRejectedItemInput } from '../../../database/types';
 import { AuthenticationError } from 'apollo-server-errors';
+import { IContext } from '../../context';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -32,7 +33,7 @@ import { AuthenticationError } from 'apollo-server-errors';
 export async function createApprovedItem(
   parent,
   { data },
-  context
+  context: IContext
 ): Promise<ApprovedItem> {
   const { scheduledDate, scheduledSurfaceGuid, ...approvedItemData } = data;
 
@@ -46,7 +47,11 @@ export async function createApprovedItem(
     );
   }
 
-  const approvedItem = await dbCreateApprovedItem(context.db, approvedItemData);
+  const approvedItem = await dbCreateApprovedItem(
+    context.db,
+    approvedItemData,
+    context.authenticatedUser.username
+  );
 
   context.emitReviewedCorpusItemEvent(
     ReviewedCorpusItemEventType.ADD_ITEM,
@@ -57,11 +62,15 @@ export async function createApprovedItem(
     // Note that we create a scheduled item but don't return it
     // in the mutation response. Need to evaluate if we do need to return it
     // alongside the approved item.
-    const scheduledItem = await createScheduledItem(context.db, {
-      approvedItemExternalId: approvedItem.externalId,
-      scheduledSurfaceGuid,
-      scheduledDate,
-    });
+    const scheduledItem = await createScheduledItem(
+      context.db,
+      {
+        approvedItemExternalId: approvedItem.externalId,
+        scheduledSurfaceGuid,
+        scheduledDate,
+      },
+      context.authenticatedUser.username
+    );
 
     context.emitScheduledCorpusItemEvent(
       ScheduledCorpusItemEventType.ADD_SCHEDULE,
@@ -83,14 +92,18 @@ export async function createApprovedItem(
 export async function updateApprovedItem(
   parent,
   { data },
-  context
+  context: IContext
 ): Promise<ApprovedItem> {
   // Check if the user can perform this mutation
   if (!context.authenticatedUser.canWriteToCorpus()) {
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
 
-  const approvedItem = await dbUpdateApprovedItem(context.db, data);
+  const approvedItem = await dbUpdateApprovedItem(
+    context.db,
+    data,
+    context.authenticatedUser.username
+  );
 
   context.emitReviewedCorpusItemEvent(
     ReviewedCorpusItemEventType.UPDATE_ITEM,
@@ -111,7 +124,7 @@ export async function updateApprovedItem(
 export async function rejectApprovedItem(
   parent,
   { data },
-  context
+  context: IContext
 ): Promise<ApprovedItem> {
   let approvedItem = await dbDeleteApprovedItem(context.db, data.externalId);
 
@@ -128,7 +141,11 @@ export async function rejectApprovedItem(
     reason: data.reason,
   };
   // Create a Rejected Item. The Prisma function will handle URL uniqueness checks
-  const rejectedItem = await createRejectedItem(context.db, input);
+  const rejectedItem = await createRejectedItem(
+    context.db,
+    input,
+    context.authenticatedUser.username
+  );
 
   // Let Snowplow know we've deleted something from the curated corpus.
   // Before that, we need to update the values for the `updatedAt` and `updatedBy`

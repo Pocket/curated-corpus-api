@@ -66,6 +66,10 @@ describe('mutations: RejectedItem', () => {
       expect(result.data?.createRejectedCuratedCorpusItem).to.deep.include(
         input
       );
+      // Expect to see the SSO username in the `createdBy` field
+      expect(result.data?.createRejectedCuratedCorpusItem.createdBy).to.equal(
+        headers.username
+      );
 
       // Check that the REJECT_ITEM event was fired successfully:
       // 1 - Event was fired once.
@@ -100,6 +104,10 @@ describe('mutations: RejectedItem', () => {
       // returned by the mutation
       expect(result.data?.createRejectedCuratedCorpusItem).to.deep.include(
         inputWithoutProspectId
+      );
+      // Expect to see the SSO username in the `createdBy` field
+      expect(result.data?.createRejectedCuratedCorpusItem.createdBy).to.equal(
+        headers.username
       );
 
       // Check that the REJECT_ITEM event was fired successfully:
