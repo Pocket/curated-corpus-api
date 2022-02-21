@@ -1,8 +1,8 @@
 import config from '../../../config';
-import { CuratedStatus } from '@prisma/client';
+import { ApprovedItem, CuratedStatus } from '@prisma/client';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { db } from '../../../test/admin-server';
+import { db, getServer } from '../../../test/admin-server';
 import {
   clearDb,
   createApprovedItemHelper,
@@ -29,7 +29,7 @@ import {
 import { Upload } from 'graphql-upload';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import { GET_REJECTED_ITEMS } from '../queries/sample-queries.gql';
-import { MozillaAccessGroup } from '../../../shared/types';
+import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
 
 describe('mutations: ApprovedItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
@@ -71,7 +71,7 @@ describe('mutations: ApprovedItem', () => {
       isSyndicated: false,
     };
 
-    it('creates an approved item with all inputs supplied', async () => {
+    it('should create an approved item if user has full access', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
       eventEmitter.on(ReviewedCorpusItemEventType.ADD_ITEM, eventTracker);
@@ -103,7 +103,7 @@ describe('mutations: ApprovedItem', () => {
       ).to.equal(result.data?.createApprovedCuratedCorpusItem.externalId);
     });
 
-    it('creates an approved item without a prospectId', async () => {
+    it('should create an approved item without a prospectId', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
       eventEmitter.on(ReviewedCorpusItemEventType.ADD_ITEM, eventTracker);
@@ -289,18 +289,17 @@ describe('mutations: ApprovedItem', () => {
   });
 
   describe('updateApprovedCuratedCorpusItem mutation', () => {
-    it('updates an approved item when required variables are supplied', async () => {
-      // Set up event tracking
-      const eventTracker = sinon.fake();
-      eventEmitter.on(ReviewedCorpusItemEventType.UPDATE_ITEM, eventTracker);
+    let item: ApprovedItem;
+    let input: UpdateApprovedItemInput;
 
-      const item = await createApprovedItemHelper(db, {
+    beforeEach(async () => {
+      item = await createApprovedItemHelper(db, {
         title: "3 Things Everyone Knows About LEGO That You Don't",
         status: CuratedStatus.RECOMMENDATION,
         language: 'en',
       });
 
-      const input: UpdateApprovedItemInput = {
+      input = {
         externalId: item.externalId,
         title: 'Anything but LEGO',
         excerpt: 'Updated excerpt',
@@ -311,6 +310,12 @@ describe('mutations: ApprovedItem', () => {
         topic: 'Business',
         isTimeSensitive: true,
       };
+    });
+
+    it('should succeed if user has full access', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.UPDATE_ITEM, eventTracker);
 
       const { data } = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
@@ -336,6 +341,89 @@ describe('mutations: ApprovedItem', () => {
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
       ).to.equal(data?.updateApprovedCuratedCorpusItem.externalId);
+    });
+
+    it('should succeed if user has access to one of scheduled surfaces', async () => {
+      // Set up auth headers with access to a single Scheduled Surface
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENGB}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers, eventEmitter);
+      await server.start();
+
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.UPDATE_ITEM, eventTracker);
+
+      const { data } = await server.executeOperation({
+        query: UPDATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      // External ID should be unchanged
+      expect(data?.updateApprovedCuratedCorpusItem.externalId).to.equal(
+        item.externalId
+      );
+
+      // Updated properties should be... updated
+      expect(data?.updateApprovedCuratedCorpusItem).to.deep.include(input);
+
+      // Check that the UPDATE_ITEM event was fired successfully:
+      // 1 - Event was fired once!
+      expect(eventTracker.callCount).to.equal(1);
+      // 2 - Event has the right type.
+      expect(await eventTracker.getCall(0).args[0].eventType).to.equal(
+        ReviewedCorpusItemEventType.UPDATE_ITEM
+      );
+      // 3- Event has the right entity passed to it.
+      expect(
+        await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
+      ).to.equal(data?.updateApprovedCuratedCorpusItem.externalId);
+
+      await server.stop();
+    });
+
+    it('should fail if request headers are not supplied', async () => {
+      // With the default context, the headers are empty
+      const server = getServer(eventEmitter);
+      await server.start();
+
+      const result = await server.executeOperation({
+        query: UPDATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.data).to.be.null;
+      expect(result.errors).not.to.be.null;
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+
+    it("should fail if user doesn't have access to any of scheduled surfaces", async () => {
+      // Set up auth headers with access to something irrelevant here, such as collections
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.COLLECTION_CURATOR_FULL}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers, eventEmitter);
+      await server.start();
+
+      const result = await server.executeOperation({
+        query: UPDATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.data).to.be.null;
+      expect(result.errors).not.to.be.null;
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+
+      await server.stop();
     });
   });
 
@@ -513,6 +601,139 @@ describe('mutations: ApprovedItem', () => {
       expect(data?.uploadApprovedCuratedCorpusItemImage.url).to.match(
         urlPattern
       );
+    });
+  });
+});
+
+describe('mutations: ApprovedItem - authentication checks', () => {
+  const eventEmitter = new CuratedCorpusEventEmitter();
+
+  // a standard set of inputs for this mutation
+  const input: CreateApprovedItemInput = {
+    prospectId: '123-abc',
+    title: 'Find Out How I Cured My Docker In 2 Days',
+    url: 'https://test.com/docker',
+    excerpt: 'A short summary of what this story is about',
+    status: CuratedStatus.CORPUS,
+    imageUrl: 'https://test.com/image.png',
+    language: 'de',
+    publisher: 'Convective Cloud',
+    topic: 'Technology',
+    isCollection: false,
+    isTimeSensitive: true,
+    isSyndicated: false,
+  };
+
+  describe('createApprovedCuratedCorpusItem mutation', () => {
+    it('should succeed if user has access to one of scheduled surfaces', async () => {
+      // set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.ADD_ITEM, eventTracker);
+
+      // Set up auth headers with access to a single Scheduled Surface
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENGB}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers, eventEmitter);
+      await server.start();
+
+      const result = await server.executeOperation({
+        query: CREATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
+
+      // Expect to see all the input data we supplied in the Approved Item
+      // returned by the mutation
+      expect(result.data?.createApprovedCuratedCorpusItem).to.deep.include(
+        input
+      );
+
+      // Check that the ADD_ITEM event was fired successfully:
+      // 1 - Event was fired once!
+      expect(eventTracker.callCount).to.equal(1);
+      // 2 - Event has the right type.
+      expect(await eventTracker.getCall(0).args[0].eventType).to.equal(
+        ReviewedCorpusItemEventType.ADD_ITEM
+      );
+      // 3- Event has the right entity passed to it.
+      expect(
+        await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
+      ).to.equal(result.data?.createApprovedCuratedCorpusItem.externalId);
+
+      await server.stop();
+    });
+
+    it('should fail if request headers are not supplied', async () => {
+      // With the default context, the headers are empty
+      const server = getServer(eventEmitter);
+      await server.start();
+
+      const result = await server.executeOperation({
+        query: CREATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.data).to.be.null;
+      expect(result.errors).not.to.be.null;
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+
+    it("should fail if user doesn't have access to any of scheduled surfaces", async () => {
+      // Set up auth headers with access to something irrelevant here, such as collections
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.COLLECTION_CURATOR_FULL}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers, eventEmitter);
+      await server.start();
+
+      const result = await server.executeOperation({
+        query: CREATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.data).to.be.null;
+      expect(result.errors).not.to.be.null;
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+
+    it('should fail optional scheduling if user has no access to relevant scheduled surface', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers, eventEmitter);
+      await server.start();
+
+      // extra inputs for scheduling - note attempting to schedule onto the US New Tab
+      // while only having access to the German New Tab
+      input.scheduledDate = '2100-01-01';
+      input.scheduledSurfaceGuid = 'NEW_TAB_EN_US';
+
+      const result = await server.executeOperation({
+        query: CREATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.data).to.be.null;
+      expect(result.errors).not.to.be.null;
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+
+      await server.stop();
     });
   });
 });

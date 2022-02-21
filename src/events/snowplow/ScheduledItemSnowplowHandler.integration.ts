@@ -75,11 +75,11 @@ function assertValidSnowplowScheduledItemEvents(data) {
         url: scheduledCorpusItem.approvedItem.url,
 
         scheduled_at: getUnixTimestamp(scheduledCorpusItem.scheduledDate),
-        new_tab_id: scheduledCorpusItem.scheduledSurfaceGuid,
-        new_tab_name: getScheduledSurfaceByGuid(
+        scheduled_surface_id: scheduledCorpusItem.scheduledSurfaceGuid,
+        scheduled_surface_name: getScheduledSurfaceByGuid(
           scheduledCorpusItem.scheduledSurfaceGuid
         )?.name,
-        new_tab_feed_utc_offset: getScheduledSurfaceByGuid(
+        scheduled_surface_utc_offset: getScheduledSurfaceByGuid(
           scheduledCorpusItem.scheduledSurfaceGuid
         )?.utcOffset.toString(),
         created_at: getUnixTimestamp(scheduledCorpusItem.createdAt),

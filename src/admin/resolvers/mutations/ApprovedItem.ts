@@ -15,8 +15,10 @@ import { uploadImageToS3 } from '../../aws/upload';
 import {
   scheduledSurfaceAllowedValues,
   ApprovedItemS3ImageUrl,
+  ACCESS_DENIED_ERROR,
 } from '../../../shared/types';
 import { CreateRejectedItemInput } from '../../../database/types';
+import { AuthenticationError } from 'apollo-server-errors';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -33,6 +35,20 @@ export async function createApprovedItem(
   context
 ): Promise<ApprovedItem> {
   const { scheduledDate, scheduledSurfaceGuid, ...approvedItemData } = data;
+
+  // If this item is being created and scheduled at the same time,
+  // the user needs write access to the relevant scheduled surface.
+  if (
+    scheduledSurfaceGuid &&
+    !context.authenticatedUser.canWriteToSurface(scheduledSurfaceGuid)
+  ) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
+  // If there is no optional scheduling, check if the user can write to the corpus.
+  if (!context.authenticatedUser.canWriteToCorpus()) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
 
   if (
     scheduledDate &&
@@ -83,6 +99,11 @@ export async function updateApprovedItem(
   { data },
   context
 ): Promise<ApprovedItem> {
+  // Check if the user can perform this mutation
+  if (!context.authenticatedUser.canWriteToCorpus()) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
   const approvedItem = await dbUpdateApprovedItem(context.db, data);
 
   context.emitReviewedCorpusItemEvent(
