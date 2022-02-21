@@ -158,15 +158,15 @@ export type ScheduledCorpusItem = {
   /**
    * A guid that identifies the scheduled surface, e.g. 'NEW_TAB_EN_US'.
    */
-  new_tab_id: string;
+  scheduled_surface_id: string;
   /**
    * The name of the scheduled surface.
    */
-  new_tab_name?: string;
+  scheduled_surface_name?: string;
   /**
    * The time that the scheduled surface feed is offset from UTC time.
    */
-  new_tab_feed_utc_offset?: string;
+  scheduled_surface_utc_offset?: string;
   /**
    * The UTC unix timestamp (in seconds) for when the scheduled surface schedule
    * was created.
