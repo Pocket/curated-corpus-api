@@ -127,6 +127,11 @@ export async function rejectApprovedItem(
   { data },
   context
 ): Promise<ApprovedItem> {
+  // check if user is not authorized to reject an item
+  if (!context.authenticatedUser.canWriteToCorpus()) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
   let approvedItem = await dbDeleteApprovedItem(context.db, data.externalId);
 
   // From our thoughtfully saved before deletion Approved Item, construct
