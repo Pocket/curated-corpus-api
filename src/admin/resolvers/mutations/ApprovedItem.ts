@@ -19,6 +19,7 @@ import {
 } from '../../../shared/types';
 import { CreateRejectedItemInput } from '../../../database/types';
 import { AuthenticationError } from 'apollo-server-errors';
+import { IContext } from '../../context';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -125,7 +126,7 @@ export async function updateApprovedItem(
 export async function rejectApprovedItem(
   parent,
   { data },
-  context
+  context: IContext
 ): Promise<ApprovedItem> {
   // check if user is not authorized to reject an item
   if (!context.authenticatedUser.canWriteToCorpus()) {

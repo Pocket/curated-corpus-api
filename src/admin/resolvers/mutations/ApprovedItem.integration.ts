@@ -428,7 +428,7 @@ describe('mutations: ApprovedItem', () => {
   });
 
   describe('rejectApprovedCuratedCorpusItem mutation', () => {
-    it('removes a corpus item from the approved corpus to the rejection pile', async () => {
+    it('moves a corpus item from the approved corpus to the rejection pile', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
       eventEmitter.on(ReviewedCorpusItemEventType.REMOVE_ITEM, eventTracker);
@@ -778,7 +778,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
     });
 
     it('should throw an error when the user has no access any scheduled surface ', async () => {
-      // Set up auth headers with access to a single Scheduled Surface
+      // Set up auth headers without access to any Scheduled Surface
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
@@ -807,7 +807,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
     });
 
     it('should throw an error when the user has only read-only access ', async () => {
-      // Set up auth headers with access to a single Scheduled Surface
+      // Set up auth headers with read-only access
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
