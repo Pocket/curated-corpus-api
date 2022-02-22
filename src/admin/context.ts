@@ -86,6 +86,16 @@ export class ContextManager implements IContext {
     );
     const hasReadOnly = accessGroups.includes(MozillaAccessGroup.READONLY);
 
+    // array to hold groups as strings because typescript is not happy with enums
+    const scheduledSurfaceAccessGroups = [
+      MozillaAccessGroup.NEW_TAB_CURATOR_ENUS as string,
+      MozillaAccessGroup.NEW_TAB_CURATOR_ENGB as string,
+      MozillaAccessGroup.NEW_TAB_CURATOR_DEDE as string,
+      MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL as string,
+      MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS as string,
+      MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE as string,
+    ];
+
     const user: AdminAPIUser = {
       name: this.config.request.headers.name as string,
       username: this.config.request.headers.username as string,
@@ -105,15 +115,6 @@ export class ContextManager implements IContext {
 
         // As long as the user has access to a specific scheduled surface,
         // they can create/edit/delete corpus items, too.
-        const scheduledSurfaceAccessGroups = [
-          MozillaAccessGroup.NEW_TAB_CURATOR_ENUS as string, // Oh, TypeScript!
-          MozillaAccessGroup.NEW_TAB_CURATOR_ENGB as string,
-          MozillaAccessGroup.NEW_TAB_CURATOR_DEDE as string,
-          MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL as string,
-          MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS as string,
-          MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE as string,
-        ];
-
         return (
           accessGroups.filter((element) => {
             return scheduledSurfaceAccessGroups.includes(element);

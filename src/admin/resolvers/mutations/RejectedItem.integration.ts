@@ -115,6 +115,31 @@ describe('mutations: RejectedItem', () => {
       ).to.equal(result.data?.createRejectedCuratedCorpusItem.externalId);
     });
 
+    it('should create a rejected item if the user has access to at least one of the scheduled surfaces', async () => {
+      const server = getServerWithMockedHeaders({
+        ...headers,
+        groups: `group-1,${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
+      });
+
+      await server.start();
+
+      const result = await server.executeOperation({
+        query: CREATE_REJECTED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
+
+      // Expect to see all the input data we supplied in the Approved Item
+      // returned by the mutation
+      expect(result.data?.createRejectedCuratedCorpusItem).to.deep.include(
+        input
+      );
+
+      await server.stop();
+    });
+
     it('should fail to create a rejected item with a duplicate URL', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
@@ -193,6 +218,27 @@ describe('mutations: RejectedItem', () => {
 
       expect(result.errors).not.to.be.null;
       // And there is an access denied error
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+
+    it('should throw an error if the user does not have any scheduled surface access', async () => {
+      const server = getServerWithMockedHeaders({
+        ...headers,
+        groups: 'group-1, group-2',
+      });
+
+      await server.start();
+
+      const result = await server.executeOperation({
+        query: CREATE_REJECTED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.data).to.be.null;
+
+      expect(result.errors).not.to.be.null;
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
 
       await server.stop();
