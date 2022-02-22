@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   mysql:
-    image: mysql:5.7@sha256:afc453de0d675083ac00d0538521f8a9a67d1cce180d70fab9925ebcc87a0eba
+    image: mysql:5.7@sha256:6c75a3ede385188dca74670e94c92ce11a0307a0ad4448265afe0d3c815dfe48
     env_file:
       - ./.docker/local.env
     ports:
@@ -11,7 +11,7 @@ services:
       - TZ=UTC
 
   localstack:
-    image: localstack/localstack@sha256:2feae63c2f3bf633e1dd725bea8207aec81f81e30ec1307f23a1af13c440fe98
+    image: localstack/localstack@sha256:1c1a0dbf3ea1ffcfb6859bee3e570083d41172e6dfc22b1deb8693781a5a6d8e
     env_file:
       - .docker/local.env
     ports:
