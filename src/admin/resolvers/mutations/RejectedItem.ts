@@ -19,7 +19,7 @@ export async function createRejectedItem(
   context: IContext
 ): Promise<RejectedCuratedCorpusItem> {
   // check if user is not authorized to reject an item
-  if (!context.authenticatedUser.canWriteToCorpus) {
+  if (!context.authenticatedUser.canWriteToCorpus()) {
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
 
