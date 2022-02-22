@@ -736,4 +736,126 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       await server.stop();
     });
   });
+
+  describe('rejectApprovedItem mutation', () => {
+    it('should successfully reject an approved item when the user has access to at least one scheduled surface ', async () => {
+      // Set up auth headers with access to a single Scheduled Surface
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENGB}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const item = await createApprovedItemHelper(db, {
+        title: '15 Unheard Ways To Achieve Greater Terraform',
+        status: CuratedStatus.RECOMMENDATION,
+        language: 'en',
+      });
+
+      const input: RejectApprovedItemInput = {
+        externalId: item.externalId,
+        reason: 'MISINFORMATION,OTHER',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
+
+      // On success, mutation should return the deleted approved item.
+      // Let's verify the id.
+      expect(result.data?.rejectApprovedCuratedCorpusItem.externalId).to.equal(
+        item.externalId
+      );
+
+      await server.stop();
+    });
+
+    it('should throw an error when the user has no access any scheduled surface ', async () => {
+      // Set up auth headers without access to any Scheduled Surface
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const input: RejectApprovedItemInput = {
+        externalId: 'test-id',
+        reason: 'MISINFORMATION,OTHER',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+
+    it('should throw an error when the user has only read-only access ', async () => {
+      // Set up auth headers with read-only access
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,${MozillaAccessGroup.READONLY}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const input: RejectApprovedItemInput = {
+        externalId: 'test-id',
+        reason: 'MISINFORMATION,OTHER',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+
+    it('should throw an error when the request headers are undefined  ', async () => {
+      // pass in empty object for headers
+      const server = getServerWithMockedHeaders({});
+      await server.start();
+
+      const input: RejectApprovedItemInput = {
+        externalId: 'test-id',
+        reason: 'MISINFORMATION,OTHER',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+  });
 });

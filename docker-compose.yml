@@ -2,6 +2,7 @@ version: '3.1'
 services:
   mysql:
     image: mysql:5.7@sha256:6c75a3ede385188dca74670e94c92ce11a0307a0ad4448265afe0d3c815dfe48
+    platform: linux/amd64
     env_file:
       - ./.docker/local.env
     ports:
@@ -12,6 +13,7 @@ services:
 
   localstack:
     image: localstack/localstack@sha256:9f7f44c36c2c118859002acd52bb3653bb849834b3509cba5ee3495cac29172a
+    platform: linux/amd64
     env_file:
       - .docker/local.env
     ports:
@@ -32,6 +34,7 @@ services:
 
   app:
     image: node:16@sha256:fd86131ddf8e0faa8ba7a3e49b6bf571745946e663e4065f3bff0a07204c1dde
+    platform: linux/amd64
     env_file:
       - .docker/local.env
     working_dir: /app
@@ -49,5 +52,6 @@ services:
 
   snowplow:
     image: pocket/snowplow-micro:latest
+    platform: linux/amd64
     ports:
       - '9090:9090'
