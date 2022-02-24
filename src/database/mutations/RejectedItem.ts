@@ -7,10 +7,12 @@ import { checkCorpusUrl } from '../helpers/checkCorpusUrl';
  *
  * @param db
  * @param data
+ * @param username
  */
 export async function createRejectedItem(
   db: PrismaClient,
-  data: CreateRejectedItemInput
+  data: CreateRejectedItemInput,
+  username: string
 ): Promise<RejectedCuratedCorpusItem> {
   // Check if an item with this URL has already been created in the Curated Corpus.
   await checkCorpusUrl(db, data.url);
@@ -18,8 +20,7 @@ export async function createRejectedItem(
   return db.rejectedCuratedCorpusItem.create({
     data: {
       ...data,
-      // TODO: pass an actual user ID that comes from auth/JWT
-      createdBy: 'sso-user',
+      createdBy: username,
     },
   });
 }

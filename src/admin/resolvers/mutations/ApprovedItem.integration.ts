@@ -90,6 +90,12 @@ describe('mutations: ApprovedItem', () => {
         input
       );
 
+      // The `createdBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(result.data?.createApprovedCuratedCorpusItem.createdBy).to.equal(
+        headers.username
+      );
+
       // Check that the ADD_ITEM event was fired successfully:
       // 1 - Event was fired once!
       expect(eventTracker.callCount).to.equal(1);
@@ -126,6 +132,12 @@ describe('mutations: ApprovedItem', () => {
       // returned by the mutation
       expect(result.data?.createApprovedCuratedCorpusItem).to.deep.include(
         inputWithoutProspectId
+      );
+
+      // The `createdBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(result.data?.createApprovedCuratedCorpusItem.createdBy).to.equal(
+        headers.username
       );
 
       // Check that the ADD_ITEM event was fired successfully:
@@ -230,6 +242,12 @@ describe('mutations: ApprovedItem', () => {
         input
       );
 
+      // The `createdBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(result.data?.createApprovedCuratedCorpusItem.createdBy).to.equal(
+        headers.username
+      );
+
       // NB: we don't (yet) return anything for the scheduled item,
       // but if the mutation does not fall over, that means it has been created
       // successfully.
@@ -330,6 +348,12 @@ describe('mutations: ApprovedItem', () => {
       // Updated properties should be... updated
       expect(data?.updateApprovedCuratedCorpusItem).to.deep.include(input);
 
+      // The `updatedBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(data?.updateApprovedCuratedCorpusItem.updatedBy).to.equal(
+        headers.username
+      );
+
       // Check that the UPDATE_ITEM event was fired successfully:
       // 1 - Event was fired once!
       expect(eventTracker.callCount).to.equal(1);
@@ -370,6 +394,12 @@ describe('mutations: ApprovedItem', () => {
 
       // Updated properties should be... updated
       expect(data?.updateApprovedCuratedCorpusItem).to.deep.include(input);
+
+      // The `updatedBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(data?.updateApprovedCuratedCorpusItem.updatedBy).to.equal(
+        headers.username
+      );
 
       // Check that the UPDATE_ITEM event was fired successfully:
       // 1 - Event was fired once!
@@ -459,6 +489,12 @@ describe('mutations: ApprovedItem', () => {
         item.externalId
       );
 
+      // The `updatedBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(result.data?.rejectApprovedCuratedCorpusItem.updatedBy).to.equal(
+        headers.username
+      );
+
       // There should be a rejected item created. Since we always truncate
       // the database before every test, it is safe to assume that the
       // `getRejectedCuratedCorpusItems` query will contain the one item
@@ -472,6 +508,11 @@ describe('mutations: ApprovedItem', () => {
       expect(
         queryData?.getRejectedCuratedCorpusItems.edges[0].node.url
       ).to.equal(item.url);
+      // The `createdBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(
+        queryData?.getRejectedCuratedCorpusItems.edges[0].node.createdBy
+      ).to.equal(headers.username);
 
       // Check that the REMOVE_ITEM and REJECT_ITEM events were fired successfully.
       expect(eventTracker.callCount).to.equal(2);
