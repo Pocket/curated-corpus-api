@@ -180,13 +180,19 @@ export async function rejectApprovedItem(
  *
  * @param parent
  * @param data
+ * @param context
  * @param s3
  */
 export async function uploadApprovedItemImage(
   parent,
   { data },
-  { s3 }
+  context: IContext
 ): Promise<ApprovedItemS3ImageUrl> {
+  // check if user is is allowed to upload images
+  if (!context.authenticatedUser.canWriteToCorpus()) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
   const image = await data;
-  return await uploadImageToS3(s3, image);
+  return await uploadImageToS3(context.s3, image);
 }
