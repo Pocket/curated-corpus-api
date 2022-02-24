@@ -185,6 +185,7 @@ describe('mutations: ScheduledItem', () => {
       expect(scheduledItem.externalId).to.not.be.null;
       expect(scheduledItem.createdAt).to.not.be.null;
       expect(scheduledItem.updatedAt).to.not.be.null;
+      expect(scheduledItem.createdBy).to.equal(headers.username);
 
       // Expect these to match the input values
       expect(new Date(scheduledItem.scheduledDate)).to.deep.equal(
@@ -389,7 +390,7 @@ describe('mutations: ScheduledItem', () => {
       const returnedItem = data?.deleteScheduledCuratedCorpusItem;
       expect(returnedItem.externalId).to.equal(scheduledItem.externalId);
       expect(returnedItem.createdBy).to.equal(scheduledItem.createdBy);
-      expect(returnedItem.updatedBy).to.equal(scheduledItem.updatedBy);
+      expect(returnedItem.updatedBy).to.equal(headers.username);
 
       expect(returnedItem.createdAt).to.equal(
         getUnixTimestamp(scheduledItem.createdAt)

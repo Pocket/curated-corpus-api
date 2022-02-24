@@ -23,7 +23,11 @@ export async function createRejectedItem(
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
 
-  const rejectedItem = await dbCreateRejectedItem(context.db, data);
+  const rejectedItem = await dbCreateRejectedItem(
+    context.db,
+    data,
+    context.authenticatedUser.username
+  );
 
   context.emitReviewedCorpusItemEvent(
     ReviewedCorpusItemEventType.REJECT_ITEM,

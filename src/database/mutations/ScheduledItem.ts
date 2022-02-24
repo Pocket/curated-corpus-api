@@ -11,10 +11,12 @@ import { NotFoundError } from '@pocket-tools/apollo-utils';
  *
  * @param db
  * @param data
+ * @param username
  */
 export async function createScheduledItem(
   db: PrismaClient,
-  data: CreateScheduledItemInput
+  data: CreateScheduledItemInput,
+  username: string
 ): Promise<ScheduledItem> {
   const { approvedItemExternalId, scheduledSurfaceGuid, scheduledDate } = data;
 
@@ -33,8 +35,7 @@ export async function createScheduledItem(
       approvedItemId: approvedItem.id,
       scheduledSurfaceGuid,
       scheduledDate,
-      // TODO: pass an actual user ID that comes from auth/JWT
-      createdBy: 'sso-user',
+      createdBy: username,
     },
     include: {
       approvedItem: true,

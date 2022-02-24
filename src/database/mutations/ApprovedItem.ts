@@ -8,10 +8,12 @@ import { checkCorpusUrl } from '../helpers/checkCorpusUrl';
  *
  * @param db
  * @param data
+ * @param username
  */
 export async function createApprovedItem(
   db: PrismaClient,
-  data: CreateApprovedItemInput
+  data: CreateApprovedItemInput,
+  username: string
 ): Promise<ApprovedItem> {
   // Check if an item with this URL has already been created in the Curated Corpus.
   await checkCorpusUrl(db, data.url);
@@ -19,8 +21,7 @@ export async function createApprovedItem(
   return db.approvedItem.create({
     data: {
       ...data,
-      // TODO: pass an actual user ID that comes from auth/JWT
-      createdBy: 'sso-user',
+      createdBy: username,
     },
   });
 }
@@ -30,10 +31,12 @@ export async function createApprovedItem(
  *
  * @param db
  * @param data
+ * @param username
  */
 export async function updateApprovedItem(
   db: PrismaClient,
-  data: UpdateApprovedItemInput
+  data: UpdateApprovedItemInput,
+  username: string
 ): Promise<ApprovedItem> {
   if (!data.externalId) {
     throw new UserInputError('externalId must be provided.');
@@ -42,8 +45,7 @@ export async function updateApprovedItem(
     where: { externalId: data.externalId },
     data: {
       ...data,
-      // TODO: pass an actual user ID that comes from auth/JWT
-      createdBy: 'sso-user',
+      updatedBy: username,
     },
   });
 }
