@@ -47,7 +47,9 @@ export async function deleteScheduledItem(
   // as the object returned from the database resolver will have the details
   // of the previous update and not the final one (aka the hard delete).
   scheduledItem.updatedBy = context.authenticatedUser.username;
-  // Do we need the date in UTC here?
+  // The date is already in UTC - excellent! The relevant SnowplowHandler class
+  // will transform it into a Unix timestamp before sending it as part of the Snowplow
+  // event data.
   scheduledItem.updatedAt = new Date();
 
   context.emitScheduledCorpusItemEvent(
