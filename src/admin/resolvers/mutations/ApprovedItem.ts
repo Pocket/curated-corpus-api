@@ -15,6 +15,8 @@ import { uploadImageToS3 } from '../../aws/upload';
 import {
   scheduledSurfaceAllowedValues,
   ApprovedItemS3ImageUrl,
+  Topics,
+  RejectionReason,
   ACCESS_DENIED_ERROR,
 } from '../../../shared/types';
 import { CreateRejectedItemInput } from '../../../database/types';
@@ -58,6 +60,13 @@ export async function createApprovedItem(
   ) {
     throw new UserInputError(
       `Cannot create a scheduled entry with Scheduled Surface GUID of "${data.scheduledSurfaceGuid}".`
+    );
+  }
+
+  // validate topic is a valid enum
+  if (!Object.values(Topics).includes(approvedItemData.topic)) {
+    throw new UserInputError(
+      `Cannot create a corpus item with the topic "${approvedItemData.topic}".`
     );
   }
 
@@ -113,6 +122,13 @@ export async function updateApprovedItem(
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
 
+  // validate topic is a valid enum
+  if (!Object.values(Topics).includes(data.topic)) {
+    throw new UserInputError(
+      `Cannot create a corpus item with the topic "${data.topic}".`
+    );
+  }
+
   const approvedItem = await dbUpdateApprovedItem(
     context.db,
     data,
@@ -147,6 +163,15 @@ export async function rejectApprovedItem(
 
   let approvedItem = await dbDeleteApprovedItem(context.db, data.externalId);
 
+  // validate reason enum
+  // rejection reason comes in as a comma separated string
+  data.reason.split(',').map((reason) => {
+    // remove whitespace in the check below!
+    if (!Object.values(RejectionReason).includes(reason.trim())) {
+      throw new UserInputError(`"${reason}" is not a valid rejection reason.`);
+    }
+  });
+
   // From our thoughtfully saved before deletion Approved Item, construct
   // input data for a Rejected Item entry.
   const input: CreateRejectedItemInput = {
@@ -159,6 +184,7 @@ export async function rejectApprovedItem(
     publisher: approvedItem.publisher,
     reason: data.reason,
   };
+
   // Create a Rejected Item. The Prisma function will handle URL uniqueness checks
   const rejectedItem = await createRejectedItem(
     context.db,

@@ -29,7 +29,11 @@ import {
 import { Upload } from 'graphql-upload';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import { GET_REJECTED_ITEMS } from '../queries/sample-queries.gql';
-import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
+import {
+  ACCESS_DENIED_ERROR,
+  MozillaAccessGroup,
+  Topics,
+} from '../../../shared/types';
 
 describe('mutations: ApprovedItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
@@ -39,6 +43,7 @@ describe('mutations: ApprovedItem', () => {
     username: 'test.user@test.com',
     groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
   };
+
   const server = getServerWithMockedHeaders(headers, eventEmitter);
 
   beforeAll(async () => {
@@ -56,20 +61,25 @@ describe('mutations: ApprovedItem', () => {
 
   describe('createApprovedCuratedCorpusItem mutation', () => {
     // a standard set of inputs for this mutation
-    const input: CreateApprovedItemInput = {
-      prospectId: '123-abc',
-      title: 'Find Out How I Cured My Docker In 2 Days',
-      url: 'https://test.com/docker',
-      excerpt: 'A short summary of what this story is about',
-      status: CuratedStatus.CORPUS,
-      imageUrl: 'https://test.com/image.png',
-      language: 'de',
-      publisher: 'Convective Cloud',
-      topic: 'Technology',
-      isCollection: false,
-      isTimeSensitive: true,
-      isSyndicated: false,
-    };
+    let input: CreateApprovedItemInput;
+
+    beforeEach(() => {
+      // reset input before each test (as tests may manipulate this value)
+      input = {
+        prospectId: '123-abc',
+        title: 'Find Out How I Cured My Docker In 2 Days',
+        url: 'https://test.com/docker',
+        excerpt: 'A short summary of what this story is about',
+        status: CuratedStatus.CORPUS,
+        imageUrl: 'https://test.com/image.png',
+        language: 'de',
+        publisher: 'Convective Cloud',
+        topic: Topics.TECHNOLOGY,
+        isCollection: false,
+        isTimeSensitive: true,
+        isSyndicated: false,
+      };
+    });
 
     it('should create an approved item if user has full access', async () => {
       // Set up event tracking
@@ -304,6 +314,33 @@ describe('mutations: ApprovedItem', () => {
       // Check that the ADD_ITEM event was not fired
       expect(eventTracker.callCount).to.equal(0);
     });
+
+    it('should not create an approved item with invalid topic supplied', async () => {
+      // Set up event tracking
+      const eventTracker = sinon.fake();
+      eventEmitter.on(ReviewedCorpusItemEventType.ADD_ITEM, eventTracker);
+
+      // the correct value is `HEALTH_FITNESS`
+      input.topic = 'HEALTH FITNESS';
+
+      const result = await server.executeOperation({
+        query: CREATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      // ...without success. There is no data
+      expect(result.data).to.be.null;
+      expect(result.errors).not.to.be.null;
+
+      // And there is the right error from the resolvers
+      expect(result.errors?.[0].message).to.contain(
+        `Cannot create a corpus item with the topic "${input.topic}".`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
+
+      // Check that the ADD_ITEM event was not fired
+      expect(eventTracker.callCount).to.equal(0);
+    });
   });
 
   describe('updateApprovedCuratedCorpusItem mutation', () => {
@@ -325,7 +362,7 @@ describe('mutations: ApprovedItem', () => {
         imageUrl: 'https://test.com/image.png',
         language: 'de',
         publisher: 'Cloud Factory',
-        topic: 'Business',
+        topic: Topics.BUSINESS,
         isTimeSensitive: true,
       };
     });
@@ -454,6 +491,25 @@ describe('mutations: ApprovedItem', () => {
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
 
       await server.stop();
+    });
+
+    it('should fail sent an invalid topic', async () => {
+      // this should be `HEALTH_FITNESS`
+      input.topic = 'HEALTH FITNESS';
+
+      const result = await server.executeOperation({
+        query: UPDATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.data).to.be.null;
+      expect(result.errors).not.to.be.null;
+
+      // And there is the right error from the resolvers
+      expect(result.errors?.[0].message).to.contain(
+        `Cannot create a corpus item with the topic "${input.topic}".`
+      );
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
     });
   });
 
@@ -602,6 +658,102 @@ describe('mutations: ApprovedItem', () => {
       // Check that the events were not fired
       expect(eventTracker.callCount).to.equal(0);
     });
+
+    it('should succeed with spaces in rejection reasons', async () => {
+      const item = await createApprovedItemHelper(db, {
+        title: '15 Unheard Ways To Achieve Greater Terraform',
+        status: CuratedStatus.RECOMMENDATION,
+        language: 'en',
+      });
+
+      const input: RejectApprovedItemInput = {
+        externalId: item.externalId,
+        reason: ' MISINFORMATION, OTHER ',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
+    });
+
+    it('should fail when given an invalid rejection reason', async () => {
+      const item = await createApprovedItemHelper(db, {
+        title: '15 Unheard Ways To Achieve Greater Terraform',
+        status: CuratedStatus.RECOMMENDATION,
+        language: 'en',
+      });
+
+      const input: RejectApprovedItemInput = {
+        externalId: item.externalId,
+        reason: 'BADFONT',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(
+        ` is not a valid rejection reason.`
+      );
+    });
+
+    it('should fail when given invalid rejection reasons', async () => {
+      const item = await createApprovedItemHelper(db, {
+        title: '15 Unheard Ways To Achieve Greater Terraform',
+        status: CuratedStatus.RECOMMENDATION,
+        language: 'en',
+      });
+
+      const input: RejectApprovedItemInput = {
+        externalId: item.externalId,
+        reason: 'BADFONT,BORINGCOLORS',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(
+        ` is not a valid rejection reason.`
+      );
+    });
+
+    it('should fail when given valid and invalid rejection reasons', async () => {
+      const item = await createApprovedItemHelper(db, {
+        title: '15 Unheard Ways To Achieve Greater Terraform',
+        status: CuratedStatus.RECOMMENDATION,
+        language: 'en',
+      });
+
+      const input: RejectApprovedItemInput = {
+        externalId: item.externalId,
+        reason: 'MISINFORMATION,IDONTLIKEIT',
+      };
+
+      const result = await server.executeOperation({
+        query: REJECT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(
+        ` is not a valid rejection reason.`
+      );
+    });
   });
 
   describe('uploadApprovedCuratedCorpusItemImage mutation', () => {
@@ -659,7 +811,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
     imageUrl: 'https://test.com/image.png',
     language: 'de',
     publisher: 'Convective Cloud',
-    topic: 'Technology',
+    topic: Topics.TECHNOLOGY,
     isCollection: false,
     isTimeSensitive: true,
     isSyndicated: false,

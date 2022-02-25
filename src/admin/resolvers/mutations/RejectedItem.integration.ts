@@ -38,15 +38,20 @@ describe('mutations: RejectedItem', () => {
 
   describe('createRejectedCuratedCorpusItem mutation', () => {
     // a standard set of inputs for this mutation
-    const input: CreateRejectedItemInput = {
-      prospectId: '123-abc',
-      url: 'https://test.com/docker',
-      title: 'Find Out How I Cured My Docker In 2 Days',
-      topic: 'Technology',
-      language: 'de',
-      publisher: 'Convective Cloud',
-      reason: 'MISINFORMATION,OTHER',
-    };
+    let input: CreateRejectedItemInput;
+
+    beforeEach(() => {
+      // re-set input for each test (as tests may alter input)
+      input = {
+        prospectId: '123-abc',
+        url: 'https://test.com/docker',
+        title: 'Find Out How I Cured My Docker In 2 Days',
+        topic: 'Technology',
+        language: 'de',
+        publisher: 'Convective Cloud',
+        reason: 'MISINFORMATION,OTHER',
+      };
+    });
 
     it('creates a rejected item with all inputs supplied', async () => {
       // Set up event tracking
@@ -271,6 +276,66 @@ describe('mutations: RejectedItem', () => {
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
 
       await server.stop();
+    });
+
+    it('should succeed with spaces in rejection reasons', async () => {
+      input.reason = ' MISINFORMATION, OTHER ';
+
+      const result = await server.executeOperation({
+        query: CREATE_REJECTED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
+    });
+
+    it('should fail when given an invalid rejection reason', async () => {
+      input.reason = 'BADFONT';
+
+      const result = await server.executeOperation({
+        query: CREATE_REJECTED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(
+        ` is not a valid rejection reason.`
+      );
+    });
+
+    it('should fail when given invalid rejection reasons', async () => {
+      input.reason = 'BADFONT,BORINGCOLORS';
+
+      const result = await server.executeOperation({
+        query: CREATE_REJECTED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(
+        ` is not a valid rejection reason.`
+      );
+    });
+
+    it('should fail when given valid and invalid rejection reasons', async () => {
+      input.reason = 'MISINFORMATION,IDONTLIKEIT';
+
+      const result = await server.executeOperation({
+        query: CREATE_REJECTED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(
+        ` is not a valid rejection reason.`
+      );
     });
   });
 });
