@@ -1,10 +1,13 @@
 import { Connection } from '@devoxa/prisma-relay-cursor-connection';
 import { ApprovedItem } from '@prisma/client';
+import { AuthenticationError } from 'apollo-server-core';
 import config from '../../../config';
 import {
   getApprovedItems as dbGetApprovedItems,
   getApprovedItemByUrl as dbGetApprovedItemByUrl,
 } from '../../../database/queries';
+import { ACCESS_DENIED_ERROR } from '../../../shared/types';
+import { IContext } from '../../context';
 
 /**
  * This query retrieves approved items from the database.
@@ -16,8 +19,16 @@ import {
 export async function getApprovedItems(
   parent,
   args,
-  { db }
+  context: IContext
 ): Promise<Connection<ApprovedItem>> {
+  //check if the user does not have the permissions to access this query
+  if (
+    !context.authenticatedUser.hasReadOnly &&
+    !context.authenticatedUser.canWriteToCorpus()
+  ) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
   let { pagination } = args;
 
   // Set the defaults for pagination if nothing's been provided
@@ -38,7 +49,7 @@ export async function getApprovedItems(
     }
   }
 
-  return await dbGetApprovedItems(db, pagination, args.filters);
+  return await dbGetApprovedItems(context.db, pagination, args.filters);
 }
 
 /**
