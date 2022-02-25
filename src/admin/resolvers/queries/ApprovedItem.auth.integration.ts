@@ -22,7 +22,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
     await db.$disconnect();
   });
 
-  describe.skip('getApprovedCuratedCorpusItems query', () => {
+  describe('getApprovedCuratedCorpusItems query', () => {
     beforeAll(async () => {
       // Create some items
       const stories = [
@@ -207,7 +207,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
       await server.stop();
     });
 
-    it.only('should throw an error when user does not have the required access', async () => {
+    it('should throw an error when user does not have the required access', async () => {
       // Set up auth headers with no valid access group
       const headers = {
         name: 'Test User',
@@ -225,7 +225,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
         },
       });
 
-      expect(result.data).to.be.null;
+      expect(result.data?.getApprovedCuratedCorpusItemByUrl).to.be.null;
 
       expect(result.errors).not.to.be.undefined;
       // check if the error we get is access denied error
@@ -252,7 +252,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
         },
       });
 
-      expect(result.data).to.be.null;
+      expect(result.data?.getApprovedCuratedCorpusItemByUrl).to.be.null;
 
       expect(result.errors).not.to.be.undefined;
       // check if the error we get is access denied error
