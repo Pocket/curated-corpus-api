@@ -1,8 +1,9 @@
+import { UserInputError } from 'apollo-server';
 import { RejectedCuratedCorpusItem } from '@prisma/client';
 import { AuthenticationError } from 'apollo-server-core';
 import { createRejectedItem as dbCreateRejectedItem } from '../../../database/mutations';
 import { ReviewedCorpusItemEventType } from '../../../events/types';
-import { ACCESS_DENIED_ERROR } from '../../../shared/types';
+import { RejectionReason, ACCESS_DENIED_ERROR } from '../../../shared/types';
 import { IContext } from '../../context';
 
 /**
@@ -22,6 +23,15 @@ export async function createRejectedItem(
   if (!context.authenticatedUser.canWriteToCorpus()) {
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
+
+  // validate reason enum
+  // rejection reason comes in as a comma separated string
+  data.reason.split(',').map((reason) => {
+    // remove whitespace in the check below!
+    if (!Object.values(RejectionReason).includes(reason.trim())) {
+      throw new UserInputError(`"${reason}" is not a valid rejection reason.`);
+    }
+  });
 
   const rejectedItem = await dbCreateRejectedItem(
     context.db,

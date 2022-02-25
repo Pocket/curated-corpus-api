@@ -143,5 +143,14 @@ export enum Topics {
   TRAVEL = 'TRAVEL',
 }
 
+export enum RejectionReason {
+  PAYWALL = 'PAYWALL',
+  POLITICAL_OPINION = 'POLITICAL_OPINION',
+  OFFENSIVE_MATERIAL = 'OFFENSIVE_MATERIAL',
+  TIME_SENSITIVE = 'TIME_SENSITIVE',
+  MISINFORMATION = 'MISINFORMATION',
+  OTHER = 'OTHER',
+}
+
 export const ACCESS_DENIED_ERROR =
   'You do not have access to perform this action.';
