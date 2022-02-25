@@ -86,10 +86,15 @@ export class ContextManager implements IContext {
     );
     const hasReadOnly = accessGroups.includes(MozillaAccessGroup.READONLY);
 
-    // converting access groups enum to an string array for typescript
-    const scheduledSurfaceAccessGroups = Object.values(MozillaAccessGroup).map(
-      (scheduledSurfaceGroup) => scheduledSurfaceGroup as string
-    );
+    // array to hold groups as strings because typescript is not happy with enums
+    const scheduledSurfaceAccessGroups = [
+      MozillaAccessGroup.NEW_TAB_CURATOR_ENUS as string,
+      MozillaAccessGroup.NEW_TAB_CURATOR_ENGB as string,
+      MozillaAccessGroup.NEW_TAB_CURATOR_DEDE as string,
+      MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL as string,
+      MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS as string,
+      MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE as string,
+    ];
 
     const user: AdminAPIUser = {
       name: this.config.request.headers.name as string,
