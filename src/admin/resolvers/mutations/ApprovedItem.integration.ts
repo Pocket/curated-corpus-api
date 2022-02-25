@@ -90,6 +90,12 @@ describe('mutations: ApprovedItem', () => {
         input
       );
 
+      // The `createdBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(result.data?.createApprovedCuratedCorpusItem.createdBy).to.equal(
+        headers.username
+      );
+
       // Check that the ADD_ITEM event was fired successfully:
       // 1 - Event was fired once!
       expect(eventTracker.callCount).to.equal(1);
@@ -126,6 +132,12 @@ describe('mutations: ApprovedItem', () => {
       // returned by the mutation
       expect(result.data?.createApprovedCuratedCorpusItem).to.deep.include(
         inputWithoutProspectId
+      );
+
+      // The `createdBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(result.data?.createApprovedCuratedCorpusItem.createdBy).to.equal(
+        headers.username
       );
 
       // Check that the ADD_ITEM event was fired successfully:
@@ -230,6 +242,12 @@ describe('mutations: ApprovedItem', () => {
         input
       );
 
+      // The `createdBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(result.data?.createApprovedCuratedCorpusItem.createdBy).to.equal(
+        headers.username
+      );
+
       // NB: we don't (yet) return anything for the scheduled item,
       // but if the mutation does not fall over, that means it has been created
       // successfully.
@@ -330,6 +348,12 @@ describe('mutations: ApprovedItem', () => {
       // Updated properties should be... updated
       expect(data?.updateApprovedCuratedCorpusItem).to.deep.include(input);
 
+      // The `updatedBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(data?.updateApprovedCuratedCorpusItem.updatedBy).to.equal(
+        headers.username
+      );
+
       // Check that the UPDATE_ITEM event was fired successfully:
       // 1 - Event was fired once!
       expect(eventTracker.callCount).to.equal(1);
@@ -370,6 +394,12 @@ describe('mutations: ApprovedItem', () => {
 
       // Updated properties should be... updated
       expect(data?.updateApprovedCuratedCorpusItem).to.deep.include(input);
+
+      // The `updatedBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(data?.updateApprovedCuratedCorpusItem.updatedBy).to.equal(
+        headers.username
+      );
 
       // Check that the UPDATE_ITEM event was fired successfully:
       // 1 - Event was fired once!
@@ -459,6 +489,12 @@ describe('mutations: ApprovedItem', () => {
         item.externalId
       );
 
+      // The `updatedBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(result.data?.rejectApprovedCuratedCorpusItem.updatedBy).to.equal(
+        headers.username
+      );
+
       // There should be a rejected item created. Since we always truncate
       // the database before every test, it is safe to assume that the
       // `getRejectedCuratedCorpusItems` query will contain the one item
@@ -472,6 +508,11 @@ describe('mutations: ApprovedItem', () => {
       expect(
         queryData?.getRejectedCuratedCorpusItems.edges[0].node.url
       ).to.equal(item.url);
+      // The `createdBy` field should now be the SSO username of the user
+      // who updated this record
+      expect(
+        queryData?.getRejectedCuratedCorpusItems.edges[0].node.createdBy
+      ).to.equal(headers.username);
 
       // Check that the REMOVE_ITEM and REJECT_ITEM events were fired successfully.
       expect(eventTracker.callCount).to.equal(2);
@@ -738,7 +779,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
   });
 
   describe('rejectApprovedItem mutation', () => {
-    it('should successfully reject an approved item when the user has access to at least one scheduled surface ', async () => {
+    it('should successfully reject an approved item when the user has access to at least one scheduled surface', async () => {
       // Set up auth headers with access to a single Scheduled Surface
       const headers = {
         name: 'Test User',
@@ -777,7 +818,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       await server.stop();
     });
 
-    it('should throw an error when the user has no access any scheduled surface ', async () => {
+    it('should throw an error when the user has no access any scheduled surface', async () => {
       // Set up auth headers without access to any Scheduled Surface
       const headers = {
         name: 'Test User',
@@ -806,7 +847,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       await server.stop();
     });
 
-    it('should throw an error when the user has only read-only access ', async () => {
+    it('should throw an error when the user has only read-only access', async () => {
       // Set up auth headers with read-only access
       const headers = {
         name: 'Test User',
@@ -835,7 +876,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       await server.stop();
     });
 
-    it('should throw an error when the request headers are undefined  ', async () => {
+    it('should throw an error when the request headers are undefined', async () => {
       // pass in empty object for headers
       const server = getServerWithMockedHeaders({});
       await server.start();
@@ -853,6 +894,51 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.errors).not.to.be.undefined;
       expect(result.data).to.be.null;
 
+      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+
+      await server.stop();
+    });
+  });
+
+  describe('uploadApprovedCuratedCorpusItemImage mutation', () => {
+    const testFilePath = __dirname + '/test-image.jpeg';
+
+    beforeEach(() => {
+      writeFileSync(testFilePath, 'I am an image');
+    });
+
+    afterEach(() => {
+      unlinkSync(testFilePath);
+    });
+
+    it('should not succeed if user does not have write to corpus privileges', async () => {
+      const headers = {
+        name: 'Test User',
+        username: 'test.user@test.com',
+        groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
+      };
+
+      const server = getServerWithMockedHeaders(headers);
+      await server.start();
+
+      const image: Upload = new Upload();
+
+      image.resolve({
+        filename: 'test.jpg',
+        mimetype: 'image/jpeg',
+        encoding: '7bit',
+        createReadStream: () => createReadStream(testFilePath),
+      });
+
+      const result = await server.executeOperation({
+        query: UPLOAD_APPROVED_ITEM_IMAGE,
+        variables: {
+          image: image,
+        },
+      });
+
+      expect(result.data).to.be.null;
+      expect(result.errors).not.to.be.null;
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
 
       await server.stop();
