@@ -14,7 +14,7 @@ import { IContext } from '../../context';
  *
  * @param parent
  * @param args
- * @param db
+ * @param context
  */
 export async function getApprovedItems(
   parent,
@@ -59,12 +59,27 @@ export async function getApprovedItems(
  *
  * @param parent
  * @param args
- * @param db
+ * @param context
  */
 export async function getApprovedItemByUrl(
   parent,
   args,
-  { db }
+  context: IContext
 ): Promise<ApprovedItem | null> {
-  return await dbGetApprovedItemByUrl(db, args.url);
+  //check if the user does not have the permissions to access this query
+  console.log('******************', context.authenticatedUser.hasReadOnly);
+  console.log(
+    '------------------',
+    context.authenticatedUser.canWriteToCorpus()
+  );
+
+  if (
+    !context.authenticatedUser.hasReadOnly &&
+    !context.authenticatedUser.canWriteToCorpus()
+  ) {
+    console.log('HERA PHERI!!!');
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
+  return await dbGetApprovedItemByUrl(context.db, args.url);
 }
