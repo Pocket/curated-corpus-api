@@ -12,7 +12,7 @@
     "test:watch": "npm test -- --watchAll",
     "test": "jest \"\\.spec\\.ts\"",
     "test-setup": "export $(egrep -v '^#' .docker/local.env | xargs -0) && ./.circleci/scripts/setup.sh --hosts",
-    "test-integrations": "jest \"ScheduledItem\\.auth\\.integration\\.ts\" --runInBand",
+    "test-integrations": "jest \"\\.integration\\.ts\" --runInBand",
     "test-integrations:watch": "npm run test-integrations -- --watchAll",
     "lint-check": "eslint --fix-dry-run \"src/**/*.ts\"",
     "lint-fix": "eslint --fix \"src/**/*.ts\"",
