@@ -123,6 +123,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
 
       // check if the error we get is access denied error
       expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
 
       await server.stop();
     });
@@ -147,6 +148,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
 
       // check if the error we get is access denied error
       expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
 
       await server.stop();
     });
@@ -224,6 +226,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
       expect(result.errors).not.to.be.undefined;
       // check if the error we get is access denied error
       expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
 
       await server.stop();
     });
@@ -251,6 +254,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
       expect(result.errors).not.to.be.undefined;
       // check if the error we get is access denied error
       expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
 
       await server.stop();
     });
