@@ -2,19 +2,30 @@ import { Connection } from '@devoxa/prisma-relay-cursor-connection';
 import { RejectedCuratedCorpusItem } from '@prisma/client';
 import config from '../../../config';
 import { getRejectedCuratedCorpusItems as dbGetRejectedCuratedCorpusItems } from '../../../database/queries';
+import { IContext } from '../../context';
+import { AuthenticationError } from 'apollo-server-errors';
+import { ACCESS_DENIED_ERROR } from '../../../shared/types';
 
 /**
  * This query retrieves rejected curated items from the database.
  *
  * @param parent
  * @param args
- * @param db
+ * @param context
  */
 export async function getRejectedItems(
   parent,
   args,
-  { db }
+  context: IContext
 ): Promise<Connection<RejectedCuratedCorpusItem>> {
+  //check if the user has the required permissions to access this query
+  if (
+    !context.authenticatedUser.hasReadOnly &&
+    !context.authenticatedUser.canWriteToCorpus()
+  ) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
   let { pagination } = args;
 
   // Set the defaults for pagination if nothing's been provided
@@ -37,5 +48,9 @@ export async function getRejectedItems(
     }
   }
 
-  return await dbGetRejectedCuratedCorpusItems(db, pagination, args.filters);
+  return await dbGetRejectedCuratedCorpusItems(
+    context.db,
+    pagination,
+    args.filters
+  );
 }
