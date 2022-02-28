@@ -3,13 +3,25 @@ import {
   clearDb,
   createApprovedItemHelper,
   createScheduledItemHelper,
+  getServerWithMockedHeaders,
 } from '../../../test/helpers';
-import { db, getServer } from '../../../test/admin-server';
+import { db } from '../../../test/admin-server';
 import { GET_SCHEDULED_ITEMS } from './sample-queries.gql';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
+import { MozillaAccessGroup } from '../../../shared/types';
 
 describe('queries: ScheduledCuratedCorpusItem', () => {
-  const server = getServer(new CuratedCorpusEventEmitter());
+  // adding headers with groups that grant full access
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
+  };
+
+  const server = getServerWithMockedHeaders(
+    headers,
+    new CuratedCorpusEventEmitter()
+  );
 
   beforeAll(async () => {
     await clearDb(db);
