@@ -16,6 +16,34 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
   beforeAll(async () => {
     // clear out db to start fresh
     await clearDb(db);
+
+    // Create some items
+    const stories = [
+      {
+        title: 'How To Win Friends And Influence People with GraphQL',
+        language: 'en',
+        status: CuratedStatus.RECOMMENDATION,
+        topic: 'FOOD',
+      },
+      {
+        title: 'What Zombies Can Teach You About GraphQL',
+        language: 'en',
+        status: CuratedStatus.RECOMMENDATION,
+        url: 'https://www.sample-domain/what-zombies-can-teach-you-graphql',
+        topic: 'TECHNOLOGY',
+      },
+      {
+        title: 'How To Make Your Product Stand Out With GraphQL',
+        language: 'en',
+        status: CuratedStatus.RECOMMENDATION,
+        topic: 'TECHNOLOGY',
+      },
+    ];
+
+    // insert test stories into the db
+    for (const story of stories) {
+      await createApprovedItemHelper(db, story);
+    }
   });
 
   afterAll(async () => {
@@ -23,40 +51,6 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
   });
 
   describe('getApprovedCuratedCorpusItems query', () => {
-    beforeAll(async () => {
-      // Create some items
-      const stories = [
-        {
-          title: 'How To Win Friends And Influence People with GraphQL',
-          language: 'en',
-          status: CuratedStatus.RECOMMENDATION,
-          topic: 'FOOD',
-        },
-        {
-          title: 'What Zombies Can Teach You About GraphQL',
-          language: 'en',
-          status: CuratedStatus.RECOMMENDATION,
-          url: 'https://www.sample-domain/what-zombies-can-teach-you-graphql',
-          topic: 'TECHNOLOGY',
-        },
-        {
-          title: 'How To Make Your Product Stand Out With GraphQL',
-          language: 'en',
-          status: CuratedStatus.RECOMMENDATION,
-          topic: 'TECHNOLOGY',
-        },
-      ];
-
-      // insert test stories into the db
-      for (const story of stories) {
-        await createApprovedItemHelper(db, story);
-      }
-    });
-
-    afterAll(async () => {
-      await db.$disconnect();
-    });
-
     it('should get all items when user has read-only access', async () => {
       // Set up auth headers with read-only access
       const headers = {
