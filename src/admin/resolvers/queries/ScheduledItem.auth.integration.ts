@@ -52,10 +52,7 @@ describe('queries: ScheduledCuratedCorpusItem - authentication', () => {
         groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
       };
 
-      const server = getServerWithMockedHeaders(
-        headers,
-        new CuratedCorpusEventEmitter()
-      );
+      const server = getServerWithMockedHeaders(headers);
 
       const result = await server.executeOperation({
         query: GET_SCHEDULED_ITEMS,
@@ -85,10 +82,7 @@ describe('queries: ScheduledCuratedCorpusItem - authentication', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
       };
 
-      const server = getServerWithMockedHeaders(
-        headers,
-        new CuratedCorpusEventEmitter()
-      );
+      const server = getServerWithMockedHeaders(headers);
 
       // even though user has access for DE_DE only, a request for EN_US should work
       const result = await server.executeOperation({
@@ -120,7 +114,6 @@ describe('queries: ScheduledCuratedCorpusItem - authentication', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_SCHEDULED_ITEMS,
@@ -139,8 +132,6 @@ describe('queries: ScheduledCuratedCorpusItem - authentication', () => {
       // check if the error we get is access denied error
       expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
       expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
-
-      await server.stop();
     });
 
     it('should throw an error when request header groups are undefined', async () => {
@@ -152,7 +143,6 @@ describe('queries: ScheduledCuratedCorpusItem - authentication', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_SCHEDULED_ITEMS,
@@ -171,8 +161,6 @@ describe('queries: ScheduledCuratedCorpusItem - authentication', () => {
       // check if the error we get is access denied error
       expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
       expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
-
-      await server.stop();
     });
   });
 });
