@@ -1,15 +1,26 @@
 import { expect } from 'chai';
 import { RejectedCuratedCorpusItem as dbRejectedCuratedCorpusItem } from '@prisma/client';
-import { db, getServer } from '../../../test/admin-server';
+import { db } from '../../../test/admin-server';
 import {
   clearDb,
   createRejectedCuratedCorpusItemHelper,
 } from '../../../test/helpers';
 import { GET_REJECTED_ITEMS } from './sample-queries.gql';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
+import { MozillaAccessGroup } from '../../../shared/types';
+import { getServerWithMockedHeaders } from '../../../test/helpers/getServerWithMockedHeaders';
 
 describe('queries: RejectedCuratedCorpusItem', () => {
-  const server = getServer(new CuratedCorpusEventEmitter());
+  const headers = {
+    name: 'Test User',
+    username: 'test.user@test.com',
+    groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
+  };
+
+  const server = getServerWithMockedHeaders(
+    headers,
+    new CuratedCorpusEventEmitter()
+  );
 
   beforeAll(async () => {
     await clearDb(db);
