@@ -7,7 +7,6 @@ import {
 } from '../../../test/helpers';
 import { db } from '../../../test/admin-server';
 import { GET_SCHEDULED_ITEMS } from './sample-queries.gql';
-import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
 
 describe('queries: ScheduledCuratedCorpusItem - authentication', () => {
