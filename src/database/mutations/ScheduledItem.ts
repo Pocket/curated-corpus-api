@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import {
   CreateScheduledItemInput,
   DeleteScheduledItemInput,
+  RescheduleScheduledItemInput,
   ScheduledItem,
 } from '../types';
 import { NotFoundError } from '@pocket-tools/apollo-utils';
@@ -53,26 +54,30 @@ export async function deleteScheduledItem(
   db: PrismaClient,
   data: DeleteScheduledItemInput
 ): Promise<ScheduledItem> {
-  // Get the item to return with the mutation
-  const scheduledItem = await db.scheduledItem.findUnique({
-    where: { externalId: data.externalId },
+  return await db.scheduledItem.delete({
+    where: {
+      externalId: data.externalId,
+    },
     include: {
       approvedItem: true,
     },
   });
+}
 
-  // Delete if it exists in the database
-  if (scheduledItem) {
-    await db.scheduledItem.delete({
-      where: {
-        id: scheduledItem.id,
-      },
-    });
-  } else {
-    throw new NotFoundError(
-      `Item with ID of '${data.externalId}' could not be found.`
-    );
-  }
-
-  return scheduledItem;
+export async function rescheduleScheduledItem(
+  db: PrismaClient,
+  data: RescheduleScheduledItemInput,
+  username: string
+): Promise<ScheduledItem> {
+  return await db.scheduledItem.update({
+    where: { externalId: data.externalId },
+    data: {
+      scheduledDate: data.scheduledDate,
+      updatedBy: username,
+      updatedAt: new Date(),
+    },
+    include: {
+      approvedItem: true,
+    },
+  });
 }

@@ -65,6 +65,17 @@ export const DELETE_SCHEDULED_ITEM = gql`
   ${ScheduledItemData}
 `;
 
+export const RESCHEDULE_SCHEDULED_ITEM = gql`
+  mutation rescheduleScheduledItem(
+    $data: RescheduleScheduledCuratedCorpusItemInput!
+  ) {
+    rescheduleScheduledCuratedCorpusItem(data: $data) {
+      ...ScheduledItemData
+    }
+  }
+  ${ScheduledItemData}
+`;
+
 export const UPLOAD_APPROVED_ITEM_IMAGE = gql`
   mutation uploadApprovedCuratedCorpusItemImage($image: Upload!) {
     uploadApprovedCuratedCorpusItemImage(data: $image) {

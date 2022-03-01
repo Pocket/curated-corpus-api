@@ -599,6 +599,20 @@ input CreateScheduledCuratedCorpusItemInput {
 }
 
 """
+Input data for rescheduling a scheduled item for a Scheduled Surface.
+"""
+input RescheduleScheduledCuratedCorpusItemInput {
+    """
+    ID of the scheduled item. A string in UUID format.
+    """
+    externalId: ID!
+    """
+    The new scheduled date for the scheduled item to appear on a Scheduled Surface. Format: YYYY-MM-DD.
+    """
+    scheduledDate: Date!
+}
+
+"""
 Input data for deleting a scheduled item for a Scheduled Surface.
 """
 input DeleteScheduledCuratedCorpusItemInput {
@@ -693,6 +707,13 @@ type Mutation {
     """
     deleteScheduledCuratedCorpusItem(
         data: DeleteScheduledCuratedCorpusItemInput!
+    ): ScheduledCuratedCorpusItem!
+
+    """
+    Updates the scheduled date of a Scheduled Surface Scheduled Item.
+    """
+    rescheduleScheduledCuratedCorpusItem(
+        data: RescheduleScheduledCuratedCorpusItemInput!
     ): ScheduledCuratedCorpusItem!
 
     """

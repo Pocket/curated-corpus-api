@@ -11,6 +11,7 @@ export enum ReviewedCorpusItemEventType {
 export enum ScheduledCorpusItemEventType {
   ADD_SCHEDULE = 'ADD_SCHEDULE',
   REMOVE_SCHEDULE = 'REMOVE_SCHEDULE',
+  RESCHEDULE = 'RESCHEDULE',
 }
 
 export type ReviewedCorpusItemEventTypeString =
