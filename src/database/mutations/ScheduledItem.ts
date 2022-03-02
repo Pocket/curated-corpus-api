@@ -74,7 +74,6 @@ export async function rescheduleScheduledItem(
     data: {
       scheduledDate: data.scheduledDate,
       updatedBy: username,
-      updatedAt: new Date(),
     },
     include: {
       approvedItem: true,

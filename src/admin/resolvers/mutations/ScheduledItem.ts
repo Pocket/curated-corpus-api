@@ -41,10 +41,7 @@ export async function deleteScheduledItem(
   }
 
   // Check if the user can execute this mutation.
-  if (
-    item &&
-    !context.authenticatedUser.canWriteToSurface(item.scheduledSurfaceGuid)
-  ) {
+  if (!context.authenticatedUser.canWriteToSurface(item.scheduledSurfaceGuid)) {
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
 
@@ -145,10 +142,7 @@ export async function rescheduleScheduledItem(
   }
 
   // Check if the user can execute this mutation.
-  if (
-    item &&
-    !context.authenticatedUser.canWriteToSurface(item.scheduledSurfaceGuid)
-  ) {
+  if (!context.authenticatedUser.canWriteToSurface(item.scheduledSurfaceGuid)) {
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
 
