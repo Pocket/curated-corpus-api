@@ -14,6 +14,7 @@ import { createRejectedItem } from './mutations/RejectedItem';
 import {
   createScheduledItem,
   deleteScheduledItem,
+  rescheduleScheduledItem,
 } from './mutations/ScheduledItem';
 import { GraphQLUpload } from 'graphql-upload';
 
@@ -51,6 +52,7 @@ export const resolvers = {
     createRejectedCuratedCorpusItem: createRejectedItem,
     createScheduledCuratedCorpusItem: createScheduledItem,
     deleteScheduledCuratedCorpusItem: deleteScheduledItem,
+    rescheduleScheduledCuratedCorpusItem: rescheduleScheduledItem,
     uploadApprovedCuratedCorpusItemImage: uploadApprovedItemImage,
   },
 };

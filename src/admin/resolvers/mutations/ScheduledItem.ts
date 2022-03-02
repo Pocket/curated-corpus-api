@@ -1,6 +1,7 @@
 import {
   deleteScheduledItem as dbDeleteScheduledItem,
   createScheduledItem as dbCreateScheduledItem,
+  rescheduleScheduledItem as dbRescheduleScheduledItem,
 } from '../../../database/mutations';
 import { ScheduledItem } from '../../../database/types';
 import {
@@ -11,6 +12,7 @@ import { ScheduledCorpusItemEventType } from '../../../events/types';
 import { UserInputError } from 'apollo-server';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { AuthenticationError } from 'apollo-server-errors';
+import { NotFoundError } from '@pocket-tools/apollo-utils';
 import { IContext } from '../../context';
 
 /**
@@ -32,11 +34,14 @@ export async function deleteScheduledItem(
     where: { externalId: data.externalId },
   });
 
+  if (!item) {
+    throw new NotFoundError(
+      `Item with ID of '${data.externalId}' could not be found.`
+    );
+  }
+
   // Check if the user can execute this mutation.
-  if (
-    item &&
-    !context.authenticatedUser.canWriteToSurface(item.scheduledSurfaceGuid)
-  ) {
+  if (!context.authenticatedUser.canWriteToSurface(item.scheduledSurfaceGuid)) {
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
 
@@ -110,6 +115,64 @@ export async function createScheduledItem(
         } on ${data.scheduledDate.toLocaleString('en-US', {
           dateStyle: 'medium',
         })}.`
+      );
+    }
+
+    // If it's something else, throw the error unchanged.
+    throw new Error(error);
+  }
+}
+
+export async function rescheduleScheduledItem(
+  parent,
+  { data },
+  context: IContext
+): Promise<ScheduledItem> {
+  // Need to fetch the item first to check access privileges.
+  // Note that we do not worry here about an extra hit to the DB
+  // as load on this service will be low.
+  const item = await context.db.scheduledItem.findUnique({
+    where: { externalId: data.externalId },
+  });
+
+  if (!item) {
+    throw new NotFoundError(
+      `Item with ID of '${data.externalId}' could not be found.`
+    );
+  }
+
+  // Check if the user can execute this mutation.
+  if (!context.authenticatedUser.canWriteToSurface(item.scheduledSurfaceGuid)) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
+  try {
+    const rescheduledItem = await dbRescheduleScheduledItem(
+      context.db,
+      data,
+      context.authenticatedUser.username
+    );
+
+    context.emitScheduledCorpusItemEvent(
+      ScheduledCorpusItemEventType.RESCHEDULE,
+      rescheduledItem
+    );
+
+    return rescheduledItem;
+  } catch (error) {
+    // If it's the duplicate scheduling constraint, catch the error
+    // and send a user-friendly one to the client instead.
+    if (
+      error instanceof PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      throw new UserInputError(
+        `This story is already scheduled to appear on ${data.scheduledDate.toLocaleString(
+          'en-US',
+          {
+            dateStyle: 'medium',
+          }
+        )}.`
       );
     }
 

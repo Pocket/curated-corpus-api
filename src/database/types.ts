@@ -104,6 +104,11 @@ export type CreateScheduledItemInput = {
   scheduledDate: string;
 };
 
+export type RescheduleScheduledItemInput = {
+  externalId: string;
+  scheduledDate: string;
+};
+
 // Types for the public `scheduledSurface` query.
 export type CorpusItem = {
   // This is `externalId` in the DB schema and Admin API
