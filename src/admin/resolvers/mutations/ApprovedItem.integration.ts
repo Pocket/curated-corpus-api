@@ -770,12 +770,12 @@ describe('mutations: ApprovedItem', () => {
     it('it should execute the mutation without errors and return the s3 location url', async () => {
       const image: Upload = new Upload();
 
-      image.resolve({
+      image.file = {
         filename: 'test.jpg',
         mimetype: 'image/jpeg',
         encoding: '7bit',
         createReadStream: () => createReadStream(testFilePath),
-      });
+      };
 
       const { data, errors } = await server.executeOperation({
         query: UPLOAD_APPROVED_ITEM_IMAGE,
@@ -1075,12 +1075,12 @@ describe('mutations: ApprovedItem - authentication checks', () => {
 
       const image: Upload = new Upload();
 
-      image.resolve({
+      image.file = {
         filename: 'test.jpg',
         mimetype: 'image/jpeg',
         encoding: '7bit',
         createReadStream: () => createReadStream(testFilePath),
-      });
+      };
 
       const result = await server.executeOperation({
         query: UPLOAD_APPROVED_ITEM_IMAGE,
