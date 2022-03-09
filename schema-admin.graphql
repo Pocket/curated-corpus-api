@@ -488,6 +488,97 @@ input CreateApprovedCuratedCorpusItemInput {
 }
 
 """
+Input data for loading an Approved Item via an automated process and optionally scheduling
+this item to appear on a Scheduled Surface.
+"""
+input LoadApprovedCuratedCorpusItemInput {
+    """
+    The GUID of the corresponding Prospect ID. Will be empty for manually added items.
+    """
+    prospectId: ID
+    """
+    The URL of the Approved Item.
+    """
+    url: Url!
+    """
+    The title of the Approved Item.
+    """
+    title: String!
+    """
+    The excerpt of the Approved Item.
+    """
+    excerpt: String!
+    """
+    The outcome of the curators' review of the Approved Item.
+    """
+    status: CuratedStatus!
+    """
+    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    """
+    language: String!
+    """
+    The name of the online publication that published this story.
+    """
+    publisher: String!
+    """
+    The image URL for this item's accompanying picture.
+    """
+    imageUrl: Url!
+    """
+    A topic this story best fits in.
+    Temporarily a string value that will be provided by Prospect API, possibly an enum in the future.
+    """
+    topic: String!
+    """
+    Whether this story is a Pocket Collection.
+    """
+    isCollection: Boolean
+    """
+    A flag to ML to not recommend this item long term after it is added to the corpus.
+    Example: a story covering an election, or "The best of 202x" collection.
+    """
+    isTimeSensitive: Boolean
+    """
+    Whether this item is a syndicated article.
+    """
+    isSyndicated: Boolean
+    """
+    A Unix timestamp of when the entity was created.
+    """
+    createdAt: Int!
+    """
+    A single sign-on user identifier of the user who created this entity.
+    """
+    createdBy: String!
+    """
+    A Unix timestamp of when the entity was last updated.
+    """
+    updatedAt: Int!
+    """
+    Optionally, specify the date this item should be appearing on a Scheduled Surface. Format: YYYY-MM-DD
+    """
+    scheduledDate: Date
+    """
+    Optionally, specify the GUID of the Scheduled Surface this item should be scheduled for.
+    """
+    scheduledSurfaceGuid: ID
+}
+
+"""
+The data that the loadApprovedCuratedCorpusItem mutation returns on success.
+"""
+type LoadApprovedCuratedCorpusItemPayload {
+    """
+    The approved item, as created by an automated process.
+    """
+    approvedItem: ApprovedCuratedCorpusItem!
+    """
+    The scheduled entry, if created by an automated process at the same time.
+    """
+    scheduledItem: ScheduledCuratedCorpusItem
+}
+
+"""
 Input data for updating an Approved Item.
 """
 input UpdateApprovedCuratedCorpusItemInput {
@@ -673,6 +764,14 @@ type Mutation {
     createApprovedCuratedCorpusItem(
         data: CreateApprovedCuratedCorpusItemInput!
     ): ApprovedCuratedCorpusItem!
+
+    """
+    Lets an automated process create an Approved Item and optionally schedule it to appear
+    on a Scheduled Surface.
+    """
+    loadApprovedCuratedCorpusItem(
+        data: LoadApprovedCuratedCorpusItemInput!
+    ): LoadApprovedCuratedCorpusItemPayload!
 
     """
     Creates a Rejected Item.
