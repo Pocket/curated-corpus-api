@@ -149,12 +149,12 @@ class CuratedCorpusAPI extends TerraformStack {
     return new PocketPagerDuty(this, 'pagerduty', {
       prefix: config.prefix,
       service: {
-        criticalEscalationPolicyId: incidentManagement.get(
-          'policy_backend_critical_id'
-        ).toString(),
-        nonCriticalEscalationPolicyId: incidentManagement.get(
-          'policy_backend_non_critical_id'
-        ).toString(),
+        criticalEscalationPolicyId: incidentManagement
+          .get('policy_backend_critical_id')
+          .toString(),
+        nonCriticalEscalationPolicyId: incidentManagement
+          .get('policy_backend_non_critical_id')
+          .toString(),
       },
     });
   }
@@ -168,15 +168,8 @@ class CuratedCorpusAPI extends TerraformStack {
     secretsManagerKmsAlias: DataAwsKmsAlias;
     snsTopic: DataAwsSnsTopic;
   }): PocketALBApplication {
-    const {
-      rds,
-      s3,
-      pagerDuty,
-      region,
-      caller,
-      secretsManagerKmsAlias,
-      snsTopic,
-    } = dependencies;
+    const { rds, s3, region, caller, secretsManagerKmsAlias, snsTopic } =
+      dependencies;
 
     return new PocketALBApplication(this, 'application', {
       internal: true,
