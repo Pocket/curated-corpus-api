@@ -26,7 +26,7 @@ import {
   ReviewedCorpusItemEventType,
   ScheduledCorpusItemEventType,
 } from '../../../events/types';
-import { Upload } from 'graphql-upload';
+import { FileUpload, Upload } from 'graphql-upload';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import { GET_REJECTED_ITEMS } from '../queries/sample-queries.gql';
 import {
@@ -769,13 +769,16 @@ describe('mutations: ApprovedItem', () => {
 
     it('it should execute the mutation without errors and return the s3 location url', async () => {
       const image: Upload = new Upload();
+      const bob = new Promise<FileUpload>(() => {});
 
-      image.file = {
-        filename: 'test.jpg',
-        mimetype: 'image/jpeg',
-        encoding: '7bit',
-        createReadStream: () => createReadStream(testFilePath),
-      };
+      image.promise = new Promise<FileUpload>(() => {
+        return {
+          filename: 'test.jpg',
+          mimetype: 'image/jpeg',
+          encoding: '7bit',
+          createReadStream: () => createReadStream(testFilePath),
+        };
+      });
 
       const { data, errors } = await server.executeOperation({
         query: UPLOAD_APPROVED_ITEM_IMAGE,
