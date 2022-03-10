@@ -38,7 +38,7 @@ export async function createRejectedCuratedCorpusItemHelper(
     prospectId: faker.datatype.uuid(),
     url: faker.internet.url(),
     topic: faker.lorem.words(2),
-    language: faker.random.arrayElement(['en', 'de']),
+    language: faker.random.arrayElement(['EN', 'DE']),
     publisher: faker.company.companyName(),
     reason: faker.lorem.word(),
     createdAt: faker.date.recent(14),

@@ -22,6 +22,7 @@ import {
 import { CreateRejectedItemInput } from '../../../database/types';
 import { AuthenticationError } from 'apollo-server-errors';
 import { IContext } from '../../context';
+import { checkLanguage } from '../../../database/helpers/checkLanguage';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -69,6 +70,9 @@ export async function createApprovedItem(
       `Cannot create a corpus item with the topic "${approvedItemData.topic}".`
     );
   }
+
+  // Validate language code
+  checkLanguage(data.language);
 
   const approvedItem = await dbCreateApprovedItem(
     context.db,
@@ -129,6 +133,9 @@ export async function updateApprovedItem(
     );
   }
 
+  // Validate language code
+  checkLanguage(data.language);
+
   const approvedItem = await dbUpdateApprovedItem(
     context.db,
     data,
@@ -180,7 +187,8 @@ export async function rejectApprovedItem(
     url: approvedItem.url,
     title: approvedItem.title,
     topic: approvedItem.topic,
-    language: approvedItem.language,
+    // Make sure the language code is in upper case.
+    language: approvedItem.language.toUpperCase(),
     publisher: approvedItem.publisher,
     reason: data.reason,
   };
@@ -230,7 +238,7 @@ export async function uploadApprovedItemImage(
   { data },
   context: IContext
 ): Promise<ApprovedItemS3ImageUrl> {
-  // check if user is is allowed to upload images
+  // check if user is allowed to upload images
   if (!context.authenticatedUser.canWriteToCorpus()) {
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }

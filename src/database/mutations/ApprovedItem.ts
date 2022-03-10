@@ -21,6 +21,9 @@ export async function createApprovedItem(
   return db.approvedItem.create({
     data: {
       ...data,
+      // Make sure the language code is in upper case.
+      language: data.language?.toUpperCase(),
+      // Use the SSO username here.
       createdBy: username,
     },
   });
@@ -45,6 +48,9 @@ export async function updateApprovedItem(
     where: { externalId: data.externalId },
     data: {
       ...data,
+      // Make sure the language code is in upper case.
+      language: data.language?.toUpperCase(),
+      // Use the SSO username here.
       updatedBy: username,
     },
   });

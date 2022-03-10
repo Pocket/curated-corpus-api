@@ -47,7 +47,7 @@ describe('mutations: RejectedItem', () => {
         url: 'https://test.com/docker',
         title: 'Find Out How I Cured My Docker In 2 Days',
         topic: 'Technology',
-        language: 'de',
+        language: 'DE',
         publisher: 'Convective Cloud',
         reason: 'MISINFORMATION,OTHER',
       };
