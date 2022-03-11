@@ -42,7 +42,7 @@ describe('Upload Utils', () => {
     expect(image.encoding).toBe('7bit');
   });
 
-  it('throws an error if the URL content if not an image', async () => {
+  it('throws an error if the URL content is not an image', async () => {
     nock('https://image.com')
       .get('/dancing-in-the-air.jpeg')
       .replyWithFile(200, testFilePath, {
