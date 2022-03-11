@@ -539,9 +539,9 @@ input ImportApprovedCuratedCorpusItemInput {
     """
     imageUrl: Url!
     """
-    A topic this story best fits in. The value will be `IMPORTED` for migrated items that don't have a topic set.
+    A topic this story best fits in. The value will be `null` for migrated items that don't have a topic set.
     """
-    topic: String!
+    topic: String
     """
     The source of the corpus item.
     """
