@@ -77,6 +77,24 @@ enum ProspectType {
 }
 
 """
+The source of the corpus item
+"""
+enum CorpusItemSource {
+    """
+    Originated as a prospect in the curation admin tool
+    """
+    PROSPECT
+    """
+    Manually entered through the curation admin tool
+    """
+    MANUAL
+    """
+    Imported from the legacy database
+    """
+    BACKFILL
+}
+
+"""
 A Scheduled Surface, including its associated Prospect Types.
 """
 type ScheduledSurface {
@@ -521,18 +539,17 @@ input ImportApprovedCuratedCorpusItemInput {
     """
     imageUrl: Url!
     """
-    A topic this story best fits in. The value will be `imported` for migrated items that don't have a topic set.
+    A topic this story best fits in. The value will be `IMPORTED` for migrated items that don't have a topic set.
     """
     topic: String!
+    """
+    The source of the corpus item.
+    """
+    source: CorpusItemSource!
     """
     Whether this story is a Pocket Collection.
     """
     isCollection: Boolean
-    """
-    A flag to ML to not recommend this item long term after it is added to the corpus.
-    Example: a story covering an election, or "The best of 202x" collection.
-    """
-    isTimeSensitive: Boolean
     """
     Whether this item is a syndicated article.
     """
@@ -550,13 +567,17 @@ input ImportApprovedCuratedCorpusItemInput {
     """
     updatedAt: Int!
     """
-    Optionally, specify the date this item should be appearing on a Scheduled Surface. Format: YYYY-MM-DD
+    A single sign-on user identifier of the user who last updated this entity.
     """
-    scheduledDate: Date
+    updatedBy: String!
     """
-    Optionally, specify the GUID of the Scheduled Surface this item should be scheduled for.
+    The date this item should be appearing on a Scheduled Surface. Format: YYYY-MM-DD
     """
-    scheduledSurfaceGuid: ID
+    scheduledDate: Date!
+    """
+    The GUID of the Scheduled Surface this item should be scheduled for.
+    """
+    scheduledSurfaceGuid: ID!
 }
 
 """
@@ -568,9 +589,9 @@ type ImportApprovedCuratedCorpusItemPayload {
     """
     approvedItem: ApprovedCuratedCorpusItem!
     """
-    The scheduled entry, if created by an automated process at the same time.
+    The scheduled entry that is created by an automated process at the same time.
     """
-    scheduledItem: ScheduledCuratedCorpusItem
+    scheduledItem: ScheduledCuratedCorpusItem!
 }
 
 """
