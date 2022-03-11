@@ -341,6 +341,38 @@ describe('mutations: ApprovedItem', () => {
       // Check that the ADD_ITEM event was not fired
       expect(eventTracker.callCount).to.equal(0);
     });
+
+    it('should fail if language code is outside of allowed values', async () => {
+      input.language = 'FR';
+
+      const result = await server.executeOperation({
+        query: CREATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(
+        `Please use an allowed language code`
+      );
+    });
+
+    it('should fail if language code is correct but not in upper case', async () => {
+      input.language = 'de';
+
+      const result = await server.executeOperation({
+        query: CREATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(
+        `Please use an allowed language code`
+      );
+    });
   });
 
   describe('updateApprovedCuratedCorpusItem mutation', () => {
@@ -493,7 +525,7 @@ describe('mutations: ApprovedItem', () => {
       await server.stop();
     });
 
-    it('should fail sent an invalid topic', async () => {
+    it('should fail if sent an invalid topic', async () => {
       // this should be `HEALTH_FITNESS`
       input.topic = 'HEALTH FITNESS';
 
@@ -510,6 +542,38 @@ describe('mutations: ApprovedItem', () => {
         `Cannot create a corpus item with the topic "${input.topic}".`
       );
       expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
+    });
+
+    it('should fail if language code is outside of allowed values', async () => {
+      input.language = 'FR';
+
+      const result = await server.executeOperation({
+        query: UPDATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(
+        `Please use an allowed language code`
+      );
+    });
+
+    it('should fail if language code is correct but not in upper case', async () => {
+      input.language = 'de';
+
+      const result = await server.executeOperation({
+        query: UPDATE_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(
+        `Please use an allowed language code`
+      );
     });
   });
 

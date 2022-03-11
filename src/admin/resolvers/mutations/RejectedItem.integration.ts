@@ -337,5 +337,37 @@ describe('mutations: RejectedItem', () => {
         ` is not a valid rejection reason.`
       );
     });
+
+    it('should fail if language code is outside of allowed values', async () => {
+      input.language = 'FR';
+
+      const result = await server.executeOperation({
+        query: CREATE_REJECTED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(
+        `Please use an allowed language code`
+      );
+    });
+
+    it('should fail if language code is correct but not in upper case', async () => {
+      input.language = 'de';
+
+      const result = await server.executeOperation({
+        query: CREATE_REJECTED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.errors).not.to.be.undefined;
+      expect(result.data).to.be.null;
+
+      expect(result.errors?.[0].message).to.contain(
+        `Please use an allowed language code`
+      );
+    });
   });
 });

@@ -9,9 +9,9 @@ import config from '../../config';
 export const checkLanguage = (language: string): void => {
   if (!config.app.languages.includes(language)) {
     throw new UserInputError(
-      `Please use an allowed language code. These include ${config.app.languages.join(
-        ', '
-      )}.`
+      `Please use an allowed language code. These include: "${config.app.languages.join(
+        '", "'
+      )}".`
     );
   }
 };
