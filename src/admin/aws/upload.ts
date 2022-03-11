@@ -4,6 +4,7 @@ import { S3 } from 'aws-sdk';
 import config from '../../config';
 import { FileUpload } from 'graphql-upload';
 import { ApprovedItemS3ImageUrl } from '../../shared/types';
+import { getFileUploadFromUrl } from './utils';
 
 /**
  * @param s3
@@ -30,4 +31,17 @@ export async function uploadImageToS3(
   return {
     url: response.Location,
   };
+}
+
+/**
+ * Get image content from URL and upload to s3
+ * @param s3
+ * @param url
+ */
+export async function uploadImageToS3FromUrl(
+  s3: S3,
+  url: string
+): Promise<ApprovedItemS3ImageUrl> {
+  const image = await getFileUploadFromUrl(url);
+  return uploadImageToS3(s3, image);
 }
