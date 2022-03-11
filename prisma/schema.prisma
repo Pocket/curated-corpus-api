@@ -14,6 +14,12 @@ enum CuratedStatus {
   CORPUS
 }
 
+enum CuratedItemSource {
+  PROSPECT
+  MANUAL
+  BACKFILL
+}
+
 // A prospect that is deemed good enough for saving in the corpus
 // and (optionally) making it to a Scheduled Surface.
 model ApprovedItem {

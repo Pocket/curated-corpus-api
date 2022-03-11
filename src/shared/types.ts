@@ -1,4 +1,5 @@
 // Pocket Shared Data - see Confluence for details
+// https://getpocket.atlassian.net/wiki/spaces/PE/pages/2584150049/Pocket+Shared+Data
 export enum ProspectType {
   GLOBAL = 'GLOBAL',
   ORGANIC_TIMESPENT = 'ORGANIC_TIMESPENT',
@@ -12,10 +13,6 @@ export type ScheduledSurface = {
   guid: string;
   utcOffset: number;
   prospectTypes: ProspectType[];
-};
-
-export type ApprovedItemS3ImageUrl = {
-  url: string;
 };
 
 export const ScheduledSurfaces: ScheduledSurface[] = [
@@ -64,6 +61,44 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
     prospectTypes: [ProspectType.TOP_SAVED],
   },
 ];
+
+export enum Topics {
+  BUSINESS = 'BUSINESS',
+  CAREER = 'CAREER',
+  EDUCATION = 'EDUCATION',
+  ENTERTAINMENT = 'ENTERTAINMENT',
+  FOOD = 'FOOD',
+  GAMING = 'GAMING',
+  HEALTH_FITNESS = 'HEALTH_FITNESS',
+  PARENTING = 'PARENTING',
+  PERSONAL_FINANCE = 'PERSONAL_FINANCE',
+  POLITICS = 'POLITICS',
+  SCIENCE = 'SCIENCE',
+  SELF_IMPROVEMENT = 'SELF_IMPROVEMENT',
+  SPORTS = 'SPORTS',
+  TECHNOLOGY = 'TECHNOLOGY',
+  TRAVEL = 'TRAVEL',
+}
+
+export enum RejectionReason {
+  PAYWALL = 'PAYWALL',
+  POLITICAL_OPINION = 'POLITICAL_OPINION',
+  OFFENSIVE_MATERIAL = 'OFFENSIVE_MATERIAL',
+  TIME_SENSITIVE = 'TIME_SENSITIVE',
+  MISINFORMATION = 'MISINFORMATION',
+  OTHER = 'OTHER',
+}
+
+export enum CorpusItemSource {
+  PROSPECT = 'PROSPECT', //  originated as a prospect in the curation admin tool
+  MANUAL = 'MANUAL', // manually entered through the curation admin tool
+  BACKFILL = 'BACKFILL', // imported from the legacy database
+}
+// End Pocket shared data
+
+export type ApprovedItemS3ImageUrl = {
+  url: string;
+};
 
 // Useful, cut down versions of the above
 export const scheduledSurfaceAllowedValues = ScheduledSurfaces.map(
@@ -124,33 +159,6 @@ export const AccessGroupToScheduledSurfaceMap: {
     'POCKET_HITS_CURATOR_ENUS'
   ),
 };
-
-export enum Topics {
-  BUSINESS = 'BUSINESS',
-  CAREER = 'CAREER',
-  EDUCATION = 'EDUCATION',
-  ENTERTAINMENT = 'ENTERTAINMENT',
-  FOOD = 'FOOD',
-  GAMING = 'GAMING',
-  HEALTH_FITNESS = 'HEALTH_FITNESS',
-  PARENTING = 'PARENTING',
-  PERSONAL_FINANCE = 'PERSONAL_FINANCE',
-  POLITICS = 'POLITICS',
-  SCIENCE = 'SCIENCE',
-  SELF_IMPROVEMENT = 'SELF_IMPROVEMENT',
-  SPORTS = 'SPORTS',
-  TECHNOLOGY = 'TECHNOLOGY',
-  TRAVEL = 'TRAVEL',
-}
-
-export enum RejectionReason {
-  PAYWALL = 'PAYWALL',
-  POLITICAL_OPINION = 'POLITICAL_OPINION',
-  OFFENSIVE_MATERIAL = 'OFFENSIVE_MATERIAL',
-  TIME_SENSITIVE = 'TIME_SENSITIVE',
-  MISINFORMATION = 'MISINFORMATION',
-  OTHER = 'OTHER',
-}
 
 export const ACCESS_DENIED_ERROR =
   'You do not have access to perform this action.';
