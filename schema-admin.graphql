@@ -77,6 +77,24 @@ enum ProspectType {
 }
 
 """
+The source of the corpus item
+"""
+enum CorpusItemSource {
+    """
+    Originated as a prospect in the curation admin tool
+    """
+    PROSPECT
+    """
+    Manually entered through the curation admin tool
+    """
+    MANUAL
+    """
+    Imported from the legacy database
+    """
+    BACKFILL
+}
+
+"""
 A Scheduled Surface, including its associated Prospect Types.
 """
 type ScheduledSurface {
@@ -488,6 +506,95 @@ input CreateApprovedCuratedCorpusItemInput {
 }
 
 """
+Input data for loading an Approved Item via an automated process and optionally scheduling
+this item to appear on a Scheduled Surface.
+"""
+input ImportApprovedCuratedCorpusItemInput {
+    """
+    The URL of the Approved Item.
+    """
+    url: Url!
+    """
+    The title of the Approved Item.
+    """
+    title: String!
+    """
+    The excerpt of the Approved Item.
+    """
+    excerpt: String!
+    """
+    The outcome of the curators' review of the Approved Item.
+    """
+    status: CuratedStatus!
+    """
+    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    """
+    language: String!
+    """
+    The name of the online publication that published this story.
+    """
+    publisher: String!
+    """
+    The image URL for this item's accompanying picture.
+    """
+    imageUrl: Url!
+    """
+    A topic this story best fits in. The value will be `null` for migrated items that don't have a topic set.
+    """
+    topic: String
+    """
+    The source of the corpus item.
+    """
+    source: CorpusItemSource!
+    """
+    Whether this story is a Pocket Collection.
+    """
+    isCollection: Boolean
+    """
+    Whether this item is a syndicated article.
+    """
+    isSyndicated: Boolean
+    """
+    A Unix timestamp of when the entity was created.
+    """
+    createdAt: Int!
+    """
+    A single sign-on user identifier of the user who created this entity.
+    """
+    createdBy: String!
+    """
+    A Unix timestamp of when the entity was last updated.
+    """
+    updatedAt: Int!
+    """
+    A single sign-on user identifier of the user who last updated this entity.
+    """
+    updatedBy: String!
+    """
+    The date this item should be appearing on a Scheduled Surface. Format: YYYY-MM-DD
+    """
+    scheduledDate: Date!
+    """
+    The GUID of the Scheduled Surface this item should be scheduled for.
+    """
+    scheduledSurfaceGuid: ID!
+}
+
+"""
+The data that the loadApprovedCuratedCorpusItem mutation returns on success.
+"""
+type ImportApprovedCuratedCorpusItemPayload {
+    """
+    The approved item, as created by an automated process.
+    """
+    approvedItem: ApprovedCuratedCorpusItem!
+    """
+    The scheduled entry that is created by an automated process at the same time.
+    """
+    scheduledItem: ScheduledCuratedCorpusItem!
+}
+
+"""
 Input data for updating an Approved Item.
 """
 input UpdateApprovedCuratedCorpusItemInput {
@@ -673,6 +780,14 @@ type Mutation {
     createApprovedCuratedCorpusItem(
         data: CreateApprovedCuratedCorpusItemInput!
     ): ApprovedCuratedCorpusItem!
+
+    """
+    Lets an automated process create an Approved Item and optionally schedule it to appear
+    on a Scheduled Surface.
+    """
+    importApprovedCuratedCorpusItem(
+        data: ImportApprovedCuratedCorpusItemInput!
+    ): ImportApprovedCuratedCorpusItemPayload!
 
     """
     Creates a Rejected Item.
