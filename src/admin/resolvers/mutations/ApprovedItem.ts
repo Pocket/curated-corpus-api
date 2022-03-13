@@ -187,8 +187,7 @@ export async function rejectApprovedItem(
     url: approvedItem.url,
     title: approvedItem.title,
     topic: approvedItem.topic,
-    // Make sure the language code is in upper case.
-    language: approvedItem.language.toUpperCase(),
+    language: approvedItem.language,
     publisher: approvedItem.publisher,
     reason: data.reason,
   };
