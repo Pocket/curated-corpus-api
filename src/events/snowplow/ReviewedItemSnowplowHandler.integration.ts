@@ -21,7 +21,7 @@ import { ReviewedItemSnowplowHandler } from './ReviewedItemSnowplowHandler';
 import { tracker } from './tracker';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 import { getUnixTimestamp } from '../../shared/utils';
-import { Topics } from '../../shared/types';
+import { Topics, CorpusItemSource } from '../../shared/types';
 
 /**
  * Use a simple mock item instead of using DB helpers
@@ -39,6 +39,7 @@ const approvedItem: ApprovedItem = {
   imageUrl: 'https://test.com/image.png',
   language: 'en',
   topic: Topics.EDUCATION,
+  source: CorpusItemSource.PROSPECT,
   isCollection: false,
   isSyndicated: false,
   isTimeSensitive: false,
@@ -95,6 +96,7 @@ function assertValidSnowplowApprovedItemEvents(eventContext) {
         image_url: approvedItem.imageUrl,
         language: approvedItem.language,
         topic: approvedItem.topic,
+        source: approvedItem.source,
         is_collection: approvedItem.isCollection,
         is_time_sensitive: approvedItem.isTimeSensitive,
         is_syndicated: approvedItem.isSyndicated,

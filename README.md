@@ -118,7 +118,10 @@ on the command line or use your IDE to debug individual tests and test suites.
 
 ## Making changes to the Prisma schema
 
-If you need to change the Prisma schema (in `prisma/schema.prisma`), you'll need to create a migration to ensure the database is in sync. After you have made your changes to `schema.prisma`, run
+If you need to change the Prisma schema (in `prisma/schema.prisma`), you'll need to create a migration to ensure the database is in sync. 
+
+- Make sure the Docker containers are running.
+- After you have made your changes to `schema.prisma`, run
 
 ```bash
 docker compose exec app npx prisma migrate dev --name some_meaningful_migration_name

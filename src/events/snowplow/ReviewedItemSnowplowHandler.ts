@@ -17,6 +17,7 @@ import {
   RejectedCuratedCorpusItem,
 } from '@prisma/client';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
+import { CorpusItemSource } from '../../shared/types';
 
 type CuratedCorpusItemUpdateEvent = Omit<SelfDescribingJson, 'data'> & {
   data: CuratedCorpusItemUpdate;
@@ -96,6 +97,11 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       corpusReviewStatus = CorpusReviewStatus.REJECTED;
     }
 
+    let itemSource: CorpusItemSource | undefined;
+    if (item['source']) {
+      itemSource = item['source'];
+    }
+
     // Set up common properties returned by both approved and rejected corpus items
     let context: ReviewedCorpusItemContext = {
       schema: config.snowplow.schemas.reviewedCorpusItem,
@@ -108,6 +114,7 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
         topic: item.topic,
         created_at: getUnixTimestamp(item.createdAt),
         created_by: item.createdBy,
+        source: itemSource,
       },
     };
 

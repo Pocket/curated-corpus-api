@@ -17,7 +17,11 @@ import { ScheduledItemSnowplowHandler } from './ScheduledItemSnowplowHandler';
 import { tracker } from './tracker';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 import { getUnixTimestamp } from '../../shared/utils';
-import { getScheduledSurfaceByGuid, Topics } from '../../shared/types';
+import {
+  CorpusItemSource,
+  getScheduledSurfaceByGuid,
+  Topics,
+} from '../../shared/types';
 import { ScheduledItem } from '../../database/types';
 
 /**
@@ -47,6 +51,7 @@ const scheduledCorpusItem: ScheduledItem = {
     imageUrl: 'https://test.com/image.png',
     language: 'en',
     topic: Topics.EDUCATION,
+    source: CorpusItemSource.PROSPECT,
     isCollection: false,
     isSyndicated: false,
     isTimeSensitive: false,
