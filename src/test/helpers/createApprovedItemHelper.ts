@@ -53,7 +53,7 @@ export async function createApprovedItemHelper(
       CuratedStatus.RECOMMENDATION,
       CuratedStatus.CORPUS,
     ]),
-    language: faker.random.arrayElement(['en', 'de']),
+    language: faker.random.arrayElement(['EN', 'DE']),
     publisher: faker.company.companyName(),
     imageUrl: faker.random.arrayElement([
       `${faker.image.nature()}?random=${random}`,
