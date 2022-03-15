@@ -278,6 +278,9 @@ export async function importApprovedItem(
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
 
+  // Check the language. Throw an error if not valid
+  checkLanguage(data.language);
+
   let approvedItem = await getApprovedItemByUrl(context.db, data.url);
   if (!approvedItem) {
     approvedItem = await dbImportApprovedItem(

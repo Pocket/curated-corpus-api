@@ -145,7 +145,8 @@ type ApprovedCuratedCorpusItem {
     """
     status: CuratedStatus!
     """
-    What language this story is in. This is a two-letter code, for example, 'en' for English.
+    What language this story is in. This is a two-letter code, for example, 'EN' for English.
+    This field currently only accepts EN or DE
     """
     language: String!
     """
