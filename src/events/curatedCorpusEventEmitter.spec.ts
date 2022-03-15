@@ -13,7 +13,7 @@ import {
   CuratedStatus,
   RejectedCuratedCorpusItem,
 } from '@prisma/client';
-import { Topics } from '../shared/types';
+import { CorpusItemSource, Topics } from '../shared/types';
 
 describe('CuratedCorpusEventEmitter', () => {
   const emitter = new CuratedCorpusEventEmitter();
@@ -42,6 +42,7 @@ describe('CuratedCorpusEventEmitter', () => {
     publisher: 'The Times of Narnia',
     imageUrl: 'https://test.com/image.png',
     topic: Topics.EDUCATION,
+    source: CorpusItemSource.PROSPECT,
     isCollection: false,
     isTimeSensitive: false,
     isSyndicated: false,

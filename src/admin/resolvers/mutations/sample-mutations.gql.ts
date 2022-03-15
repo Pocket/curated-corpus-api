@@ -83,3 +83,18 @@ export const UPLOAD_APPROVED_ITEM_IMAGE = gql`
     }
   }
 `;
+
+export const IMPORT_APPROVED_ITEM = gql`
+  mutation importApprovedItem($data: ImportApprovedCuratedCorpusItemInput!) {
+    importApprovedCuratedCorpusItem(data: $data) {
+      approvedItem {
+        ...CuratedItemData
+      }
+      scheduledItem {
+        ...ScheduledItemData
+      }
+    }
+  }
+  ${CuratedItemData}
+  ${ScheduledItemData}
+`;

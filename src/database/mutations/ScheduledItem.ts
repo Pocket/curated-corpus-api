@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import {
   CreateScheduledItemInput,
   DeleteScheduledItemInput,
+  ImportScheduledItemInput,
   RescheduleScheduledItemInput,
   ScheduledItem,
 } from '../types';
@@ -38,6 +39,23 @@ export async function createScheduledItem(
       scheduledDate,
       createdBy: username,
     },
+    include: {
+      approvedItem: true,
+    },
+  });
+}
+
+/**
+ * Create (import) a scheduled item for a given approved item
+ * @param db
+ * @param data
+ */
+export async function importScheduledItem(
+  db: PrismaClient,
+  data: ImportScheduledItemInput
+): Promise<ScheduledItem> {
+  return db.scheduledItem.create({
+    data,
     include: {
       approvedItem: true,
     },
