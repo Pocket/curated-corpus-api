@@ -6,6 +6,7 @@ import { getRejectedItems } from './queries/RejectedItem';
 import { getScheduledItems } from './queries/ScheduledItem';
 import {
   createApprovedItem,
+  importApprovedItem,
   rejectApprovedItem,
   updateApprovedItem,
   uploadApprovedItemImage,
@@ -54,5 +55,6 @@ export const resolvers = {
     deleteScheduledCuratedCorpusItem: deleteScheduledItem,
     rescheduleScheduledCuratedCorpusItem: rescheduleScheduledItem,
     uploadApprovedCuratedCorpusItemImage: uploadApprovedItemImage,
+    importApprovedCuratedCorpusItem: importApprovedItem,
   },
 };

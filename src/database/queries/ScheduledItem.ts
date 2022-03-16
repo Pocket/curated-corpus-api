@@ -117,3 +117,26 @@ export async function getItemsForScheduledSurface(
     return item;
   });
 }
+
+/**
+ * Get scheduled item with attributes that define it as unique
+ * @param db
+ * @param data
+ */
+export async function getScheduledItemByUniqueAttributes(
+  db: PrismaClient,
+  data
+): Promise<ScheduledItem | null> {
+  return db.scheduledItem.findUnique({
+    where: {
+      ItemScheduledSurfaceDate: {
+        approvedItemId: data.approvedItemId,
+        scheduledSurfaceGuid: data.scheduledSurfaceGuid,
+        scheduledDate: data.scheduledDate,
+      },
+    },
+    include: {
+      approvedItem: true,
+    },
+  });
+}

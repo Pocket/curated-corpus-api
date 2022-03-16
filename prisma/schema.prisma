@@ -24,24 +24,25 @@ enum CuratedItemSource {
 // and (optionally) making it to a Scheduled Surface.
 model ApprovedItem {
   // fields
-  id              Int           @id @default(autoincrement())
-  externalId      String        @default(uuid()) @db.VarChar(255)
-  prospectId      String?       @db.VarChar(255)
-  url             String        @db.VarChar(500)
-  title           String        @db.VarChar(255)
-  excerpt         String        @db.Text
-  status          CuratedStatus @default(CORPUS)
-  language        String        @db.VarChar(2)
-  publisher       String        @db.VarChar(255)
-  imageUrl        String        @db.VarChar(500)
-  topic           String        @db.VarChar(255)
-  isCollection    Boolean       @default(false)
-  isTimeSensitive Boolean       @default(false)
-  isSyndicated    Boolean       @default(false)
-  createdAt       DateTime      @default(now())
-  createdBy       String        @db.VarChar(255)
-  updatedAt       DateTime      @updatedAt
-  updatedBy       String?       @db.VarChar(255)
+  id              Int                @id @default(autoincrement())
+  externalId      String             @default(uuid()) @db.VarChar(255)
+  prospectId      String?            @db.VarChar(255)
+  url             String             @db.VarChar(500)
+  title           String             @db.VarChar(255)
+  excerpt         String             @db.Text
+  status          CuratedStatus      @default(CORPUS)
+  language        String             @db.VarChar(2)
+  publisher       String             @db.VarChar(255)
+  imageUrl        String             @db.VarChar(500)
+  topic           String             @db.VarChar(255)
+  source          CuratedItemSource?
+  isCollection    Boolean            @default(false)
+  isTimeSensitive Boolean            @default(false)
+  isSyndicated    Boolean            @default(false)
+  createdAt       DateTime           @default(now())
+  createdBy       String             @db.VarChar(255)
+  updatedAt       DateTime           @updatedAt
+  updatedBy       String?            @db.VarChar(255)
 
   // associated models
   scheduledItems ScheduledItem[]

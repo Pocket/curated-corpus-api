@@ -12,6 +12,7 @@ import {
 } from '../../../test/helpers';
 import {
   CREATE_APPROVED_ITEM,
+  IMPORT_APPROVED_ITEM,
   REJECT_APPROVED_ITEM,
   UPDATE_APPROVED_ITEM,
   UPLOAD_APPROVED_ITEM_IMAGE,
@@ -31,9 +32,11 @@ import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import { GET_REJECTED_ITEMS } from '../queries/sample-queries.gql';
 import {
   ACCESS_DENIED_ERROR,
+  CorpusItemSource,
   MozillaAccessGroup,
   Topics,
 } from '../../../shared/types';
+import { ImportApprovedCuratedCorpusItemInput } from '../types';
 
 describe('mutations: ApprovedItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
@@ -860,6 +863,172 @@ describe('mutations: ApprovedItem', () => {
       );
     });
   });
+
+  describe('importApprovedCuratedCorpusItem mutation', () => {
+    const input: ImportApprovedCuratedCorpusItemInput = {
+      url: 'https://test.com/docker',
+      title: 'Find Out How I Cured My Docker In 2 Days',
+      excerpt: 'A short summary of what this story is about',
+      status: CuratedStatus.RECOMMENDATION,
+      imageUrl: 'https://test.com/image.png',
+      language: 'EN',
+      publisher: 'Convective Cloud',
+      topic: Topics.TECHNOLOGY,
+      source: CorpusItemSource.BACKFILL,
+      isCollection: false,
+      isSyndicated: false,
+      createdAt: 1647312676,
+      createdBy: 'ad|Mozilla-LDAP|swing',
+      updatedAt: 1647312676,
+      updatedBy: 'ad|Mozilla-LDAP|swing',
+      scheduledDate: '2022-02-02',
+      scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+    };
+
+    async function expectAddItemEventFired(addItemEventTracker, approvedItem) {
+      // 1 - Check that the ADD_ITEM event was fired once
+      expect(addItemEventTracker.callCount).to.equal(1);
+      // 2 - Event has the right type.
+      expect(await addItemEventTracker.getCall(0).args[0].eventType).to.equal(
+        ReviewedCorpusItemEventType.ADD_ITEM
+      );
+      // 3- Event has the right entity passed to it.
+      expect(
+        await addItemEventTracker.getCall(0).args[0].reviewedCorpusItem
+          .externalId
+      ).to.equal(approvedItem.externalId);
+    }
+
+    async function expectScheduleItemEventFired(
+      addScheduleEventTracker,
+      scheduledItem
+    ) {
+      // 1 - Check that the ADD_SCHEDULE event was fired once
+      expect(addScheduleEventTracker.callCount).to.equal(1);
+      // 2 - Event has the right type.
+      expect(
+        await addScheduleEventTracker.getCall(0).args[0].eventType
+      ).to.equal(ScheduledCorpusItemEventType.ADD_SCHEDULE);
+      // 3- Event has the right entity passed to it.
+      expect(
+        await addScheduleEventTracker.getCall(0).args[0].scheduledCorpusItem
+          .externalId
+      ).to.equal(scheduledItem.externalId);
+    }
+
+    let addItemEventTracker;
+    let addScheduleEventTracker;
+    let server;
+
+    beforeEach(async () => {
+      // set up event tracking
+      addItemEventTracker = sinon.fake();
+      eventEmitter.on(
+        ReviewedCorpusItemEventType.ADD_ITEM,
+        addItemEventTracker
+      );
+      addScheduleEventTracker = sinon.fake();
+      eventEmitter.on(
+        ScheduledCorpusItemEventType.ADD_SCHEDULE,
+        addScheduleEventTracker
+      );
+
+      const headers = {
+        groups: `${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
+      };
+      server = getServerWithMockedHeaders(headers, eventEmitter);
+    });
+
+    it('should create approved item and scheduled item if neither exists', async () => {
+      const result = await server.executeOperation({
+        query: IMPORT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      const approvedItem =
+        result.data?.importApprovedCuratedCorpusItem.approvedItem;
+      const scheduledItem =
+        result.data?.importApprovedCuratedCorpusItem.scheduledItem;
+
+      // Check approvedItem
+      expect(approvedItem.url).to.equal(input.url);
+      await expectAddItemEventFired(addItemEventTracker, approvedItem);
+
+      // Check scheduledItem
+      expect(scheduledItem.approvedItem.externalId).to.equal(
+        approvedItem.externalId
+      );
+      await expectScheduleItemEventFired(
+        addScheduleEventTracker,
+        scheduledItem
+      );
+    });
+
+    it('should create scheduled item if approved item exists', async () => {
+      await createApprovedItemHelper(db, {
+        title: 'something wicked this way comes',
+        url: input.url,
+      });
+
+      const result = await server.executeOperation({
+        query: IMPORT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      const approvedItem =
+        result.data?.importApprovedCuratedCorpusItem.approvedItem;
+      const scheduledItem =
+        result.data?.importApprovedCuratedCorpusItem.scheduledItem;
+
+      // Check approvedItem
+      expect(approvedItem.url).to.equal(input.url);
+      // Check that the ADD_ITEM event was not fired
+      expect(addItemEventTracker.callCount).to.equal(0);
+
+      // Check scheduledItem
+      expect(scheduledItem.approvedItem.externalId).to.equal(
+        approvedItem.externalId
+      );
+      await expectScheduleItemEventFired(
+        addScheduleEventTracker,
+        scheduledItem
+      );
+    });
+
+    it('should return exiting approved item and scheduled item', async () => {
+      const existingApprovedItem = await createApprovedItemHelper(db, {
+        title: 'something wicked this way comes',
+        url: input.url,
+      });
+      await createScheduledItemHelper(db, {
+        approvedItem: existingApprovedItem,
+        scheduledDate: new Date(input.scheduledDate).toISOString(),
+        scheduledSurfaceGuid: input.scheduledSurfaceGuid,
+      });
+
+      const result = await server.executeOperation({
+        query: IMPORT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      const approvedItem =
+        result.data?.importApprovedCuratedCorpusItem.approvedItem;
+      const scheduledItem =
+        result.data?.importApprovedCuratedCorpusItem.scheduledItem;
+
+      // Check approvedItem
+      expect(approvedItem.url).to.equal(input.url);
+      // Check that the ADD_ITEM event was not fired
+      expect(addItemEventTracker.callCount).to.equal(0);
+
+      // Check scheduledItem
+      expect(scheduledItem.approvedItem.externalId).to.equal(
+        approvedItem.externalId
+      );
+      // Check that the ADD_SCHEDULE event was not fired
+      expect(addScheduleEventTracker.callCount).to.equal(0);
+    });
+  });
 });
 
 describe('mutations: ApprovedItem - authentication checks', () => {
@@ -880,6 +1049,10 @@ describe('mutations: ApprovedItem - authentication checks', () => {
     isTimeSensitive: true,
     isSyndicated: false,
   };
+
+  beforeAll(async () => {
+    await clearDb(db);
+  });
 
   describe('createApprovedCuratedCorpusItem mutation', () => {
     it('should succeed if user has access to one of scheduled surfaces', async () => {

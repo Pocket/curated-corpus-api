@@ -1,5 +1,9 @@
-import { PrismaClient, ApprovedItem } from '@prisma/client';
-import { CreateApprovedItemInput, UpdateApprovedItemInput } from '../types';
+import { ApprovedItem, PrismaClient } from '@prisma/client';
+import {
+  CreateApprovedItemInput,
+  ImportApprovedItemInput,
+  UpdateApprovedItemInput,
+} from '../types';
 import { ApolloError, UserInputError } from 'apollo-server';
 import { checkCorpusUrl } from '../helpers/checkCorpusUrl';
 
@@ -25,6 +29,21 @@ export async function createApprovedItem(
       createdBy: username,
     },
   });
+}
+
+/**
+ * This mutation imports/creates an approved curated item.
+ * Due to the nature of the import, we do not throw an
+ * error when an approved item already exists
+ *
+ * @param db
+ * @param data
+ */
+export async function importApprovedItem(
+  db: PrismaClient,
+  data: ImportApprovedItemInput
+): Promise<ApprovedItem> {
+  return db.approvedItem.create({ data });
 }
 
 /**
