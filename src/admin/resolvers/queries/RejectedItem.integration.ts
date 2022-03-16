@@ -37,47 +37,47 @@ describe('queries: RejectedCuratedCorpusItem', () => {
     const rejectedCuratedCorpusItems = [
       {
         title: '10 Unforgivable Sins Of PHP',
-        language: 'en',
+        language: 'EN',
         reason: 'fake reason',
       },
       {
         title: 'Take The Stress Out Of PHP',
-        language: 'en',
+        language: 'EN',
         url: 'https://www.sample-domain/take-the-stress-out-of-php',
         topic: 'Technology',
       },
       {
         title: 'The Untold Secret To Mastering PHP In Just 3 Days',
-        language: 'en',
+        language: 'EN',
         topic: 'Technology',
       },
       {
         title: 'You Can Thank Us Later - 3 Reasons To Stop Thinking About PHP',
-        language: 'en',
+        language: 'EN',
       },
       {
         title: 'Why Ignoring PHP Will Cost You Time and Sales',
-        language: 'en',
+        language: 'EN',
       },
       {
         title: 'PHP: This Is What Professionals Do',
-        language: 'en',
+        language: 'EN',
       },
       {
         title: 'All About Cake PHP',
-        language: 'en',
+        language: 'EN',
       },
       {
         title: "Are You Embarrassed By Your PHP Skills? Here's What To Do",
-        language: 'de',
+        language: 'DE',
       },
       {
         title: 'Proof That PHP Is Exactly What You Are Looking For',
-        language: 'de',
+        language: 'DE',
       },
       {
         title: 'Learn Laravel in 10 days',
-        language: 'de',
+        language: 'DE',
       },
     ];
 
@@ -212,12 +212,12 @@ describe('queries: RejectedCuratedCorpusItem', () => {
       const { data } = await server.executeOperation({
         query: GET_REJECTED_ITEMS,
         variables: {
-          filters: { language: 'de' },
+          filters: { language: 'DE' },
         },
       });
 
       const germanItems = rejectedCuratedCorpusItems.filter(
-        (item) => item.language === 'de'
+        (item) => item.language === 'DE'
       );
       // we only have three stories in German set up before each test
       expect(data?.getRejectedCuratedCorpusItems.edges).to.have.length(
@@ -280,7 +280,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
             url: 'sample-domain',
             title: 'PHP',
             topic: 'Technology',
-            language: 'en',
+            language: 'EN',
           },
         },
       });

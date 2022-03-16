@@ -21,20 +21,20 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
     const stories = [
       {
         title: 'How To Win Friends And Influence People with GraphQL',
-        language: 'en',
+        language: 'EN',
         status: CuratedStatus.RECOMMENDATION,
         topic: 'FOOD',
       },
       {
         title: 'What Zombies Can Teach You About GraphQL',
-        language: 'en',
+        language: 'EN',
         status: CuratedStatus.RECOMMENDATION,
         url: 'https://www.sample-domain/what-zombies-can-teach-you-graphql',
         topic: 'TECHNOLOGY',
       },
       {
         title: 'How To Make Your Product Stand Out With GraphQL',
-        language: 'en',
+        language: 'EN',
         status: CuratedStatus.RECOMMENDATION,
         topic: 'TECHNOLOGY',
       },

@@ -22,7 +22,6 @@ import {
 import { CreateRejectedItemInput } from '../../../database/types';
 import { AuthenticationError } from 'apollo-server-errors';
 import { IContext } from '../../context';
-import { checkLanguage } from '../../../database/helpers/checkLanguage';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -70,9 +69,6 @@ export async function createApprovedItem(
       `Cannot create a corpus item with the topic "${approvedItemData.topic}".`
     );
   }
-
-  // Validate language code
-  checkLanguage(data.language);
 
   const approvedItem = await dbCreateApprovedItem(
     context.db,
@@ -133,8 +129,6 @@ export async function updateApprovedItem(
     );
   }
 
-  // Validate language code
-  checkLanguage(data.language);
 
   const approvedItem = await dbUpdateApprovedItem(
     context.db,

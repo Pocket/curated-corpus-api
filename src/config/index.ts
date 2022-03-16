@@ -28,7 +28,6 @@ export default {
       maxSize: 10000000, // in bytes => 10MB
       maxFiles: 10,
     },
-    languages: ['EN', 'DE'],
   },
   aws: {
     s3: {

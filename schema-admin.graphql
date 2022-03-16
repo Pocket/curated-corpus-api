@@ -145,9 +145,9 @@ type ApprovedCuratedCorpusItem {
     """
     status: CuratedStatus!
     """
-    What language this story is in. This is a two-letter code, for example, 'en' for English.
+    What language this story is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: String!
+    language: CuratedCorpusItemLanguage!
     """
     The name of the online publication that published this story.
     """
@@ -219,9 +219,9 @@ type RejectedCuratedCorpusItem {
     """
     topic: String!
     """
-    What language this story is in. This is a two-letter code, for example, 'en' for English.
+    What language this story is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: String!
+    language: CuratedCorpusItemLanguage!
     """
     The name of the online publication that published this story.
     """
@@ -395,9 +395,9 @@ input ApprovedCuratedCorpusItemFilter {
     status: CuratedStatus
     """
     Optional filter on the language Approved Items have been classified as.
-    This is a two-letter string, e.g. 'en' for English or 'de' for 'German'.
+    This is a two-letter string, e.g. 'EN' for English or 'DE' for 'German'.
     """
-    language: String
+    language: CuratedCorpusItemLanguage
 }
 
 """
@@ -418,9 +418,9 @@ input RejectedCuratedCorpusItemFilter {
     topic: String
     """
     Optional filter on the language Rejected Curated Items have been classified as.
-    This is a two-letter string, e.g. 'en' for English or 'de' for 'German'.
+    This is a two-letter string, e.g. 'EN' for English or 'DE' for 'German'.
     """
-    language: String
+    language: CuratedCorpusItemLanguage
 }
 
 """
@@ -466,9 +466,9 @@ input CreateApprovedCuratedCorpusItemInput {
     """
     status: CuratedStatus!
     """
-    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    What language this item is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: String!
+    language: CuratedCorpusItemLanguage!
     """
     The name of the online publication that published this story.
     """
@@ -527,9 +527,9 @@ input ImportApprovedCuratedCorpusItemInput {
     """
     status: CuratedStatus!
     """
-    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    What language this item is in. This is a two-letter capitalized code, for example, 'EN' for English.
     """
-    language: String!
+    language: CuratedCorpusItemLanguage!
     """
     The name of the online publication that published this story.
     """
@@ -615,9 +615,9 @@ input UpdateApprovedCuratedCorpusItemInput {
     """
     status: CuratedStatus!
     """
-    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    What language this item is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: String!
+    language: CuratedCorpusItemLanguage!
     """
     The name of the online publication that published this story.
     """
@@ -674,9 +674,9 @@ input CreateRejectedCuratedCorpusItemInput {
     """
     topic: String!
     """
-    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    What language this item is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: String
+    language: CuratedCorpusItemLanguage
     """
     The name of the online publication that published this story.
     """

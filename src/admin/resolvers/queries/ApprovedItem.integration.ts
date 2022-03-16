@@ -42,63 +42,63 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       const stories = [
         {
           title: 'How To Win Friends And Influence People with GraphQL',
-          language: 'en',
+          language: 'EN',
           status: CuratedStatus.RECOMMENDATION,
           topic: 'FOOD',
         },
         {
           title: 'What Zombies Can Teach You About GraphQL',
-          language: 'en',
+          language: 'EN',
           status: CuratedStatus.RECOMMENDATION,
           url: 'https://www.sample-domain/what-zombies-can-teach-you-graphql',
           topic: 'TECHNOLOGY',
         },
         {
           title: 'How To Make Your Product Stand Out With GraphQL',
-          language: 'en',
+          language: 'EN',
           status: CuratedStatus.RECOMMENDATION,
           topic: 'TECHNOLOGY',
         },
         {
           title: 'How To Get Fabulous GraphQL On A Tight Budget',
-          language: 'en',
+          language: 'EN',
           status: CuratedStatus.RECOMMENDATION,
           topic: 'FOOD',
         },
         {
           title: 'Death, GraphQL And Taxes',
-          language: 'en',
+          language: 'EN',
           status: CuratedStatus.CORPUS,
           topic: 'ENTERTAINMENT',
         },
         {
           title: '22 Tips To Start Building A GraphQL You Always Wanted',
-          language: 'en',
+          language: 'EN',
           status: CuratedStatus.CORPUS,
           topic: 'POLITICS',
         },
         {
           title: '5 Ways You Can Get More GraphQL While Spending Less',
-          language: 'en',
+          language: 'EN',
           status: CuratedStatus.CORPUS,
           topic: 'POLITICS',
         },
         {
           title:
             "Are You Embarrassed By Your GraphQL Skills? Here's What To Do",
-          language: 'de',
+          language: 'DE',
           status: CuratedStatus.CORPUS,
           topic: 'FOOD',
         },
         {
           title: 'Proof That GraphQL Is Exactly What You Are Looking For',
-          language: 'de',
+          language: 'DE',
           status: CuratedStatus.CORPUS,
           topic: 'TRAVEL',
         },
         {
           title: 'If You Do Not Do GraphQL Now, You Will Hate Yourself Later',
-          language: 'de',
+          language: 'DE',
           status: CuratedStatus.CORPUS,
           topic: 'TRAVEL',
         },
@@ -227,7 +227,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       const { data } = await server.executeOperation({
         query: GET_APPROVED_ITEMS,
         variables: {
-          filters: { language: 'de' },
+          filters: { language: 'DE' },
         },
       });
 
@@ -302,7 +302,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
             url: 'sample-domain',
             title: 'zombies',
             topic: 'TECHNOLOGY',
-            language: 'en',
+            language: 'EN',
             status: CuratedStatus.RECOMMENDATION,
           },
         },

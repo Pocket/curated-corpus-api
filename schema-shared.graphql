@@ -9,6 +9,16 @@ A date in the YYYY-MM-DD format.
 scalar Date
 
 """
+Valid language codes for curated corpus items.
+"""
+enum CuratedCorpusItemLanguage {
+    "German"
+    DE
+    "English"
+    EN
+}
+
+"""
 Information about pagination in a connection.
 """
 type PageInfo {

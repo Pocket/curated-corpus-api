@@ -45,7 +45,7 @@ const scheduledCorpusItem: ScheduledItem = {
     excerpt: 'Something here',
     publisher: 'Octopus Publishing House',
     imageUrl: 'https://test.com/image.png',
-    language: 'en',
+    language: 'EN',
     topic: Topics.EDUCATION,
     isCollection: false,
     isSyndicated: false,

@@ -45,9 +45,9 @@ type CorpusItem @key(fields: "id") {
     """
     excerpt: String!
     """
-    What language this item is in. This is a two-letter code, for example, 'en' for English.
+    What language this item is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: String!
+    language: CuratedCorpusItemLanguage!
     """
     The name of the online publication that published this story.
     """

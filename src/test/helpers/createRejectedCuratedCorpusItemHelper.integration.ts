@@ -44,7 +44,7 @@ describe('createRejectedCuratedCorpusItemHelper', () => {
       title: 'Never Suffer From PHP Again',
       topic: 'Business',
       publisher: 'Any Publisher',
-      language: 'en',
+      language: 'EN',
       reason: 'unspecified',
     };
 
