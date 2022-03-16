@@ -869,7 +869,7 @@ describe('mutations: ApprovedItem', () => {
       url: 'https://test.com/docker',
       title: 'Find Out How I Cured My Docker In 2 Days',
       excerpt: 'A short summary of what this story is about',
-      status: CuratedStatus.CORPUS,
+      status: CuratedStatus.RECOMMENDATION,
       imageUrl: 'https://test.com/image.png',
       language: 'EN',
       publisher: 'Convective Cloud',
@@ -918,6 +918,7 @@ describe('mutations: ApprovedItem', () => {
 
     let addItemEventTracker;
     let addScheduleEventTracker;
+    let server;
 
     beforeEach(async () => {
       // set up event tracking
@@ -935,8 +936,7 @@ describe('mutations: ApprovedItem', () => {
       const headers = {
         groups: `${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
       };
-      const server = getServerWithMockedHeaders(headers, eventEmitter);
-      await server.start();
+      server = getServerWithMockedHeaders(headers, eventEmitter);
     });
 
     it('should create approved item and scheduled item if neither exists', async () => {

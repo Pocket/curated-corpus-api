@@ -29,6 +29,7 @@ import {
   CreateRejectedItemInput,
   ImportApprovedItemInput,
   ImportScheduledItemInput,
+  ScheduledItem,
 } from '../../../database/types';
 import { AuthenticationError } from 'apollo-server-errors';
 import { IContext } from '../../context';
@@ -273,7 +274,7 @@ export async function importApprovedItem(
   { data },
   context: IContext
 ): Promise<ImportApprovedCuratedCorpusItemPayload> {
-  // check if user is authorized to import an item
+  // Check if user is authorized to import an item
   if (!context.authenticatedUser.canWriteToCorpus()) {
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
@@ -281,8 +282,12 @@ export async function importApprovedItem(
   // Check the language. Throw an error if not valid
   checkLanguage(data.language);
 
-  let approvedItem = await getApprovedItemByUrl(context.db, data.url);
-  if (!approvedItem) {
+  // Get approved item
+  // Try creating the approved item first. The assumption here is that for an
+  // import, we don't expect the approved item to exist. Handle an existing
+  // approved item in the catch statement
+  let approvedItem: ApprovedItem;
+  try {
     approvedItem = await dbImportApprovedItem(
       context.db,
       toDbApprovedItemInput(data)
@@ -291,14 +296,19 @@ export async function importApprovedItem(
       ReviewedCorpusItemEventType.ADD_ITEM,
       approvedItem
     );
+  } catch (e) {
+    approvedItem = (await getApprovedItemByUrl(
+      context.db,
+      data.url
+    )) as ApprovedItem;
   }
 
-  let scheduledItem = await getScheduledItemByUniqueAttributes(context.db, {
-    approvedItemId: approvedItem.id,
-    scheduledSurfaceGuid: data.scheduledSurfaceGuid,
-    scheduledDate: data.scheduledDate,
-  });
-  if (!scheduledItem) {
+  // Get scheduled item
+  // Try creating the scheduled item first. The assumption here is that for an
+  // import, we don't expect the scheduled item to exist. Handle an existing
+  // scheduled item in the catch statement
+  let scheduledItem: ScheduledItem;
+  try {
     scheduledItem = await importScheduledItem(
       context.db,
       toDbScheduledItemInput({
@@ -310,6 +320,12 @@ export async function importApprovedItem(
       ScheduledCorpusItemEventType.ADD_SCHEDULE,
       scheduledItem
     );
+  } catch (e) {
+    scheduledItem = (await getScheduledItemByUniqueAttributes(context.db, {
+      approvedItemId: approvedItem.id,
+      scheduledSurfaceGuid: data.scheduledSurfaceGuid,
+      scheduledDate: data.scheduledDate,
+    })) as ScheduledItem;
   }
 
   return {
