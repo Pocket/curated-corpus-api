@@ -5,7 +5,7 @@ import {
   CreateScheduledItemHelperInput,
   createScheduledItemHelper,
 } from './createScheduledItemHelper';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 const db = new PrismaClient();
 
