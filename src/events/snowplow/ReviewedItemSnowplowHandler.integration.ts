@@ -96,7 +96,7 @@ function assertValidSnowplowApprovedItemEvents(eventContext) {
         image_url: approvedItem.imageUrl,
         language: approvedItem.language,
         topic: approvedItem.topic,
-        source: approvedItem.source,
+        loaded_from: approvedItem.source,
         is_collection: approvedItem.isCollection,
         is_time_sensitive: approvedItem.isTimeSensitive,
         is_syndicated: approvedItem.isSyndicated,

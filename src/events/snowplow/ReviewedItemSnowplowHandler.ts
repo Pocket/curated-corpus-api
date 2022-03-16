@@ -97,9 +97,10 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       corpusReviewStatus = CorpusReviewStatus.REJECTED;
     }
 
-    let itemSource: CorpusItemSource | undefined;
+    // Only approved items have a source
+    let loadedFrom: CorpusItemSource | undefined;
     if (item['source']) {
-      itemSource = item['source'];
+      loadedFrom = item['source'];
     }
 
     // Set up common properties returned by both approved and rejected corpus items
@@ -114,7 +115,7 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
         topic: item.topic,
         created_at: getUnixTimestamp(item.createdAt),
         created_by: item.createdBy,
-        source: itemSource,
+        loaded_from: loadedFrom,
       },
     };
 
