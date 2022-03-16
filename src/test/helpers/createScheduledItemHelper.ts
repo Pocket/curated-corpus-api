@@ -4,7 +4,7 @@ import {
   Prisma,
   PrismaClient,
 } from '@prisma/client';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 // the data required to create a scheduled item that goes onto a scheduled surface
 interface CreateScheduledItemHelperRequiredInput {

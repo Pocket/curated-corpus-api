@@ -4,7 +4,7 @@ import {
   Prisma,
   PrismaClient,
 } from '@prisma/client';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 // the minimum of data required to create a approved curated item
 interface CreateApprovedItemHelperRequiredInput {
   title: string;

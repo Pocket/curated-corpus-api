@@ -3,7 +3,7 @@ import {
   Prisma,
   PrismaClient,
 } from '@prisma/client';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 // the minimum of data required to create a rejected item
 interface CreateRejectedCuratedCorpusItemHelperRequiredInput {
   title: string;
