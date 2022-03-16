@@ -1,6 +1,6 @@
 import { CuratedStatus, PrismaClient } from '@prisma/client';
 import { expect } from 'chai';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 import { clearDb } from './clearDb';
 import {
   createApprovedItemHelper,

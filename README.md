@@ -3,7 +3,7 @@
 The Curated Corpus API serves three primary functions:
 
 1. Allow our editorial team to manage both an approved corpus and a rejected corpus.
-2. Allow our editorial team to schedule approved corpus items across a number of Scheduled Surfaces (e.g. Firefox New Tab).
+2. Allow our editorial team to schedule approved corpus items across a number of Scheduled Surfaces (e.g. en-US Firefox New Tab).
 3. Allow the ML team access to approved corpus items for eventual display on Pocket surfaces.
 
 The corpus is managed by editors through our [curation admin tools](https://github.com/Pocket/curation-admin-tools). These tools allow editors to customize meta information about approved items - title, excerpt, image, etc. The approved corpus is the authoritative source for this meta information (_not_ the [Parser](https://github.com/Pocket/Parser)).
@@ -85,6 +85,30 @@ docker compose exec app npx prisma migrate reset
 ```
 
 Note that the above command will not be adding to any data you may have added to the database through other means - it will do a complete reset AND apply the seed script located at `src/prisma/seed.ts`.
+
+### Admin API Authorization
+
+The admin API requires HTTP headers be set to authorize operations (both queries and mutations). The public API does not require any authorization.
+
+To run queries _against the `/admin` API_ in the GraphQL playground, you'll need to specify some HTTP headers. To do so:
+
+1. Open up the GraphQL playground at `http://localhost:4025` and make sure your playground tab's address is `http://localhost:4025/admin`.
+2. Click the **HTTP HEADERS** link at the bottom of the left hand side of the playground to reveal a text box.
+3. Enter the necessary headers (see sample below) into the box and try an operation - it should work!
+
+The sample headers below allow full access to all queries and mutations:
+
+```typescript
+{
+  "groups": "mozilliansorg_pocket_scheduled_surface_curator_full",
+  "name": "Cherry Glazer",
+  "username": "ad|Mozilla-LDAP|cglazer"
+}
+```
+
+Note that the `groups` header can contain mulitple values separated by commas (but still in a single string).
+
+If you'd like to experiment with different levels of authorization (e.g. access to only one scheduled surface), you can find the full list of Mozillian groups on our [Shared Data document](https://getpocket.atlassian.net/wiki/spaces/PE/pages/2584150049/Pocket+Shared+Data#Source-of-Truth.3).
 
 ## Testing
 

@@ -4,7 +4,7 @@ import {
   createScheduledItemHelper,
   createRejectedCuratedCorpusItemHelper,
 } from '../src/test/helpers';
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
 
