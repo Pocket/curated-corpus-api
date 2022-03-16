@@ -3,6 +3,7 @@ import {
   CuratedStatus,
   ScheduledItem as ScheduledItemModel,
 } from '@prisma/client';
+import { CorpusItemSource } from '../shared/types';
 
 export type PaginationInput = {
   after?: string;
@@ -39,6 +40,7 @@ type ApprovedItemRequiredInput = {
   publisher: string;
   imageUrl: string;
   topic: string;
+  source: CorpusItemSource;
   isTimeSensitive: boolean;
 };
 

@@ -6,6 +6,7 @@ import {
   createApprovedItemHelper,
   CreateApprovedItemHelperInput,
 } from './createApprovedItemHelper';
+import { CorpusItemSource } from '../../shared/types';
 
 const db = new PrismaClient();
 
@@ -51,6 +52,7 @@ describe('createApprovedItemHelper', () => {
       imageUrl: faker.image.imageUrl(),
       createdBy: 'big-company|name.surname@example.com',
       topic: 'Business',
+      source: CorpusItemSource.PROSPECT,
       isCollection: false,
       isTimeSensitive: false,
       isSyndicated: true,

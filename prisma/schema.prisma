@@ -35,7 +35,7 @@ model ApprovedItem {
   publisher       String           @db.VarChar(255)
   imageUrl        String           @db.VarChar(500)
   topic           String           @db.VarChar(255)
-  source          CorpusItemSource @default(PROSPECT)
+  source          CorpusItemSource
   isCollection    Boolean          @default(false)
   isTimeSensitive Boolean          @default(false)
   isSyndicated    Boolean          @default(false)
