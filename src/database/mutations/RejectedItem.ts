@@ -20,6 +20,7 @@ export async function createRejectedItem(
   return db.rejectedCuratedCorpusItem.create({
     data: {
       ...data,
+      // Use the SSO username here.
       createdBy: username,
     },
   });

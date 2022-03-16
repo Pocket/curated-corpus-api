@@ -21,6 +21,7 @@ export async function createApprovedItem(
   return db.approvedItem.create({
     data: {
       ...data,
+      // Use the SSO username here.
       createdBy: username,
     },
   });
@@ -45,6 +46,7 @@ export async function updateApprovedItem(
     where: { externalId: data.externalId },
     data: {
       ...data,
+      // Use the SSO username here.
       updatedBy: username,
     },
   });
