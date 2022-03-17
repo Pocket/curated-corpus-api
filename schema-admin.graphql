@@ -147,7 +147,7 @@ type ApprovedCuratedCorpusItem {
     """
     What language this story is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: CuratedCorpusItemLanguage!
+    language: CorpusLanguage!
     """
     The name of the online publication that published this story.
     """
@@ -221,7 +221,7 @@ type RejectedCuratedCorpusItem {
     """
     What language this story is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: CuratedCorpusItemLanguage!
+    language: CorpusLanguage!
     """
     The name of the online publication that published this story.
     """
@@ -397,7 +397,7 @@ input ApprovedCuratedCorpusItemFilter {
     Optional filter on the language Approved Items have been classified as.
     This is a two-letter string, e.g. 'EN' for English or 'DE' for 'German'.
     """
-    language: CuratedCorpusItemLanguage
+    language: CorpusLanguage
 }
 
 """
@@ -420,7 +420,7 @@ input RejectedCuratedCorpusItemFilter {
     Optional filter on the language Rejected Curated Items have been classified as.
     This is a two-letter string, e.g. 'EN' for English or 'DE' for 'German'.
     """
-    language: CuratedCorpusItemLanguage
+    language: CorpusLanguage
 }
 
 """
@@ -468,7 +468,7 @@ input CreateApprovedCuratedCorpusItemInput {
     """
     What language this item is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: CuratedCorpusItemLanguage!
+    language: CorpusLanguage!
     """
     The name of the online publication that published this story.
     """
@@ -529,7 +529,7 @@ input ImportApprovedCuratedCorpusItemInput {
     """
     What language this item is in. This is a two-letter capitalized code, for example, 'EN' for English.
     """
-    language: CuratedCorpusItemLanguage!
+    language: CorpusLanguage!
     """
     The name of the online publication that published this story.
     """
@@ -617,7 +617,7 @@ input UpdateApprovedCuratedCorpusItemInput {
     """
     What language this item is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: CuratedCorpusItemLanguage!
+    language: CorpusLanguage!
     """
     The name of the online publication that published this story.
     """
@@ -676,7 +676,7 @@ input CreateRejectedCuratedCorpusItemInput {
     """
     What language this item is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: CuratedCorpusItemLanguage
+    language: CorpusLanguage
     """
     The name of the online publication that published this story.
     """

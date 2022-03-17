@@ -11,7 +11,7 @@ scalar Date
 """
 Valid language codes for curated corpus items.
 """
-enum CuratedCorpusItemLanguage {
+enum CorpusLanguage {
     "German"
     DE
     "English"

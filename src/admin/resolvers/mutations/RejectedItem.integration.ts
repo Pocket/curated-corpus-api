@@ -350,7 +350,9 @@ describe('mutations: RejectedItem', () => {
       expect(result.data).to.be.oneOf([null, undefined]);
 
       expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      expect(result.errors?.[0].message).to.contain('language');
+      expect(result.errors?.[0].message).to.contain(
+        'does not exist in "CorpusLanguage" enum.'
+      );
     });
 
     it('should fail if language code is correct but not in upper case', async () => {
@@ -365,7 +367,9 @@ describe('mutations: RejectedItem', () => {
       expect(result.data).to.be.oneOf([null, undefined]);
 
       expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      expect(result.errors?.[0].message).to.contain('language');
+      expect(result.errors?.[0].message).to.contain(
+        'does not exist in "CorpusLanguage" enum.'
+      );
     });
   });
 });
