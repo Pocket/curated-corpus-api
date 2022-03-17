@@ -61,6 +61,7 @@
     "aws-xray-sdk-core": "^3.3.4",
     "aws-xray-sdk-express": "^3.3.4",
     "dataloader": "^2.0.0",
+    "date-fns": "^2.28.0",
     "graphql": "^15.8.0",
     "graphql-anywhere": "^4.2.7",
     "graphql-scalars": "^1.14.1",

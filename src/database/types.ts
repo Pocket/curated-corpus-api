@@ -3,6 +3,35 @@ import {
   CuratedStatus,
   ScheduledItem as ScheduledItemModel,
 } from '@prisma/client';
+import { CorpusItemSource } from '../shared/types';
+
+export type ImportApprovedItemInput = {
+  url: string;
+  title: string;
+  excerpt: string;
+  status: CuratedStatus;
+  language: string;
+  publisher: string;
+  imageUrl: string;
+  topic: string;
+  source: CorpusItemSource;
+  isCollection: boolean;
+  isSyndicated: boolean;
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+  updatedBy: string;
+};
+
+export type ImportScheduledItemInput = {
+  approvedItemId: number;
+  scheduledSurfaceGuid: string;
+  scheduledDate: string;
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+  updatedBy: string;
+};
 
 export type PaginationInput = {
   after?: string;
@@ -52,6 +81,8 @@ export type CreateApprovedItemInput = ApprovedItemRequiredInput & {
   // on a Scheduled Surface at the same time.
   scheduledDate?: string;
   scheduledSurfaceGuid?: string;
+
+  source?: CorpusItemSource;
 };
 
 export type UpdateApprovedItemInput = Omit<

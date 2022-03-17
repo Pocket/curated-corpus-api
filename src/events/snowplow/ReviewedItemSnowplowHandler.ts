@@ -17,6 +17,7 @@ import {
   RejectedCuratedCorpusItem,
 } from '@prisma/client';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
+import { CorpusItemSource } from '../../shared/types';
 
 type CuratedCorpusItemUpdateEvent = Omit<SelfDescribingJson, 'data'> & {
   data: CuratedCorpusItemUpdate;
@@ -143,6 +144,7 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       approved_corpus_item_external_id: item.externalId,
       updated_at: getUnixTimestamp(item.updatedAt),
       updated_by: item.updatedBy ?? undefined,
+      loaded_from: item.source as CorpusItemSource,
     };
 
     return context;

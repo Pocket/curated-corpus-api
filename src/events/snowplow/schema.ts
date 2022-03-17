@@ -2,6 +2,8 @@
 // then come back and update this file (and other related files, probably)
 
 // Helper types and enums used in the schema
+import { CorpusItemSource } from '../../shared/types';
+
 export type RejectionReason = { reason: string };
 
 export enum ObjectVersion {
@@ -59,6 +61,10 @@ export type ReviewedCorpusItem = {
    * The URL of the reviewed corpus item.
    */
   url: string;
+  /**
+   * Indicates the backend source for an approved corpus item.
+   */
+  loaded_from?: CorpusItemSource;
   /**
    * The decision by the curator on the item’s validity for the curated corpus.
    */
