@@ -47,7 +47,7 @@ describe('createApprovedItemHelper', () => {
       title: 'What even is time?',
       excerpt: faker.lorem.sentences(3),
       status: CuratedStatus.RECOMMENDATION,
-      language: 'en',
+      language: 'EN',
       imageUrl: faker.image.imageUrl(),
       createdBy: 'big-company|name.surname@example.com',
       topic: 'Business',

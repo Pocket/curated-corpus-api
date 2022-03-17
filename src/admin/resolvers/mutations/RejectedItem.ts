@@ -5,7 +5,6 @@ import { createRejectedItem as dbCreateRejectedItem } from '../../../database/mu
 import { ReviewedCorpusItemEventType } from '../../../events/types';
 import { RejectionReason, ACCESS_DENIED_ERROR } from '../../../shared/types';
 import { IContext } from '../../context';
-import { checkLanguage } from '../../../database/helpers/checkLanguage';
 
 /**
  * Creates a rejected curated item with data supplied.
@@ -33,9 +32,6 @@ export async function createRejectedItem(
       throw new UserInputError(`"${reason}" is not a valid rejection reason.`);
     }
   });
-
-  // Validate language code
-  checkLanguage(data.language);
 
   const rejectedItem = await dbCreateRejectedItem(
     context.db,

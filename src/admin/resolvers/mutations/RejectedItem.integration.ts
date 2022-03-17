@@ -339,7 +339,7 @@ describe('mutations: RejectedItem', () => {
     });
 
     it('should fail if language code is outside of allowed values', async () => {
-      input.language = 'FR';
+      input.language = 'ZZ';
 
       const result = await server.executeOperation({
         query: CREATE_REJECTED_ITEM,
@@ -347,10 +347,11 @@ describe('mutations: RejectedItem', () => {
       });
 
       expect(result.errors).not.to.be.undefined;
-      expect(result.data).to.be.null;
+      expect(result.data).to.be.oneOf([null, undefined]);
 
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
       expect(result.errors?.[0].message).to.contain(
-        `Please use an allowed language code`
+        'does not exist in "CorpusLanguage" enum.'
       );
     });
 
@@ -363,10 +364,11 @@ describe('mutations: RejectedItem', () => {
       });
 
       expect(result.errors).not.to.be.undefined;
-      expect(result.data).to.be.null;
+      expect(result.data).to.be.oneOf([null, undefined]);
 
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
       expect(result.errors?.[0].message).to.contain(
-        `Please use an allowed language code`
+        'does not exist in "CorpusLanguage" enum.'
       );
     });
   });

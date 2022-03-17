@@ -346,7 +346,7 @@ describe('mutations: ApprovedItem', () => {
     });
 
     it('should fail if language code is outside of allowed values', async () => {
-      input.language = 'FR';
+      input.language = 'ZZ';
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
@@ -354,10 +354,11 @@ describe('mutations: ApprovedItem', () => {
       });
 
       expect(result.errors).not.to.be.undefined;
-      expect(result.data).to.be.null;
+      expect(result.data).to.be.oneOf([null, undefined]);
 
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
       expect(result.errors?.[0].message).to.contain(
-        `Please use an allowed language code`
+        'does not exist in "CorpusLanguage" enum.'
       );
     });
 
@@ -370,10 +371,11 @@ describe('mutations: ApprovedItem', () => {
       });
 
       expect(result.errors).not.to.be.undefined;
-      expect(result.data).to.be.null;
+      expect(result.data).to.be.oneOf([null, undefined]);
 
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
       expect(result.errors?.[0].message).to.contain(
-        `Please use an allowed language code`
+        'does not exist in "CorpusLanguage" enum.'
       );
     });
   });
@@ -386,7 +388,7 @@ describe('mutations: ApprovedItem', () => {
       item = await createApprovedItemHelper(db, {
         title: "3 Things Everyone Knows About LEGO That You Don't",
         status: CuratedStatus.RECOMMENDATION,
-        language: 'en',
+        language: 'EN',
       });
 
       input = {
@@ -548,7 +550,7 @@ describe('mutations: ApprovedItem', () => {
     });
 
     it('should fail if language code is outside of allowed values', async () => {
-      input.language = 'FR';
+      input.language = 'ZZ';
 
       const result = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
@@ -556,10 +558,11 @@ describe('mutations: ApprovedItem', () => {
       });
 
       expect(result.errors).not.to.be.undefined;
-      expect(result.data).to.be.null;
+      expect(result.data).to.be.oneOf([null, undefined]);
 
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
       expect(result.errors?.[0].message).to.contain(
-        `Please use an allowed language code`
+        'does not exist in "CorpusLanguage" enum.'
       );
     });
 
@@ -572,10 +575,11 @@ describe('mutations: ApprovedItem', () => {
       });
 
       expect(result.errors).not.to.be.undefined;
-      expect(result.data).to.be.null;
+      expect(result.data).to.be.oneOf([null, undefined]);
 
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
       expect(result.errors?.[0].message).to.contain(
-        `Please use an allowed language code`
+        'does not exist in "CorpusLanguage" enum.'
       );
     });
   });
@@ -590,7 +594,7 @@ describe('mutations: ApprovedItem', () => {
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.RECOMMENDATION,
-        language: 'en',
+        language: 'EN',
       });
 
       const input: RejectApprovedItemInput = {
@@ -693,7 +697,7 @@ describe('mutations: ApprovedItem', () => {
       const item = await createApprovedItemHelper(db, {
         title: 'More Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.CORPUS,
-        language: 'en',
+        language: 'EN',
       });
 
       // Add an entry to a Scheduled Surface - approved item now can't be deleted
@@ -730,7 +734,7 @@ describe('mutations: ApprovedItem', () => {
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.RECOMMENDATION,
-        language: 'en',
+        language: 'EN',
       });
 
       const input: RejectApprovedItemInput = {
@@ -751,7 +755,7 @@ describe('mutations: ApprovedItem', () => {
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.RECOMMENDATION,
-        language: 'en',
+        language: 'EN',
       });
 
       const input: RejectApprovedItemInput = {
@@ -776,7 +780,7 @@ describe('mutations: ApprovedItem', () => {
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.RECOMMENDATION,
-        language: 'en',
+        language: 'EN',
       });
 
       const input: RejectApprovedItemInput = {
@@ -801,7 +805,7 @@ describe('mutations: ApprovedItem', () => {
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.RECOMMENDATION,
-        language: 'en',
+        language: 'EN',
       });
 
       const input: RejectApprovedItemInput = {
@@ -1182,7 +1186,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.RECOMMENDATION,
-        language: 'en',
+        language: 'EN',
       });
 
       const input: RejectApprovedItemInput = {

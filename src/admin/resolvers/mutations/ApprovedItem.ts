@@ -33,7 +33,6 @@ import {
 } from '../../../database/types';
 import { AuthenticationError } from 'apollo-server-errors';
 import { IContext } from '../../context';
-import { checkLanguage } from '../../../database/helpers/checkLanguage';
 import { getApprovedItemByUrl } from '../../../database/queries';
 import { getScheduledItemByUniqueAttributes } from '../../../database/queries/ScheduledItem';
 import { fromUnixTime } from 'date-fns';
@@ -84,9 +83,6 @@ export async function createApprovedItem(
       `Cannot create a corpus item with the topic "${approvedItemData.topic}".`
     );
   }
-
-  // Validate language code
-  checkLanguage(data.language);
 
   const approvedItem = await dbCreateApprovedItem(
     context.db,
@@ -146,9 +142,6 @@ export async function updateApprovedItem(
       `Cannot create a corpus item with the topic "${data.topic}".`
     );
   }
-
-  // Validate language code
-  checkLanguage(data.language);
 
   const approvedItem = await dbUpdateApprovedItem(
     context.db,
@@ -278,10 +271,6 @@ export async function importApprovedItem(
   if (!context.authenticatedUser.canWriteToCorpus()) {
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
-
-  // Check the language. Throw an error if not valid
-  checkLanguage(data.language);
-
   // Get approved item
   // Try creating the approved item first. The assumption here is that for an
   // import, we don't expect the approved item to exist. Handle an existing
