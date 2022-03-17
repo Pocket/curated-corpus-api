@@ -143,7 +143,6 @@ export async function updateApprovedItem(
     );
   }
 
-
   const approvedItem = await dbUpdateApprovedItem(
     context.db,
     data,
