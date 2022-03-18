@@ -13,7 +13,7 @@ import {
   ReviewedCorpusItemEventType,
   ScheduledCorpusItemEventType,
 } from '../../../events/types';
-import { uploadImageToS3 } from '../../aws/upload';
+import { uploadImageToS3, uploadImageToS3FromUrl } from '../../aws/upload';
 import {
   ImportApprovedCuratedCorpusItemInput,
   ImportApprovedCuratedCorpusItemPayload,
@@ -36,6 +36,7 @@ import { IContext } from '../../context';
 import { getApprovedItemByUrl } from '../../../database/queries';
 import { getScheduledItemByUniqueAttributes } from '../../../database/queries/ScheduledItem';
 import { fromUnixTime } from 'date-fns';
+import { InvalidImageUrl } from '../../aws/errors';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -264,19 +265,23 @@ export async function uploadApprovedItemImage(
  */
 export async function importApprovedItem(
   parent,
-  { data },
+  { data }: { data: ImportApprovedCuratedCorpusItemInput },
   context: IContext
 ): Promise<ImportApprovedCuratedCorpusItemPayload> {
   // Check if user is authorized to import an item
   if (!context.authenticatedUser.canWriteToCorpus()) {
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
+
   // Get approved item
   // Try creating the approved item first. The assumption here is that for an
   // import, we don't expect the approved item to exist. Handle an existing
   // approved item in the catch statement
   let approvedItem: ApprovedItem;
   try {
+    const image = await uploadImageToS3FromUrl(context.s3, data.imageUrl);
+    data = { ...data, imageUrl: image.url };
+
     approvedItem = await dbImportApprovedItem(
       context.db,
       toDbApprovedItemInput(data)
@@ -290,6 +295,11 @@ export async function importApprovedItem(
       context.db,
       data.url
     )) as ApprovedItem;
+
+    // If there's an invalid image, stop here and throw an exception
+    if (!approvedItem && e instanceof InvalidImageUrl) {
+      throw new UserInputError(e.message);
+    }
   }
 
   // Get scheduled item

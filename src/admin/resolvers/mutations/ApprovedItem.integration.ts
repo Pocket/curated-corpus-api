@@ -37,6 +37,7 @@ import {
   Topics,
 } from '../../../shared/types';
 import { ImportApprovedCuratedCorpusItemInput } from '../types';
+import nock from 'nock';
 
 describe('mutations: ApprovedItem', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
@@ -920,11 +921,15 @@ describe('mutations: ApprovedItem', () => {
       ).to.equal(scheduledItem.externalId);
     }
 
+    const testFilePath = __dirname + '/test-image.png';
     let addItemEventTracker;
     let addScheduleEventTracker;
     let server;
 
     beforeEach(async () => {
+      // setup image
+      writeFileSync(testFilePath, 'I am an image');
+
       // set up event tracking
       addItemEventTracker = sinon.fake();
       eventEmitter.on(
@@ -943,7 +948,13 @@ describe('mutations: ApprovedItem', () => {
       server = getServerWithMockedHeaders(headers, eventEmitter);
     });
 
+    afterEach(() => unlinkSync(testFilePath));
+
     it('should create approved item and scheduled item if neither exists', async () => {
+      nock(input.imageUrl).get('').replyWithFile(200, testFilePath, {
+        'Content-Type': 'image/png',
+      });
+
       const result = await server.executeOperation({
         query: IMPORT_APPROVED_ITEM,
         variables: { data: input },
@@ -955,7 +966,12 @@ describe('mutations: ApprovedItem', () => {
         result.data?.importApprovedCuratedCorpusItem.scheduledItem;
 
       // Check approvedItem
+      const urlPrefix = config.aws.s3.localEndpoint;
+      const urlPattern = new RegExp(
+        `^${urlPrefix}/${config.aws.s3.bucket}/.+.png$`
+      );
       expect(approvedItem.url).to.equal(input.url);
+      expect(approvedItem.imageUrl).to.match(urlPattern);
       await expectAddItemEventFired(addItemEventTracker, approvedItem);
 
       // Check scheduledItem
@@ -966,6 +982,21 @@ describe('mutations: ApprovedItem', () => {
         addScheduleEventTracker,
         scheduledItem
       );
+    });
+
+    it('should throw an invalid image url error if an invalid image url is provided', async () => {
+      nock(input.imageUrl).get('').replyWithFile(200, testFilePath, {
+        'Content-Type': 'not-an/image',
+      });
+
+      const result = await server.executeOperation({
+        query: IMPORT_APPROVED_ITEM,
+        variables: { data: input },
+      });
+
+      expect(result.data).to.be.null;
+      expect(result.errors[0].message).to.equal('Invalid image URL');
+      expect(result.errors[0].extensions.code).to.equal('BAD_USER_INPUT');
     });
 
     it('should create scheduled item if approved item exists', async () => {

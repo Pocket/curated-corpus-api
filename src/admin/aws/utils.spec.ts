@@ -2,6 +2,7 @@ import nock from 'nock';
 import { unlinkSync, writeFileSync } from 'fs';
 import { FileUpload } from 'graphql-upload';
 import { getFileUploadFromUrl } from './utils';
+import { InvalidImageUrl } from './errors';
 
 function getStreamContent(stream) {
   let content = '';
@@ -51,6 +52,6 @@ describe('Upload Utils', () => {
 
     await expect(
       getFileUploadFromUrl('https://image.com/dancing-in-the-air.jpeg')
-    ).rejects.toThrow('URL content is not an image');
+    ).rejects.toThrow(InvalidImageUrl);
   });
 });
