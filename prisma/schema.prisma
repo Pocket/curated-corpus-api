@@ -34,7 +34,7 @@ model ApprovedItem {
   language        String             @db.VarChar(2)
   publisher       String             @db.VarChar(255)
   imageUrl        String             @db.VarChar(500)
-  topic           String             @db.VarChar(255)
+  topic           String?             @db.VarChar(255)
   source          CuratedItemSource?
   isCollection    Boolean            @default(false)
   isTimeSensitive Boolean            @default(false)
