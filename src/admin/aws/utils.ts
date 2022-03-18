@@ -1,23 +1,37 @@
 import { FileUpload } from 'graphql-upload';
 import fetch from 'node-fetch';
 import mime from 'mime-types';
+import { InvalidImageUrl } from './errors';
 
 /**
  * Fetch image from URL and transform into a GraphQL FileUpload object
  * @param url
  */
 export async function getFileUploadFromUrl(url: string): Promise<FileUpload> {
-  const res = await fetch(url);
-  const contentType = res.headers.get('content-type');
+  try {
+    const res = await fetch(url);
+    const contentType = res.headers.get('content-type');
 
-  if (!contentType?.startsWith('image')) {
-    throw new Error('URL content is not an image');
+    checkValidImageContentType(contentType);
+
+    return {
+      filename: `image.${mime.extension(contentType)}`,
+      mimetype: contentType,
+      encoding: '7bit',
+      createReadStream: () => res.body,
+    };
+  } catch (e) {
+    throw new InvalidImageUrl();
   }
+}
 
-  return {
-    filename: `image.${mime.extension(contentType)}`,
-    mimetype: contentType,
-    encoding: '7bit',
-    createReadStream: () => res.body,
-  };
+/**
+ * Check content type header is a valid image content type.
+ * Must begin with image
+ * @param contentType
+ */
+export function checkValidImageContentType(contentType): boolean {
+  if (!contentType?.startsWith('image')) throw new Error();
+
+  return true;
 }
