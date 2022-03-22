@@ -5,6 +5,8 @@ import {
   PrismaClient,
 } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import { CorpusItemSource } from '../../shared/types';
+
 // the minimum of data required to create a approved curated item
 interface CreateApprovedItemHelperRequiredInput {
   title: string;
@@ -21,6 +23,7 @@ interface CreateApprovedItemHelperOptionalInput {
   imageUrl?: string;
   createdBy?: string;
   topic?: string;
+  source?: CorpusItemSource;
   isCollection?: boolean;
   isTimeSensitive?: boolean;
   isSyndicated?: boolean;
@@ -79,6 +82,11 @@ export async function createApprovedItemHelper(
       'SPORTS',
       'TECHNOLOGY',
       'TRAVEL',
+    ]),
+    source: faker.random.arrayElement([
+      CorpusItemSource.PROSPECT,
+      CorpusItemSource.MANUAL,
+      CorpusItemSource.BACKFILL,
     ]),
     isCollection: faker.datatype.boolean(),
     isTimeSensitive: faker.datatype.boolean(),

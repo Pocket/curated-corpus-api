@@ -106,7 +106,8 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
         corpus_review_status: corpusReviewStatus,
         // manually added items do not have a prospectId
         prospect_id: item.prospectId || undefined,
-        topic: item.topic,
+        // TODO: consider removing the `||` part once legacy Curation data is fully migrated to Curated Corpus.
+        topic: item.topic || undefined,
         created_at: getUnixTimestamp(item.createdAt),
         created_by: item.createdBy,
       },

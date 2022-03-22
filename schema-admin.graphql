@@ -163,6 +163,10 @@ type ApprovedCuratedCorpusItem {
     """
     topic: String!
     """
+    The source of the corpus item.
+    """
+    source: CorpusItemSource!
+    """
     Whether this story is a Pocket Collection.
     """
     isCollection: Boolean!
@@ -486,6 +490,10 @@ input CreateApprovedCuratedCorpusItemInput {
     Temporarily a string value that will be provided by Prospect API, possibly an enum in the future.
     """
     topic: String!
+    """
+    The source of the corpus item.
+    """
+    source: CorpusItemSource!
     """
     Whether this story is a Pocket Collection.
     """
