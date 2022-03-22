@@ -194,7 +194,8 @@ export async function rejectApprovedItem(
     prospectId: approvedItem.prospectId || undefined,
     url: approvedItem.url,
     title: approvedItem.title,
-    topic: approvedItem.topic,
+    // TODO: consider removing the `||` part once legacy Curation data is fully migrated to Curated Corpus.
+    topic: approvedItem.topic || '',
     language: approvedItem.language,
     publisher: approvedItem.publisher,
     reason: data.reason,
@@ -348,7 +349,7 @@ function toDbApprovedItemInput(
     language: data.language,
     publisher: data.publisher,
     imageUrl: data.imageUrl,
-    topic: data.topic,
+    topic: data.topic ?? '',
     url: data.url,
     isCollection: data.isCollection,
     isSyndicated: data.isSyndicated,

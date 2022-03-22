@@ -14,7 +14,7 @@ export type ImportApprovedCuratedCorpusItemInput = {
   language: string;
   publisher: string;
   imageUrl: string;
-  topic: string;
+  topic?: string;
   source: CorpusItemSource;
   isCollection: boolean;
   isSyndicated: boolean;
