@@ -92,6 +92,7 @@ export const IMPORT_APPROVED_ITEM = gql`
       }
       scheduledItem {
         ...ScheduledItemData
+          scheduledSurfaceGuid
       }
     }
   }
