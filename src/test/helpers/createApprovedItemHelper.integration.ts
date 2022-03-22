@@ -6,6 +6,7 @@ import {
   createApprovedItemHelper,
   CreateApprovedItemHelperInput,
 } from './createApprovedItemHelper';
+import { CorpusItemSource } from '../../shared/types';
 
 const db = new PrismaClient();
 
@@ -36,6 +37,7 @@ describe('createApprovedItemHelper', () => {
     expect(item.excerpt).to.be.not.undefined;
     expect(item.status).to.be.not.undefined;
     expect(item.topic).to.be.not.undefined;
+    expect(item.source).to.be.not.undefined;
     expect(item.isCollection).to.be.a('boolean');
     expect(item.isTimeSensitive).to.be.a('boolean');
     expect(item.isSyndicated).to.be.a('boolean');
@@ -51,6 +53,7 @@ describe('createApprovedItemHelper', () => {
       imageUrl: faker.image.imageUrl(),
       createdBy: 'big-company|name.surname@example.com',
       topic: 'Business',
+      source: CorpusItemSource.PROSPECT,
       isCollection: false,
       isTimeSensitive: false,
       isSyndicated: true,

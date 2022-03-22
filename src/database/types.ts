@@ -68,6 +68,7 @@ type ApprovedItemRequiredInput = {
   publisher: string;
   imageUrl: string;
   topic: string;
+  source: CorpusItemSource;
   isTimeSensitive: boolean;
 };
 
@@ -81,13 +82,11 @@ export type CreateApprovedItemInput = ApprovedItemRequiredInput & {
   // on a Scheduled Surface at the same time.
   scheduledDate?: string;
   scheduledSurfaceGuid?: string;
-
-  source?: CorpusItemSource;
 };
 
 export type UpdateApprovedItemInput = Omit<
   ApprovedItemRequiredInput,
-  'prospectId'
+  'prospectId' | 'source'
 > & {
   externalId: string;
 };
