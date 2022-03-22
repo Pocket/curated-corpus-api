@@ -12,6 +12,7 @@ export const CuratedItemData = gql`
     excerpt
     status
     topic
+    source
     isCollection
     isTimeSensitive
     isSyndicated
