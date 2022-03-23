@@ -7,6 +7,7 @@ import {
   getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import {
+  APPROVED_ITEM_REFERENCE_RESOLVER,
   GET_APPROVED_ITEM_BY_URL,
   GET_APPROVED_ITEMS,
 } from './sample-queries.gql';
@@ -322,11 +323,11 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       const storyInput = [
         {
           title: 'Story one',
-          url: 'https://www.sample-domain.com/what-zombies-can-teach-you-graphql',
+          url: 'https://www.sample-domain1.com/what-zombies-can-teach-you-graphql',
         },
         {
           title: 'Story two',
-          url: 'https://www.test.com/story-two',
+          url: 'https://www.test1.com/story-two',
         },
         {
           title: 'Story three',
@@ -340,7 +341,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
     });
 
     it('should get an existing approved item by URL', async () => {
-      const inputUrl = 'https://www.test.com/story-two';
+      const inputUrl = 'https://www.test1.com/story-two';
 
       const result = await server.executeOperation({
         query: GET_APPROVED_ITEM_BY_URL,
@@ -388,6 +389,108 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
 
       // There should be no errors
       expect(result.errors).to.be.undefined;
+    });
+  });
+
+  describe('ApprovedItem reference resolver', () => {
+    beforeAll(async () => {
+      // Create a few items with known URLs.
+      const storyInput = [
+        {
+          title: 'Story one',
+          url: 'https://www.sample-domain.com/what-zombies-can-teach-you-graphql',
+        },
+        {
+          title: 'Story two',
+          url: 'https://www.test2.com/story-two',
+        },
+        {
+          title: 'Story three',
+          url: 'https://www.test2.com/story-three',
+        },
+        {
+          title: 'Story four',
+          url: 'https://www.test2.com/story-four',
+        },
+        {
+          title: 'Story five',
+          url: 'https://www.test2.com/story-five',
+        },
+        {
+          title: 'Story six',
+          url: 'https://www.test2.com/story-six',
+        },
+        {
+          title: 'Story seven',
+          url: 'https://www.test2.com/story-seven',
+        },
+      ];
+
+      for (const input of storyInput) {
+        await createApprovedItemHelper(db, input);
+      }
+    });
+
+    it('returns the approved item if it exists', async () => {
+      const result = await server.executeOperation({
+        query: APPROVED_ITEM_REFERENCE_RESOLVER,
+        variables: {
+          representations: [
+            {
+              __typename: 'ApprovedCuratedCorpusItem',
+              url: 'https://www.test2.com/story-three',
+            },
+          ],
+        },
+      });
+
+      expect(result.errors).to.be.undefined;
+
+      expect(result.data).to.not.be.null;
+      expect(result.data?._entities).to.have.lengthOf(1);
+    });
+
+    it('returns multiple items in the correct order', async () => {
+      const result = await server.executeOperation({
+        query: APPROVED_ITEM_REFERENCE_RESOLVER,
+        variables: {
+          representations: [
+            {
+              __typename: 'ApprovedCuratedCorpusItem',
+              url: 'https://www.test2.com/story-seven',
+            },
+            {
+              __typename: 'ApprovedCuratedCorpusItem',
+              url: 'https://www.test2.com/story-three',
+            },
+            {
+              __typename: 'ApprovedCuratedCorpusItem',
+              url: 'https://www.sample-domain.com/what-zombies-can-teach-you-graphql',
+            },
+            {
+              __typename: 'ApprovedCuratedCorpusItem',
+              url: 'https://www.test2.com/story-two',
+            },
+          ],
+        },
+      });
+
+      expect(result.errors).to.be.undefined;
+
+      expect(result.data).to.not.be.null;
+      expect(result.data?._entities).to.have.lengthOf(4);
+      expect(result.data?._entities[0].url).to.equal(
+        'https://www.test2.com/story-seven'
+      );
+      expect(result.data?._entities[1].url).to.equal(
+        'https://www.test2.com/story-three'
+      );
+      expect(result.data?._entities[2].url).to.equal(
+        'https://www.sample-domain.com/what-zombies-can-teach-you-graphql'
+      );
+      expect(result.data?._entities[3].url).to.equal(
+        'https://www.test2.com/story-two'
+      );
     });
   });
 });
