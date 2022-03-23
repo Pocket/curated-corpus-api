@@ -8,24 +8,24 @@ import {
   createApprovedItemHelper,
   createRejectedCuratedCorpusItemHelper,
   createScheduledItemHelper,
-  getServerWithMockedHeaders
+  getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import {
   CREATE_APPROVED_ITEM,
   IMPORT_APPROVED_ITEM,
   REJECT_APPROVED_ITEM,
   UPDATE_APPROVED_ITEM,
-  UPLOAD_APPROVED_ITEM_IMAGE
+  UPLOAD_APPROVED_ITEM_IMAGE,
 } from './sample-mutations.gql';
 import {
   CreateApprovedItemInput,
   RejectApprovedItemInput,
-  UpdateApprovedItemInput
+  UpdateApprovedItemInput,
 } from '../../../database/types';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import {
   ReviewedCorpusItemEventType,
-  ScheduledCorpusItemEventType
+  ScheduledCorpusItemEventType,
 } from '../../../events/types';
 import { Upload } from 'graphql-upload';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
@@ -34,7 +34,7 @@ import {
   ACCESS_DENIED_ERROR,
   CorpusItemSource,
   MozillaAccessGroup,
-  Topics
+  Topics,
 } from '../../../shared/types';
 import { ImportApprovedCuratedCorpusItemInput } from '../types';
 import nock from 'nock';
@@ -45,7 +45,7 @@ describe('mutations: ApprovedItem', () => {
   const headers = {
     name: 'Test User',
     username: 'test.user@test.com',
-    groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`
+    groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
   };
 
   const server = getServerWithMockedHeaders(headers, eventEmitter);
@@ -82,7 +82,7 @@ describe('mutations: ApprovedItem', () => {
         source: CorpusItemSource.PROSPECT,
         isCollection: false,
         isTimeSensitive: true,
-        isSyndicated: false
+        isSyndicated: false,
       };
     });
 
@@ -93,7 +93,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).to.be.undefined;
@@ -137,7 +137,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: inputWithoutProspectId }
+        variables: { data: inputWithoutProspectId },
       });
 
       expect(result.errors).to.be.undefined;
@@ -176,13 +176,13 @@ describe('mutations: ApprovedItem', () => {
       // Create an approved item with a set URL
       await createApprovedItemHelper(db, {
         title: 'I was here first!',
-        url: 'https://test.com/docker'
+        url: 'https://test.com/docker',
       });
 
       // Attempt to create another item with the same URL
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       // ...without success. There is no data
@@ -206,13 +206,13 @@ describe('mutations: ApprovedItem', () => {
       // Create an approved item with a set URL
       await createRejectedCuratedCorpusItemHelper(db, {
         title: 'I was here first!',
-        url: 'https://test.com/docker'
+        url: 'https://test.com/docker',
       });
 
       // Attempt to create another item with the same URL
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       // ...without success. There is no data
@@ -240,7 +240,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).to.be.undefined;
@@ -303,7 +303,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       // ...without success. There is no data
@@ -330,7 +330,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       // ...without success. There is no data
@@ -352,7 +352,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).not.to.be.undefined;
@@ -369,7 +369,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).not.to.be.undefined;
@@ -388,9 +388,9 @@ describe('mutations: ApprovedItem', () => {
 
     beforeEach(async () => {
       item = await createApprovedItemHelper(db, {
-        title: '3 Things Everyone Knows About LEGO That You Don\'t',
+        title: "3 Things Everyone Knows About LEGO That You Don't",
         status: CuratedStatus.RECOMMENDATION,
-        language: 'EN'
+        language: 'EN',
       });
 
       input = {
@@ -402,7 +402,7 @@ describe('mutations: ApprovedItem', () => {
         language: 'DE',
         publisher: 'Cloud Factory',
         topic: Topics.BUSINESS,
-        isTimeSensitive: true
+        isTimeSensitive: true,
       };
     });
 
@@ -413,7 +413,7 @@ describe('mutations: ApprovedItem', () => {
 
       const { data } = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       // External ID should be unchanged
@@ -448,7 +448,7 @@ describe('mutations: ApprovedItem', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENGB}`
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENGB}`,
       };
 
       const server = getServerWithMockedHeaders(headers, eventEmitter);
@@ -460,7 +460,7 @@ describe('mutations: ApprovedItem', () => {
 
       const { data } = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       // External ID should be unchanged
@@ -499,7 +499,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.data).to.be.null;
@@ -509,12 +509,12 @@ describe('mutations: ApprovedItem', () => {
       await server.stop();
     });
 
-    it('should fail if user doesn\'t have access to any of scheduled surfaces', async () => {
+    it("should fail if user doesn't have access to any of scheduled surfaces", async () => {
       // Set up auth headers with access to something irrelevant here, such as collections
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: `group1,group2,${MozillaAccessGroup.COLLECTION_CURATOR_FULL}`
+        groups: `group1,group2,${MozillaAccessGroup.COLLECTION_CURATOR_FULL}`,
       };
 
       const server = getServerWithMockedHeaders(headers, eventEmitter);
@@ -522,7 +522,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.data).to.be.null;
@@ -538,7 +538,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.data).to.be.null;
@@ -556,7 +556,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).not.to.be.undefined;
@@ -573,7 +573,7 @@ describe('mutations: ApprovedItem', () => {
 
       const result = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).not.to.be.undefined;
@@ -596,17 +596,17 @@ describe('mutations: ApprovedItem', () => {
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.RECOMMENDATION,
-        language: 'EN'
+        language: 'EN',
       });
 
       const input: RejectApprovedItemInput = {
         externalId: item.externalId,
-        reason: 'MISINFORMATION,OTHER'
+        reason: 'MISINFORMATION,OTHER',
       };
 
       const result = await server.executeOperation({
         query: REJECT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).to.be.undefined;
@@ -629,7 +629,7 @@ describe('mutations: ApprovedItem', () => {
       // `getRejectedCuratedCorpusItems` query will contain the one item
       // that was created by this mutation.
       const { data: queryData } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS
+        query: GET_REJECTED_ITEMS,
       });
       // There should be one rejected item in there...
       expect(queryData?.getRejectedCuratedCorpusItems.totalCount).to.equal(1);
@@ -671,12 +671,12 @@ describe('mutations: ApprovedItem', () => {
 
       const input: RejectApprovedItemInput = {
         externalId: 'this-id-does-not-exist',
-        reason: 'MISINFORMATION,OTHER'
+        reason: 'MISINFORMATION,OTHER',
       };
 
       const result = await server.executeOperation({
         query: REJECT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).not.to.be.null;
@@ -699,24 +699,24 @@ describe('mutations: ApprovedItem', () => {
       const item = await createApprovedItemHelper(db, {
         title: 'More Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.CORPUS,
-        language: 'EN'
+        language: 'EN',
       });
 
       // Add an entry to a Scheduled Surface - approved item now can't be deleted
       // for data integrity reasons.
       await createScheduledItemHelper(db, {
         approvedItem: item,
-        scheduledSurfaceGuid: 'NEW_TAB_EN_US'
+        scheduledSurfaceGuid: 'NEW_TAB_EN_US',
       });
 
       const input: RejectApprovedItemInput = {
         externalId: item.externalId,
-        reason: 'MISINFORMATION,OTHER'
+        reason: 'MISINFORMATION,OTHER',
       };
 
       const result = await server.executeOperation({
         query: REJECT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).not.to.be.null;
@@ -736,17 +736,17 @@ describe('mutations: ApprovedItem', () => {
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.RECOMMENDATION,
-        language: 'EN'
+        language: 'EN',
       });
 
       const input: RejectApprovedItemInput = {
         externalId: item.externalId,
-        reason: ' MISINFORMATION, OTHER '
+        reason: ' MISINFORMATION, OTHER ',
       };
 
       const result = await server.executeOperation({
         query: REJECT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).to.be.undefined;
@@ -757,17 +757,17 @@ describe('mutations: ApprovedItem', () => {
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.RECOMMENDATION,
-        language: 'EN'
+        language: 'EN',
       });
 
       const input: RejectApprovedItemInput = {
         externalId: item.externalId,
-        reason: 'BADFONT'
+        reason: 'BADFONT',
       };
 
       const result = await server.executeOperation({
         query: REJECT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).not.to.be.undefined;
@@ -782,17 +782,17 @@ describe('mutations: ApprovedItem', () => {
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.RECOMMENDATION,
-        language: 'EN'
+        language: 'EN',
       });
 
       const input: RejectApprovedItemInput = {
         externalId: item.externalId,
-        reason: 'BADFONT,BORINGCOLORS'
+        reason: 'BADFONT,BORINGCOLORS',
       };
 
       const result = await server.executeOperation({
         query: REJECT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).not.to.be.undefined;
@@ -807,17 +807,17 @@ describe('mutations: ApprovedItem', () => {
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.RECOMMENDATION,
-        language: 'EN'
+        language: 'EN',
       });
 
       const input: RejectApprovedItemInput = {
         externalId: item.externalId,
-        reason: 'MISINFORMATION,IDONTLIKEIT'
+        reason: 'MISINFORMATION,IDONTLIKEIT',
       };
 
       const result = await server.executeOperation({
         query: REJECT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).not.to.be.undefined;
@@ -847,14 +847,14 @@ describe('mutations: ApprovedItem', () => {
         filename: 'test.jpg',
         mimetype: 'image/jpeg',
         encoding: '7bit',
-        createReadStream: () => createReadStream(testFilePath)
+        createReadStream: () => createReadStream(testFilePath),
       });
 
       const { data, errors } = await server.executeOperation({
         query: UPLOAD_APPROVED_ITEM_IMAGE,
         variables: {
-          image: image
-        }
+          image: image,
+        },
       });
 
       const urlPrefix = config.aws.s3.localEndpoint;
@@ -888,7 +888,7 @@ describe('mutations: ApprovedItem', () => {
       updatedAt: 1647312676,
       updatedBy: 'ad|Mozilla-LDAP|swing',
       scheduledDate: '2022-02-02',
-      scheduledSurfaceGuid: 'NEW_TAB_EN_US'
+      scheduledSurfaceGuid: 'NEW_TAB_EN_US',
     };
 
     async function expectAddItemEventFired(addItemEventTracker, approvedItem) {
@@ -944,7 +944,7 @@ describe('mutations: ApprovedItem', () => {
       );
 
       const headers = {
-        groups: `${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`
+        groups: `${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
       };
       server = getServerWithMockedHeaders(headers, eventEmitter);
     });
@@ -953,12 +953,12 @@ describe('mutations: ApprovedItem', () => {
 
     it('should create approved item and scheduled item if neither exists', async () => {
       nock(input.imageUrl).get('').replyWithFile(200, testFilePath, {
-        'Content-Type': 'image/png'
+        'Content-Type': 'image/png',
       });
 
       const result = await server.executeOperation({
         query: IMPORT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       const approvedItem =
@@ -975,7 +975,9 @@ describe('mutations: ApprovedItem', () => {
       expect(approvedItem.imageUrl).to.match(urlPattern);
       expect(approvedItem.externalId).is.not.undefined;
       expect(scheduledItem.externalId).is.not.undefined;
-      expect(scheduledItem.scheduledSurfaceGuid).equals(input.scheduledSurfaceGuid);
+      expect(scheduledItem.scheduledSurfaceGuid).equals(
+        input.scheduledSurfaceGuid
+      );
 
       await expectAddItemEventFired(addItemEventTracker, approvedItem);
 
@@ -991,12 +993,12 @@ describe('mutations: ApprovedItem', () => {
 
     it('should throw an invalid image url error if an invalid image url is provided', async () => {
       nock(input.imageUrl).get('').replyWithFile(200, testFilePath, {
-        'Content-Type': 'not-an/image'
+        'Content-Type': 'not-an/image',
       });
 
       const result = await server.executeOperation({
         query: IMPORT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.data).to.be.null;
@@ -1007,12 +1009,12 @@ describe('mutations: ApprovedItem', () => {
     it('should create scheduled item if approved item exists', async () => {
       await createApprovedItemHelper(db, {
         title: 'something wicked this way comes',
-        url: input.url
+        url: input.url,
       });
 
       const result = await server.executeOperation({
         query: IMPORT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       const approvedItem =
@@ -1038,17 +1040,17 @@ describe('mutations: ApprovedItem', () => {
     it('should return exiting approved item and scheduled item', async () => {
       const existingApprovedItem = await createApprovedItemHelper(db, {
         title: 'something wicked this way comes',
-        url: input.url
+        url: input.url,
       });
       await createScheduledItemHelper(db, {
         approvedItem: existingApprovedItem,
         scheduledDate: new Date(input.scheduledDate).toISOString(),
-        scheduledSurfaceGuid: input.scheduledSurfaceGuid
+        scheduledSurfaceGuid: input.scheduledSurfaceGuid,
       });
 
       const result = await server.executeOperation({
         query: IMPORT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       const approvedItem =
@@ -1088,7 +1090,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
     source: CorpusItemSource.PROSPECT,
     isCollection: false,
     isTimeSensitive: true,
-    isSyndicated: false
+    isSyndicated: false,
   };
 
   beforeAll(async () => {
@@ -1105,7 +1107,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENGB}`
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENGB}`,
       };
 
       const server = getServerWithMockedHeaders(headers, eventEmitter);
@@ -1113,7 +1115,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).to.be.undefined;
@@ -1147,7 +1149,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.data).to.be.null;
@@ -1157,12 +1159,12 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       await server.stop();
     });
 
-    it('should fail if user doesn\'t have access to any of scheduled surfaces', async () => {
+    it("should fail if user doesn't have access to any of scheduled surfaces", async () => {
       // Set up auth headers with access to something irrelevant here, such as collections
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: `group1,group2,${MozillaAccessGroup.COLLECTION_CURATOR_FULL}`
+        groups: `group1,group2,${MozillaAccessGroup.COLLECTION_CURATOR_FULL}`,
       };
 
       const server = getServerWithMockedHeaders(headers, eventEmitter);
@@ -1170,7 +1172,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.data).to.be.null;
@@ -1184,7 +1186,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
       };
 
       const server = getServerWithMockedHeaders(headers, eventEmitter);
@@ -1197,7 +1199,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.data).to.be.null;
@@ -1214,7 +1216,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENGB}`
+        groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENGB}`,
       };
 
       const server = getServerWithMockedHeaders(headers);
@@ -1223,17 +1225,17 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
         status: CuratedStatus.RECOMMENDATION,
-        language: 'EN'
+        language: 'EN',
       });
 
       const input: RejectApprovedItemInput = {
         externalId: item.externalId,
-        reason: 'MISINFORMATION,OTHER'
+        reason: 'MISINFORMATION,OTHER',
       };
 
       const result = await server.executeOperation({
         query: REJECT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).to.be.undefined;
@@ -1253,7 +1255,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: `group1,group2`
+        groups: `group1,group2`,
       };
 
       const server = getServerWithMockedHeaders(headers);
@@ -1261,12 +1263,12 @@ describe('mutations: ApprovedItem - authentication checks', () => {
 
       const input: RejectApprovedItemInput = {
         externalId: 'test-id',
-        reason: 'MISINFORMATION,OTHER'
+        reason: 'MISINFORMATION,OTHER',
       };
 
       const result = await server.executeOperation({
         query: REJECT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).not.to.be.undefined;
@@ -1282,7 +1284,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: `group1,${MozillaAccessGroup.READONLY}`
+        groups: `group1,${MozillaAccessGroup.READONLY}`,
       };
 
       const server = getServerWithMockedHeaders(headers);
@@ -1290,12 +1292,12 @@ describe('mutations: ApprovedItem - authentication checks', () => {
 
       const input: RejectApprovedItemInput = {
         externalId: 'test-id',
-        reason: 'MISINFORMATION,OTHER'
+        reason: 'MISINFORMATION,OTHER',
       };
 
       const result = await server.executeOperation({
         query: REJECT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).not.to.be.undefined;
@@ -1313,12 +1315,12 @@ describe('mutations: ApprovedItem - authentication checks', () => {
 
       const input: RejectApprovedItemInput = {
         externalId: 'test-id',
-        reason: 'MISINFORMATION,OTHER'
+        reason: 'MISINFORMATION,OTHER',
       };
 
       const result = await server.executeOperation({
         query: REJECT_APPROVED_ITEM,
-        variables: { data: input }
+        variables: { data: input },
       });
 
       expect(result.errors).not.to.be.undefined;
@@ -1345,7 +1347,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: `group1,group2,${MozillaAccessGroup.READONLY}`
+        groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
       };
 
       const server = getServerWithMockedHeaders(headers);
@@ -1357,14 +1359,14 @@ describe('mutations: ApprovedItem - authentication checks', () => {
         filename: 'test.jpg',
         mimetype: 'image/jpeg',
         encoding: '7bit',
-        createReadStream: () => createReadStream(testFilePath)
+        createReadStream: () => createReadStream(testFilePath),
       });
 
       const result = await server.executeOperation({
         query: UPLOAD_APPROVED_ITEM_IMAGE,
         variables: {
-          image: image
-        }
+          image: image,
+        },
       });
 
       expect(result.data).to.be.null;
