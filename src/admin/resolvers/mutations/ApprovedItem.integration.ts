@@ -973,6 +973,12 @@ describe('mutations: ApprovedItem', () => {
       );
       expect(approvedItem.url).to.equal(input.url);
       expect(approvedItem.imageUrl).to.match(urlPattern);
+      expect(approvedItem.externalId).is.not.undefined;
+      expect(scheduledItem.externalId).is.not.undefined;
+      expect(scheduledItem.scheduledSurfaceGuid).equals(
+        input.scheduledSurfaceGuid
+      );
+
       await expectAddItemEventFired(addItemEventTracker, approvedItem);
 
       // Check scheduledItem
