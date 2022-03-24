@@ -119,7 +119,7 @@ type ScheduledSurface {
 """
 A prospective story that has been reviewed by the curators and saved to the curated corpus.
 """
-type ApprovedCuratedCorpusItem {
+type ApprovedCuratedCorpusItem @key(fields: "url") {
     """
     An alternative primary key in UUID format that is generated on creation.
     """

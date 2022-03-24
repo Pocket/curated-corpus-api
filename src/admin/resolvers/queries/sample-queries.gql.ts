@@ -91,3 +91,14 @@ export const GET_SCHEDULED_SURFACES_FOR_USER = gql`
     }
   }
 `;
+
+export const APPROVED_ITEM_REFERENCE_RESOLVER = gql`
+  query ($representations: [_Any!]!) {
+    _entities(representations: $representations) {
+      ... on ApprovedCuratedCorpusItem {
+        ...CuratedItemData
+      }
+    }
+  }
+  ${CuratedItemData}
+`;
