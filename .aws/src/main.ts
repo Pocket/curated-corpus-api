@@ -201,6 +201,14 @@ class CuratedCorpusAPI extends TerraformStack {
               name: 'SNOWPLOW_ENDPOINT',
               value: config.envVars.snowplowEndpoint,
             },
+            {
+              name: 'EVENT_BUS_NAME',
+              value: config.eventBus.name,
+            },
+            {
+              name: 'AWS_REGION',
+              value: region.name,
+            },
           ],
           secretEnvVars: [
             {

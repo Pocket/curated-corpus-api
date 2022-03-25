@@ -1,5 +1,6 @@
 import { ApprovedItem, RejectedCuratedCorpusItem } from '@prisma/client';
-import { ScheduledItem } from '../database/types';
+import { ScheduledItem, CorpusItem } from '../database/types';
+import { ScheduledItem as ScheduledItemModel } from '@prisma/client';
 
 export enum ReviewedCorpusItemEventType {
   ADD_ITEM = 'ADD_ITEM',
@@ -38,3 +39,19 @@ export type ReviewedCorpusItemPayload = {
 export type ScheduledCorpusItemPayload = {
   scheduledCorpusItem: ScheduledItem;
 };
+
+export type ScheduledItemEventBusPayload = Pick<
+  ScheduledItemModel,
+  'createdBy' | 'scheduledSurfaceGuid'
+> &
+  Pick<
+    ApprovedItem,
+    'topic' | 'isSyndicated' | keyof Omit<CorpusItem, 'id'>
+  > & {
+    scheduledItemId: string; // externalId of ScheduledItem
+    approvedItemId: string; // externalId of ApprovedItem
+    scheduledDate: string; // UTC Date string YYYY-MM-DD
+    eventType: string; // TODO - config.eventBridge.addScheduledEventType
+    createdAt: string; // UTC timestamp string
+    updatedAt: string; // UTC timestamp string
+  };

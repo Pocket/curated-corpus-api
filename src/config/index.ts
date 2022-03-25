@@ -30,15 +30,23 @@ export default {
     },
   },
   aws: {
+    region: process.env.AWS_REGION || 'us-east-1',
+    endpoint: localEndpoint,
     s3: {
       localEndpoint,
       bucket: process.env.AWS_S3_BUCKET || 'curated-corpus-api-local-images',
+    },
+    eventBus: {
+      name: process.env.EVENT_BUS_NAME || 'default',
     },
   },
   events: {
     source: 'curated-corpus-api',
     // TODO: what should this value be? See list-api, user-api with similar comments
     version: '0.0.2',
+  },
+  eventBridge: {
+    addScheduledItemEventType: 'add-scheduled-item',
   },
   sentry: {
     dsn: process.env.SENTRY_DSN || '',

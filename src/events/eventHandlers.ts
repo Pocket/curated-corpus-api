@@ -3,6 +3,7 @@ import { tracker } from './snowplow/tracker';
 import config from '../config';
 import { ReviewedItemSnowplowHandler } from './snowplow/ReviewedItemSnowplowHandler';
 import { ScheduledItemSnowplowHandler } from './snowplow/ScheduledItemSnowplowHandler';
+import { EventBusHandler } from './eventBus/EventBusHandler';
 
 export type CuratedCorpusEventHandlerFn = (
   emitter: CuratedCorpusEventEmitter
@@ -32,4 +33,8 @@ export function corpusScheduleSnowplowEventHandler(
     config.snowplow.corpusScheduleEvents
   ) as string[];
   new ScheduledItemSnowplowHandler(emitter, tracker, snowplowEventsToListen);
+}
+
+export function eventBusHandler(emitter: CuratedCorpusEventEmitter): void {
+  new EventBusHandler(emitter);
 }
