@@ -3,7 +3,7 @@ import { tracker } from './snowplow/tracker';
 import config from '../config';
 import { ReviewedItemSnowplowHandler } from './snowplow/ReviewedItemSnowplowHandler';
 import { ScheduledItemSnowplowHandler } from './snowplow/ScheduledItemSnowplowHandler';
-import { EventBusHandler } from './eventBus/EventBusHandler';
+import { EventBusHandler } from './eventBus';
 
 export type CuratedCorpusEventHandlerFn = (
   emitter: CuratedCorpusEventEmitter

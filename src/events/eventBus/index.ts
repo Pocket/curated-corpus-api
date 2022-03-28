@@ -1,1 +1,1 @@
-export { EventBusHandler as EventBusFactory } from './EventBusHandler';
+export { EventBusHandler } from './EventBusHandler';
