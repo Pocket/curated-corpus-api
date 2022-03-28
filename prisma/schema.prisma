@@ -91,6 +91,7 @@ model ScheduledItem {
   approvedItem ApprovedItem @relation(fields: [approvedItemId], references: [id])
 
   // indexes
+  @@index ([scheduledSurfaceGuid])
   // Prevent scheduling the same item on the same Scheduled Surface for the same day multiple times.
   @@unique([externalId])
   @@unique([approvedItemId, scheduledSurfaceGuid, scheduledDate], name: "ItemScheduledSurfaceDate")
