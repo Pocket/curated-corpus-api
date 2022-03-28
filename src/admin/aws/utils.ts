@@ -2,6 +2,7 @@ import { FileUpload } from 'graphql-upload';
 import fetch from 'node-fetch';
 import mime from 'mime-types';
 import { InvalidImageUrl } from './errors';
+import * as https from 'https';
 
 /**
  * Fetch image from URL and transform into a GraphQL FileUpload object
@@ -9,7 +10,13 @@ import { InvalidImageUrl } from './errors';
  */
 export async function getFileUploadFromUrl(url: string): Promise<FileUpload> {
   try {
-    const res = await fetch(url);
+    const httpsAgent = new https.Agent({
+      rejectUnauthorized: false,
+    });
+
+    const res = await fetch(url, {
+      agent: httpsAgent,
+    });
     const contentType = res.headers.get('content-type');
 
     checkValidImageContentType(contentType);
