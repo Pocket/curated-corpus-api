@@ -12,7 +12,7 @@ import {
   GET_APPROVED_ITEM_BY_URL,
 } from './sample-queries.gql';
 
-describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
+describe('queries: ApprovedCorpusItem - authentication', () => {
   beforeAll(async () => {
     // clear out db to start fresh
     await clearDb(db);
@@ -50,7 +50,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
     await db.$disconnect();
   });
 
-  describe('getApprovedCuratedCorpusItems query', () => {
+  describe('getApprovedCorpusItems query', () => {
     it('should get all items when user has read-only access', async () => {
       // Set up auth headers with read-only access
       const headers = {
@@ -70,9 +70,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
       expect(result.data).not.to.be.null;
 
       // should return all 3 items
-      expect(result.data?.getApprovedCuratedCorpusItems.edges).to.have.length(
-        3
-      );
+      expect(result.data?.getApprovedCorpusItems.edges).to.have.length(3);
 
       await server.stop();
     });
@@ -96,9 +94,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
       expect(result.data).not.to.be.null;
 
       // should return all 3 items
-      expect(result.data?.getApprovedCuratedCorpusItems.edges).to.have.length(
-        3
-      );
+      expect(result.data?.getApprovedCorpusItems.edges).to.have.length(3);
 
       await server.stop();
     });
@@ -154,7 +150,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
     });
   });
 
-  describe('getApprovedCuratedCorpusItemByUrl query', () => {
+  describe('getApprovedCorpusItemByUrl query', () => {
     it('should get item when user has read-only access', async () => {
       // Set up auth headers with read-only access
       const headers = {
@@ -221,7 +217,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
         },
       });
 
-      expect(result.data?.getApprovedCuratedCorpusItemByUrl).to.be.null;
+      expect(result.data?.getApprovedCorpusItemByUrl).to.be.null;
 
       expect(result.errors).not.to.be.undefined;
       // check if the error we get is access denied error
@@ -249,7 +245,7 @@ describe('queries: ApprovedCuratedCorpusItem - authentication', () => {
         },
       });
 
-      expect(result.data?.getApprovedCuratedCorpusItemByUrl).to.be.null;
+      expect(result.data?.getApprovedCorpusItemByUrl).to.be.null;
 
       expect(result.errors).not.to.be.undefined;
       // check if the error we get is access denied error

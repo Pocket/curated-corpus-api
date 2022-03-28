@@ -1,7 +1,7 @@
 import { gql } from 'apollo-server';
 
 export const CuratedItemData = gql`
-  fragment CuratedItemData on ApprovedCuratedCorpusItem {
+  fragment CuratedItemData on ApprovedCorpusItem {
     externalId
     prospectId
     title
@@ -24,7 +24,7 @@ export const CuratedItemData = gql`
 `;
 
 export const RejectedItemData = gql`
-  fragment RejectedItemData on RejectedCuratedCorpusItem {
+  fragment RejectedItemData on RejectedCorpusItem {
     externalId
     prospectId
     url
@@ -39,7 +39,7 @@ export const RejectedItemData = gql`
 `;
 
 export const ScheduledItemData = gql`
-  fragment ScheduledItemData on ScheduledCuratedCorpusItem {
+  fragment ScheduledItemData on ScheduledCorpusItem {
     externalId
     createdAt
     createdBy

@@ -10,7 +10,7 @@ import { GET_SCHEDULED_ITEMS } from './sample-queries.gql';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import { MozillaAccessGroup } from '../../../shared/types';
 
-describe('queries: ScheduledCuratedCorpusItem', () => {
+describe('queries: ScheduledCorpusItem', () => {
   // adding headers with groups that grant full access
   const headers = {
     name: 'Test User',
@@ -33,7 +33,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
     await server.stop();
   });
 
-  describe('getScheduledCuratedCorpusItems query', () => {
+  describe('getScheduledCorpusItems query', () => {
     beforeAll(async () => {
       // Create some approved items and schedule them for a date in the future
       for (let i = 0; i < 5; i++) {
@@ -76,7 +76,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       expect(result.errors).to.be.undefined;
       expect(result.data).not.to.be.null;
 
-      const resultArray = result.data?.getScheduledCuratedCorpusItems;
+      const resultArray = result.data?.getScheduledCorpusItems;
       expect(resultArray).to.have.lengthOf(2);
       expect(resultArray[0].totalCount).to.equal(10);
       expect(resultArray[0].items).to.have.lengthOf(10);
@@ -97,7 +97,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       expect(result.errors).to.be.undefined;
       expect(result.data).not.to.be.null;
 
-      const resultArray = result.data?.getScheduledCuratedCorpusItems;
+      const resultArray = result.data?.getScheduledCorpusItems;
 
       // Check the first group of scheduled items
       expect(resultArray[0].collectionCount).not.to.be.null;
@@ -140,7 +140,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       expect(result.errors).to.be.undefined;
       expect(result.data).not.to.be.null;
 
-      const resultArray = result.data?.getScheduledCuratedCorpusItems;
+      const resultArray = result.data?.getScheduledCorpusItems;
 
       expect(resultArray[0].totalCount).to.equal(10);
       expect(resultArray[0].items).to.have.lengthOf(10);
