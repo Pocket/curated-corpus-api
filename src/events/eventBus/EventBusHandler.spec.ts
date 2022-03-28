@@ -68,7 +68,7 @@ describe('EventBusHandler', () => {
   afterEach(() => sandbox.resetHistory());
   afterAll(() => sandbox.restore());
   it('registers listeners on all events in the config map', () => {
-    const fake = sinon.stub();
+    const fake = sinon.stub().returns({ eventType: 'fake' });
     const testEmitter = new EventEmitter();
     const mapping = {
       [ScheduledCorpusItemEventType.ADD_SCHEDULE]: () => fake(),
@@ -121,6 +121,7 @@ describe('EventBusHandler', () => {
     expect(sendCommand.Entries[0]).toMatchObject({
       Source: config.eventBridge.source,
       EventBusName: config.aws.eventBus.name,
+      DetailType: config.eventBridge.addScheduledItemEventType,
     });
     expect(JSON.parse(sendCommand.Entries[0]['Detail'])).toEqual(expectedEvent);
   });

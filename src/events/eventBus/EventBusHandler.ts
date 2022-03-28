@@ -87,7 +87,7 @@ export class EventBusHandler {
           EventBusName: config.aws.eventBus.name,
           Detail: JSON.stringify(eventPayload),
           Source: config.eventBridge.source,
-          DetailType: config.eventBridge.addScheduledItemEventType,
+          DetailType: eventPayload.eventType,
         },
       ],
     });
