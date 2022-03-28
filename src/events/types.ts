@@ -40,10 +40,14 @@ export type ScheduledCorpusItemPayload = {
   scheduledCorpusItem: ScheduledItem;
 };
 
-export type ScheduledItemEventBusPayload = Pick<
-  ScheduledItemModel,
-  'createdBy' | 'scheduledSurfaceGuid'
-> &
+// Base interface for events sent to event bus
+export interface BaseEventBusPayload {
+  eventType: string;
+}
+
+// Data for events sent to event bus for Scheduled Surface schedule
+export type ScheduledItemEventBusPayload = BaseEventBusPayload &
+  Pick<ScheduledItemModel, 'createdBy' | 'scheduledSurfaceGuid'> &
   Pick<
     ApprovedItem,
     'topic' | 'isSyndicated' | keyof Omit<CorpusItem, 'id'>
@@ -51,7 +55,6 @@ export type ScheduledItemEventBusPayload = Pick<
     scheduledItemId: string; // externalId of ScheduledItem
     approvedItemId: string; // externalId of ApprovedItem
     scheduledDate: string; // UTC Date string YYYY-MM-DD
-    eventType: string; // TODO - config.eventBridge.addScheduledEventType
     createdAt: string; // UTC timestamp string
     updatedAt: string; // UTC timestamp string
   };

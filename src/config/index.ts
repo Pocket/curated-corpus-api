@@ -47,6 +47,7 @@ export default {
   },
   eventBridge: {
     addScheduledItemEventType: 'add-scheduled-item',
+    source: 'curation-migration-datasync',
   },
   sentry: {
     dsn: process.env.SENTRY_DSN || '',

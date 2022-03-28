@@ -5,11 +5,7 @@ import { CorpusItemSource, Topics } from '../../shared/types';
 import { ScheduledItem } from '../../database/types';
 import sinon from 'sinon';
 import * as Sentry from '@sentry/node';
-import {
-  EventBridgeClient,
-  PutEventsCommand,
-  PutEventsCommandInput,
-} from '@aws-sdk/client-eventbridge';
+import { EventBridgeClient } from '@aws-sdk/client-eventbridge';
 import {
   ScheduledCorpusItemEventType,
   ScheduledCorpusItemPayload,
@@ -17,6 +13,7 @@ import {
 } from '../types';
 import config from '../../config';
 import { setTimeout } from 'timers/promises';
+import EventEmitter from 'events';
 
 /**
  * Mock event payload
@@ -70,6 +67,20 @@ describe('EventBusHandler', () => {
 
   afterEach(() => sandbox.resetHistory());
   afterAll(() => sandbox.restore());
+  it('registers listeners on all events in the config map', () => {
+    const fake = sinon.stub();
+    const testEmitter = new EventEmitter();
+    const mapping = {
+      [ScheduledCorpusItemEventType.ADD_SCHEDULE]: () => fake(),
+      [ScheduledCorpusItemEventType.REMOVE_SCHEDULE]: () => fake(),
+    };
+    new EventBusHandler(testEmitter, mapping);
+    expect(testEmitter.listeners('ADD_SCHEDULE').length).toBe(1);
+    expect(testEmitter.listeners('REMOVE_SCHEDULE').length).toBe(1);
+    testEmitter.emit('ADD_SCHEDULE');
+    testEmitter.emit('REMOVE_SCHEDULE');
+    expect(fake.callCount).toBe(2);
+  });
   it('scheduled-item-add: should send event to event bus with proper event data', async () => {
     const expectedEvent: ScheduledItemEventBusPayload = {
       scheduledItemId: '789-xyz',
@@ -93,7 +104,8 @@ describe('EventBusHandler', () => {
       ...scheduledEventData,
       eventType: ScheduledCorpusItemEventType.ADD_SCHEDULE,
     });
-    await setTimeout(500);
+    // Wait just a tad in case promise needs time to resolve
+    await setTimeout(100);
     expect(sentryStub.callCount).toBe(0);
     expect(consoleSpy.callCount).toBe(0);
     // Listener was registered on event
@@ -107,7 +119,7 @@ describe('EventBusHandler', () => {
     const sendCommand = clientStub.getCall(0).args[0].input as any;
     expect(sendCommand).toHaveProperty('Entries');
     expect(sendCommand.Entries[0]).toMatchObject({
-      Source: config.eventBridge.addScheduledItemEventType,
+      Source: config.eventBridge.source,
       EventBusName: config.aws.eventBus.name,
     });
     expect(JSON.parse(sendCommand.Entries[0]['Detail'])).toEqual(expectedEvent);
@@ -122,7 +134,8 @@ describe('EventBusHandler', () => {
       ...scheduledEventData,
       eventType: ScheduledCorpusItemEventType.ADD_SCHEDULE,
     });
-    await setTimeout(500);
+    // Wait just a tad in case promise needs time to resolve
+    await setTimeout(100);
     expect(sentryStub.callCount).toBe(1);
     expect(sentryStub.getCall(0).firstArg.message).toContain(
       `Failed to send event 'add-scheduled-item' to event bus`

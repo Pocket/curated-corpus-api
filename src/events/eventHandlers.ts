@@ -35,6 +35,10 @@ export function corpusScheduleSnowplowEventHandler(
   new ScheduledItemSnowplowHandler(emitter, tracker, snowplowEventsToListen);
 }
 
+/**
+ * Register listeners for events to forward to Event Bus
+ * @param emitter
+ */
 export function eventBusHandler(emitter: CuratedCorpusEventEmitter): void {
   new EventBusHandler(emitter);
 }
