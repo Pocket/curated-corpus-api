@@ -29,3 +29,13 @@ export function groupBy(array: any[], key: string) {
 
   return result;
 }
+
+/**
+ * Converts a Date object to a YYYY-MM-DD string (in UTC)
+ */
+export function toUtcDateString(date: Date) {
+  const month = date.getUTCMonth() + 1; // zero-indexed
+  const padMonthString = month.toString().padStart(2, '0');
+  const padDayString = date.getUTCDate().toString().padStart(2, '0');
+  return `${date.getUTCFullYear()}-${padMonthString}-${padDayString}`;
+}

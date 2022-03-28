@@ -15,6 +15,7 @@ import {
 import {
   corpusItemSnowplowEventHandler,
   corpusScheduleSnowplowEventHandler,
+  eventBusHandler,
 } from './events/eventHandlers';
 const serviceName = 'CurationCorpusAPI';
 
@@ -61,6 +62,7 @@ async function startServers() {
   initItemEventHandlers(curatedCorpusEventEmitter, [
     corpusItemSnowplowEventHandler,
     corpusScheduleSnowplowEventHandler,
+    eventBusHandler,
   ]);
 
   // Inject initialized event emittters to create context factory function

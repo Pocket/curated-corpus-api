@@ -37,6 +37,10 @@ export const config = {
     repository: 'pocket/curated-corpus-api',
     branch,
   },
+  // The name of the Event Bus to publish events to (per account)
+  eventBus: {
+    name: 'default',
+  },
   envVars: {
     snowplowEndpoint,
   },
