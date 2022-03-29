@@ -15,8 +15,8 @@ import {
 } from '../../../events/types';
 import { uploadImageToS3, uploadImageToS3FromUrl } from '../../aws/upload';
 import {
-  ImportApprovedCuratedCorpusItemInput,
-  ImportApprovedCuratedCorpusItemPayload,
+  ImportApprovedCorpusItemInput,
+  ImportApprovedCorpusItemPayload,
 } from '../types';
 import {
   ACCESS_DENIED_ERROR,
@@ -266,9 +266,9 @@ export async function uploadApprovedItemImage(
  */
 export async function importApprovedItem(
   parent,
-  { data }: { data: ImportApprovedCuratedCorpusItemInput },
+  { data }: { data: ImportApprovedCorpusItemInput },
   context: IContext
-): Promise<ImportApprovedCuratedCorpusItemPayload> {
+): Promise<ImportApprovedCorpusItemPayload> {
   // Check if user is authorized to import an item
   if (!context.authenticatedUser.canWriteToCorpus()) {
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
@@ -335,12 +335,12 @@ export async function importApprovedItem(
 }
 
 /**
- * Transform GraphQL ImportApprovedCuratedCorpusItemInput to ImportApprovedItemInput
+ * Transform GraphQL ImportApprovedCorpusItemInput to ImportApprovedItemInput
  * for the database
  * @param data
  */
 function toDbApprovedItemInput(
-  data: ImportApprovedCuratedCorpusItemInput
+  data: ImportApprovedCorpusItemInput
 ): ImportApprovedItemInput {
   return {
     title: data.title,
@@ -362,12 +362,12 @@ function toDbApprovedItemInput(
 }
 
 /**
- * Transforms GraphQL ImportApprovedCuratedCorpusItemInput with approvedItemId
+ * Transforms GraphQL ImportApprovedCorpusItemInput with approvedItemId
  * to ImportScheduledItemInput for the database
  * @param data
  */
 function toDbScheduledItemInput(
-  data: ImportApprovedCuratedCorpusItemInput & { approvedItemId: number }
+  data: ImportApprovedCorpusItemInput & { approvedItemId: number }
 ): ImportScheduledItemInput {
   return {
     approvedItemId: data.approvedItemId,

@@ -8,10 +8,10 @@ import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
 import { GET_REJECTED_ITEMS } from './sample-queries.gql';
 import { expect } from 'chai';
 
-describe('queries: RejectedCuratedCorpusItem (authentication)', () => {
-  // A few sample Rejected Curated Corpus items - we don't need a lot of these
+describe('queries: RejectedCorpusItem (authentication)', () => {
+  // A few sample Rejected Corpus items - we don't need a lot of these
   // for auth checks
-  const rejectedCuratedCorpusItems = [
+  const rejectedCorpusItems = [
     {
       title: '10 Unforgivable Sins Of PHP',
     },
@@ -39,7 +39,7 @@ describe('queries: RejectedCuratedCorpusItem (authentication)', () => {
   beforeAll(async () => {
     await clearDb(db);
 
-    for (const item of rejectedCuratedCorpusItems) {
+    for (const item of rejectedCorpusItems) {
       await createRejectedCuratedCorpusItemHelper(db, item);
     }
   });
@@ -48,7 +48,7 @@ describe('queries: RejectedCuratedCorpusItem (authentication)', () => {
     await db.$disconnect();
   });
 
-  describe('getRejectedCuratedCorpusItem query', () => {
+  describe('getRejectedCorpusItem query', () => {
     it('should get all items when user has read-only access', async () => {
       // Set up auth headers with read-only access
       headers = {
@@ -67,9 +67,7 @@ describe('queries: RejectedCuratedCorpusItem (authentication)', () => {
       expect(result.data).not.to.be.null;
 
       // should return all four items - the entire corpus should be accessible
-      expect(result.data?.getRejectedCuratedCorpusItems.edges).to.have.length(
-        4
-      );
+      expect(result.data?.getRejectedCorpusItems.edges).to.have.length(4);
 
       await server.stop();
     });
@@ -92,9 +90,7 @@ describe('queries: RejectedCuratedCorpusItem (authentication)', () => {
       expect(result.data).not.to.be.null;
 
       // should return all four items - the entire corpus should be accessible
-      expect(result.data?.getRejectedCuratedCorpusItems.edges).to.have.length(
-        4
-      );
+      expect(result.data?.getRejectedCorpusItems.edges).to.have.length(4);
 
       await server.stop();
     });

@@ -36,7 +36,7 @@ describe('mutations: RejectedItem', () => {
     await clearDb(db);
   });
 
-  describe('createRejectedCuratedCorpusItem mutation', () => {
+  describe('createRejectedCorpusItem mutation', () => {
     // a standard set of inputs for this mutation
     let input: CreateRejectedItemInput;
 
@@ -68,11 +68,9 @@ describe('mutations: RejectedItem', () => {
 
       // Expect to see all the input data we supplied in the Approved Item
       // returned by the mutation
-      expect(result.data?.createRejectedCuratedCorpusItem).to.deep.include(
-        input
-      );
+      expect(result.data?.createRejectedCorpusItem).to.deep.include(input);
       // Expect to see the SSO username in the `createdBy` field
-      expect(result.data?.createRejectedCuratedCorpusItem.createdBy).to.equal(
+      expect(result.data?.createRejectedCorpusItem.createdBy).to.equal(
         headers.username
       );
 
@@ -86,7 +84,7 @@ describe('mutations: RejectedItem', () => {
       // 3- Event has the right entity passed to it.
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(result.data?.createRejectedCuratedCorpusItem.externalId);
+      ).to.equal(result.data?.createRejectedCorpusItem.externalId);
     });
 
     it('creates a rejected item without a prospectId', async () => {
@@ -107,11 +105,11 @@ describe('mutations: RejectedItem', () => {
 
       // Expect to see all the input data we supplied in the Approved Item
       // returned by the mutation
-      expect(result.data?.createRejectedCuratedCorpusItem).to.deep.include(
+      expect(result.data?.createRejectedCorpusItem).to.deep.include(
         inputWithoutProspectId
       );
       // Expect to see the SSO username in the `createdBy` field
-      expect(result.data?.createRejectedCuratedCorpusItem.createdBy).to.equal(
+      expect(result.data?.createRejectedCorpusItem.createdBy).to.equal(
         headers.username
       );
 
@@ -125,7 +123,7 @@ describe('mutations: RejectedItem', () => {
       // 3- Event has the right entity passed to it.
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(result.data?.createRejectedCuratedCorpusItem.externalId);
+      ).to.equal(result.data?.createRejectedCorpusItem.externalId);
     });
 
     it('should create a rejected item if the user has access to at least one of the scheduled surfaces', async () => {
@@ -146,9 +144,7 @@ describe('mutations: RejectedItem', () => {
 
       // Expect to see all the input data we supplied in the Approved Item
       // returned by the mutation
-      expect(result.data?.createRejectedCuratedCorpusItem).to.deep.include(
-        input
-      );
+      expect(result.data?.createRejectedCorpusItem).to.deep.include(input);
 
       await server.stop();
     });

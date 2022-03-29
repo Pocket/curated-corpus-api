@@ -119,9 +119,9 @@ type ScheduledSurface {
 }
 
 """
-A prospective story that has been reviewed by the curators and saved to the curated corpus.
+A prospective story that has been reviewed by the curators and saved to the corpus.
 """
-type ApprovedCuratedCorpusItem @key(fields: "url") {
+type ApprovedCorpusItem @key(fields: "url") {
     """
     An alternative primary key in UUID format that is generated on creation.
     """
@@ -202,7 +202,7 @@ type ApprovedCuratedCorpusItem @key(fields: "url") {
 """
 A prospective story that has been rejected by the curators.
 """
-type RejectedCuratedCorpusItem {
+type RejectedCorpusItem {
     """
     An alternative primary key in UUID format that is generated on creation.
     """
@@ -249,7 +249,7 @@ type RejectedCuratedCorpusItem {
 """
 An edge in a connection.
 """
-type ApprovedCuratedCorpusItemEdge {
+type ApprovedCorpusItemEdge {
     """
     A cursor for use in pagination.
     """
@@ -257,10 +257,10 @@ type ApprovedCuratedCorpusItemEdge {
     """
     The Approved Item at the end of the edge.
     """
-    node: ApprovedCuratedCorpusItem!
+    node: ApprovedCorpusItem!
 }
 
-type ApprovedCuratedCorpusImageUrl {
+type ApprovedCorpusImageUrl {
     """
     The url of the image stored in the s3 bucket
     """
@@ -268,27 +268,27 @@ type ApprovedCuratedCorpusImageUrl {
 }
 
 """
-An edge in a connection for RejectedCuratedCorpusItem type.
+An edge in a connection for RejectedCorpusItem type.
 """
-type RejectedCuratedCorpusItemEdge {
+type RejectedCorpusItemEdge {
     """
     A cursor for use in pagination.
     """
     cursor: String!
     """
-    The Rejected Curated Item at the end of the edge.
+    The Rejected Item at the end of the edge.
     """
-    node: RejectedCuratedCorpusItem!
+    node: RejectedCorpusItem!
 }
 
 """
 The connection type for Approved Item.
 """
-type ApprovedCuratedCorpusItemConnection {
+type ApprovedCorpusItemConnection {
     """
     A list of edges.
     """
-    edges: [ApprovedCuratedCorpusItemEdge!]!
+    edges: [ApprovedCorpusItemEdge!]!
     """
     Information to aid in pagination.
     """
@@ -300,13 +300,13 @@ type ApprovedCuratedCorpusItemConnection {
 }
 
 """
-The connection type for Rejected Curated Item.
+The connection type for Rejected Item.
 """
-type RejectedCuratedCorpusItemConnection {
+type RejectedCorpusItemConnection {
     """
     A list of edges.
     """
-    edges: [RejectedCuratedCorpusItemEdge!]!
+    edges: [RejectedCorpusItemEdge!]!
     """
     Information to aid in pagination.
     """
@@ -321,7 +321,7 @@ type RejectedCuratedCorpusItemConnection {
 A scheduled entry for an Approved Item to appear on a Scheduled Surface.
 For example, a story that is scheduled to appear on December 31st, 2021 on the New Tab in Firefox for the US audience.
 """
-type ScheduledCuratedCorpusItem {
+type ScheduledCorpusItem {
     """
     An alternative primary key in UUID format that is generated on creation.
     """
@@ -350,17 +350,17 @@ type ScheduledCuratedCorpusItem {
     """
     The associated Approved Item.
     """
-    approvedItem: ApprovedCuratedCorpusItem!
+    approvedItem: ApprovedCorpusItem!
     """
-    The GUID of this schedudedSurface to which this item is scheduled. Example: 'NEW_TAB_EN_US'.
+    The GUID of this scheduledSurface to which this item is scheduled. Example: 'NEW_TAB_EN_US'.
     """
     scheduledSurfaceGuid: ID!
 }
 
 """
-The shape of the result returned by the getScheduledCuratedCorpusItems query.
+The shape of the result returned by the getScheduledCorpusItems query.
 """
-type ScheduledCuratedCorpusItemsResult {
+type ScheduledCorpusItemsResult {
     """
     The date items are scheduled for, in YYYY-MM-DD format.
     """
@@ -380,13 +380,13 @@ type ScheduledCuratedCorpusItemsResult {
     """
     An array of items for a given Scheduled Surface
     """
-    items: [ScheduledCuratedCorpusItem!]!
+    items: [ScheduledCorpusItem!]!
 }
 
 """
-Available fields for filtering ApprovedCuratedCorpusItems.
+Available fields for filtering Approved Items.
 """
-input ApprovedCuratedCorpusItemFilter {
+input ApprovedCorpusItemFilter {
     """
     Optional filter on the URL field. Returns partial matches.
     """
@@ -411,9 +411,9 @@ input ApprovedCuratedCorpusItemFilter {
 }
 
 """
-Available fields for filtering RejectedCuratedCorpusItems.
+Available fields for filtering Rejected Items.
 """
-input RejectedCuratedCorpusItemFilter {
+input RejectedCorpusItemFilter {
     """
     Optional filter on the URL field. Returns partial matches.
     """
@@ -436,7 +436,7 @@ input RejectedCuratedCorpusItemFilter {
 """
 Available fields for filtering scheduled items for a given Scheduled Surface.
 """
-input ScheduledCuratedCorpusItemsFilterInput {
+input ScheduledCorpusItemsFilterInput {
     """
     The GUID of the Scheduled Surface. Example: 'NEW_TAB_EN_US'.
     """
@@ -454,7 +454,7 @@ input ScheduledCuratedCorpusItemsFilterInput {
 """
 Input data for creating an Approved Item and optionally scheduling this item to appear on a Scheduled Surface.
 """
-input CreateApprovedCuratedCorpusItemInput {
+input CreateApprovedCorpusItemInput {
     """
     The GUID of the corresponding Prospect ID. Will be empty for manually added items.
     """
@@ -523,7 +523,7 @@ input CreateApprovedCuratedCorpusItemInput {
 Input data for loading an Approved Item via an automated process and optionally scheduling
 this item to appear on a Scheduled Surface.
 """
-input ImportApprovedCuratedCorpusItemInput {
+input ImportApprovedCorpusItemInput {
     """
     The URL of the Approved Item.
     """
@@ -597,21 +597,21 @@ input ImportApprovedCuratedCorpusItemInput {
 """
 The data that the loadApprovedCuratedCorpusItem mutation returns on success.
 """
-type ImportApprovedCuratedCorpusItemPayload {
+type ImportApprovedCorpusItemPayload {
     """
     The approved item, as created by an automated process.
     """
-    approvedItem: ApprovedCuratedCorpusItem!
+    approvedItem: ApprovedCorpusItem!
     """
     The scheduled entry that is created by an automated process at the same time.
     """
-    scheduledItem: ScheduledCuratedCorpusItem!
+    scheduledItem: ScheduledCorpusItem!
 }
 
 """
 Input data for updating an Approved Item.
 """
-input UpdateApprovedCuratedCorpusItemInput {
+input UpdateApprovedCorpusItemInput {
     """
     Approved Item ID.
     """
@@ -655,7 +655,7 @@ input UpdateApprovedCuratedCorpusItemInput {
 """
 Input data for rejecting an Approved Item.
 """
-input RejectApprovedCuratedCorpusItemInput {
+input RejectApprovedCorpusItemInput {
     """
     Approved Item ID.
     """
@@ -669,7 +669,7 @@ input RejectApprovedCuratedCorpusItemInput {
 """
 Input data for creating a Rejected Item.
 """
-input CreateRejectedCuratedCorpusItemInput {
+input CreateRejectedCorpusItemInput {
     """
     The GUID of the corresponding Prospect ID. Will be empty for manually added item.
     """
@@ -704,7 +704,7 @@ input CreateRejectedCuratedCorpusItemInput {
 """
 Input data for creating a scheduled entry for an Approved Item on a Scheduled Surface.
 """
-input CreateScheduledCuratedCorpusItemInput {
+input CreateScheduledCorpusItemInput {
     """
     The ID of the Approved Item that needs to be scheduled.
     """
@@ -722,7 +722,7 @@ input CreateScheduledCuratedCorpusItemInput {
 """
 Input data for rescheduling a scheduled item for a Scheduled Surface.
 """
-input RescheduleScheduledCuratedCorpusItemInput {
+input RescheduleScheduledCorpusItemInput {
     """
     ID of the scheduled item. A string in UUID format.
     """
@@ -736,7 +736,7 @@ input RescheduleScheduledCuratedCorpusItemInput {
 """
 Input data for deleting a scheduled item for a Scheduled Surface.
 """
-input DeleteScheduledCuratedCorpusItemInput {
+input DeleteScheduledCorpusItemInput {
     """
     ID of the scheduled item. A string in UUID format.
     """
@@ -745,41 +745,41 @@ input DeleteScheduledCuratedCorpusItemInput {
 
 type Query {
     """
-    Retrieves a paginated, filterable list of ApprovedCuratedCorpusItems.
+    Retrieves a paginated, filterable list of Approved Items.
     """
-    getApprovedCuratedCorpusItems(
-        filters: ApprovedCuratedCorpusItemFilter
+    getApprovedCorpusItems(
+        filters: ApprovedCorpusItemFilter
         pagination: PaginationInput
-    ): ApprovedCuratedCorpusItemConnection!
+    ): ApprovedCorpusItemConnection!
 
     """
-    Retrieves a paginated, filterable list of RejectedCuratedCorpusItems.
+    Retrieves a paginated, filterable list of Rejected Items.
     """
-    getRejectedCuratedCorpusItems(
-        filters: RejectedCuratedCorpusItemFilter
+    getRejectedCorpusItems(
+        filters: RejectedCorpusItemFilter
         pagination: PaginationInput
-    ): RejectedCuratedCorpusItemConnection!
+    ): RejectedCorpusItemConnection!
 
     """
     Retrieves a list of Approved Items that are scheduled to appear on a Scheduled Surface.
     """
-    getScheduledCuratedCorpusItems(
+    getScheduledCorpusItems(
         """
         Required arguments to narrow down scheduled items to a specific Scheduled Surface
         between the supplied start and end dates.
         """
-        filters: ScheduledCuratedCorpusItemsFilterInput!
-    ): [ScheduledCuratedCorpusItemsResult!]!
+        filters: ScheduledCorpusItemsFilterInput!
+    ): [ScheduledCorpusItemsResult!]!
 
     """
-    Retrieves an approved curated item with the given URL.
+    Retrieves an approved item with the given URL.
     """
-    getApprovedCuratedCorpusItemByUrl(
+    getApprovedCorpusItemByUrl(
         """
         The URL of the approved item.
         """
         url: String!
-    ): ApprovedCuratedCorpusItem
+    ): ApprovedCorpusItem
 
     """
     Retrieves all ScheduledSurfaces available to the given SSO user. Requires an Authorization header.
@@ -791,64 +791,64 @@ type Mutation {
     """
     Creates an Approved Item and optionally schedules it to appear on a Scheduled Surface.
     """
-    createApprovedCuratedCorpusItem(
-        data: CreateApprovedCuratedCorpusItemInput!
-    ): ApprovedCuratedCorpusItem!
+    createApprovedCorpusItem(
+        data: CreateApprovedCorpusItemInput!
+    ): ApprovedCorpusItem!
 
     """
     Lets an automated process create an Approved Item and optionally schedule it to appear
     on a Scheduled Surface.
     """
-    importApprovedCuratedCorpusItem(
-        data: ImportApprovedCuratedCorpusItemInput!
-    ): ImportApprovedCuratedCorpusItemPayload!
+    importApprovedCorpusItem(
+        data: ImportApprovedCorpusItemInput!
+    ): ImportApprovedCorpusItemPayload!
 
     """
     Creates a Rejected Item.
     """
-    createRejectedCuratedCorpusItem(
-        data: CreateRejectedCuratedCorpusItemInput!
-    ): RejectedCuratedCorpusItem!
+    createRejectedCorpusItem(
+        data: CreateRejectedCorpusItemInput!
+    ): RejectedCorpusItem!
 
     """
     Updates an Approved Item.
     """
-    updateApprovedCuratedCorpusItem(
-        data: UpdateApprovedCuratedCorpusItemInput!
-    ): ApprovedCuratedCorpusItem!
+    updateApprovedCorpusItem(
+        data: UpdateApprovedCorpusItemInput!
+    ): ApprovedCorpusItem!
 
     """
     Rejects an Approved Item: deletes it from the corpus and creates a Rejected Item instead.
     """
-    rejectApprovedCuratedCorpusItem(
-        data: RejectApprovedCuratedCorpusItemInput!
-    ): ApprovedCuratedCorpusItem!
+    rejectApprovedCorpusItem(
+        data: RejectApprovedCorpusItemInput!
+    ): ApprovedCorpusItem!
 
     """
     Creates a Scheduled Surface Scheduled Item.
     """
-    createScheduledCuratedCorpusItem(
-        data: CreateScheduledCuratedCorpusItemInput!
-    ): ScheduledCuratedCorpusItem!
+    createScheduledCorpusItem(
+        data: CreateScheduledCorpusItemInput!
+    ): ScheduledCorpusItem!
 
     """
     Deletes an item from a Scheduled Surface.
     """
-    deleteScheduledCuratedCorpusItem(
-        data: DeleteScheduledCuratedCorpusItemInput!
-    ): ScheduledCuratedCorpusItem!
+    deleteScheduledCorpusItem(
+        data: DeleteScheduledCorpusItemInput!
+    ): ScheduledCorpusItem!
 
     """
     Updates the scheduled date of a Scheduled Surface Scheduled Item.
     """
-    rescheduleScheduledCuratedCorpusItem(
-        data: RescheduleScheduledCuratedCorpusItemInput!
-    ): ScheduledCuratedCorpusItem!
+    rescheduleScheduledCorpusItem(
+        data: RescheduleScheduledCorpusItemInput!
+    ): ScheduledCorpusItem!
 
     """
-    Uploads an image to S3 for an Approved Curated Corpus Item
+    Uploads an image to S3 for an Approved Item
     """
-    uploadApprovedCuratedCorpusItemImage(
+    uploadApprovedCorpusItemImage(
         data: Upload!
-    ): ApprovedCuratedCorpusImageUrl!
+    ): ApprovedCorpusImageUrl!
 }

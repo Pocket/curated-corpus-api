@@ -9,7 +9,7 @@ import { db } from '../../../test/admin-server';
 import { GET_SCHEDULED_ITEMS } from './sample-queries.gql';
 import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
 
-describe('queries: ScheduledCuratedCorpusItem - authentication', () => {
+describe('queries: ScheduledCorpusItem - authentication', () => {
   beforeAll(async () => {
     await clearDb(db);
 
@@ -42,7 +42,7 @@ describe('queries: ScheduledCuratedCorpusItem - authentication', () => {
     await db.$disconnect();
   });
 
-  describe('getScheduledCuratedCorpusItems query', () => {
+  describe('getScheduledCorpusItems query', () => {
     it('should get all items when the user has read-only access', async () => {
       // adding headers with groups with read-only access
       const headers = {
@@ -67,7 +67,7 @@ describe('queries: ScheduledCuratedCorpusItem - authentication', () => {
       expect(result.errors).to.be.undefined;
       expect(result.data).not.to.be.null;
 
-      const resultArray = result.data?.getScheduledCuratedCorpusItems;
+      const resultArray = result.data?.getScheduledCorpusItems;
       expect(resultArray).to.have.lengthOf(2);
       expect(resultArray[0].totalCount).to.equal(10);
       expect(resultArray[0].items).to.have.lengthOf(10);
@@ -98,7 +98,7 @@ describe('queries: ScheduledCuratedCorpusItem - authentication', () => {
       expect(result.errors).to.be.undefined;
       expect(result.data).not.to.be.null;
 
-      const resultArray = result.data?.getScheduledCuratedCorpusItems;
+      const resultArray = result.data?.getScheduledCorpusItems;
       expect(resultArray).to.have.lengthOf(2);
       expect(resultArray[0].totalCount).to.equal(10);
       expect(resultArray[0].items).to.have.lengthOf(10);
