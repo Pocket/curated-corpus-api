@@ -81,8 +81,11 @@ describe('EventBusHandler', () => {
     testEmitter.emit('REMOVE_SCHEDULE');
     expect(fake.callCount).toBe(2);
   });
-  it('scheduled-item-add: should send event to event bus with proper event data', async () => {
-    const expectedEvent: ScheduledItemEventBusPayload = {
+  describe('scheduled item events', () => {
+    const partialExpectedEvent: Omit<
+      ScheduledItemEventBusPayload,
+      'eventType'
+    > = {
       scheduledItemId: '789-xyz',
       approvedItemId: '123-abc',
       url: 'https://test.com/a-story',
@@ -98,34 +101,50 @@ describe('EventBusHandler', () => {
       updatedAt: new Date(1648225373000).toUTCString(),
       scheduledSurfaceGuid: 'NEW_TAB_EN_US',
       scheduledDate: '2030-01-01',
-      eventType: config.eventBridge.addScheduledItemEventType,
     };
-    emitter.emit(ScheduledCorpusItemEventType.ADD_SCHEDULE, {
-      ...scheduledEventData,
-      eventType: ScheduledCorpusItemEventType.ADD_SCHEDULE,
-    });
-    // Wait just a tad in case promise needs time to resolve
-    await setTimeout(100);
-    expect(sentryStub.callCount).toBe(0);
-    expect(consoleSpy.callCount).toBe(0);
-    // Listener was registered on event
-    expect(
-      emitter.listeners(ScheduledCorpusItemEventType.ADD_SCHEDULE).length
-    ).toBe(1);
-    // Event was sent to Event Bus
-    expect(clientStub.callCount).toBe(1);
-    // Check that the payload is correct; since it's JSON, we need to decode the data
-    // otherwise it also does ordering check
-    const sendCommand = clientStub.getCall(0).args[0].input as any;
-    expect(sendCommand).toHaveProperty('Entries');
-    expect(sendCommand.Entries[0]).toMatchObject({
-      Source: config.eventBridge.source,
-      EventBusName: config.aws.eventBus.name,
-      DetailType: config.eventBridge.addScheduledItemEventType,
-    });
-    expect(JSON.parse(sendCommand.Entries[0]['Detail'])).toEqual(expectedEvent);
+    it.each([
+      [
+        config.eventBridge.addScheduledItemEventType,
+        ScheduledCorpusItemEventType.ADD_SCHEDULE,
+      ],
+      [
+        config.eventBridge.removeScheduledItemEventType,
+        ScheduledCorpusItemEventType.REMOVE_SCHEDULE,
+      ],
+    ])(
+      '%s: should send event to event bus with proper event data',
+      async (eventType, emittedEvent) => {
+        emitter.emit(emittedEvent, {
+          ...scheduledEventData,
+          eventType: emittedEvent,
+        });
+        const expectedEvent: ScheduledItemEventBusPayload = {
+          eventType,
+          ...partialExpectedEvent,
+        };
+        // Wait just a tad in case promise needs time to resolve
+        await setTimeout(100);
+        expect(sentryStub.callCount).toBe(0);
+        expect(consoleSpy.callCount).toBe(0);
+        // Listener was registered on event
+        expect(emitter.listeners(emittedEvent).length).toBe(1);
+        // Event was sent to Event Bus
+        expect(clientStub.callCount).toBe(1);
+        // Check that the payload is correct; since it's JSON, we need to decode the data
+        // otherwise it also does ordering check
+        const sendCommand = clientStub.getCall(0).args[0].input as any;
+        expect(sendCommand).toHaveProperty('Entries');
+        expect(sendCommand.Entries[0]).toMatchObject({
+          Source: config.eventBridge.source,
+          EventBusName: config.aws.eventBus.name,
+          DetailType: eventType,
+        });
+        expect(JSON.parse(sendCommand.Entries[0]['Detail'])).toEqual(
+          expectedEvent
+        );
+      }
+    );
   });
-
   it('should log error if any events fail to send', async () => {
     clientStub.restore();
     sandbox

@@ -11,8 +11,18 @@ import { toUtcDateString } from '../../shared/utils';
 // Used to configure the default EventBusHandler class,
 // if a mapping is not passed to the constructor.
 export const eventBusConfig: EventHandlerCallbackMap = {
-  [ScheduledCorpusItemEventType.ADD_SCHEDULE]: (data: any) =>
-    payloadBuilders.scheduledItemEvent(data),
+  [ScheduledCorpusItemEventType.ADD_SCHEDULE]: (data: any) => {
+    return payloadBuilders.scheduledItemEvent(
+      config.eventBridge.addScheduledItemEventType,
+      data
+    );
+  },
+  [ScheduledCorpusItemEventType.REMOVE_SCHEDULE]: (data: any) => {
+    return payloadBuilders.scheduledItemEvent(
+      config.eventBridge.removeScheduledItemEventType,
+      data
+    );
+  },
 };
 
 // To add a new event handler, create a function that generates the
@@ -22,14 +32,16 @@ const payloadBuilders = {
   /**
    * Generate event payload to send to event bus when an approved item
    * is scheduled to go on New Tab
+   * @param eventType
    * @param data ScheduledCorpusItemPayload
    * @returns ScheduledItemEventBusPayload
    */
   scheduledItemEvent(
+    eventType: string,
     data: ScheduledCorpusItemPayload
   ): ScheduledItemEventBusPayload {
-    const eventPayload: ScheduledItemEventBusPayload = {
-      eventType: config.eventBridge.addScheduledItemEventType,
+    return {
+      eventType: eventType,
       scheduledItemId: data.scheduledCorpusItem.externalId,
       approvedItemId: data.scheduledCorpusItem.approvedItem.externalId,
       url: data.scheduledCorpusItem.approvedItem.url,
@@ -46,6 +58,5 @@ const payloadBuilders = {
       scheduledSurfaceGuid: data.scheduledCorpusItem.scheduledSurfaceGuid,
       scheduledDate: toUtcDateString(data.scheduledCorpusItem.scheduledDate),
     };
-    return eventPayload;
   },
 };
