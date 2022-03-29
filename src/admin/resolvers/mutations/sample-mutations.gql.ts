@@ -10,8 +10,8 @@ import {
  * Curation Admin Tools Frontend and this repository's integration tests.
  */
 export const CREATE_APPROVED_ITEM = gql`
-  mutation createApprovedItem($data: CreateApprovedCuratedCorpusItemInput!) {
-    createApprovedCuratedCorpusItem(data: $data) {
+  mutation createApprovedItem($data: CreateApprovedCorpusItemInput!) {
+    createApprovedCorpusItem(data: $data) {
       ...CuratedItemData
     }
   }
@@ -19,10 +19,8 @@ export const CREATE_APPROVED_ITEM = gql`
 `;
 
 export const UPDATE_APPROVED_ITEM = gql`
-  mutation updateApprovedCuratedCorpusItem(
-    $data: UpdateApprovedCuratedCorpusItemInput!
-  ) {
-    updateApprovedCuratedCorpusItem(data: $data) {
+  mutation updateApprovedCorpusItem($data: UpdateApprovedCorpusItemInput!) {
+    updateApprovedCorpusItem(data: $data) {
       ...CuratedItemData
     }
   }
@@ -30,8 +28,8 @@ export const UPDATE_APPROVED_ITEM = gql`
 `;
 
 export const REJECT_APPROVED_ITEM = gql`
-  mutation rejectApprovedItem($data: RejectApprovedCuratedCorpusItemInput!) {
-    rejectApprovedCuratedCorpusItem(data: $data) {
+  mutation rejectApprovedItem($data: RejectApprovedCorpusItemInput!) {
+    rejectApprovedCorpusItem(data: $data) {
       ...CuratedItemData
     }
   }
@@ -39,8 +37,8 @@ export const REJECT_APPROVED_ITEM = gql`
 `;
 
 export const CREATE_REJECTED_ITEM = gql`
-  mutation createRejectedItem($data: CreateRejectedCuratedCorpusItemInput!) {
-    createRejectedCuratedCorpusItem(data: $data) {
+  mutation createRejectedItem($data: CreateRejectedCorpusItemInput!) {
+    createRejectedCorpusItem(data: $data) {
       ...RejectedItemData
     }
   }
@@ -48,8 +46,8 @@ export const CREATE_REJECTED_ITEM = gql`
 `;
 
 export const CREATE_SCHEDULED_ITEM = gql`
-  mutation createScheduledItem($data: CreateScheduledCuratedCorpusItemInput!) {
-    createScheduledCuratedCorpusItem(data: $data) {
+  mutation createScheduledItem($data: CreateScheduledCorpusItemInput!) {
+    createScheduledCorpusItem(data: $data) {
       ...ScheduledItemData
     }
   }
@@ -57,8 +55,8 @@ export const CREATE_SCHEDULED_ITEM = gql`
 `;
 
 export const DELETE_SCHEDULED_ITEM = gql`
-  mutation deleteScheduledItem($data: DeleteScheduledCuratedCorpusItemInput!) {
-    deleteScheduledCuratedCorpusItem(data: $data) {
+  mutation deleteScheduledItem($data: DeleteScheduledCorpusItemInput!) {
+    deleteScheduledCorpusItem(data: $data) {
       ...ScheduledItemData
     }
   }
@@ -66,10 +64,8 @@ export const DELETE_SCHEDULED_ITEM = gql`
 `;
 
 export const RESCHEDULE_SCHEDULED_ITEM = gql`
-  mutation rescheduleScheduledItem(
-    $data: RescheduleScheduledCuratedCorpusItemInput!
-  ) {
-    rescheduleScheduledCuratedCorpusItem(data: $data) {
+  mutation rescheduleScheduledItem($data: RescheduleScheduledCorpusItemInput!) {
+    rescheduleScheduledCorpusItem(data: $data) {
       ...ScheduledItemData
     }
   }
@@ -77,16 +73,16 @@ export const RESCHEDULE_SCHEDULED_ITEM = gql`
 `;
 
 export const UPLOAD_APPROVED_ITEM_IMAGE = gql`
-  mutation uploadApprovedCuratedCorpusItemImage($image: Upload!) {
-    uploadApprovedCuratedCorpusItemImage(data: $image) {
+  mutation uploadApprovedCorpusItemImage($image: Upload!) {
+    uploadApprovedCorpusItemImage(data: $image) {
       url
     }
   }
 `;
 
 export const IMPORT_APPROVED_ITEM = gql`
-  mutation importApprovedItem($data: ImportApprovedCuratedCorpusItemInput!) {
-    importApprovedCuratedCorpusItem(data: $data) {
+  mutation importApprovedItem($data: ImportApprovedCorpusItemInput!) {
+    importApprovedCorpusItem(data: $data) {
       approvedItem {
         ...CuratedItemData
       }

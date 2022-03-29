@@ -42,7 +42,7 @@ describe('mutations: ScheduledItem', () => {
     await clearDb(db);
   });
 
-  describe('createScheduledCuratedCorpusItem mutation', () => {
+  describe('createScheduledCorpusItem mutation', () => {
     it('should fail on invalid Scheduled Surface GUID', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
@@ -177,7 +177,7 @@ describe('mutations: ScheduledItem', () => {
         variables: { data: input },
       });
 
-      const scheduledItem = data?.createScheduledCuratedCorpusItem;
+      const scheduledItem = data?.createScheduledCorpusItem;
 
       // Expect these fields to return valid values
       expect(scheduledItem.externalId).to.not.be.null;
@@ -317,7 +317,7 @@ describe('mutations: ScheduledItem', () => {
     });
   });
 
-  describe('deleteScheduledCuratedCorpusItem mutation', () => {
+  describe('deleteScheduledCorpusItem mutation', () => {
     it('should fail on invalid external ID', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
@@ -376,7 +376,7 @@ describe('mutations: ScheduledItem', () => {
       // ApprovedItem), so until there is a query to retrieve the scheduled item
       // of the right shape (if it's ever implemented), laborious property-by-property
       // comparison is the go.
-      const returnedItem = data?.deleteScheduledCuratedCorpusItem;
+      const returnedItem = data?.deleteScheduledCorpusItem;
       expect(returnedItem.externalId).to.equal(scheduledItem.externalId);
       expect(returnedItem.createdBy).to.equal(scheduledItem.createdBy);
       expect(returnedItem.updatedBy).to.equal(headers.username);
@@ -516,7 +516,7 @@ describe('mutations: ScheduledItem', () => {
     });
   });
 
-  describe('rescheduleScheduledCuratedCorpusItem mutation', () => {
+  describe('rescheduleScheduledCorpusItem mutation', () => {
     it('should fail on invalid external ID', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
@@ -577,7 +577,7 @@ describe('mutations: ScheduledItem', () => {
       // ApprovedItem), so until there is a query to retrieve the scheduled item
       // of the right shape (if it's ever implemented), laborious property-by-property
       // comparison is the go.
-      const returnedItem = data?.rescheduleScheduledCuratedCorpusItem;
+      const returnedItem = data?.rescheduleScheduledCorpusItem;
       expect(returnedItem.externalId).to.equal(scheduledItem.externalId);
       expect(returnedItem.createdBy).to.equal(scheduledItem.createdBy);
       expect(returnedItem.updatedBy).to.equal(headers.username);

@@ -14,7 +14,7 @@ import {
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import { MozillaAccessGroup } from '../../../shared/types';
 
-describe('queries: ApprovedCuratedCorpusItem', () => {
+describe('queries: ApprovedCorpusItem', () => {
   // adding headers with groups that grant full access
   const headers = {
     name: 'Test User',
@@ -37,7 +37,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
     await server.stop();
   });
 
-  describe('getApprovedCuratedCorpusItems query', () => {
+  describe('getApprovedCorpusItems query', () => {
     beforeAll(async () => {
       // Create some items
       const stories = [
@@ -118,12 +118,12 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
         },
       });
 
-      expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(10);
-      expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(10);
+      expect(data?.getApprovedCorpusItems.edges).to.have.length(10);
+      expect(data?.getApprovedCorpusItems.totalCount).to.equal(10);
 
       // Check default sorting - createdAt.DESC
-      const firstItem = data?.getApprovedCuratedCorpusItems.edges[0].node;
-      const secondItem = data?.getApprovedCuratedCorpusItems.edges[1].node;
+      const firstItem = data?.getApprovedCorpusItems.edges[0].node;
+      const secondItem = data?.getApprovedCorpusItems.edges[1].node;
       expect(firstItem.createdAt > secondItem.createdAt).to.be.true;
     });
 
@@ -135,7 +135,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
         },
       });
 
-      const firstItem = data?.getApprovedCuratedCorpusItems.edges[0].node;
+      const firstItem = data?.getApprovedCorpusItems.edges[0].node;
       // The important thing to test here is that the query returns all of these
       // properties without falling over, and not that they hold any specific value.
       expect(firstItem.externalId).to.be.not.undefined;
@@ -163,7 +163,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       });
 
       // We expect to get two results back
-      expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(2);
+      expect(data?.getApprovedCorpusItems.edges).to.have.length(2);
     });
 
     it('should return a PageInfo object', async () => {
@@ -174,7 +174,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
         },
       });
 
-      const pageInfo = data?.getApprovedCuratedCorpusItems.pageInfo;
+      const pageInfo = data?.getApprovedCorpusItems.pageInfo;
       expect(pageInfo.hasNextPage).to.equal(true);
       expect(pageInfo.hasPreviousPage).to.equal(false);
       expect(pageInfo.startCursor).to.be.a('string');
@@ -189,7 +189,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
         },
       });
 
-      const cursor = data?.getApprovedCuratedCorpusItems.edges[3].cursor;
+      const cursor = data?.getApprovedCorpusItems.edges[3].cursor;
 
       const { data: nextPageData } = await server.executeOperation({
         query: GET_APPROVED_ITEMS,
@@ -198,7 +198,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
         },
       });
 
-      expect(nextPageData?.getApprovedCuratedCorpusItems.edges)
+      expect(nextPageData?.getApprovedCorpusItems.edges)
         .to.be.an('array')
         .that.does.not.contain({ cursor });
     });
@@ -211,7 +211,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
         },
       });
 
-      const cursor = data?.getApprovedCuratedCorpusItems.edges[0].cursor;
+      const cursor = data?.getApprovedCorpusItems.edges[0].cursor;
 
       const { data: prevPageData } = await server.executeOperation({
         query: GET_APPROVED_ITEMS,
@@ -220,7 +220,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
         },
       });
 
-      expect(prevPageData?.getApprovedCuratedCorpusItems.edges)
+      expect(prevPageData?.getApprovedCorpusItems.edges)
         .to.be.an('array')
         .that.does.not.contain({ cursor });
     });
@@ -234,9 +234,9 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       });
 
       // we only have three stories in German set up before each test
-      expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(3);
+      expect(data?.getApprovedCorpusItems.edges).to.have.length(3);
       // make sure the total count is not _all_ results, i.e. 10, but only three
-      expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(3);
+      expect(data?.getApprovedCorpusItems.totalCount).to.equal(3);
     });
 
     it('should filter by story title', async () => {
@@ -248,9 +248,9 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       });
 
       // we only have one story with "Zombies" in the title
-      expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(1);
+      expect(data?.getApprovedCorpusItems.edges).to.have.length(1);
       // make sure total results value is correct
-      expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(1);
+      expect(data?.getApprovedCorpusItems.totalCount).to.equal(1);
     });
 
     it('should filter by topic', async () => {
@@ -262,10 +262,10 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       });
 
       // we only have two stories categorised as "Technology"
-      expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(2);
+      expect(data?.getApprovedCorpusItems.edges).to.have.length(2);
 
       // make sure total results value is correct
-      expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(2);
+      expect(data?.getApprovedCorpusItems.totalCount).to.equal(2);
     });
 
     it('should filter by curated status', async () => {
@@ -277,9 +277,9 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       });
 
       // expect to see six stories added to the corpus as second-tier recommendations
-      expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(6);
+      expect(data?.getApprovedCorpusItems.edges).to.have.length(6);
       // make sure total results value is correct
-      expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(6);
+      expect(data?.getApprovedCorpusItems.totalCount).to.equal(6);
     });
 
     it('should filter by story URL', async () => {
@@ -291,9 +291,9 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       });
 
       // expect to see just the one story with the above domain
-      expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(1);
+      expect(data?.getApprovedCorpusItems.edges).to.have.length(1);
       // make sure total results value is correct
-      expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(1);
+      expect(data?.getApprovedCorpusItems.totalCount).to.equal(1);
     });
 
     it('should filter by several parameters', async () => {
@@ -311,13 +311,13 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
       });
 
       // expect to see just the one story
-      expect(data?.getApprovedCuratedCorpusItems.edges).to.have.length(1);
+      expect(data?.getApprovedCorpusItems.edges).to.have.length(1);
       // make sure total results value is correct
-      expect(data?.getApprovedCuratedCorpusItems.totalCount).to.equal(1);
+      expect(data?.getApprovedCorpusItems.totalCount).to.equal(1);
     });
   });
 
-  describe('getApprovedCuratedCorpusItemByUrl query', () => {
+  describe('getApprovedCorpusItemByUrl query', () => {
     beforeAll(async () => {
       // Create a few items with known URLs.
       const storyInput = [
@@ -350,7 +350,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
         },
       });
 
-      const item = result.data?.getApprovedCuratedCorpusItemByUrl;
+      const item = result.data?.getApprovedCorpusItemByUrl;
 
       // Is this really the item we wanted to retrieve?
       expect(item.url).to.equal(inputUrl);
@@ -382,10 +382,10 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
         },
       });
 
-      expect(result.data).to.have.property('getApprovedCuratedCorpusItemByUrl');
+      expect(result.data).to.have.property('getApprovedCorpusItemByUrl');
 
       // There should be no data returned
-      expect(result.data?.getApprovedCuratedCorpusItemByUrl).to.be.null;
+      expect(result.data?.getApprovedCorpusItemByUrl).to.be.null;
 
       // There should be no errors
       expect(result.errors).to.be.undefined;
@@ -437,7 +437,7 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
         variables: {
           representations: [
             {
-              __typename: 'ApprovedCuratedCorpusItem',
+              __typename: 'ApprovedCorpusItem',
               url: 'https://www.test2.com/story-three',
             },
           ],
@@ -456,19 +456,19 @@ describe('queries: ApprovedCuratedCorpusItem', () => {
         variables: {
           representations: [
             {
-              __typename: 'ApprovedCuratedCorpusItem',
+              __typename: 'ApprovedCorpusItem',
               url: 'https://www.test2.com/story-seven',
             },
             {
-              __typename: 'ApprovedCuratedCorpusItem',
+              __typename: 'ApprovedCorpusItem',
               url: 'https://www.test2.com/story-three',
             },
             {
-              __typename: 'ApprovedCuratedCorpusItem',
+              __typename: 'ApprovedCorpusItem',
               url: 'https://www.sample-domain.com/what-zombies-can-teach-you-graphql',
             },
             {
-              __typename: 'ApprovedCuratedCorpusItem',
+              __typename: 'ApprovedCorpusItem',
               url: 'https://www.test2.com/story-two',
             },
           ],
