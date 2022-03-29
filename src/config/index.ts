@@ -48,6 +48,8 @@ export default {
   eventBridge: {
     addScheduledItemEventType: 'add-scheduled-item',
     removeScheduledItemEventType: 'remove-scheduled-item',
+    updateScheduledItemEventType: 'update-scheduled-item',
+    updateApprovedItemEventType: 'update-approved-item',
     source: 'curation-migration-datasync',
   },
   sentry: {

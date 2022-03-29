@@ -58,3 +58,23 @@ export type ScheduledItemEventBusPayload = BaseEventBusPayload &
     createdAt: string; // UTC timestamp string
     updatedAt: string; // UTC timestamp string
   };
+
+export type ApprovedItemEventBusPayload = BaseEventBusPayload &
+  Partial<
+    Pick<
+      ApprovedItem,
+      | 'url'
+      | 'title'
+      | 'excerpt'
+      | 'language'
+      | 'publisher'
+      | 'imageUrl'
+      | 'topic'
+      | 'isSyndicated'
+      | 'createdBy'
+    >
+  > & {
+    approvedItemId: string; // externalId of ApprovedItem
+    createdAt?: string; // UTC timestamp string
+    updatedAt: string; // UTC timestamp string;
+  };

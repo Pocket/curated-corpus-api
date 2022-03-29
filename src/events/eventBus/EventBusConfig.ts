@@ -1,4 +1,7 @@
 import {
+  ApprovedItemEventBusPayload,
+  ReviewedCorpusItemEventType,
+  ReviewedCorpusItemPayload,
   ScheduledCorpusItemEventType,
   ScheduledCorpusItemPayload,
   ScheduledItemEventBusPayload,
@@ -20,6 +23,18 @@ export const eventBusConfig: EventHandlerCallbackMap = {
   [ScheduledCorpusItemEventType.REMOVE_SCHEDULE]: (data: any) => {
     return payloadBuilders.scheduledItemEvent(
       config.eventBridge.removeScheduledItemEventType,
+      data
+    );
+  },
+  [ScheduledCorpusItemEventType.RESCHEDULE]: (data: any) => {
+    return payloadBuilders.scheduledItemEvent(
+      config.eventBridge.updateScheduledItemEventType,
+      data
+    );
+  },
+  [ReviewedCorpusItemEventType.UPDATE_ITEM]: (data: any) => {
+    return payloadBuilders.approvedItemEvent(
+      config.eventBridge.updateApprovedItemEventType,
       data
     );
   },
@@ -57,6 +72,32 @@ const payloadBuilders = {
       updatedAt: data.scheduledCorpusItem.updatedAt.toUTCString(),
       scheduledSurfaceGuid: data.scheduledCorpusItem.scheduledSurfaceGuid,
       scheduledDate: toUtcDateString(data.scheduledCorpusItem.scheduledDate),
+    };
+  },
+  approvedItemEvent(
+    eventType: string,
+    data: ReviewedCorpusItemPayload
+  ): ApprovedItemEventBusPayload {
+    // The nullish coalesce and checking for properties are due to
+    // union type in ReviewedCorpusItemPayload
+    const item = data.reviewedCorpusItem;
+    return {
+      eventType: eventType,
+      approvedItemId: item.externalId,
+      url: item.url,
+      title: item.title ?? undefined,
+      excerpt: 'excerpt' in item ? item.excerpt : undefined,
+      language: 'language' in item ? item.language ?? undefined : undefined,
+      publisher: 'publisher' in item ? item.publisher ?? undefined : undefined,
+      imageUrl: 'imageUrl' in item ? item.imageUrl : undefined,
+      topic: item.topic,
+      isSyndicated: 'isSyndicated' in item ? item.isSyndicated : undefined,
+      createdAt: item.createdAt.toUTCString(),
+      createdBy: item.createdBy,
+      updatedAt:
+        'updatedAt' in item
+          ? item.updatedAt.toUTCString()
+          : new Date().toUTCString(),
     };
   },
 };
