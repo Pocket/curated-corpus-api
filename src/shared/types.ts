@@ -69,6 +69,7 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
 export enum Topics {
   BUSINESS = 'BUSINESS',
   CAREER = 'CAREER',
+  CORONAVIRUS = 'CORONAVIRUS',
   EDUCATION = 'EDUCATION',
   ENTERTAINMENT = 'ENTERTAINMENT',
   FOOD = 'FOOD',
