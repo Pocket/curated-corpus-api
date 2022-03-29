@@ -26,7 +26,7 @@ describe('queries: ScheduledSurface', () => {
       scheduledSurfaces.forEach((scheduledSurface) => {
         expect(scheduledSurface.guid).not.to.be.undefined;
         expect(scheduledSurface.name).not.to.be.undefined;
-        expect(scheduledSurface.utcOffset).not.to.be.undefined;
+        expect(scheduledSurface.ianaTimezone).not.to.be.undefined;
         expect(scheduledSurface.prospectTypes).not.to.be.undefined;
       });
 
@@ -54,7 +54,7 @@ describe('queries: ScheduledSurface', () => {
       scheduledSurfaces.forEach((scheduledSurface) => {
         expect(scheduledSurface.guid).not.to.be.undefined;
         expect(scheduledSurface.name).not.to.be.undefined;
-        expect(scheduledSurface.utcOffset).not.to.be.undefined;
+        expect(scheduledSurface.ianaTimezone).not.to.be.undefined;
         expect(scheduledSurface.prospectTypes).not.to.be.undefined;
       });
 

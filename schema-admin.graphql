@@ -109,9 +109,9 @@ type ScheduledSurface {
     """
     name: String!
     """
-    The UTC offset of the Scheduled Surface's scheduling day, represented in HMM numeric format.
+    The IANA timezone of the Scheduled Surface, used to determine the start of a day.
     """
-    utcOffset: Int!
+    ianaTimezone: String!
     """
     An array of associated ProspectTypes.
     """
