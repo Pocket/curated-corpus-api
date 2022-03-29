@@ -42,6 +42,7 @@
   "homepage": "https://github.com/Pocket/curated-corpus-api#readme",
   "dependencies": {
     "@apollo/federation": "^0.33.9",
+    "@aws-sdk/client-eventbridge": "^3.56.0",
     "@devoxa/prisma-relay-cursor-connection": "^2.1.0",
     "@pocket-tools/apollo-utils": "^2.2.0",
     "@prisma/client": "^3.9.1",
@@ -78,6 +79,7 @@
     "@types/graphql-upload": "8.0.7",
     "@types/jest": "27.4.1",
     "@types/node": "16.11.26",
+    "@types/sinon": "^10.0.11",
     "chai": "4.3.6",
     "jest": "27.5.1",
     "nock": "13.2.4",

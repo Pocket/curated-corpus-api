@@ -201,6 +201,14 @@ class CuratedCorpusAPI extends TerraformStack {
               name: 'SNOWPLOW_ENDPOINT',
               value: config.envVars.snowplowEndpoint,
             },
+            {
+              name: 'EVENT_BUS_NAME',
+              value: config.eventBus.name,
+            },
+            {
+              name: 'AWS_REGION',
+              value: region.name,
+            },
           ],
           secretEnvVars: [
             {
@@ -279,6 +287,13 @@ class CuratedCorpusAPI extends TerraformStack {
           {
             actions: ['s3:*'],
             resources: [`arn:aws:s3:::${s3.id}`, `arn:aws:s3:::${s3.id}/*`],
+            effect: 'Allow',
+          },
+          {
+            actions: ['events:PutEvents'],
+            resources: [
+              `arn:aws:events:${region.name}:${caller.accountId}:event-bus/${config.eventBus.name}`,
+            ],
             effect: 'Allow',
           },
         ],
