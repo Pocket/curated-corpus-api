@@ -119,6 +119,13 @@ type ScheduledSurface {
 }
 
 """
+Temp type to pacify federation checks
+"""
+type ApprovedCuratedCorpusItem @key(fields: "url") {
+    url: Url!
+}
+
+"""
 A prospective story that has been reviewed by the curators and saved to the corpus.
 """
 type ApprovedCorpusItem @key(fields: "url") {
