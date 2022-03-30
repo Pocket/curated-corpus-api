@@ -1,7 +1,7 @@
 import nock from 'nock';
 import { unlinkSync, writeFileSync } from 'fs';
 import { FileUpload } from 'graphql-upload';
-import { getFileUploadFromUrl } from './utils';
+import { getFileUploadFromUrl, getPocketCacheUrl } from './utils';
 import { InvalidImageUrl } from './errors';
 
 function getStreamContent(stream) {
@@ -24,14 +24,14 @@ describe('Upload Utils', () => {
   });
 
   it('converts an image from a URL to a graphql FileUpload type', async () => {
-    nock('https://image.com')
+    nock('https://pocket-image-cache.com')
       .get('/dancing-in-the-air.jpeg')
       .replyWithFile(200, testFilePath, {
         'Content-Type': 'image/jpeg',
       });
 
     const image: FileUpload = await getFileUploadFromUrl(
-      'https://image.com/dancing-in-the-air.jpeg'
+      'https://pocket-image-cache.com/dancing-in-the-air.jpeg'
     );
 
     const stream = image.createReadStream();
@@ -44,14 +44,30 @@ describe('Upload Utils', () => {
   });
 
   it('throws an error if the URL content is not an image', async () => {
-    nock('https://image.com')
+    nock('https://pocket-image-cache.com')
       .get('/dancing-in-the-air.jpeg')
       .replyWithFile(200, testFilePath, {
         'Content-Type': 'application/json',
       });
 
     await expect(
-      getFileUploadFromUrl('https://image.com/dancing-in-the-air.jpeg')
+      getFileUploadFromUrl(
+        'https://pocket-image-cache.com/dancing-in-the-air.jpeg'
+      )
     ).rejects.toThrow(InvalidImageUrl);
+  });
+
+  it('converts url to pocket cache URL', async () => {
+    expect(
+      getPocketCacheUrl('https://sweet-potato.jpg?is_sweet=yes and no')
+    ).toEqual(
+      'https://pocket-image-cache.com/x/filters:format(jpeg):quality(100):no_upscale():strip_exif()/https://sweet-potato.jpg?is_sweet=yes%20and%20no'
+    );
+  });
+
+  it('does not convert pocket-image-cache URLs', async () => {
+    expect(
+      getPocketCacheUrl('https://pocket-image-cache.com/x/https://banana')
+    ).toEqual('https://pocket-image-cache.com/x/https://banana');
   });
 });

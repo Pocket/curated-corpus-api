@@ -870,7 +870,7 @@ describe('mutations: ApprovedItem', () => {
       title: 'Find Out How I Cured My Docker In 2 Days',
       excerpt: 'A short summary of what this story is about',
       status: CuratedStatus.RECOMMENDATION,
-      imageUrl: 'https://test.com/image.png',
+      imageUrl: 'https://pocket-image-cache.com/image.png',
       language: 'EN',
       publisher: 'Convective Cloud',
       topic: Topics.TECHNOLOGY,
