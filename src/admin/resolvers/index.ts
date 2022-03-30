@@ -26,7 +26,7 @@ export const resolvers = {
   // The custom scalars from GraphQL-Scalars that we find useful.
   Date: DateResolver,
 
-  ApprovedCuratedCorpusItem: {
+  ApprovedCorpusItem: {
     // Our own entities that need timestamp conversion, hence field resolvers
     // everywhere for values returned by `createdAt` and `updatedAt` fields.
     createdAt: UnixTimestampResolver,
@@ -47,31 +47,31 @@ export const resolvers = {
       return dbGetApprovedItemByUrl(db, url);
     },
   },
-  RejectedCuratedCorpusItem: {
+  RejectedCorpusItem: {
     createdAt: UnixTimestampResolver,
   },
-  ScheduledCuratedCorpusItem: {
+  ScheduledCorpusItem: {
     createdAt: UnixTimestampResolver,
     updatedAt: UnixTimestampResolver,
   },
   // The queries available
   Query: {
-    getApprovedCuratedCorpusItems: getApprovedItems,
-    getRejectedCuratedCorpusItems: getRejectedItems,
-    getScheduledCuratedCorpusItems: getScheduledItems,
-    getApprovedCuratedCorpusItemByUrl: getApprovedItemByUrl,
+    getApprovedCorpusItems: getApprovedItems,
+    getRejectedCorpusItems: getRejectedItems,
+    getScheduledCorpusItems: getScheduledItems,
+    getApprovedCorpusItemByUrl: getApprovedItemByUrl,
     getScheduledSurfacesForUser: getScheduledSurfacesForUser,
   },
   // Mutations that we need in the admin interface
   Mutation: {
-    createApprovedCuratedCorpusItem: createApprovedItem,
-    rejectApprovedCuratedCorpusItem: rejectApprovedItem,
-    updateApprovedCuratedCorpusItem: updateApprovedItem,
-    createRejectedCuratedCorpusItem: createRejectedItem,
-    createScheduledCuratedCorpusItem: createScheduledItem,
-    deleteScheduledCuratedCorpusItem: deleteScheduledItem,
-    rescheduleScheduledCuratedCorpusItem: rescheduleScheduledItem,
-    uploadApprovedCuratedCorpusItemImage: uploadApprovedItemImage,
-    importApprovedCuratedCorpusItem: importApprovedItem,
+    createApprovedCorpusItem: createApprovedItem,
+    rejectApprovedCorpusItem: rejectApprovedItem,
+    updateApprovedCorpusItem: updateApprovedItem,
+    createRejectedCorpusItem: createRejectedItem,
+    createScheduledCorpusItem: createScheduledItem,
+    deleteScheduledCorpusItem: deleteScheduledItem,
+    rescheduleScheduledCorpusItem: rescheduleScheduledItem,
+    uploadApprovedCorpusItemImage: uploadApprovedItemImage,
+    importApprovedCorpusItem: importApprovedItem,
   },
 };

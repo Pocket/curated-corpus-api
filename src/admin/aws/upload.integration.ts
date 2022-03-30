@@ -41,7 +41,7 @@ describe('Upload', () => {
   });
 
   it('uploads an image to s3 using the url', async () => {
-    nock('https://image.com')
+    nock('https://pocket-image-cache.com')
       .get('/dancing-in-the-air.jpeg')
       .replyWithFile(200, testFilePath, {
         'Content-Type': 'image/jpeg',
@@ -49,7 +49,7 @@ describe('Upload', () => {
 
     const upload = await uploadImageToS3FromUrl(
       s3,
-      'https://image.com/dancing-in-the-air.jpeg'
+      'https://pocket-image-cache.com/dancing-in-the-air.jpeg'
     );
 
     expectSuccessfulUpload(upload);

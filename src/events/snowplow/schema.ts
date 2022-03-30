@@ -170,9 +170,9 @@ export type ScheduledCorpusItem = {
    */
   scheduled_surface_name?: string;
   /**
-   * The time that the scheduled surface feed is offset from UTC time.
+   * The iana.org timezone of the scheduled surface.
    */
-  scheduled_surface_utc_offset?: string;
+  scheduled_surface_iana_timezone?: string;
   /**
    * The UTC unix timestamp (in seconds) for when the scheduled surface schedule
    * was created.

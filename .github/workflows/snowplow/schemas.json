@@ -18,7 +18,7 @@
         "vendor": "com.pocket",
         "name": "scheduled_corpus_item",
         "format": "jsonschema",
-        "version": "1-0-0"
+        "version": "1-0-2"
       }
     ]
   }

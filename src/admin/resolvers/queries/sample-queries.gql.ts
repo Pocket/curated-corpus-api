@@ -11,10 +11,10 @@ import {
  */
 export const GET_APPROVED_ITEMS = gql`
   query getApprovedItems(
-    $filters: ApprovedCuratedCorpusItemFilter
+    $filters: ApprovedCorpusItemFilter
     $pagination: PaginationInput
   ) {
-    getApprovedCuratedCorpusItems(filters: $filters, pagination: $pagination) {
+    getApprovedCorpusItems(filters: $filters, pagination: $pagination) {
       totalCount
       pageInfo {
         hasNextPage
@@ -35,10 +35,10 @@ export const GET_APPROVED_ITEMS = gql`
 
 export const GET_REJECTED_ITEMS = gql`
   query getRejectedItems(
-    $filters: RejectedCuratedCorpusItemFilter
+    $filters: RejectedCorpusItemFilter
     $pagination: PaginationInput
   ) {
-    getRejectedCuratedCorpusItems(filters: $filters, pagination: $pagination) {
+    getRejectedCorpusItems(filters: $filters, pagination: $pagination) {
       totalCount
       pageInfo {
         hasNextPage
@@ -58,8 +58,8 @@ export const GET_REJECTED_ITEMS = gql`
 `;
 
 export const GET_SCHEDULED_ITEMS = gql`
-  query getScheduledItems($filters: ScheduledCuratedCorpusItemsFilterInput!) {
-    getScheduledCuratedCorpusItems(filters: $filters) {
+  query getScheduledItems($filters: ScheduledCorpusItemsFilterInput!) {
+    getScheduledCorpusItems(filters: $filters) {
       totalCount
       collectionCount
       syndicatedCount
@@ -73,8 +73,8 @@ export const GET_SCHEDULED_ITEMS = gql`
 `;
 
 export const GET_APPROVED_ITEM_BY_URL = gql`
-  query getApprovedCuratedCorpusItemByUrl($url: String!) {
-    getApprovedCuratedCorpusItemByUrl(url: $url) {
+  query getApprovedCorpusItemByUrl($url: String!) {
+    getApprovedCorpusItemByUrl(url: $url) {
       ...CuratedItemData
     }
   }
@@ -86,7 +86,7 @@ export const GET_SCHEDULED_SURFACES_FOR_USER = gql`
     getScheduledSurfacesForUser {
       guid
       name
-      utcOffset
+      ianaTimezone
       prospectTypes
     }
   }
@@ -95,7 +95,7 @@ export const GET_SCHEDULED_SURFACES_FOR_USER = gql`
 export const APPROVED_ITEM_REFERENCE_RESOLVER = gql`
   query ($representations: [_Any!]!) {
     _entities(representations: $representations) {
-      ... on ApprovedCuratedCorpusItem {
+      ... on ApprovedCorpusItem {
         ...CuratedItemData
       }
     }

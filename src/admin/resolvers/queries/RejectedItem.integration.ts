@@ -10,7 +10,7 @@ import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmi
 import { MozillaAccessGroup } from '../../../shared/types';
 import { getServerWithMockedHeaders } from '../../../test/helpers/getServerWithMockedHeaders';
 
-describe('queries: RejectedCuratedCorpusItem', () => {
+describe('queries: RejectedCorpusItem', () => {
   const headers = {
     name: 'Test User',
     username: 'test.user@test.com',
@@ -32,7 +32,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
     await server.stop();
   });
 
-  describe('getRejectedCuratedCorpusItem query', () => {
+  describe('getRejectedCorpusItem query', () => {
     // Fake sample Rejected Curated Corpus items
     const rejectedCuratedCorpusItems = [
       {
@@ -95,10 +95,10 @@ describe('queries: RejectedCuratedCorpusItem', () => {
         },
       });
 
-      expect(data?.getRejectedCuratedCorpusItems.edges).to.have.length(
+      expect(data?.getRejectedCorpusItems.edges).to.have.length(
         rejectedCuratedCorpusItems.length
       );
-      expect(data?.getRejectedCuratedCorpusItems.totalCount).to.equal(
+      expect(data?.getRejectedCorpusItems.totalCount).to.equal(
         rejectedCuratedCorpusItems.length
       );
     });
@@ -108,8 +108,8 @@ describe('queries: RejectedCuratedCorpusItem', () => {
         query: GET_REJECTED_ITEMS,
       });
 
-      const firstItem = data?.getRejectedCuratedCorpusItems.edges[0].node;
-      const secondItem = data?.getRejectedCuratedCorpusItems.edges[1].node;
+      const firstItem = data?.getRejectedCorpusItems.edges[0].node;
+      const secondItem = data?.getRejectedCorpusItems.edges[1].node;
 
       expect(firstItem.createdAt).to.be.greaterThan(secondItem.createdAt);
     });
@@ -123,7 +123,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
       });
 
       const firstItem: dbRejectedCuratedCorpusItem =
-        data?.getRejectedCuratedCorpusItems.edges[0].node;
+        data?.getRejectedCorpusItems.edges[0].node;
       // The important thing to test here is that the query returns all of these
       // properties without falling over, and not that they hold any specific value.
       expect(firstItem.externalId).to.be.not.undefined;
@@ -147,7 +147,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
       });
 
       // We expect to get two results back
-      expect(data?.getRejectedCuratedCorpusItems.edges).to.have.length(2);
+      expect(data?.getRejectedCorpusItems.edges).to.have.length(2);
     });
 
     it('should return a PageInfo object', async () => {
@@ -158,7 +158,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
         },
       });
 
-      const pageInfo = data?.getRejectedCuratedCorpusItems.pageInfo;
+      const pageInfo = data?.getRejectedCorpusItems.pageInfo;
       expect(pageInfo.hasNextPage).to.equal(true);
       expect(pageInfo.hasPreviousPage).to.equal(false);
       expect(pageInfo.startCursor).to.be.a('string');
@@ -172,7 +172,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
         },
       });
 
-      const cursor = data?.getRejectedCuratedCorpusItems.edges[3].cursor;
+      const cursor = data?.getRejectedCorpusItems.edges[3].cursor;
 
       const { data: nextPageData } = await server.executeOperation({
         query: GET_REJECTED_ITEMS,
@@ -181,7 +181,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
         },
       });
 
-      expect(nextPageData?.getRejectedCuratedCorpusItems.edges)
+      expect(nextPageData?.getRejectedCorpusItems.edges)
         .to.be.an('array')
         .that.does.not.contain({ cursor });
     });
@@ -194,7 +194,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
         },
       });
 
-      const cursor = data?.getRejectedCuratedCorpusItems.edges[0].cursor;
+      const cursor = data?.getRejectedCorpusItems.edges[0].cursor;
 
       const { data: prevPageData } = await server.executeOperation({
         query: GET_REJECTED_ITEMS,
@@ -203,7 +203,7 @@ describe('queries: RejectedCuratedCorpusItem', () => {
         },
       });
 
-      expect(prevPageData?.getRejectedCuratedCorpusItems.edges)
+      expect(prevPageData?.getRejectedCorpusItems.edges)
         .to.be.an('array')
         .that.does.not.contain({ cursor });
     });
@@ -220,11 +220,11 @@ describe('queries: RejectedCuratedCorpusItem', () => {
         (item) => item.language === 'DE'
       );
       // we only have three stories in German set up before each test
-      expect(data?.getRejectedCuratedCorpusItems.edges).to.have.length(
+      expect(data?.getRejectedCorpusItems.edges).to.have.length(
         germanItems.length
       );
       // make sure the total count is not _all_ results, i.e. 10, but only three
-      expect(data?.getRejectedCuratedCorpusItems.totalCount).to.equal(
+      expect(data?.getRejectedCorpusItems.totalCount).to.equal(
         germanItems.length
       );
     });
@@ -238,9 +238,9 @@ describe('queries: RejectedCuratedCorpusItem', () => {
       });
 
       // we only have one story with "laravel" in the title
-      expect(data?.getRejectedCuratedCorpusItems.edges).to.have.length(1);
+      expect(data?.getRejectedCorpusItems.edges).to.have.length(1);
       // make sure total results value is correct
-      expect(data?.getRejectedCuratedCorpusItems.totalCount).to.equal(1);
+      expect(data?.getRejectedCorpusItems.totalCount).to.equal(1);
     });
 
     it('should filter by topic', async () => {
@@ -252,10 +252,10 @@ describe('queries: RejectedCuratedCorpusItem', () => {
       });
 
       // we only have two stories categorized as "Technology"
-      expect(data?.getRejectedCuratedCorpusItems.edges).to.have.length(2);
+      expect(data?.getRejectedCorpusItems.edges).to.have.length(2);
 
       // make sure total results value is correct
-      expect(data?.getRejectedCuratedCorpusItems.totalCount).to.equal(2);
+      expect(data?.getRejectedCorpusItems.totalCount).to.equal(2);
     });
 
     it('should filter by story URL', async () => {
@@ -267,9 +267,9 @@ describe('queries: RejectedCuratedCorpusItem', () => {
       });
 
       // expect to see just the one story with the above domain
-      expect(data?.getRejectedCuratedCorpusItems.edges).to.have.length(1);
+      expect(data?.getRejectedCorpusItems.edges).to.have.length(1);
       // make sure total results value is correct
-      expect(data?.getRejectedCuratedCorpusItems.totalCount).to.equal(1);
+      expect(data?.getRejectedCorpusItems.totalCount).to.equal(1);
     });
 
     it('should filter url, title, topic and language', async () => {
@@ -286,9 +286,9 @@ describe('queries: RejectedCuratedCorpusItem', () => {
       });
 
       // expect to see just the one story
-      expect(data?.getRejectedCuratedCorpusItems.edges).to.have.length(1);
+      expect(data?.getRejectedCorpusItems.edges).to.have.length(1);
       // make sure total results value is correct
-      expect(data?.getRejectedCuratedCorpusItems.totalCount).to.equal(1);
+      expect(data?.getRejectedCorpusItems.totalCount).to.equal(1);
     });
   });
 });

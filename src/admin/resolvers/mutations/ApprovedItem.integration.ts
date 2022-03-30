@@ -36,7 +36,7 @@ import {
   MozillaAccessGroup,
   Topics,
 } from '../../../shared/types';
-import { ImportApprovedCuratedCorpusItemInput } from '../types';
+import { ImportApprovedCorpusItemInput } from '../types';
 import nock from 'nock';
 
 describe('mutations: ApprovedItem', () => {
@@ -63,7 +63,7 @@ describe('mutations: ApprovedItem', () => {
     await clearDb(db);
   });
 
-  describe('createApprovedCuratedCorpusItem mutation', () => {
+  describe('createApprovedCorpusItem mutation', () => {
     // a standard set of inputs for this mutation
     let input: CreateApprovedItemInput;
 
@@ -101,13 +101,11 @@ describe('mutations: ApprovedItem', () => {
 
       // Expect to see all the input data we supplied in the Approved Item
       // returned by the mutation
-      expect(result.data?.createApprovedCuratedCorpusItem).to.deep.include(
-        input
-      );
+      expect(result.data?.createApprovedCorpusItem).to.deep.include(input);
 
       // The `createdBy` field should now be the SSO username of the user
       // who updated this record
-      expect(result.data?.createApprovedCuratedCorpusItem.createdBy).to.equal(
+      expect(result.data?.createApprovedCorpusItem.createdBy).to.equal(
         headers.username
       );
 
@@ -121,7 +119,7 @@ describe('mutations: ApprovedItem', () => {
       // 3- Event has the right entity passed to it.
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(result.data?.createApprovedCuratedCorpusItem.externalId);
+      ).to.equal(result.data?.createApprovedCorpusItem.externalId);
     });
 
     it('should create an approved item without a prospectId', async () => {
@@ -145,13 +143,13 @@ describe('mutations: ApprovedItem', () => {
 
       // Expect to see all the input data we supplied in the Approved Item
       // returned by the mutation
-      expect(result.data?.createApprovedCuratedCorpusItem).to.deep.include(
+      expect(result.data?.createApprovedCorpusItem).to.deep.include(
         inputWithoutProspectId
       );
 
       // The `createdBy` field should now be the SSO username of the user
       // who updated this record
-      expect(result.data?.createApprovedCuratedCorpusItem.createdBy).to.equal(
+      expect(result.data?.createApprovedCorpusItem.createdBy).to.equal(
         headers.username
       );
 
@@ -165,7 +163,7 @@ describe('mutations: ApprovedItem', () => {
       // 3- Event has the right entity passed to it.
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(result.data?.createApprovedCuratedCorpusItem.externalId);
+      ).to.equal(result.data?.createApprovedCorpusItem.externalId);
     });
 
     it('should fail to create an approved item with a duplicate URL', async () => {
@@ -253,13 +251,11 @@ describe('mutations: ApprovedItem', () => {
       // input values from the input before comparison.
       delete input.scheduledDate;
       delete input.scheduledSurfaceGuid;
-      expect(result.data?.createApprovedCuratedCorpusItem).to.deep.include(
-        input
-      );
+      expect(result.data?.createApprovedCorpusItem).to.deep.include(input);
 
       // The `createdBy` field should now be the SSO username of the user
       // who updated this record
-      expect(result.data?.createApprovedCuratedCorpusItem.createdBy).to.equal(
+      expect(result.data?.createApprovedCorpusItem.createdBy).to.equal(
         headers.username
       );
 
@@ -282,7 +278,7 @@ describe('mutations: ApprovedItem', () => {
       // 3- Events have the right entities passed to it.
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(result.data?.createApprovedCuratedCorpusItem.externalId);
+      ).to.equal(result.data?.createApprovedCorpusItem.externalId);
 
       // Since we don't return the scheduled item alongside the curated item
       // in the result of this mutation, there is no exact value to compare it to.
@@ -382,7 +378,7 @@ describe('mutations: ApprovedItem', () => {
     });
   });
 
-  describe('updateApprovedCuratedCorpusItem mutation', () => {
+  describe('updateApprovedCorpusItem mutation', () => {
     let item: ApprovedItem;
     let input: UpdateApprovedItemInput;
 
@@ -417,16 +413,16 @@ describe('mutations: ApprovedItem', () => {
       });
 
       // External ID should be unchanged
-      expect(data?.updateApprovedCuratedCorpusItem.externalId).to.equal(
+      expect(data?.updateApprovedCorpusItem.externalId).to.equal(
         item.externalId
       );
 
       // Updated properties should be... updated
-      expect(data?.updateApprovedCuratedCorpusItem).to.deep.include(input);
+      expect(data?.updateApprovedCorpusItem).to.deep.include(input);
 
       // The `updatedBy` field should now be the SSO username of the user
       // who updated this record
-      expect(data?.updateApprovedCuratedCorpusItem.updatedBy).to.equal(
+      expect(data?.updateApprovedCorpusItem.updatedBy).to.equal(
         headers.username
       );
 
@@ -440,7 +436,7 @@ describe('mutations: ApprovedItem', () => {
       // 3- Event has the right entity passed to it.
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(data?.updateApprovedCuratedCorpusItem.externalId);
+      ).to.equal(data?.updateApprovedCorpusItem.externalId);
     });
 
     it('should succeed if user has access to one of scheduled surfaces', async () => {
@@ -464,16 +460,16 @@ describe('mutations: ApprovedItem', () => {
       });
 
       // External ID should be unchanged
-      expect(data?.updateApprovedCuratedCorpusItem.externalId).to.equal(
+      expect(data?.updateApprovedCorpusItem.externalId).to.equal(
         item.externalId
       );
 
       // Updated properties should be... updated
-      expect(data?.updateApprovedCuratedCorpusItem).to.deep.include(input);
+      expect(data?.updateApprovedCorpusItem).to.deep.include(input);
 
       // The `updatedBy` field should now be the SSO username of the user
       // who updated this record
-      expect(data?.updateApprovedCuratedCorpusItem.updatedBy).to.equal(
+      expect(data?.updateApprovedCorpusItem.updatedBy).to.equal(
         headers.username
       );
 
@@ -487,7 +483,7 @@ describe('mutations: ApprovedItem', () => {
       // 3- Event has the right entity passed to it.
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(data?.updateApprovedCuratedCorpusItem.externalId);
+      ).to.equal(data?.updateApprovedCorpusItem.externalId);
 
       await server.stop();
     });
@@ -586,7 +582,7 @@ describe('mutations: ApprovedItem', () => {
     });
   });
 
-  describe('rejectApprovedCuratedCorpusItem mutation', () => {
+  describe('rejectApprovedCorpusItem mutation', () => {
     it('moves a corpus item from the approved corpus to the rejection pile', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
@@ -614,33 +610,33 @@ describe('mutations: ApprovedItem', () => {
 
       // On success, mutation should return the deleted approved item.
       // Let's verify the id.
-      expect(result.data?.rejectApprovedCuratedCorpusItem.externalId).to.equal(
+      expect(result.data?.rejectApprovedCorpusItem.externalId).to.equal(
         item.externalId
       );
 
       // The `updatedBy` field should now be the SSO username of the user
       // who updated this record
-      expect(result.data?.rejectApprovedCuratedCorpusItem.updatedBy).to.equal(
+      expect(result.data?.rejectApprovedCorpusItem.updatedBy).to.equal(
         headers.username
       );
 
       // There should be a rejected item created. Since we always truncate
       // the database before every test, it is safe to assume that the
-      // `getRejectedCuratedCorpusItems` query will contain the one item
+      // `getRejectedCorpusItems` query will contain the one item
       // that was created by this mutation.
       const { data: queryData } = await server.executeOperation({
         query: GET_REJECTED_ITEMS,
       });
       // There should be one rejected item in there...
-      expect(queryData?.getRejectedCuratedCorpusItems.totalCount).to.equal(1);
+      expect(queryData?.getRejectedCorpusItems.totalCount).to.equal(1);
       // ...and its URL should match that of the deleted Approved Item.
-      expect(
-        queryData?.getRejectedCuratedCorpusItems.edges[0].node.url
-      ).to.equal(item.url);
+      expect(queryData?.getRejectedCorpusItems.edges[0].node.url).to.equal(
+        item.url
+      );
       // The `createdBy` field should now be the SSO username of the user
       // who updated this record
       expect(
-        queryData?.getRejectedCuratedCorpusItems.edges[0].node.createdBy
+        queryData?.getRejectedCorpusItems.edges[0].node.createdBy
       ).to.equal(headers.username);
 
       // Check that the REMOVE_ITEM and REJECT_ITEM events were fired successfully.
@@ -652,7 +648,7 @@ describe('mutations: ApprovedItem', () => {
       );
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(result.data?.rejectApprovedCuratedCorpusItem.externalId);
+      ).to.equal(result.data?.rejectApprovedCorpusItem.externalId);
 
       // The REJECT_ITEM event sends through the newly created Rejected Item.
       expect(await eventTracker.getCall(1).args[0].eventType).to.equal(
@@ -660,7 +656,7 @@ describe('mutations: ApprovedItem', () => {
       );
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.url
-      ).to.equal(queryData?.getRejectedCuratedCorpusItems.edges[0].node.url);
+      ).to.equal(queryData?.getRejectedCorpusItems.edges[0].node.url);
     });
 
     it('should fail if externalId of approved item is not valid', async () => {
@@ -829,7 +825,7 @@ describe('mutations: ApprovedItem', () => {
     });
   });
 
-  describe('uploadApprovedCuratedCorpusItemImage mutation', () => {
+  describe('uploadApprovedCorpusItemImage mutation', () => {
     const testFilePath = __dirname + '/test-image.jpeg';
 
     beforeEach(() => {
@@ -863,20 +859,18 @@ describe('mutations: ApprovedItem', () => {
       );
 
       expect(errors).to.be.undefined;
-      expect(data).to.have.keys('uploadApprovedCuratedCorpusItemImage');
-      expect(data?.uploadApprovedCuratedCorpusItemImage.url).to.match(
-        urlPattern
-      );
+      expect(data).to.have.keys('uploadApprovedCorpusItemImage');
+      expect(data?.uploadApprovedCorpusItemImage.url).to.match(urlPattern);
     });
   });
 
-  describe('importApprovedCuratedCorpusItem mutation', () => {
-    const input: ImportApprovedCuratedCorpusItemInput = {
+  describe('importApprovedCorpusItem mutation', () => {
+    const input: ImportApprovedCorpusItemInput = {
       url: 'https://test.com/docker',
       title: 'Find Out How I Cured My Docker In 2 Days',
       excerpt: 'A short summary of what this story is about',
       status: CuratedStatus.RECOMMENDATION,
-      imageUrl: 'https://test.com/image.png',
+      imageUrl: 'https://pocket-image-cache.com/image.png',
       language: 'EN',
       publisher: 'Convective Cloud',
       topic: Topics.TECHNOLOGY,
@@ -961,10 +955,8 @@ describe('mutations: ApprovedItem', () => {
         variables: { data: input },
       });
 
-      const approvedItem =
-        result.data?.importApprovedCuratedCorpusItem.approvedItem;
-      const scheduledItem =
-        result.data?.importApprovedCuratedCorpusItem.scheduledItem;
+      const approvedItem = result.data?.importApprovedCorpusItem.approvedItem;
+      const scheduledItem = result.data?.importApprovedCorpusItem.scheduledItem;
 
       // Check approvedItem
       const urlPrefix = config.aws.s3.localEndpoint;
@@ -1017,10 +1009,10 @@ describe('mutations: ApprovedItem', () => {
         variables: { data: input },
       });
 
-      const approvedItem =
-        result.data?.importApprovedCuratedCorpusItem.approvedItem;
-      const scheduledItem =
-        result.data?.importApprovedCuratedCorpusItem.scheduledItem;
+      const approvedItem = result.data?.importApprovedCorpusItem.approvedItem;
+      result.data?.importApprovedCorpusItem.approvedItem;
+      const scheduledItem = result.data?.importApprovedCorpusItem.scheduledItem;
+      result.data?.importApprovedCorpusItem.scheduledItem;
 
       // Check approvedItem
       expect(approvedItem.url).to.equal(input.url);
@@ -1053,10 +1045,10 @@ describe('mutations: ApprovedItem', () => {
         variables: { data: input },
       });
 
-      const approvedItem =
-        result.data?.importApprovedCuratedCorpusItem.approvedItem;
-      const scheduledItem =
-        result.data?.importApprovedCuratedCorpusItem.scheduledItem;
+      const approvedItem = result.data?.importApprovedCorpusItem.approvedItem;
+      result.data?.importApprovedCorpusItem.approvedItem;
+      const scheduledItem = result.data?.importApprovedCorpusItem.scheduledItem;
+      result.data?.importApprovedCorpusItem.scheduledItem;
 
       // Check approvedItem
       expect(approvedItem.url).to.equal(input.url);
@@ -1097,7 +1089,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
     await clearDb(db);
   });
 
-  describe('createApprovedCuratedCorpusItem mutation', () => {
+  describe('createApprovedCorpusItem mutation', () => {
     it('should succeed if user has access to one of scheduled surfaces', async () => {
       // set up event tracking
       const eventTracker = sinon.fake();
@@ -1123,9 +1115,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
 
       // Expect to see all the input data we supplied in the Approved Item
       // returned by the mutation
-      expect(result.data?.createApprovedCuratedCorpusItem).to.deep.include(
-        input
-      );
+      expect(result.data?.createApprovedCorpusItem).to.deep.include(input);
 
       // Check that the ADD_ITEM event was fired successfully:
       // 1 - Event was fired once!
@@ -1137,7 +1127,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       // 3- Event has the right entity passed to it.
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(result.data?.createApprovedCuratedCorpusItem.externalId);
+      ).to.equal(result.data?.createApprovedCorpusItem.externalId);
 
       await server.stop();
     });
@@ -1243,7 +1233,7 @@ describe('mutations: ApprovedItem - authentication checks', () => {
 
       // On success, mutation should return the deleted approved item.
       // Let's verify the id.
-      expect(result.data?.rejectApprovedCuratedCorpusItem.externalId).to.equal(
+      expect(result.data?.rejectApprovedCorpusItem.externalId).to.equal(
         item.externalId
       );
 
