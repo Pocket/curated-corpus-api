@@ -102,7 +102,7 @@ export class ScheduledItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       context.data = {
         ...context.data,
         scheduled_surface_name: scheduledSurface.name,
-        scheduled_surface_utc_offset: scheduledSurface.utcOffset.toString(),
+        scheduled_surface_iana_timezone: scheduledSurface.ianaTimezone,
       };
     }
 

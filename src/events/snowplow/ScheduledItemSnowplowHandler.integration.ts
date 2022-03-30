@@ -84,9 +84,9 @@ function assertValidSnowplowScheduledItemEvents(data) {
         scheduled_surface_name: getScheduledSurfaceByGuid(
           scheduledCorpusItem.scheduledSurfaceGuid
         )?.name,
-        scheduled_surface_utc_offset: getScheduledSurfaceByGuid(
+        scheduled_surface_iana_timezone: getScheduledSurfaceByGuid(
           scheduledCorpusItem.scheduledSurfaceGuid
-        )?.utcOffset.toString(),
+        )?.ianaTimezone,
         created_at: getUnixTimestamp(scheduledCorpusItem.createdAt),
         created_by: scheduledCorpusItem.createdBy,
         updated_at: getUnixTimestamp(scheduledCorpusItem.updatedAt),

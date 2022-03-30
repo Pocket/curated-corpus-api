@@ -13,7 +13,7 @@ export enum ProspectType {
 export type ScheduledSurface = {
   name: string;
   guid: string;
-  utcOffset: number;
+  ianaTimezone: string;
   prospectTypes: ProspectType[];
 };
 
@@ -21,7 +21,7 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
   {
     name: 'New Tab (en-US)',
     guid: 'NEW_TAB_EN_US',
-    utcOffset: -500,
+    ianaTimezone: 'America/New_York',
     prospectTypes: [
       ProspectType.GLOBAL,
       ProspectType.ORGANIC_TIMESPENT,
@@ -33,7 +33,7 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
   {
     name: 'New Tab (de-DE)',
     guid: 'NEW_TAB_DE_DE',
-    utcOffset: 100,
+    ianaTimezone: 'Europe/Berlin',
     prospectTypes: [
       ProspectType.GLOBAL,
       ProspectType.ORGANIC_TIMESPENT,
@@ -43,25 +43,25 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
   {
     name: 'New Tab (en-GB)',
     guid: 'NEW_TAB_EN_GB',
-    utcOffset: 0,
+    ianaTimezone: 'Europe/London',
     prospectTypes: [ProspectType.GLOBAL, ProspectType.ORGANIC_TIMESPENT],
   },
   {
     name: 'New Tab (en-INTL)',
     guid: 'NEW_TAB_EN_INTL',
-    utcOffset: 530,
+    ianaTimezone: 'Asia/Kolkata',
     prospectTypes: [ProspectType.GLOBAL, ProspectType.ORGANIC_TIMESPENT],
   },
   {
     name: 'Pocket Hits (en-US)',
     guid: 'POCKET_HITS_EN_US',
-    utcOffset: -500,
+    ianaTimezone: 'America/New_York',
     prospectTypes: [ProspectType.TOP_SAVED],
   },
   {
     name: 'Pocket Hits (de-DE)',
     guid: 'POCKET_HITS_DE_DE',
-    utcOffset: 100,
+    ianaTimezone: 'Europe/Berlin',
     prospectTypes: [ProspectType.TOP_SAVED],
   },
 ];
