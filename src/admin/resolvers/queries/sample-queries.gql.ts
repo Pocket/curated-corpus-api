@@ -86,7 +86,7 @@ export const GET_SCHEDULED_SURFACES_FOR_USER = gql`
     getScheduledSurfacesForUser {
       guid
       name
-      utcOffset
+      ianaTimezone
       prospectTypes
     }
   }
