@@ -10,6 +10,8 @@ import {
   ScheduledCorpusItemEventType,
   ScheduledCorpusItemPayload,
   ScheduledItemEventBusPayload,
+  ApprovedItemEventBusPayload,
+  ReviewedCorpusItemEventType,
 } from '../types';
 import config from '../../config';
 import { setTimeout } from 'timers/promises';
@@ -47,7 +49,7 @@ const scheduledCorpusItem: ScheduledItem = {
     isTimeSensitive: false,
     createdAt: new Date(1648225373000),
     createdBy: 'Amy',
-    updatedAt: new Date(164822537300),
+    updatedAt: new Date(1648225373000),
     updatedBy: 'Amy',
   },
 };
@@ -81,6 +83,51 @@ describe('EventBusHandler', () => {
     testEmitter.emit('REMOVE_SCHEDULE');
     expect(fake.callCount).toBe(2);
   });
+  describe('approved item events', () => {
+    it('update-approved-item should send event with proper data', async () => {
+      const expectedEvent: ApprovedItemEventBusPayload = {
+        approvedItemId: '123-abc',
+        url: 'https://test.com/a-story',
+        title: 'Everything you need to know about React',
+        excerpt: 'Something here',
+        publisher: 'Octopus Publishing House',
+        imageUrl: 'https://test.com/image.png',
+        language: 'EN',
+        topic: 'EDUCATION',
+        isSyndicated: false,
+        createdAt: new Date(1648225373000).toUTCString(),
+        createdBy: 'Amy',
+        updatedAt: new Date(1648225373000).toUTCString(),
+        eventType: config.eventBridge.updateApprovedItemEventType,
+      };
+      emitter.emit(ReviewedCorpusItemEventType.UPDATE_ITEM, {
+        reviewedCorpusItem: scheduledCorpusItem.approvedItem,
+        eventType: ReviewedCorpusItemEventType.UPDATE_ITEM,
+      });
+      // Wait just a tad in case promise needs time to resolve
+      await setTimeout(100);
+      expect(sentryStub.callCount).toBe(0);
+      expect(consoleSpy.callCount).toBe(0);
+      // Listener was registered on event
+      expect(
+        emitter.listeners(ReviewedCorpusItemEventType.UPDATE_ITEM).length
+      ).toBe(1);
+      // Event was sent to Event Bus
+      expect(clientStub.callCount).toBe(1);
+      // Check that the payload is correct; since it's JSON, we need to decode the data
+      // otherwise it also does ordering check
+      const sendCommand = clientStub.getCall(0).args[0].input as any;
+      expect(sendCommand).toHaveProperty('Entries');
+      expect(sendCommand.Entries[0]).toMatchObject({
+        Source: config.eventBridge.source,
+        EventBusName: config.aws.eventBus.name,
+        DetailType: config.eventBridge.updateApprovedItemEventType,
+      });
+      expect(JSON.parse(sendCommand.Entries[0]['Detail'])).toEqual(
+        expectedEvent
+      );
+    });
+  });
   describe('scheduled item events', () => {
     const partialExpectedEvent: Omit<
       ScheduledItemEventBusPayload,
@@ -110,6 +157,10 @@ describe('EventBusHandler', () => {
       [
         config.eventBridge.removeScheduledItemEventType,
         ScheduledCorpusItemEventType.REMOVE_SCHEDULE,
+      ],
+      [
+        config.eventBridge.updateScheduledItemEventType,
+        ScheduledCorpusItemEventType.RESCHEDULE,
       ],
     ])(
       '%s: should send event to event bus with proper event data',
