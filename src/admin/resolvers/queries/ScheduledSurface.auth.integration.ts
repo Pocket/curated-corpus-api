@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { getServerWithMockedHeaders } from '../../../test/helpers';
 import { GET_SCHEDULED_SURFACES_FOR_USER } from './sample-queries.gql';
-import { MozillaAccessGroup, ScheduledSurfaces } from '../../../shared/types';
+import { MozillaAccessGroup } from '../../../shared/types';
 
 describe('auth: ScheduledSurface', () => {
   describe('getScheduledSurfacesForUser query', () => {

@@ -147,6 +147,7 @@ export enum ScheduledSurfaceGuidToMozillaAccessGroup {
   NEW_TAB_DE_DE = MozillaAccessGroup.NEW_TAB_CURATOR_DEDE,
   POCKET_HITS_EN_US = MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS,
   POCKET_HITS_DE_DE = MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE,
+  SANDBOX = MozillaAccessGroup.CURATOR_SANDBOX,
 }
 
 export const AccessGroupToScheduledSurfaceMap: {
