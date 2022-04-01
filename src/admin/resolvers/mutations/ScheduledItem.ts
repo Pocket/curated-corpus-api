@@ -4,10 +4,8 @@ import {
   rescheduleScheduledItem as dbRescheduleScheduledItem,
 } from '../../../database/mutations';
 import { ScheduledItem } from '../../../database/types';
-import {
-  ACCESS_DENIED_ERROR,
-  scheduledSurfaceAllowedValues,
-} from '../../../shared/types';
+import { ACCESS_DENIED_ERROR } from '../../../shared/types';
+import { scheduledSurfaceAllowedValues } from '../../../shared/utils';
 import { ScheduledCorpusItemEventType } from '../../../events/types';
 import { UserInputError } from 'apollo-server';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';

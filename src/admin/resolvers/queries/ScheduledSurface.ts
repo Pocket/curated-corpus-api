@@ -1,9 +1,12 @@
 import {
-  AccessGroupToScheduledSurfaceMap,
   MozillaAccessGroup,
   ScheduledSurface,
   ScheduledSurfaces,
 } from '../../../shared/types';
+import {
+  getScheduledSurfaceByAccessGroup,
+  scheduledSurfaceAccessGroups,
+} from '../../../shared/utils';
 
 /**
  * This query retrieves Scheduled Surfaces available to the given SSO user
@@ -37,8 +40,11 @@ export function getScheduledSurfacesForUser(
   // Iterate through groups that give permission to one surface only
   // and add these to the return value
   authenticatedUser.groups.forEach((group: MozillaAccessGroup) => {
-    if (group in AccessGroupToScheduledSurfaceMap) {
-      scheduledSurfaces.push(AccessGroupToScheduledSurfaceMap[group]!);
+    if (scheduledSurfaceAccessGroups.includes(group)) {
+      const surface = getScheduledSurfaceByAccessGroup(group);
+      if (surface) {
+        scheduledSurfaces.push(surface);
+      }
     }
   });
 
