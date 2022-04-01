@@ -64,6 +64,12 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
     ianaTimezone: 'Europe/Berlin',
     prospectTypes: [ProspectType.TOP_SAVED],
   },
+  {
+    name: 'Sandbox',
+    guid: 'SANDBOX',
+    ianaTimezone: 'America/New_York',
+    prospectTypes: [],
+  },
 ];
 
 export enum Topics {
@@ -130,6 +136,7 @@ export enum MozillaAccessGroup {
   NEW_TAB_CURATOR_ENINTL = 'mozilliansorg_pocket_new_tab_curator_enintl', // Access to en-intl new tab in corpus tool.
   POCKET_HITS_CURATOR_ENUS = 'mozilliansorg_pocket_pocket_hits_curator_enus', // Access to en us Pocket Hits in the corpus tool.
   POCKET_HITS_CURATOR_DEDE = 'mozilliansorg_pocket_pocket_hits_curator_dede', // Access to de de Pocket Hits in the corpus tool.
+  CURATOR_SANDBOX = 'mozilliansorg_pocket_curator_sandbox', // Access to sandbox test surface in the corpus tool.
 }
 
 // enum that maps the scheduled surface guid to a Mozilla access group
@@ -140,6 +147,7 @@ export enum ScheduledSurfaceGuidToMozillaAccessGroup {
   NEW_TAB_DE_DE = MozillaAccessGroup.NEW_TAB_CURATOR_DEDE,
   POCKET_HITS_EN_US = MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS,
   POCKET_HITS_DE_DE = MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE,
+  SANDBOX = MozillaAccessGroup.CURATOR_SANDBOX,
 }
 
 export const AccessGroupToScheduledSurfaceMap: {
@@ -153,16 +161,11 @@ export const AccessGroupToScheduledSurfaceMap: {
     getScheduledSurfaceByGuid('NEW_TAB_EN_GB'),
   [MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL]:
     getScheduledSurfaceByGuid('NEW_TAB_EN_INTL'),
-  [MozillaAccessGroup.NEW_TAB_CURATOR_ENGB]:
-    getScheduledSurfaceByGuid('NEW_TAB_EN_GB'),
-  [MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL]:
-    getScheduledSurfaceByGuid('NEW_TAB_EN_INTL'),
-  [MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE]: getScheduledSurfaceByGuid(
-    'POCKET_HITS_CURATOR_DEDE'
-  ),
-  [MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS]: getScheduledSurfaceByGuid(
-    'POCKET_HITS_CURATOR_ENUS'
-  ),
+  [MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE]:
+    getScheduledSurfaceByGuid('POCKET_HITS_DE_DE'),
+  [MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS]:
+    getScheduledSurfaceByGuid('POCKET_HITS_EN_US'),
+  [MozillaAccessGroup.CURATOR_SANDBOX]: getScheduledSurfaceByGuid('SANDBOX'),
 };
 
 export const ACCESS_DENIED_ERROR =

@@ -94,6 +94,7 @@ export class ContextManager implements IContext {
       MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL as string,
       MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS as string,
       MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE as string,
+      MozillaAccessGroup.CURATOR_SANDBOX as string,
     ];
 
     const user: AdminAPIUser = {
