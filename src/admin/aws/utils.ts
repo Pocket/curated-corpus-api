@@ -34,7 +34,7 @@ export function getPocketCacheUrl(url: string) {
     return url;
   }
 
-  return `https://pocket-image-cache.com/x/filters:format(jpeg):quality(100):no_upscale():strip_exif()/${encodeURI(
+  return `https://pocket-image-cache.com/x/filters:format(jpeg):quality(100):no_upscale():strip_exif()/${encodeURIComponent(
     url
   )}`;
 }
