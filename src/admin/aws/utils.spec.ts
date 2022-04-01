@@ -61,7 +61,7 @@ describe('Upload Utils', () => {
     expect(
       getPocketCacheUrl('https://sweet-potato.jpg?is_sweet=yes and no')
     ).toEqual(
-      'https://pocket-image-cache.com/x/filters:format(jpeg):quality(100):no_upscale():strip_exif()/https://sweet-potato.jpg?is_sweet=yes%20and%20no'
+      'https://pocket-image-cache.com/x/filters:format(jpeg):quality(100):no_upscale():strip_exif()/https%3A%2F%2Fsweet-potato.jpg%3Fis_sweet%3Dyes%20and%20no'
     );
   });
 
