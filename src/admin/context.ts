@@ -15,10 +15,11 @@ import {
   ScheduledCorpusItemPayload,
 } from '../events/types';
 import s3 from './aws/s3';
+import { MozillaAccessGroup } from '../shared/types';
 import {
-  MozillaAccessGroup,
-  ScheduledSurfaceGuidToMozillaAccessGroup,
-} from '../shared/types';
+  getScheduledSurfaceByGuid,
+  scheduledSurfaceAccessGroups,
+} from '../shared/utils';
 
 // Custom properties we get from Admin API for the authenticated user
 export interface AdminAPIUser {
@@ -86,17 +87,6 @@ export class ContextManager implements IContext {
     );
     const hasReadOnly = accessGroups.includes(MozillaAccessGroup.READONLY);
 
-    // array to hold groups as strings because typescript is not happy with enums
-    const scheduledSurfaceAccessGroups = [
-      MozillaAccessGroup.NEW_TAB_CURATOR_ENUS as string,
-      MozillaAccessGroup.NEW_TAB_CURATOR_ENGB as string,
-      MozillaAccessGroup.NEW_TAB_CURATOR_DEDE as string,
-      MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL as string,
-      MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS as string,
-      MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE as string,
-      MozillaAccessGroup.CURATOR_SANDBOX as string,
-    ];
-
     const user: AdminAPIUser = {
       name: this.config.request.headers.name as string,
       username: this.config.request.headers.username as string,
@@ -134,7 +124,8 @@ export class ContextManager implements IContext {
         // and modify entities tied to that scheduled surface, such as prospects
         // or scheduled corpus items.
         const authGroupForScheduledSurface =
-          ScheduledSurfaceGuidToMozillaAccessGroup[scheduledSurfaceGuid];
+          getScheduledSurfaceByGuid(scheduledSurfaceGuid)?.accessGroup ||
+          'NOT FOUND';
 
         return accessGroups.includes(authGroupForScheduledSurface);
       },

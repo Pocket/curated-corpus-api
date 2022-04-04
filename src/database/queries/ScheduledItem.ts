@@ -6,7 +6,7 @@ import {
   ScheduledItemsResult,
   ScheduledSurfaceItem,
 } from '../types';
-import { scheduledSurfaceAllowedValues } from '../../shared/types';
+import { scheduledSurfaceAllowedValues } from '../../shared/utils';
 import { groupBy } from '../../shared/utils';
 
 /**

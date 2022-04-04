@@ -17,11 +17,8 @@ import { ScheduledItemSnowplowHandler } from './ScheduledItemSnowplowHandler';
 import { tracker } from './tracker';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 import { getUnixTimestamp } from '../../shared/utils';
-import {
-  CorpusItemSource,
-  getScheduledSurfaceByGuid,
-  Topics,
-} from '../../shared/types';
+import { CorpusItemSource, Topics } from '../../shared/types';
+import { getScheduledSurfaceByGuid } from '../../shared/utils';
 import { ScheduledItem } from '../../database/types';
 
 /**

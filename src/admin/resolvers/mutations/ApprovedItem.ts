@@ -22,9 +22,9 @@ import {
   ACCESS_DENIED_ERROR,
   ApprovedItemS3ImageUrl,
   RejectionReason,
-  scheduledSurfaceAllowedValues,
   Topics,
 } from '../../../shared/types';
+import { scheduledSurfaceAllowedValues } from '../../../shared/utils';
 import {
   CreateRejectedItemInput,
   ImportApprovedItemInput,

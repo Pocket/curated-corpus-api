@@ -1,3 +1,5 @@
+import { ScheduledSurface, ScheduledSurfaces } from './types';
+
 /**
  * Generate an integer Epoch time from a JavaScript Date object.
  *
@@ -39,3 +41,36 @@ export function toUtcDateString(date: Date) {
   const padDayString = date.getUTCDate().toString().padStart(2, '0');
   return `${date.getUTCFullYear()}-${padMonthString}-${padDayString}`;
 }
+
+// Pocket shared data utility constructs/functions
+
+// array for easy access to scheduled surface guids
+export const scheduledSurfaceAllowedValues = ScheduledSurfaces.map(
+  (surface) => {
+    return surface.guid;
+  }
+);
+
+// array for easy access to scheduled surface access groups
+export const scheduledSurfaceAccessGroups = ScheduledSurfaces.map(
+  (surface: ScheduledSurface) => {
+    return surface.accessGroup;
+  }
+);
+
+export const getScheduledSurfaceByAccessGroup = (
+  group: string
+): ScheduledSurface | undefined => {
+  return ScheduledSurfaces.find(
+    (surface: ScheduledSurface) => surface.accessGroup === group
+  );
+};
+
+export const getScheduledSurfaceByGuid = (
+  guid: string
+): ScheduledSurface | undefined => {
+  return ScheduledSurfaces.find(
+    (surface: ScheduledSurface) => surface.guid === guid
+  );
+};
+// End Pocket shared data utility constructs/functions
