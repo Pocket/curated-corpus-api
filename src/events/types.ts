@@ -74,7 +74,7 @@ export type ApprovedItemEventBusPayload = BaseEventBusPayload &
       | 'createdBy'
     >
   > & {
-    approvedItemId: string; // externalId of ApprovedItem
+    approvedItemExternalId: string; // externalId of ApprovedItem
     createdAt?: string; // UTC timestamp string
     updatedAt: string; // UTC timestamp string;
   };

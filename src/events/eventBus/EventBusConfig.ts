@@ -83,7 +83,7 @@ const payloadBuilders = {
     const item = data.reviewedCorpusItem;
     return {
       eventType: eventType,
-      approvedItemId: item.externalId,
+      approvedItemExternalId: item.externalId,
       url: item.url,
       title: item.title ?? undefined,
       excerpt: 'excerpt' in item ? item.excerpt : undefined,
