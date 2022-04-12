@@ -52,8 +52,8 @@ export type ScheduledItemEventBusPayload = BaseEventBusPayload &
     ApprovedItem,
     'topic' | 'isSyndicated' | keyof Omit<CorpusItem, 'id'>
   > & {
-    scheduledItemId: string; // externalId of ScheduledItem
-    approvedItemId: string; // externalId of ApprovedItem
+    scheduledItemExternalId: string; // externalId of ScheduledItem
+    approvedItemExternalId: string; // externalId of ApprovedItem
     scheduledDate: string; // UTC Date string YYYY-MM-DD
     createdAt: string; // UTC timestamp string
     updatedAt: string; // UTC timestamp string
