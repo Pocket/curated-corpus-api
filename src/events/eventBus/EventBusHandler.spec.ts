@@ -86,7 +86,7 @@ describe('EventBusHandler', () => {
   describe('approved item events', () => {
     it('update-approved-item should send event with proper data', async () => {
       const expectedEvent: ApprovedItemEventBusPayload = {
-        approvedItemId: '123-abc',
+        approvedItemExternalId: '123-abc',
         url: 'https://test.com/a-story',
         title: 'Everything you need to know about React',
         excerpt: 'Something here',
