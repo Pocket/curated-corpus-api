@@ -57,8 +57,8 @@ const payloadBuilders = {
   ): ScheduledItemEventBusPayload {
     return {
       eventType: eventType,
-      scheduledItemId: data.scheduledCorpusItem.externalId,
-      approvedItemId: data.scheduledCorpusItem.approvedItem.externalId,
+      scheduledItemExternalId: data.scheduledCorpusItem.externalId,
+      approvedItemExternalId: data.scheduledCorpusItem.approvedItem.externalId,
       url: data.scheduledCorpusItem.approvedItem.url,
       title: data.scheduledCorpusItem.approvedItem.title,
       excerpt: data.scheduledCorpusItem.approvedItem.excerpt,

@@ -133,8 +133,8 @@ describe('EventBusHandler', () => {
       ScheduledItemEventBusPayload,
       'eventType'
     > = {
-      scheduledItemId: '789-xyz',
-      approvedItemId: '123-abc',
+      scheduledItemExternalId: '789-xyz',
+      approvedItemExternalId: '123-abc',
       url: 'https://test.com/a-story',
       title: 'Everything you need to know about React',
       excerpt: 'Something here',
