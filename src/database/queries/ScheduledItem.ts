@@ -28,7 +28,9 @@ export async function getScheduledItems(
 
   // Get a flat array of scheduled items from Prisma
   const items = await db.scheduledItem.findMany({
-    orderBy: { scheduledDate: 'asc' },
+    // we need to order by scheduleDate first, as we perform a programmatic
+    // groupBy below on that field
+    orderBy: [{ scheduledDate: 'asc' }, { updatedAt: 'asc' }],
     where: {
       scheduledSurfaceGuid: { equals: scheduledSurfaceGuid },
       scheduledDate: {
@@ -86,6 +88,7 @@ export async function getItemsForScheduledSurface(
 ): Promise<ScheduledSurfaceItem[]> {
   // Get a flat array of scheduled items from Prisma
   const items = await db.scheduledItem.findMany({
+    orderBy: { updatedAt: 'asc' },
     where: {
       scheduledSurfaceGuid: { equals: id },
       scheduledDate: date,

@@ -94,6 +94,26 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       expect(item.corpusItem.publisher).not.to.be.null;
     });
 
+    it('should sort the items by updatedAt asc', async () => {
+      const result = await server.executeOperation({
+        query: GET_SCHEDULED_SURFACE_WITH_ITEMS,
+        variables: {
+          id: 'NEW_TAB_EN_US',
+          date: '2025-05-05',
+        },
+      });
+
+      const items = result.data?.scheduledSurface.items;
+
+      const updatedAtDates = items.map((item) => {
+        return item.updatedAt;
+      });
+
+      const sortedUpdatedAtDates = updatedAtDates.sort();
+
+      expect(updatedAtDates).to.deep.equal(sortedUpdatedAtDates);
+    });
+
     it('should return an empty result set if nothing is available', async () => {
       const result = await server.executeOperation({
         query: GET_SCHEDULED_SURFACE_WITH_ITEMS,
