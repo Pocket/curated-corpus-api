@@ -1,4 +1,4 @@
-import { AuthenticationError } from 'apollo-server-core';
+import { AuthenticationError } from 'apollo-server-errors';
 import { getScheduledItems as dbGetScheduledItems } from '../../../database/queries';
 import { ScheduledItemsResult } from '../../../database/types';
 import { ACCESS_DENIED_ERROR } from '../../../shared/types';

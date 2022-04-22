@@ -11,6 +11,7 @@ import { client } from '../database/client';
 import { CuratedCorpusEventEmitter } from '../events/curatedCorpusEventEmitter';
 import { ContextManager } from '../admin/context';
 import s3 from '../admin/aws/s3';
+import { errorHandler } from '@pocket-tools/apollo-utils';
 
 // Export this separately so that it can be used in Apollo integration tests
 export const db = client();
@@ -46,5 +47,6 @@ export const getServer = (
       ApolloServerPluginInlineTraceDisabled(),
       ApolloServerPluginUsageReportingDisabled(),
     ],
+    formatError: errorHandler,
   });
 };

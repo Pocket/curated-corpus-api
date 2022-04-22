@@ -5,7 +5,7 @@ import { typeDefsAdmin } from '../typeDefs';
 import { resolvers as resolversAdmin } from './resolvers';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
 import { GraphQLRequestContext } from 'apollo-server-types';
-import { sentryPlugin } from '@pocket-tools/apollo-utils';
+import { errorHandler, sentryPlugin } from '@pocket-tools/apollo-utils';
 import { ContextManager } from './context';
 import {
   ApolloServerPluginLandingPageDisabled,
@@ -46,6 +46,7 @@ export function getServer(contextFactory: ContextFactory): ApolloServer {
         : ApolloServerPluginLandingPageGraphQLPlayground(),
     ],
     context: ({ req }) => contextFactory(req),
+    formatError: errorHandler,
   });
 }
 
