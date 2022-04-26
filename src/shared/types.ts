@@ -8,6 +8,7 @@ export enum ProspectType {
   DOMAIN_ALLOWLIST = 'DOMAIN_ALLOWLIST',
   COUNTS_LOGISTIC_APPROVAL = 'COUNTS_LOGISTIC_APPROVAL',
   HYBRID_LOGISTIC_APPROVAL = 'HYBRID_LOGISTIC_APPROVAL',
+  APPROVED = 'APPROVED',
 }
 
 export enum MozillaAccessGroup {
@@ -60,28 +61,47 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
     name: 'New Tab (en-GB)',
     guid: 'NEW_TAB_EN_GB',
     ianaTimezone: 'Europe/London',
-    prospectTypes: [ProspectType.GLOBAL, ProspectType.ORGANIC_TIMESPENT],
+    prospectTypes: [
+      ProspectType.GLOBAL,
+      ProspectType.ORGANIC_TIMESPENT,
+      ProspectType.APPROVED,
+    ],
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ENGB,
   },
   {
     name: 'New Tab (en-INTL)',
     guid: 'NEW_TAB_EN_INTL',
     ianaTimezone: 'Asia/Kolkata',
-    prospectTypes: [ProspectType.GLOBAL, ProspectType.ORGANIC_TIMESPENT],
+    prospectTypes: [
+      ProspectType.GLOBAL,
+      ProspectType.ORGANIC_TIMESPENT,
+      ProspectType.APPROVED,
+    ],
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL,
   },
   {
     name: 'Pocket Hits (en-US)',
     guid: 'POCKET_HITS_EN_US',
     ianaTimezone: 'America/New_York',
-    prospectTypes: [ProspectType.TOP_SAVED],
+    prospectTypes: [
+      ProspectType.TOP_SAVED,
+      ProspectType.GLOBAL,
+      ProspectType.ORGANIC_TIMESPENT,
+      ProspectType.COUNTS_LOGISTIC_APPROVAL,
+      ProspectType.HYBRID_LOGISTIC_APPROVAL,
+    ],
     accessGroup: MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS,
   },
   {
     name: 'Pocket Hits (de-DE)',
     guid: 'POCKET_HITS_DE_DE',
     ianaTimezone: 'Europe/Berlin',
-    prospectTypes: [ProspectType.TOP_SAVED],
+    prospectTypes: [
+      ProspectType.TOP_SAVED,
+      ProspectType.GLOBAL,
+      ProspectType.ORGANIC_TIMESPENT,
+      ProspectType.DOMAIN_ALLOWLIST,
+    ],
     accessGroup: MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE,
   },
   {

@@ -76,6 +76,7 @@ enum ProspectType {
     DOMAIN_ALLOWLIST
     COUNTS_LOGISTIC_APPROVAL
     HYBRID_LOGISTIC_APPROVAL
+    APPROVED
 }
 
 """
@@ -855,7 +856,5 @@ type Mutation {
     """
     Uploads an image to S3 for an Approved Item
     """
-    uploadApprovedCorpusItemImage(
-        data: Upload!
-    ): ApprovedCorpusImageUrl!
+    uploadApprovedCorpusItemImage(data: Upload!): ApprovedCorpusImageUrl!
 }
