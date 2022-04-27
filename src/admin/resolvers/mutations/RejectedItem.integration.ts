@@ -334,12 +334,7 @@ describe('mutations: RejectedItem', () => {
       );
     });
 
-    // TODO: figure out how to fix these tests
-
-    // the error thrown *is* a UserInputError - BUT it comes from graphql. the
-    // instanceOf check fails. this must be a different UserInputError based on
-    // the source/because it's from graphql directly.
-    it.skip('should fail if language code is outside of allowed values', async () => {
+    it('should fail if language code is outside of allowed values', async () => {
       input.language = 'ZZ';
 
       const result = await server.executeOperation({
@@ -356,7 +351,7 @@ describe('mutations: RejectedItem', () => {
       );
     });
 
-    it.skip('should fail if language code is correct but not in upper case', async () => {
+    it('should fail if language code is correct but not in upper case', async () => {
       input.language = 'de';
 
       const result = await server.executeOperation({

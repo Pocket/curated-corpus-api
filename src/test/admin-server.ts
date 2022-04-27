@@ -1,3 +1,4 @@
+import { UserInputError } from 'apollo-server';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSubgraphSchema } from '@apollo/federation';
 import {
@@ -47,6 +48,14 @@ export const getServer = (
       ApolloServerPluginInlineTraceDisabled(),
       ApolloServerPluginUsageReportingDisabled(),
     ],
-    formatError: errorHandler,
+    formatError: (error) => {
+      // for an explanation of the below, see the comment in
+      // src/admin/server.ts
+      if (error instanceof UserInputError) {
+        return error;
+      } else {
+        return errorHandler(error);
+      }
+    },
   });
 };
