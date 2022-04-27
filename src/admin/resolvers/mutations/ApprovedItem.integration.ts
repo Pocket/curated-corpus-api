@@ -186,11 +186,12 @@ describe('mutations: ApprovedItem', () => {
       // ...without success. There is no data
       expect(result.errors).not.to.be.null;
 
+      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
+
       // And there is the correct error from the resolvers
       expect(result.errors?.[0].message).to.contain(
         `An approved item with the URL "${input.url}" already exists`
       );
-      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
 
       // Check that the ADD_ITEM event was not fired
       expect(eventTracker.callCount).to.equal(0);

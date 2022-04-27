@@ -4,7 +4,7 @@ import {
   ImportApprovedItemInput,
   UpdateApprovedItemInput,
 } from '../types';
-import { ApolloError, UserInputError } from 'apollo-server';
+import { ApolloError, UserInputError } from 'apollo-server-errors';
 import { checkCorpusUrl } from '../helpers/checkCorpusUrl';
 
 /**

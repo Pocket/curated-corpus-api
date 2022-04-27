@@ -1,6 +1,5 @@
-import { UserInputError } from 'apollo-server';
+import { AuthenticationError, UserInputError } from 'apollo-server-errors';
 import { RejectedCuratedCorpusItem } from '@prisma/client';
-import { AuthenticationError } from 'apollo-server-core';
 import { createRejectedItem as dbCreateRejectedItem } from '../../../database/mutations';
 import { ReviewedCorpusItemEventType } from '../../../events/types';
 import { RejectionReason, ACCESS_DENIED_ERROR } from '../../../shared/types';

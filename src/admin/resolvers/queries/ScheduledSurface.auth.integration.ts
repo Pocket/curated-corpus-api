@@ -38,7 +38,6 @@ describe('auth: ScheduledSurface', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const { data } = await server.executeOperation({
         query: GET_SCHEDULED_SURFACES_FOR_USER,
@@ -54,8 +53,6 @@ describe('auth: ScheduledSurface', () => {
         expect(scheduledSurface.ianaTimezone).not.to.be.undefined;
         expect(scheduledSurface.prospectTypes).not.to.be.undefined;
       });
-
-      await server.stop();
     });
 
     it('should return a single surface for users with access to one scheduled surface', async () => {

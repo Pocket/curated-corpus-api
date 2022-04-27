@@ -60,7 +60,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_APPROVED_ITEMS,
@@ -71,8 +70,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
 
       // should return all 3 items
       expect(result.data?.getApprovedCorpusItems.edges).to.have.length(3);
-
-      await server.stop();
     });
 
     it('should get all items when user has only one scheduled surface access', async () => {
@@ -84,7 +81,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_APPROVED_ITEMS,
@@ -95,8 +91,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
 
       // should return all 3 items
       expect(result.data?.getApprovedCorpusItems.edges).to.have.length(3);
-
-      await server.stop();
     });
 
     it('should throw an error when user does not have the required access', async () => {
@@ -133,7 +127,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_APPROVED_ITEMS,
@@ -145,8 +138,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
       // check if the error we get is access denied error
       expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
       expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
-
-      await server.stop();
     });
   });
 
@@ -160,7 +151,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_APPROVED_ITEM_BY_URL,
@@ -171,8 +161,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
 
       expect(result.data).not.to.be.null;
       expect(result.errors).to.be.undefined;
-
-      await server.stop();
     });
 
     it('should get item when user has only one scheduled surface access', async () => {
@@ -184,7 +172,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_APPROVED_ITEM_BY_URL,
@@ -195,8 +182,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
 
       expect(result.data).not.to.be.null;
       expect(result.errors).to.be.undefined;
-
-      await server.stop();
     });
 
     it('should throw an error when user does not have the required access', async () => {
@@ -208,7 +193,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_APPROVED_ITEM_BY_URL,
@@ -223,8 +207,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
       // check if the error we get is access denied error
       expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
       expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
-
-      await server.stop();
     });
 
     it('should throw an error when request header groups are undefined', async () => {
@@ -236,7 +218,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_APPROVED_ITEM_BY_URL,
@@ -251,8 +232,6 @@ describe('queries: ApprovedCorpusItem - authentication', () => {
       // check if the error we get is access denied error
       expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
       expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
-
-      await server.stop();
     });
   });
 });

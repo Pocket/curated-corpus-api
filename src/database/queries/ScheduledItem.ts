@@ -8,6 +8,7 @@ import {
 } from '../types';
 import { scheduledSurfaceAllowedValues } from '../../shared/utils';
 import { groupBy } from '../../shared/utils';
+import { UserInputError } from 'apollo-server-errors';
 
 /**
  * @param db
@@ -21,7 +22,7 @@ export async function getScheduledItems(
 
   // validate scheduledSurfaceGuid
   if (!scheduledSurfaceAllowedValues.includes(scheduledSurfaceGuid)) {
-    throw new Error(
+    throw new UserInputError(
       `${scheduledSurfaceGuid} is not a valid Scheduled Surface GUID`
     );
   }

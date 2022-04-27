@@ -1,4 +1,4 @@
-import { UserInputError } from 'apollo-server';
+import { UserInputError } from 'apollo-server-errors';
 import { PrismaClient } from '@prisma/client';
 
 /**

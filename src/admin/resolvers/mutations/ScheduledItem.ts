@@ -7,7 +7,7 @@ import { ScheduledItem } from '../../../database/types';
 import { ACCESS_DENIED_ERROR } from '../../../shared/types';
 import { scheduledSurfaceAllowedValues } from '../../../shared/utils';
 import { ScheduledCorpusItemEventType } from '../../../events/types';
-import { UserInputError } from 'apollo-server';
+import { UserInputError } from 'apollo-server-errors';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { AuthenticationError } from 'apollo-server-errors';
 import { NotFoundError } from '@pocket-tools/apollo-utils';
@@ -117,7 +117,7 @@ export async function createScheduledItem(
     }
 
     // If it's something else, throw the error unchanged.
-    throw new Error(error);
+    throw error;
   }
 }
 

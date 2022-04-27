@@ -1,6 +1,6 @@
 import { Connection } from '@devoxa/prisma-relay-cursor-connection';
 import { ApprovedItem } from '@prisma/client';
-import { AuthenticationError } from 'apollo-server-core';
+import { AuthenticationError } from 'apollo-server-errors';
 import config from '../../../config';
 import {
   getApprovedItems as dbGetApprovedItems,

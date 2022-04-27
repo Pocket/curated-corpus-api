@@ -1,3 +1,4 @@
+import { UserInputError } from 'apollo-server';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSubgraphSchema } from '@apollo/federation';
 import {
@@ -11,6 +12,7 @@ import { client } from '../database/client';
 import { CuratedCorpusEventEmitter } from '../events/curatedCorpusEventEmitter';
 import { ContextManager } from '../admin/context';
 import s3 from '../admin/aws/s3';
+import { errorHandler } from '@pocket-tools/apollo-utils';
 
 // Export this separately so that it can be used in Apollo integration tests
 export const db = client();
@@ -46,5 +48,14 @@ export const getServer = (
       ApolloServerPluginInlineTraceDisabled(),
       ApolloServerPluginUsageReportingDisabled(),
     ],
+    formatError: (error) => {
+      // for an explanation of the below, see the comment in
+      // src/admin/server.ts
+      if (error instanceof UserInputError) {
+        return error;
+      } else {
+        return errorHandler(error);
+      }
+    },
   });
 };

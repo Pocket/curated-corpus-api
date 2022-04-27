@@ -1,4 +1,4 @@
-import { UserInputError } from 'apollo-server';
+import { UserInputError } from 'apollo-server-errors';
 import { ApprovedItem } from '@prisma/client';
 import {
   createApprovedItem as dbCreateApprovedItem,
