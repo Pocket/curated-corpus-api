@@ -30,10 +30,10 @@ export function getServer(contextFactory: ContextFactory): ApolloServer {
       { typeDefs: typeDefsAdmin, resolvers: resolversAdmin },
     ]),
     plugins: [
-      //Copied from Apollo docs, the sessionID signifies if we should separate out caches by user.
+      // Copied from Apollo docs, the sessionID signifies if we should separate out caches by user.
       responseCachePlugin({
-        //https://www.apollographql.com/docs/apollo-server/performance/caching/#saving-full-responses-to-a-cache
-        //The user id is added to the request header by the apollo gateway (client api)
+        // https://www.apollographql.com/docs/apollo-server/performance/caching/#saving-full-responses-to-a-cache
+        // The user id is added to the request header by the apollo gateway (client api)
         sessionId: (requestContext: GraphQLRequestContext) =>
           requestContext?.request?.http?.headers?.has('userId')
             ? requestContext?.request?.http?.headers?.get('userId')
@@ -100,7 +100,7 @@ export function getServer(contextFactory: ContextFactory): ApolloServer {
       // kelvin then showed me the below wrapper spell, which accounts for the mistakes
       // of the gods, until they should find time to fix them.
       //
-      // the best lives on to this day, contained, yet still dangerous to those
+      // the beast lives on to this day, contained, yet still dangerous to those
       // unfortunate enough to cross its path.
       //
       // be wary, traveler, and double-check your imports.
@@ -118,9 +118,13 @@ export function getServer(contextFactory: ContextFactory): ApolloServer {
       // `UserInputError`, which is what we expect, but they are importing this error
       // from `apollo-server`, which causes our `instanceOf` check to fail.
       //
+
+      // check to see if the error came from a graphql schema violation (see above)
       if (error instanceof UserInputError) {
+        // if so, we are safe to pass it through to clients
         return error;
       } else {
+        // otherwise, send the error to our error handler
         return errorHandler(error);
       }
     },
