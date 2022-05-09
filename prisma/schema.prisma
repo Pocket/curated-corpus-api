@@ -20,6 +20,16 @@ enum CuratedItemSource {
   BACKFILL
 }
 
+model ApprovedItemAuthor {
+  externalId      String          @id @default(uuid()) @db.VarChar(255)
+  name            String          @db.VarChar(255)
+  approvedItemId  Int
+  sortOrder       Int             @default(0)
+  approvedItem    ApprovedItem @relation(fields: [approvedItemId], references: [id], onDelete: Cascade)
+
+  @@index([approvedItemId])
+}
+
 // A prospect that is deemed good enough for saving in the corpus
 // and (optionally) making it to a Scheduled Surface.
 model ApprovedItem {
@@ -30,6 +40,7 @@ model ApprovedItem {
   url             String             @db.VarChar(500)
   title           String             @db.VarChar(255)
   excerpt         String             @db.Text
+  authors         ApprovedItemAuthor[]
   status          CuratedStatus      @default(CORPUS)
   language        String             @db.VarChar(2)
   publisher       String             @db.VarChar(255)

@@ -82,6 +82,13 @@ export type ReviewedCorpusItem = {
    * The excerpt for the reviewed corpus item.
    */
   excerpt?: string;
+
+  /**
+   * The list of authors for the reviewed corpus item.
+   */
+  // TODO: follow up in slack thread on if we need sort order sent to snowplow
+  // https://pocket.slack.com/archives/CTLKW5WCF/p1652133701280769?thread_ts=1651704195.064879&cid=CTLKW5WCF
+  authors?: string[];
   /**
    * The url of the main image of the reviewed corpus item.
    */

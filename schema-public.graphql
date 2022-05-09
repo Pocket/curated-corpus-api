@@ -56,6 +56,10 @@ type CorpusItem @key(fields: "id") {
     The image URL for this item's accompanying picture.
     """
     imageUrl: Url!
+    """
+    The author names and sort orders associated with this CorpusItem.
+    """
+    authors: [CorpusItemAuthor!]
 }
 
 """
