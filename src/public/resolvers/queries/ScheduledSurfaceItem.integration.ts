@@ -46,6 +46,19 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
           scheduledDate: new Date('2025-05-05').toISOString(),
         });
       }
+
+      // Create another batch of approved items for a different scheduled surface GUID
+      // but the same date as the first batch
+      for (let i = 0; i < 7; i++) {
+        const approvedItem = await createApprovedItemHelper(db, {
+          title: `Batch 3, Story #${i + 1}`,
+        });
+        await createScheduledItemHelper(db, {
+          scheduledSurfaceGuid: 'POCKET_HITS_EN_US',
+          approvedItem,
+          scheduledDate: new Date('2050-01-01').toISOString(),
+        });
+      }
     });
 
     it('should return all requested items', async () => {
@@ -62,6 +75,22 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       expect(result.data).not.to.be.null;
 
       expect(result.data?.scheduledSurface.items).to.have.lengthOf(5);
+    });
+
+    it('should return items for requested scheduled surface only', async () => {
+      const result = await server.executeOperation({
+        query: GET_SCHEDULED_SURFACE_WITH_ITEMS,
+        variables: {
+          id: 'POCKET_HITS_EN_US',
+          date: '2050-01-01',
+        },
+      });
+
+      // Good to check this here before we get into actual return values
+      expect(result.errors).to.be.undefined;
+      expect(result.data).not.to.be.null;
+
+      expect(result.data?.scheduledSurface.items).to.have.lengthOf(7);
     });
 
     it('should return all expected properties', async () => {

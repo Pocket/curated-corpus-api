@@ -13,6 +13,10 @@ export async function getItemsForScheduledSurface(
   args,
   { db }
 ): Promise<ScheduledSurfaceItem[]> {
-  const { id, date } = args;
+  const { date } = args;
+
+  // The value of scheduled surface ID comes from the parent query
+  const { id } = parent;
+
   return await dbGetItemsForScheduledSurface(db, id, date);
 }
