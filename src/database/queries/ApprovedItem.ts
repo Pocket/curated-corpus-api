@@ -32,6 +32,11 @@ export async function getApprovedItems(
   const baseArgs: prisma.Prisma.ApprovedItemFindManyArgs = {
     orderBy: { createdAt: 'desc' },
     where: constructWhereClauseFromFilters(filters),
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
+    },
   };
 
   // Unleash the full potential of the below function that extends Prisma's own `findMany`.

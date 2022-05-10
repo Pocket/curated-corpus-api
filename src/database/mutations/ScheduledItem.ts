@@ -40,7 +40,13 @@ export async function createScheduledItem(
       createdBy: username,
     },
     include: {
-      approvedItem: true,
+      approvedItem: {
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+      },
     },
   });
 }
@@ -77,7 +83,13 @@ export async function deleteScheduledItem(
       externalId: data.externalId,
     },
     include: {
-      approvedItem: true,
+      approvedItem: {
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+      },
     },
   });
 }
@@ -94,7 +106,13 @@ export async function rescheduleScheduledItem(
       updatedBy: username,
     },
     include: {
-      approvedItem: true,
+      approvedItem: {
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+      },
     },
   });
 }

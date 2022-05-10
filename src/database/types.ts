@@ -55,6 +55,11 @@ export type RejectedCuratedCorpusItemFilter = {
   language?: string;
 };
 
+export type ApprovedItemAuthor = {
+  name: string;
+  sortOrder: number;
+};
+
 /**
  * These properties are the same for both createApprovedItem and updateApprovedItem
  * mutations.
@@ -63,6 +68,7 @@ type ApprovedItemRequiredInput = {
   prospectId?: string;
   title: string;
   excerpt: string;
+  authors: ApprovedItemAuthor[];
   status: CuratedStatus;
   language: string;
   publisher: string;
@@ -145,6 +151,7 @@ export type CorpusItem = {
   id: string;
   url: string;
   title: string;
+  authors: ApprovedItemAuthor[];
   excerpt: string;
   language: string;
   publisher: string;
