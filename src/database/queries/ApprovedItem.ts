@@ -87,7 +87,14 @@ export async function getApprovedItemByUrl(
   db: PrismaClient,
   url: string
 ): Promise<ApprovedItem | null> {
-  return db.approvedItem.findUnique({ where: { url } });
+  return db.approvedItem.findUnique({
+    where: { url },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
+    },
+  });
 }
 
 /**

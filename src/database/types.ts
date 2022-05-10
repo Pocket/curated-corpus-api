@@ -1,5 +1,5 @@
 import {
-  ApprovedItem,
+  ApprovedItem as ApprovedItemModel,
   CuratedStatus,
   ScheduledItem as ScheduledItemModel,
 } from '@prisma/client';
@@ -143,6 +143,10 @@ export type CreateScheduledItemInput = {
 export type RescheduleScheduledItemInput = {
   externalId: string;
   scheduledDate: string;
+};
+
+export type ApprovedItem = ApprovedItemModel & {
+  authors?: ApprovedItemAuthor[];
 };
 
 // Types for the public `scheduledSurface` query.

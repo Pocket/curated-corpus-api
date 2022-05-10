@@ -1,12 +1,7 @@
-import {
-  ApprovedItem,
-  CuratedStatus,
-  Prisma,
-  PrismaClient,
-} from '@prisma/client';
+import { CuratedStatus, Prisma, PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import { CorpusItemSource } from '../../shared/types';
-import { ApprovedItemAuthor } from '../../database/types';
+import { ApprovedItemAuthor, ApprovedItem } from '../../database/types';
 
 // the minimum of data required to create a approved curated item
 interface CreateApprovedItemHelperRequiredInput {
@@ -45,6 +40,14 @@ export async function createApprovedItemHelper(
 ): Promise<ApprovedItem> {
   const random = Math.round(Math.random() * 1000);
 
+  // randomize number of authors
+  const authorCount = faker.datatype.number({ min: 1, max: 3 });
+  const authors: ApprovedItemAuthor[] = [];
+
+  for (let i = 0; i < authorCount; i++) {
+    authors.push({ name: faker.name.findName(), sortOrder: i });
+  }
+
   // defaults for optional properties
   const createApprovedItemDefaults = {
     prospectId: faker.datatype.uuid(),
@@ -53,6 +56,9 @@ export async function createApprovedItemHelper(
     // so the URL needs a little more to stay reliably unique.
     url: `${faker.internet.url()}/${faker.lorem.slug()}/${faker.datatype.uuid()}`,
     excerpt: faker.lorem.sentence(15),
+    authors: {
+      create: authors,
+    },
     status: faker.random.arrayElement([
       CuratedStatus.RECOMMENDATION,
       CuratedStatus.CORPUS,
@@ -104,5 +110,8 @@ export async function createApprovedItemHelper(
     ...data,
   };
 
-  return await prisma.approvedItem.create({ data: inputs });
+  return await prisma.approvedItem.create({
+    data: inputs,
+    include: { authors: { orderBy: [{ sortOrder: 'asc' }] } },
+  });
 }

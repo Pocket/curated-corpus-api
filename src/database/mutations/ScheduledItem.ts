@@ -63,7 +63,13 @@ export async function importScheduledItem(
   return db.scheduledItem.create({
     data,
     include: {
-      approvedItem: true,
+      approvedItem: {
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+      },
     },
   });
 }

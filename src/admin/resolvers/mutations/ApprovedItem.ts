@@ -9,6 +9,7 @@ import {
   importScheduledItem,
   updateApprovedItem as dbUpdateApprovedItem,
 } from '../../../database/mutations';
+import { getApprovedItemByUrl } from '../../../database/queries';
 import {
   ReviewedCorpusItemEventType,
   ScheduledCorpusItemEventType,
@@ -143,6 +144,18 @@ export async function updateApprovedItem(
       `Cannot create a corpus item with the topic "${data.topic}".`
     );
   }
+
+  // TODO: cleanly delete existintg authors as we do in collections
+  // get collectionStory internal id for deleting authors & checking for existing story
+  const existingItem = await getApprovedItemByUrl(context.db, data.url);
+
+  // delete related authors
+  await context.db.approvedItemAuthor.deleteMany({
+    where: {
+      approvedItemId: existingItem.id,
+    },
+  });
+  // the above is copied from collections and needs some re-working
 
   const approvedItem = await dbUpdateApprovedItem(
     context.db,
