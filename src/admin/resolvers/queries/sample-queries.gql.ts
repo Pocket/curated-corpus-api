@@ -102,3 +102,14 @@ export const APPROVED_ITEM_REFERENCE_RESOLVER = gql`
   }
   ${CuratedItemData}
 `;
+
+export const REJECTED_ITEM_REFERENCE_RESOLVER = gql`
+  query ($representations: [_Any!]!) {
+    _entities(representations: $representations) {
+      ... on RejectedCorpusItem {
+        ...RejectedItemData
+      }
+    }
+  }
+  ${RejectedItemData}
+`;

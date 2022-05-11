@@ -1,7 +1,10 @@
 import { Connection } from '@devoxa/prisma-relay-cursor-connection';
 import { RejectedCuratedCorpusItem } from '@prisma/client';
 import config from '../../../config';
-import { getRejectedCuratedCorpusItems as dbGetRejectedCuratedCorpusItems } from '../../../database/queries';
+import {
+  getRejectedItemByUrl as dbGetRejectedItemByUrl,
+  getRejectedCuratedCorpusItems as dbGetRejectedCuratedCorpusItems,
+} from '../../../database/queries';
 import { IContext } from '../../context';
 import { AuthenticationError } from 'apollo-server-errors';
 import { ACCESS_DENIED_ERROR } from '../../../shared/types';
@@ -53,4 +56,29 @@ export async function getRejectedItems(
     pagination,
     args.filters
   );
+}
+
+/**
+ * This query returns a rejected item with a given URL if it finds one
+ * in the Curated Corpus (among rejected items only), or
+ * return null if the url is not found
+ *
+ * @param parent
+ * @param args
+ * @param context
+ */
+export async function getRejectedItemByUrl(
+  parent,
+  args,
+  context: IContext
+): Promise<RejectedCuratedCorpusItem | null> {
+  //check if the user does not have the permissions to access this query
+  if (
+    !context.authenticatedUser.hasReadOnly &&
+    !context.authenticatedUser.canWriteToCorpus()
+  ) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
+  return await dbGetRejectedItemByUrl(context.db, args.url);
 }

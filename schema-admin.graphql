@@ -214,7 +214,7 @@ type ApprovedCorpusItem @key(fields: "url") {
 """
 A prospective story that has been rejected by the curators.
 """
-type RejectedCorpusItem {
+type RejectedCorpusItem @key(fields: "url") {
     """
     An alternative primary key in UUID format that is generated on creation.
     """
