@@ -34,10 +34,10 @@ import {
 } from '../../../database/types';
 import { AuthenticationError } from 'apollo-server-errors';
 import { IContext } from '../../context';
-import { getApprovedItemByUrl } from '../../../database/queries';
 import { getScheduledItemByUniqueAttributes } from '../../../database/queries/ScheduledItem';
 import { fromUnixTime } from 'date-fns';
 import { InvalidImageUrl } from '../../aws/errors';
+import { getApprovedItemByExternalId } from '../../../database/queries/ApprovedItem';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -145,18 +145,25 @@ export async function updateApprovedItem(
     );
   }
 
-  // TODO: cleanly delete existintg authors as we do in collections
-  // get collectionStory internal id for deleting authors & checking for existing story
-  const existingItem = await getApprovedItemByUrl(context.db, data.url);
+  // To be able to delete authors associated with a corpus item, we first need
+  // to get the internal (integer) id for the story. This means doing a DB query
+  // to fetch the entire object.
+  const existingItem = await getApprovedItemByExternalId(
+    context.db,
+    data.externalId
+  );
 
-  // delete related authors
-  await context.db.approvedItemAuthor.deleteMany({
-    where: {
-      approvedItemId: existingItem.id,
-    },
-  });
-  // the above is copied from collections and needs some re-working
+  // Remove the old author(s) from the DB records before we run the update function
+  if (existingItem) {
+    await context.db.approvedItemAuthor.deleteMany({
+      where: {
+        approvedItemId: existingItem.id,
+      },
+    });
+  }
 
+  // Update the corpus item with the updated fields sent through, including
+  // any authors.
   const approvedItem = await dbUpdateApprovedItem(
     context.db,
     data,

@@ -117,7 +117,7 @@ export async function deleteApprovedItem(
     );
   }
 
-  // Check for scheduled entries for this approved item
+  // Check for scheduled entries for this approved item.
   const scheduledItems = await db.scheduledItem.findMany({
     where: { approvedItemId: approvedItem.id },
   });
@@ -126,6 +126,13 @@ export async function deleteApprovedItem(
       `Cannot remove item from approved corpus - scheduled entries exist.`
     );
   }
+
+  // Delete the authors associated with this approved item.
+  await db.approvedItemAuthor.deleteMany({
+    where: {
+      approvedItemId: approvedItem.id,
+    },
+  });
 
   // Hard delete the Approved Item if we got past this point.
   await db.approvedItem.delete({

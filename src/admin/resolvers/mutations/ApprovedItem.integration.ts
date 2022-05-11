@@ -433,6 +433,8 @@ describe('mutations: ApprovedItem', () => {
         variables: { data: input },
       });
 
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(res.errors).to.be.undefined;
       const data = res.data;
 
       // External ID should be unchanged
@@ -477,10 +479,14 @@ describe('mutations: ApprovedItem', () => {
       const eventTracker = sinon.fake();
       eventEmitter.on(ReviewedCorpusItemEventType.UPDATE_ITEM, eventTracker);
 
-      const { data } = await server.executeOperation({
+      const res = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
         variables: { data: input },
       });
+
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(res.errors).to.be.undefined;
+      const data = res.data;
 
       // External ID should be unchanged
       expect(data?.updateApprovedCorpusItem.externalId).to.equal(

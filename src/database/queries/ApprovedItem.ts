@@ -42,7 +42,7 @@ export async function getApprovedItems(
   // Unleash the full potential of the below function that extends Prisma's own `findMany`.
   //
   // This helper function returns a list of ApprovedItem edges alongside a `totalCount` value
-  // and a `pageInfo` object (see type above in the promise returned: `Connection<ApprovedItem>`
+  // and a `pageInfo` object (see type above in the promise returned: `Connection<ApprovedItem>`)
   // that matches what the GraphQL server expects to provide to the client perfectly.
   //
   // Step 1: Provide at least two types - ApprovedItem as the record/entity we're using, and
@@ -94,6 +94,22 @@ export async function getApprovedItemByUrl(
         orderBy: [{ sortOrder: 'asc' }],
       },
     },
+  });
+}
+
+/**
+ * Return an approved item with the given external ID if found in the Curated Corpus
+ * or null otherwise.
+ *
+ * @param db
+ * @param externalId
+ */
+export async function getApprovedItemByExternalId(
+  db: PrismaClient,
+  externalId: string
+): Promise<ApprovedItem | null> {
+  return db.approvedItem.findUnique({
+    where: { externalId },
   });
 }
 
