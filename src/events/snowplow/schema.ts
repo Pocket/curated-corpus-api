@@ -1,6 +1,3 @@
-// TODO: ask kenny/d&l to update schema to reference scheduled surface instead of new tab,
-// then come back and update this file (and other related files, probably)
-
 // Helper types and enums used in the schema
 import { CorpusItemSource } from '../../shared/types';
 
@@ -86,8 +83,6 @@ export type ReviewedCorpusItem = {
   /**
    * The list of authors for the reviewed corpus item.
    */
-  // TODO: follow up in slack thread on if we need sort order sent to snowplow
-  // https://pocket.slack.com/archives/CTLKW5WCF/p1652133701280769?thread_ts=1651704195.064879&cid=CTLKW5WCF
   authors?: string[];
   /**
    * The url of the main image of the reviewed corpus item.

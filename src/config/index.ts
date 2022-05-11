@@ -42,7 +42,6 @@ export default {
   },
   events: {
     source: 'curated-corpus-api',
-    // TODO: what should this value be? See list-api, user-api with similar comments
     version: '0.0.2',
   },
   eventBridge: {
