@@ -1,4 +1,4 @@
-import { RejectedCuratedCorpusItem, PrismaClient, ApprovedItem } from '@prisma/client';
+import { RejectedCuratedCorpusItem, PrismaClient } from '@prisma/client';
 // need this to be able to use Prisma-native types for orderBy and filter clauses
 import { Prisma } from '@prisma/client';
 import {

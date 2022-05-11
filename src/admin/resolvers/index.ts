@@ -20,7 +20,7 @@ import {
 import { GraphQLUpload } from 'graphql-upload';
 import {
   getApprovedItemByUrl as dbGetApprovedItemByUrl,
-  getRejectedItemByUrl as dbGetRejectedItemByUrl
+  getRejectedItemByUrl as dbGetRejectedItemByUrl,
 } from '../../database/queries';
 
 export const resolvers = {

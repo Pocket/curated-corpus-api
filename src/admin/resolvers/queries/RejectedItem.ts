@@ -3,7 +3,7 @@ import { RejectedCuratedCorpusItem } from '@prisma/client';
 import config from '../../../config';
 import {
   getRejectedItemByUrl as dbGetRejectedItemByUrl,
-  getRejectedCuratedCorpusItems as dbGetRejectedCuratedCorpusItems
+  getRejectedCuratedCorpusItems as dbGetRejectedCuratedCorpusItems,
 } from '../../../database/queries';
 import { IContext } from '../../context';
 import { AuthenticationError } from 'apollo-server-errors';
