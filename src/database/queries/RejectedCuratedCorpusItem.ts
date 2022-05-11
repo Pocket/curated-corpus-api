@@ -1,4 +1,4 @@
-import { RejectedCuratedCorpusItem, PrismaClient } from '@prisma/client';
+import { RejectedCuratedCorpusItem, PrismaClient, ApprovedItem } from '@prisma/client';
 // need this to be able to use Prisma-native types for orderBy and filter clauses
 import { Prisma } from '@prisma/client';
 import {
@@ -82,3 +82,17 @@ const constructWhereClauseFromFilters = (
     url: filters.url ? { contains: filters.url } : undefined,
   };
 };
+
+/**
+ * Return an approved item with the given URL if found in the Curated Corpus or
+ * return null if the url is not found
+ *
+ * @param db
+ * @param url
+ */
+export async function getRejectedItemByUrl(
+  db: PrismaClient,
+  url: string
+): Promise<RejectedCuratedCorpusItem | null> {
+  return db.rejectedCuratedCorpusItem.findUnique({ where: { url } });
+}

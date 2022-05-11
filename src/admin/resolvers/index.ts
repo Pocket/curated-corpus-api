@@ -18,7 +18,10 @@ import {
   rescheduleScheduledItem,
 } from './mutations/ScheduledItem';
 import { GraphQLUpload } from 'graphql-upload';
-import { getApprovedItemByUrl as dbGetApprovedItemByUrl } from '../../database/queries';
+import {
+  getApprovedItemByUrl as dbGetApprovedItemByUrl,
+  getRejectedItemByUrl as dbGetRejectedItemByUrl
+} from '../../database/queries';
 
 export const resolvers = {
   // Map the Upload scalar to graphql-upload
@@ -49,6 +52,21 @@ export const resolvers = {
   },
   RejectedCorpusItem: {
     createdAt: UnixTimestampResolver,
+
+    // Resolve reference to approved items by the `url` field.
+    __resolveReference: async (item, { db }) => {
+      const { url } = item;
+
+      /**
+       * Even though it appears that we're querying the partner up to four times
+       * to retrieve the information for the four fields below, Prisma is actually
+       * batching the queries behind the scenes and there is no performance hit.
+       *
+       * It is also returning items in the correct order for us.
+       * Docs here: https://www.prisma.io/docs/guides/performance-and-optimization/query-optimization-performance
+       */
+      return dbGetRejectedItemByUrl(db, url);
+    },
   },
   ScheduledCorpusItem: {
     createdAt: UnixTimestampResolver,
