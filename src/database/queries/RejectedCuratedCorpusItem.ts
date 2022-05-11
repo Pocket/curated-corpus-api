@@ -82,3 +82,17 @@ const constructWhereClauseFromFilters = (
     url: filters.url ? { contains: filters.url } : undefined,
   };
 };
+
+/**
+ * Return an approved item with the given URL if found in the Curated Corpus or
+ * return null if the url is not found
+ *
+ * @param db
+ * @param url
+ */
+export async function getRejectedItemByUrl(
+  db: PrismaClient,
+  url: string
+): Promise<RejectedCuratedCorpusItem | null> {
+  return db.rejectedCuratedCorpusItem.findUnique({ where: { url } });
+}

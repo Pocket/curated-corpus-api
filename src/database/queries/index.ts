@@ -1,5 +1,8 @@
 export { getApprovedItems, getApprovedItemByUrl } from './ApprovedItem';
-export { getRejectedCuratedCorpusItems } from './RejectedCuratedCorpusItem';
+export {
+  getRejectedCuratedCorpusItems,
+  getRejectedItemByUrl,
+} from './RejectedCuratedCorpusItem';
 export {
   getScheduledItems,
   getItemsForScheduledSurface,
