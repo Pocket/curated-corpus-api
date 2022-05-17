@@ -201,7 +201,10 @@ type ApprovedCorpusItem @key(fields: "url") {
     """
     Subquery to get the ScheduledCorpusItems to display to a user for a given date
     """
-    scheduledSurfaceHistory(scheduledSurfaceGuid: ID, limit: Int): [ScheduledCorpusItem!]!
+    scheduledSurfaceHistory(
+        scheduledSurfaceGuid: ID
+        limit: Int
+    ): [ScheduledCorpusItem!]!
 }
 
 """
@@ -355,7 +358,7 @@ type ScheduledCorpusItem {
     """
     The associated Approved Item.
     """
-    approvedItem: ApprovedCorpusItem
+    approvedItem: ApprovedCorpusItem!
     """
     The GUID of this scheduledSurface to which this item is scheduled. Example: 'NEW_TAB_EN_US'.
     """

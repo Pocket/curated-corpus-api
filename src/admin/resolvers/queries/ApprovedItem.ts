@@ -100,12 +100,15 @@ export async function getScheduledSurfaceHistory(
   //
   // Limiting the number of results to one means only the most recent result
   // will be returned.
-  const { scheduledSurfaceGuid, limit } = args;
+
+  //TODO: maybe add a config variable for the default limit?
+  const { scheduledSurfaceGuid, limit = 10 } = args;
 
   // Check if the scheduled surface supplied is valid
   const surface = ScheduledSurfaces.find((surface) => {
     return surface.guid === scheduledSurfaceGuid;
   });
+
   if (!surface) {
     throw new UserInputError(
       `Could not find Scheduled Surface with id of "${scheduledSurfaceGuid}".`

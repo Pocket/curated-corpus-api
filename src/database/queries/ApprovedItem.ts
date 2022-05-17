@@ -99,9 +99,14 @@ export async function getScheduledSurfaceHistory(
   scheduledSurfaceGuid?: string,
   limit?: number
 ): Promise<ScheduledItem[]> {
-  const approvedItem = db.approvedItem.findUnique({
+  const approvedItem = await db.approvedItem.findUnique({
     where: { externalId },
   });
+
+  // early exit if no approved item is found
+  if (!approvedItem) {
+    return [];
+  }
 
   return await db.scheduledItem.findMany({
     take: limit,
