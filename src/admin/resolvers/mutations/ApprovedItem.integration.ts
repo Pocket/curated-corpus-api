@@ -394,19 +394,16 @@ describe('mutations: ApprovedItem', () => {
         language: 'EN',
       });
 
-      authors = [];
-
       // authors from `item` above do not go through graphql and therefore
       // contain extra info (externalId, approvedItemId). we need to remove
       // those properties to prepare an authors array for the update `input`
       // below
       if (item.authors) {
-        authors = item.authors?.map((author) => {
-          return {
+        authors =
+          item.authors?.map((author) => ({
             name: author.name,
             sortOrder: author.sortOrder,
-          };
-        });
+          })) ?? [];
       }
 
       input = {
