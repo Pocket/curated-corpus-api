@@ -1,6 +1,3 @@
-// TODO: ask kenny/d&l to update schema to reference scheduled surface instead of new tab,
-// then come back and update this file (and other related files, probably)
-
 // Helper types and enums used in the schema
 import { CorpusItemSource } from '../../shared/types';
 
@@ -82,6 +79,11 @@ export type ReviewedCorpusItem = {
    * The excerpt for the reviewed corpus item.
    */
   excerpt?: string;
+
+  /**
+   * The list of authors for the reviewed corpus item.
+   */
+  authors?: string[];
   /**
    * The url of the main image of the reviewed corpus item.
    */

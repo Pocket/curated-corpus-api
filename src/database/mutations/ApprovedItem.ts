@@ -27,6 +27,15 @@ export async function createApprovedItem(
       ...data,
       // Use the SSO username here.
       createdBy: username,
+      // Authors are stored in its own table, so need to have a nested `create`.
+      authors: {
+        create: data.authors,
+      },
+    },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
     },
   });
 }
@@ -67,6 +76,15 @@ export async function updateApprovedItem(
       ...data,
       // Use the SSO username here.
       updatedBy: username,
+      // Authors are stored in its own table, so need to have a nested `create`.
+      authors: {
+        create: data.authors,
+      },
+    },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
     },
   });
 }
@@ -85,6 +103,11 @@ export async function deleteApprovedItem(
   // returned to the resolver as the result of the mutation.
   const approvedItem = await db.approvedItem.findUnique({
     where: { externalId },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
+    },
   });
 
   // Fail early if item wasn't found.
@@ -94,7 +117,7 @@ export async function deleteApprovedItem(
     );
   }
 
-  // Check for scheduled entries for this approved item
+  // Check for scheduled entries for this approved item.
   const scheduledItems = await db.scheduledItem.findMany({
     where: { approvedItemId: approvedItem.id },
   });
@@ -103,6 +126,13 @@ export async function deleteApprovedItem(
       `Cannot remove item from approved corpus - scheduled entries exist.`
     );
   }
+
+  // Delete the authors associated with this approved item.
+  await db.approvedItemAuthor.deleteMany({
+    where: {
+      approvedItemId: approvedItem.id,
+    },
+  });
 
   // Hard delete the Approved Item if we got past this point.
   await db.approvedItem.delete({

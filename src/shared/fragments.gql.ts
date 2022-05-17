@@ -10,6 +10,10 @@ export const CuratedItemData = gql`
     url
     imageUrl
     excerpt
+    authors {
+      name
+      sortOrder
+    }
     status
     topic
     source

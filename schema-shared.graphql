@@ -1,4 +1,3 @@
-
 """
 A URL - usually, for an interesting story on the internet that's worth saving to Pocket.
 """
@@ -16,6 +15,14 @@ enum CorpusLanguage {
     DE
     "English"
     EN
+}
+
+"""
+An author associated with a CorpusItem.
+"""
+type CorpusItemAuthor {
+    name: String!
+    sortOrder: Int!
 }
 
 """
