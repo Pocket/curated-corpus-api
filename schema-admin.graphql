@@ -120,13 +120,6 @@ type ScheduledSurface {
 }
 
 """
-Temp type to pacify federation checks
-"""
-type ApprovedCuratedCorpusItem @key(fields: "url") {
-    url: Url!
-}
-
-"""
 A prospective story that has been reviewed by the curators and saved to the corpus.
 """
 type ApprovedCorpusItem @key(fields: "url") {
@@ -205,6 +198,10 @@ type ApprovedCorpusItem @key(fields: "url") {
     A single sign-on user identifier of the user who last updated this entity. Null on creation.
     """
     updatedBy: String
+    """
+    Subquery to get the ScheduledCorpusItems to display to a user for a given date
+    """
+    scheduledSurfaceHistory(scheduledSurfaceGuid: ID, limit: Int): [ScheduledCorpusItem!]!
 }
 
 """
@@ -358,7 +355,7 @@ type ScheduledCorpusItem {
     """
     The associated Approved Item.
     """
-    approvedItem: ApprovedCorpusItem!
+    approvedItem: ApprovedCorpusItem
     """
     The GUID of this scheduledSurface to which this item is scheduled. Example: 'NEW_TAB_EN_US'.
     """

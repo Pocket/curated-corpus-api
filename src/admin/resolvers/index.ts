@@ -1,6 +1,10 @@
 import { DateResolver } from 'graphql-scalars';
 import { UnixTimestampResolver } from './fields/UnixTimestamp';
-import { getApprovedItems, getApprovedItemByUrl } from './queries/ApprovedItem';
+import {
+  getApprovedItems,
+  getApprovedItemByUrl,
+  getScheduledSurfaceHistory,
+} from './queries/ApprovedItem';
 import { getScheduledSurfacesForUser } from './queries/ScheduledSurface';
 import { getRejectedItems } from './queries/RejectedItem';
 import { getScheduledItems } from './queries/ScheduledItem';
@@ -49,6 +53,10 @@ export const resolvers = {
        */
       return dbGetApprovedItemByUrl(db, url);
     },
+
+    // The `scheduledSurfaceHistory` subquery pulls in data on most recent
+    // scheduling of a curated item onto a surface.
+    scheduledSurfaceHistory: getScheduledSurfaceHistory,
   },
   RejectedCorpusItem: {
     createdAt: UnixTimestampResolver,

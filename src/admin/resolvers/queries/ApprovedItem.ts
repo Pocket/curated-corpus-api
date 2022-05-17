@@ -1,12 +1,13 @@
 import { Connection } from '@devoxa/prisma-relay-cursor-connection';
-import { ApprovedItem } from '@prisma/client';
-import { AuthenticationError } from 'apollo-server-errors';
+import { ApprovedItem, ScheduledItem } from '@prisma/client';
+import { AuthenticationError, UserInputError } from 'apollo-server-errors';
 import config from '../../../config';
 import {
   getApprovedItems as dbGetApprovedItems,
   getApprovedItemByUrl as dbGetApprovedItemByUrl,
+  getScheduledSurfaceHistory as dbGetScheduledSurfaceHistory,
 } from '../../../database/queries';
-import { ACCESS_DENIED_ERROR } from '../../../shared/types';
+import { ACCESS_DENIED_ERROR, ScheduledSurfaces } from '../../../shared/types';
 import { IContext } from '../../context';
 
 /**
@@ -75,4 +76,54 @@ export async function getApprovedItemByUrl(
   }
 
   return await dbGetApprovedItemByUrl(context.db, args.url);
+}
+
+/**
+ * Retrieves a history of when and on what scheduled surface a corpus item
+ * was scheduled.
+ */
+export async function getScheduledSurfaceHistory(
+  parent,
+  args,
+  { db }
+): Promise<ScheduledItem[]> {
+  // Get the external ID of the Approved Item itself
+  const { externalId } = parent;
+
+  // Get the optional filters. Not specifying any means we will retrieve
+  // the entire list of all the occasions this approved item was scheduled
+  // on all surfaces, in descending order (most recently scheduled first).
+  //
+  // Limiting it to a single surface means we'll only retrieve data for
+  // one scheduled surface (useful for when you only need the one to filter out
+  // prospects on the Prospecting page).
+  //
+  // Limiting the number of results to one means only the most recent result
+  // will be returned.
+  const { scheduledSurfaceGuid, limit } = args;
+
+  // Check if the scheduled surface supplied is valid
+  const surface = ScheduledSurfaces.find((surface) => {
+    return surface.guid === scheduledSurfaceGuid;
+  });
+  if (!surface) {
+    throw new UserInputError(
+      `Could not find Scheduled Surface with id of "${scheduledSurfaceGuid}".`
+    );
+  }
+
+  // Check if the limit specified passes basic sanity checks
+  if (limit.isNaN() || limit < 1) {
+    throw new UserInputError(
+      `Please specify the number of results to be returned (one or more).`
+    );
+  }
+
+  // call the db function that returns scheduled items
+  return dbGetScheduledSurfaceHistory(
+    db,
+    externalId,
+    scheduledSurfaceGuid,
+    limit
+  );
 }

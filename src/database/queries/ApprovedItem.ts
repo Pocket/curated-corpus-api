@@ -1,9 +1,9 @@
-import { ApprovedItem, PrismaClient } from '@prisma/client';
 // need this to be able to use Prisma-native types for orderBy and filter clauses
 import * as prisma from '@prisma/client';
+import { ApprovedItem, PrismaClient, ScheduledItem } from '@prisma/client';
 import {
-  findManyCursorConnection,
   Connection,
+  findManyCursorConnection,
 } from '@devoxa/prisma-relay-cursor-connection';
 import { ApprovedItemFilter, PaginationInput } from '../types';
 
@@ -83,6 +83,36 @@ export async function getApprovedItemByUrl(
   url: string
 ): Promise<ApprovedItem | null> {
   return db.approvedItem.findUnique({ where: { url } });
+}
+
+/**
+ *
+ *
+ * @param db
+ * @param externalId
+ * @param scheduledSurfaceGuid
+ * @param limit
+ */
+export async function getScheduledSurfaceHistory(
+  db: PrismaClient,
+  externalId: string,
+  scheduledSurfaceGuid?: string,
+  limit?: number
+): Promise<ScheduledItem[]> {
+  const approvedItem = db.approvedItem.findUnique({
+    where: { externalId },
+  });
+
+  return await db.scheduledItem.findMany({
+    take: limit,
+    orderBy: { scheduledDate: 'desc' },
+    where: {
+      approvedItemId: approvedItem.id,
+      scheduledSurfaceGuid: scheduledSurfaceGuid
+        ? { equals: scheduledSurfaceGuid }
+        : undefined,
+    },
+  });
 }
 
 /**
