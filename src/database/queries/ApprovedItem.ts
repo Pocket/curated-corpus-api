@@ -11,7 +11,6 @@ import {
   PaginationInput,
 } from '../types';
 import { DateTime } from 'luxon';
-import { UserInputError } from 'apollo-server-errors';
 
 /**
  * A dedicated type for the unique cursor value used in the getCuratedItems query.

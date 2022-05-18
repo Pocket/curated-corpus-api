@@ -1,5 +1,5 @@
 import { Connection } from '@devoxa/prisma-relay-cursor-connection';
-import { ApprovedItem, ScheduledItem } from '@prisma/client';
+import { ApprovedItem } from '@prisma/client';
 import { AuthenticationError, UserInputError } from 'apollo-server-errors';
 import config from '../../../config';
 import {
@@ -101,22 +101,32 @@ export async function getScheduledSurfaceHistory(
   //
   // Limiting the number of results to one means only the most recent result
   // will be returned.
-  const {
-    filters: {
-      limit = config.app.pagination.scheduledSurfaceHistory,
-      scheduledSurfaceGuid,
-    },
-  } = args;
+  const { filters } = args;
+  let limit: number = config.app.pagination.scheduledSurfaceHistory;
+  let scheduledSurfaceGuid: string | undefined;
 
-  // Check if the scheduled surface supplied is valid
-  const surface = ScheduledSurfaces.find((surface) => {
-    return surface.guid === scheduledSurfaceGuid;
-  });
+  // Filters on this subquery are completely optional, which necessitates
+  // the below shenanigans to work out the values if the filters _are_ present.
+  if (filters) {
+    limit = 'limit' in filters ? filters.limit : limit;
 
-  if (!surface) {
-    throw new UserInputError(
-      `Could not find Scheduled Surface with id of "${scheduledSurfaceGuid}".`
-    );
+    scheduledSurfaceGuid =
+      'scheduledSurfaceGuid' in filters
+        ? filters.scheduledSurfaceGuid
+        : undefined;
+  }
+
+  // If supplied, check if the scheduled surface is valid
+  if (scheduledSurfaceGuid) {
+    const surface = ScheduledSurfaces.find((surface) => {
+      return surface.guid === scheduledSurfaceGuid;
+    });
+
+    if (!surface) {
+      throw new UserInputError(
+        `Could not find Scheduled Surface with id of "${scheduledSurfaceGuid}".`
+      );
+    }
   }
 
   // call the db function that returns scheduled items
