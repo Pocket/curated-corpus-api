@@ -176,3 +176,10 @@ export type ScheduledSurface = {
   name: string;
   items?: ScheduledSurfaceItem[];
 };
+
+export type ApprovedItemScheduledSurfaceHistory = {
+  externalId: string;
+  createdBy: string;
+  scheduledDate: string;
+  scheduledSurfaceGuid: string;
+};
