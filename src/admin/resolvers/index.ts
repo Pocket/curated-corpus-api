@@ -1,4 +1,4 @@
-import { DateResolver } from 'graphql-scalars';
+import { DateResolver, NonNegativeIntResolver } from 'graphql-scalars';
 import { UnixTimestampResolver } from './fields/UnixTimestamp';
 import {
   getApprovedItems,
@@ -32,6 +32,7 @@ export const resolvers = {
   Upload: GraphQLUpload,
   // The custom scalars from GraphQL-Scalars that we find useful.
   Date: DateResolver,
+  NonNegativeInt: NonNegativeIntResolver,
 
   ApprovedCorpusItem: {
     // Our own entities that need timestamp conversion, hence field resolvers

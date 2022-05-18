@@ -7,6 +7,10 @@ scalar Url
 A date in the YYYY-MM-DD format.
 """
 scalar Date
+"""
+A positive integer number.
+"""
+scalar NonNegativeInt
 
 """
 Valid language codes for curated corpus items.

@@ -23,6 +23,7 @@ export default {
       approvedItemsPerPage: 30,
       rejectedItemsPerPage: 30,
       maxAllowedResults: 100,
+      scheduledSurfaceHistory: 10,
     },
     upload: {
       maxSize: 10000000, // in bytes => 10MB

@@ -9,6 +9,7 @@ import {
 } from '../../../database/queries';
 import { ACCESS_DENIED_ERROR, ScheduledSurfaces } from '../../../shared/types';
 import { IContext } from '../../context';
+import { ApprovedItemScheduledSurfaceHistory } from '../../../database/types';
 
 /**
  * This query retrieves approved items from the database.
@@ -86,7 +87,7 @@ export async function getScheduledSurfaceHistory(
   parent,
   args,
   { db }
-): Promise<ScheduledItem[]> {
+): Promise<ApprovedItemScheduledSurfaceHistory[]> {
   // Get the external ID of the Approved Item itself
   const { externalId } = parent;
 
@@ -100,9 +101,12 @@ export async function getScheduledSurfaceHistory(
   //
   // Limiting the number of results to one means only the most recent result
   // will be returned.
-
-  //TODO: maybe add a config variable for the default limit?
-  const { scheduledSurfaceGuid, limit = 10 } = args;
+  const {
+    filters: {
+      limit = config.app.pagination.scheduledSurfaceHistory,
+      scheduledSurfaceGuid,
+    },
+  } = args;
 
   // Check if the scheduled surface supplied is valid
   const surface = ScheduledSurfaces.find((surface) => {
@@ -112,13 +116,6 @@ export async function getScheduledSurfaceHistory(
   if (!surface) {
     throw new UserInputError(
       `Could not find Scheduled Surface with id of "${scheduledSurfaceGuid}".`
-    );
-  }
-
-  // Check if the limit specified passes basic sanity checks
-  if (limit.isNaN() || limit < 1) {
-    throw new UserInputError(
-      `Please specify the number of results to be returned (one or more).`
     );
   }
 

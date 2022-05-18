@@ -1,11 +1,17 @@
 // need this to be able to use Prisma-native types for orderBy and filter clauses
 import * as prisma from '@prisma/client';
-import { ApprovedItem, PrismaClient, ScheduledItem } from '@prisma/client';
+import { ApprovedItem, PrismaClient } from '@prisma/client';
 import {
   Connection,
   findManyCursorConnection,
 } from '@devoxa/prisma-relay-cursor-connection';
-import { ApprovedItemFilter, PaginationInput } from '../types';
+import {
+  ApprovedItemFilter,
+  ApprovedItemScheduledSurfaceHistory,
+  PaginationInput,
+} from '../types';
+import { DateTime } from 'luxon';
+import { UserInputError } from 'apollo-server-errors';
 
 /**
  * A dedicated type for the unique cursor value used in the getCuratedItems query.
@@ -86,7 +92,7 @@ export async function getApprovedItemByUrl(
 }
 
 /**
- *
+ * Return a list of scheduled entries for an Approved Item with a given externalID.
  *
  * @param db
  * @param externalId
@@ -98,17 +104,20 @@ export async function getScheduledSurfaceHistory(
   externalId: string,
   scheduledSurfaceGuid?: string,
   limit?: number
-): Promise<ScheduledItem[]> {
+): Promise<ApprovedItemScheduledSurfaceHistory[]> {
   const approvedItem = await db.approvedItem.findUnique({
     where: { externalId },
   });
 
-  // early exit if no approved item is found
+  // Early exit if no approved item is found.
+  // This is never supposed to happen since it's a subquery
+  // on the ApprovedItem, but it does solve the issue of not
+  // needing a non-null assertion in the Prisma query below :).
   if (!approvedItem) {
     return [];
   }
 
-  return await db.scheduledItem.findMany({
+  const result = await db.scheduledItem.findMany({
     take: limit,
     orderBy: { scheduledDate: 'desc' },
     where: {
@@ -117,6 +126,24 @@ export async function getScheduledSurfaceHistory(
         ? { equals: scheduledSurfaceGuid }
         : undefined,
     },
+    select: {
+      // Only select the fields we need for the return type
+      externalId: true,
+      createdBy: true,
+      scheduledDate: true,
+      scheduledSurfaceGuid: true,
+    },
+  });
+
+  // Mould the result into the shape the resolver expects to return.
+  return result.map((item) => {
+    return {
+      ...item,
+      // Format the scheduled date to YYYY-MM-DD format
+      scheduledDate: DateTime.fromJSDate(item.scheduledDate).toFormat(
+        'yyyy-MM-dd'
+      ),
+    };
   });
 }
 
