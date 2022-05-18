@@ -1,5 +1,5 @@
 import config from '../../../config';
-import { ApprovedItem, CuratedStatus } from '@prisma/client';
+import { CuratedStatus } from '@prisma/client';
 import { expect } from 'chai';
 import sinon from 'sinon';
 import { db, getServer } from '../../../test/admin-server';
@@ -18,6 +18,8 @@ import {
   UPLOAD_APPROVED_ITEM_IMAGE,
 } from './sample-mutations.gql';
 import {
+  ApprovedItem,
+  ApprovedItemAuthor,
   CreateApprovedItemInput,
   RejectApprovedItemInput,
   UpdateApprovedItemInput,
@@ -74,6 +76,7 @@ describe('mutations: ApprovedItem', () => {
         title: 'Find Out How I Cured My Docker In 2 Days',
         url: 'https://test.com/docker',
         excerpt: 'A short summary of what this story is about',
+        authors: [{ name: 'Mary Shelley', sortOrder: 1 }],
         status: CuratedStatus.CORPUS,
         imageUrl: 'https://test.com/image.png',
         language: 'DE',
@@ -381,6 +384,7 @@ describe('mutations: ApprovedItem', () => {
 
   describe('updateApprovedCorpusItem mutation', () => {
     let item: ApprovedItem;
+    let authors: ApprovedItemAuthor[];
     let input: UpdateApprovedItemInput;
 
     beforeEach(async () => {
@@ -390,10 +394,23 @@ describe('mutations: ApprovedItem', () => {
         language: 'EN',
       });
 
+      // authors from `item` above do not go through graphql and therefore
+      // contain extra info (externalId, approvedItemId). we need to remove
+      // those properties to prepare an authors array for the update `input`
+      // below
+      if (item.authors) {
+        authors =
+          item.authors?.map((author) => ({
+            name: author.name,
+            sortOrder: author.sortOrder,
+          })) ?? [];
+      }
+
       input = {
         externalId: item.externalId,
         title: 'Anything but LEGO',
         excerpt: 'Updated excerpt',
+        authors,
         status: CuratedStatus.CORPUS,
         imageUrl: 'https://test.com/image.png',
         language: 'DE',
@@ -408,10 +425,14 @@ describe('mutations: ApprovedItem', () => {
       const eventTracker = sinon.fake();
       eventEmitter.on(ReviewedCorpusItemEventType.UPDATE_ITEM, eventTracker);
 
-      const { data } = await server.executeOperation({
+      const res = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
         variables: { data: input },
       });
+
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(res.errors).to.be.undefined;
+      const data = res.data;
 
       // External ID should be unchanged
       expect(data?.updateApprovedCorpusItem.externalId).to.equal(
@@ -455,10 +476,14 @@ describe('mutations: ApprovedItem', () => {
       const eventTracker = sinon.fake();
       eventEmitter.on(ReviewedCorpusItemEventType.UPDATE_ITEM, eventTracker);
 
-      const { data } = await server.executeOperation({
+      const res = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
         variables: { data: input },
       });
+
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(res.errors).to.be.undefined;
+      const data = res.data;
 
       // External ID should be unchanged
       expect(data?.updateApprovedCorpusItem.externalId).to.equal(
@@ -1075,6 +1100,10 @@ describe('mutations: ApprovedItem - authentication checks', () => {
     title: 'Find Out How I Cured My Docker In 2 Days',
     url: 'https://test.com/docker',
     excerpt: 'A short summary of what this story is about',
+    authors: [
+      { name: 'Mark Twain', sortOrder: 1 },
+      { name: 'Jane Austen', sortOrder: 2 },
+    ],
     status: CuratedStatus.CORPUS,
     imageUrl: 'https://test.com/image.png',
     language: 'DE',

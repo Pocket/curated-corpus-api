@@ -20,29 +20,40 @@ enum CuratedItemSource {
   BACKFILL
 }
 
+model ApprovedItemAuthor {
+  externalId     String       @id @default(uuid()) @db.VarChar(255)
+  name           String       @db.VarChar(255)
+  approvedItemId Int
+  sortOrder      Int          @default(0)
+  approvedItem   ApprovedItem @relation(fields: [approvedItemId], references: [id], onDelete: Cascade)
+
+  @@index([approvedItemId])
+}
+
 // A prospect that is deemed good enough for saving in the corpus
 // and (optionally) making it to a Scheduled Surface.
 model ApprovedItem {
   // fields
-  id              Int                @id @default(autoincrement())
-  externalId      String             @default(uuid()) @db.VarChar(255)
-  prospectId      String?            @db.VarChar(255)
-  url             String             @db.VarChar(500)
-  title           String             @db.VarChar(255)
-  excerpt         String             @db.Text
-  status          CuratedStatus      @default(CORPUS)
-  language        String             @db.VarChar(2)
-  publisher       String             @db.VarChar(255)
-  imageUrl        String             @db.VarChar(500)
-  topic           String?            @db.VarChar(255)
+  id              Int                  @id @default(autoincrement())
+  externalId      String               @default(uuid()) @db.VarChar(255)
+  prospectId      String?              @db.VarChar(255)
+  url             String               @db.VarChar(500)
+  title           String               @db.VarChar(255)
+  excerpt         String               @db.Text
+  authors         ApprovedItemAuthor[]
+  status          CuratedStatus        @default(CORPUS)
+  language        String               @db.VarChar(2)
+  publisher       String               @db.VarChar(255)
+  imageUrl        String               @db.VarChar(500)
+  topic           String?              @db.VarChar(255)
   source          CuratedItemSource?
-  isCollection    Boolean            @default(false)
-  isTimeSensitive Boolean            @default(false)
-  isSyndicated    Boolean            @default(false)
-  createdAt       DateTime           @default(now())
-  createdBy       String             @db.VarChar(255)
-  updatedAt       DateTime           @updatedAt
-  updatedBy       String?            @db.VarChar(255)
+  isCollection    Boolean              @default(false)
+  isTimeSensitive Boolean              @default(false)
+  isSyndicated    Boolean              @default(false)
+  createdAt       DateTime             @default(now())
+  createdBy       String               @db.VarChar(255)
+  updatedAt       DateTime             @updatedAt
+  updatedBy       String?              @db.VarChar(255)
 
   // associated models
   scheduledItems ScheduledItem[]
@@ -91,8 +102,8 @@ model ScheduledItem {
   approvedItem ApprovedItem @relation(fields: [approvedItemId], references: [id])
 
   // indexes
-  @@index ([scheduledSurfaceGuid])
   // Prevent scheduling the same item on the same Scheduled Surface for the same day multiple times.
   @@unique([externalId])
   @@unique([approvedItemId, scheduledSurfaceGuid, scheduledDate], name: "ItemScheduledSurfaceDate")
+  @@index([scheduledSurfaceGuid])
 }

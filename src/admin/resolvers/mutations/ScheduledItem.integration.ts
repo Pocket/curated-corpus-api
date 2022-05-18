@@ -192,10 +192,16 @@ describe('mutations: ScheduledItem', () => {
       // Need to destructure timestamps and compare them separately
       // as Prisma will convert to ISO string for comparison
       // and GraphQL server returns Unix timestamps.
-      const { createdAt, updatedAt, ...otherApprovedItemProps } = approvedItem;
+      const {
+        createdAt,
+        updatedAt,
+        authors: approvedItemAuthors,
+        ...otherApprovedItemProps
+      } = approvedItem;
       const {
         createdAt: createdAtReturned,
         updatedAt: updatedAtReturned,
+        authors: authorsReturned,
         ...otherReturnedApprovedItemProps
       } = scheduledItem.approvedItem;
       expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
@@ -203,6 +209,22 @@ describe('mutations: ScheduledItem', () => {
       expect(otherApprovedItemProps).to.deep.include(
         otherReturnedApprovedItemProps
       );
+
+      // check authors
+      // note that approvedItemAuthors does not go through our graphql interface,
+      // so it has *all* db properties, including externalId and approvedItemId.
+      // these properties are *not* present in authorsReturned, so we need to do
+      // a custom comparison
+      if (approvedItemAuthors) {
+        const approvedItemAuthorsMapped = approvedItemAuthors.map((aia) => {
+          return {
+            name: aia.name,
+            sortOrder: aia.sortOrder,
+          };
+        });
+
+        expect(approvedItemAuthorsMapped).to.deep.equal(authorsReturned);
+      }
 
       // Check that the ADD_SCHEDULE event was fired successfully:
       // 1 - Event was fired once!
@@ -392,10 +414,16 @@ describe('mutations: ScheduledItem', () => {
       // Need to destructure timestamps and compare them separately
       // as Prisma will convert to ISO string for comparison
       // and GraphQL server returns Unix timestamps.
-      const { createdAt, updatedAt, ...otherApprovedItemProps } = approvedItem;
+      const {
+        createdAt,
+        updatedAt,
+        authors: approvedItemAuthors,
+        ...otherApprovedItemProps
+      } = approvedItem;
       const {
         createdAt: createdAtReturned,
         updatedAt: updatedAtReturned,
+        authors: authorsReturned,
         ...otherReturnedApprovedItemProps
       } = returnedItem.approvedItem;
       expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
@@ -403,6 +431,22 @@ describe('mutations: ScheduledItem', () => {
       expect(otherApprovedItemProps).to.deep.include(
         otherReturnedApprovedItemProps
       );
+
+      // check authors
+      // note that approvedItemAuthors does not go through our graphql interface,
+      // so it has *all* db properties, including externalId and approvedItemId.
+      // these properties are *not* present in authorsReturned, so we need to do
+      // a custom comparison
+      if (approvedItemAuthors) {
+        const approvedItemAuthorsMapped = approvedItemAuthors.map((aia) => {
+          return {
+            name: aia.name,
+            sortOrder: aia.sortOrder,
+          };
+        });
+
+        expect(approvedItemAuthorsMapped).to.deep.equal(authorsReturned);
+      }
 
       // Check that the REMOVE_SCHEDULE event was fired successfully:
       // 1 - Event was fired once!
@@ -590,10 +634,16 @@ describe('mutations: ScheduledItem', () => {
       // Need to destructure timestamps and compare them separately
       // as Prisma will convert to ISO string for comparison
       // and GraphQL server returns Unix timestamps.
-      const { createdAt, updatedAt, ...otherApprovedItemProps } = approvedItem;
+      const {
+        createdAt,
+        updatedAt,
+        authors: approvedItemAuthors,
+        ...otherApprovedItemProps
+      } = approvedItem;
       const {
         createdAt: createdAtReturned,
         updatedAt: updatedAtReturned,
+        authors: authorsReturned,
         ...otherReturnedApprovedItemProps
       } = returnedItem.approvedItem;
       expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
@@ -601,6 +651,22 @@ describe('mutations: ScheduledItem', () => {
       expect(otherApprovedItemProps).to.deep.include(
         otherReturnedApprovedItemProps
       );
+
+      // check authors
+      // note that approvedItemAuthors does not go through our graphql interface,
+      // so it has *all* db properties, including externalId and approvedItemId.
+      // these properties are *not* present in authorsReturned, so we need to do
+      // a custom comparison
+      if (approvedItemAuthors) {
+        const approvedItemAuthorsMapped = approvedItemAuthors.map((aia) => {
+          return {
+            name: aia.name,
+            sortOrder: aia.sortOrder,
+          };
+        });
+
+        expect(approvedItemAuthorsMapped).to.deep.equal(authorsReturned);
+      }
 
       // Check that the RESCHEDULE event was fired successfully:
       // 1 - Event was fired once!

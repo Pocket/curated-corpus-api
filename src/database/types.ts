@@ -1,5 +1,5 @@
 import {
-  ApprovedItem,
+  ApprovedItem as ApprovedItemModel,
   CuratedStatus,
   ScheduledItem as ScheduledItemModel,
 } from '@prisma/client';
@@ -55,6 +55,11 @@ export type RejectedCuratedCorpusItemFilter = {
   language?: string;
 };
 
+export type ApprovedItemAuthor = {
+  name: string;
+  sortOrder: number;
+};
+
 /**
  * These properties are the same for both createApprovedItem and updateApprovedItem
  * mutations.
@@ -63,6 +68,7 @@ type ApprovedItemRequiredInput = {
   prospectId?: string;
   title: string;
   excerpt: string;
+  authors: ApprovedItemAuthor[];
   status: CuratedStatus;
   language: string;
   publisher: string;
@@ -139,12 +145,17 @@ export type RescheduleScheduledItemInput = {
   scheduledDate: string;
 };
 
+export type ApprovedItem = ApprovedItemModel & {
+  authors?: ApprovedItemAuthor[];
+};
+
 // Types for the public `scheduledSurface` query.
 export type CorpusItem = {
   // This is `externalId` in the DB schema and Admin API
   id: string;
   url: string;
   title: string;
+  authors: ApprovedItemAuthor[];
   excerpt: string;
   language: string;
   publisher: string;

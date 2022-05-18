@@ -144,6 +144,10 @@ type ApprovedCorpusItem @key(fields: "url") {
     """
     excerpt: String!
     """
+    The authors associated with this ApprovedCorpusItem.
+    """
+    authors: [CorpusItemAuthor!]
+    """
     The outcome of the curators' review.
     """
     status: CuratedStatus!
@@ -497,6 +501,14 @@ input ScheduledCorpusItemsFilterInput {
 }
 
 """
+An author associated with a CorpusItem.
+"""
+input CorpusItemAuthorInput {
+    name: String!
+    sortOrder: Int!
+}
+
+"""
 Input data for creating an Approved Item and optionally scheduling this item to appear on a Scheduled Surface.
 """
 input CreateApprovedCorpusItemInput {
@@ -516,6 +528,10 @@ input CreateApprovedCorpusItemInput {
     The excerpt of the Approved Item.
     """
     excerpt: String!
+    """
+    A name and sort order for each author.
+    """
+    authors: [CorpusItemAuthorInput!]!
     """
     The outcome of the curators' review of the Approved Item.
     """
@@ -669,6 +685,10 @@ input UpdateApprovedCorpusItemInput {
     The excerpt of the Approved Item.
     """
     excerpt: String!
+    """
+    A name and sort order for each author.
+    """
+    authors: [CorpusItemAuthorInput!]!
     """
     The outcome of the curators' review of the Approved Item.
     """

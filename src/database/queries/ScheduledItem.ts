@@ -40,7 +40,13 @@ export async function getScheduledItems(
       },
     },
     include: {
-      approvedItem: true,
+      approvedItem: {
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+      },
     },
   });
 
@@ -95,7 +101,13 @@ export async function getItemsForScheduledSurface(
       scheduledDate: date,
     },
     include: {
-      approvedItem: true,
+      approvedItem: {
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+      },
     },
   });
 
@@ -113,6 +125,7 @@ export async function getItemsForScheduledSurface(
         url: scheduledItem.approvedItem.url,
         title: scheduledItem.approvedItem.title,
         excerpt: scheduledItem.approvedItem.excerpt,
+        authors: scheduledItem.approvedItem.authors,
         language: scheduledItem.approvedItem.language,
         publisher: scheduledItem.approvedItem.publisher,
         imageUrl: scheduledItem.approvedItem.imageUrl,
@@ -140,7 +153,13 @@ export async function getScheduledItemByUniqueAttributes(
       },
     },
     include: {
-      approvedItem: true,
+      approvedItem: {
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+      },
     },
   });
 }
