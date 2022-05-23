@@ -118,6 +118,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       expect(item.corpusItem.url).not.to.be.null;
       expect(item.corpusItem.title).not.to.be.null;
       expect(item.corpusItem.excerpt).not.to.be.null;
+      expect(item.corpusItem.authors).not.to.be.null;
       expect(item.corpusItem.language).not.to.be.null;
       expect(item.corpusItem.imageUrl).not.to.be.null;
       expect(item.corpusItem.publisher).not.to.be.null;
