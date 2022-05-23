@@ -1,9 +1,5 @@
 import { expect } from 'chai';
-import {
-  ApprovedItem,
-  CuratedStatus,
-  RejectedCuratedCorpusItem,
-} from '@prisma/client';
+import { CuratedStatus, RejectedCuratedCorpusItem } from '@prisma/client';
 import {
   assertValidSnowplowObjectUpdateEvents,
   getAllSnowplowEvents,
@@ -22,6 +18,7 @@ import { tracker } from './tracker';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 import { getUnixTimestamp } from '../../shared/utils';
 import { CorpusItemSource, Topics } from '../../shared/types';
+import { ApprovedItem, ApprovedItemAuthor } from '../../database/types';
 
 /**
  * Use a simple mock item instead of using DB helpers
@@ -35,6 +32,10 @@ const approvedItem: ApprovedItem = {
   status: CuratedStatus.RECOMMENDATION,
   title: 'Everything you need to know about React',
   excerpt: 'Something here',
+  authors: [
+    { name: 'Jane Austen', sortOrder: 1 },
+    { name: 'Mary Shelley', sortOrder: 2 },
+  ],
   publisher: 'Octopus Publishing House',
   imageUrl: 'https://test.com/image.png',
   language: 'EN',
@@ -93,6 +94,10 @@ function assertValidSnowplowApprovedItemEvents(eventContext) {
         url: approvedItem.url,
         title: approvedItem.title,
         excerpt: approvedItem.excerpt,
+        authors:
+          approvedItem.authors?.map(
+            (author: ApprovedItemAuthor) => author.name
+          ) ?? [],
         image_url: approvedItem.imageUrl,
         language: approvedItem.language,
         topic: approvedItem.topic,
