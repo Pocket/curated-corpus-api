@@ -1,5 +1,9 @@
 import { CuratedCorpusSnowplowHandler } from './CuratedCorpusSnowplowHandler';
-import { BaseEventData, ReviewedCorpusItemPayload } from '../types';
+import {
+  ApprovedItem,
+  BaseEventData,
+  ReviewedCorpusItemPayload,
+} from '../types';
 import { buildSelfDescribingEvent, Tracker } from '@snowplow/node-tracker';
 import { SelfDescribingJson } from '@snowplow/tracker-core';
 import config from '../../config';
@@ -11,13 +15,10 @@ import {
   ReviewedCorpusItem,
 } from './schema';
 import { getUnixTimestamp } from '../../shared/utils';
-import {
-  ApprovedItem,
-  CuratedStatus,
-  RejectedCuratedCorpusItem,
-} from '@prisma/client';
+import { CuratedStatus, RejectedCuratedCorpusItem } from '@prisma/client';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 import { CorpusItemSource } from '../../shared/types';
+import { ApprovedItemAuthor } from '../../database/types';
 
 type CuratedCorpusItemUpdateEvent = Omit<SelfDescribingJson, 'data'> & {
   data: CuratedCorpusItemUpdate;
@@ -138,6 +139,8 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       title: item.title,
       language: item.language,
       excerpt: item.excerpt,
+      authors:
+        item.authors?.map((author: ApprovedItemAuthor) => author.name) ?? [],
       image_url: item.imageUrl,
       is_collection: item.isCollection,
       is_syndicated: item.isSyndicated,

@@ -1,6 +1,13 @@
-import { ApprovedItem, RejectedCuratedCorpusItem } from '@prisma/client';
-import { ScheduledItem, CorpusItem } from '../database/types';
-import { ScheduledItem as ScheduledItemModel } from '@prisma/client';
+import {
+  ApprovedItem as ApprovedItemModel,
+  RejectedCuratedCorpusItem,
+  ScheduledItem as ScheduledItemModel,
+} from '@prisma/client';
+import {
+  ApprovedItemAuthor,
+  ScheduledItem,
+  CorpusItem,
+} from '../database/types';
 
 export enum ReviewedCorpusItemEventType {
   ADD_ITEM = 'ADD_ITEM',
@@ -30,6 +37,10 @@ export type BaseEventData = {
   version: string; // semver (e.g. 1.2.33)
 };
 
+export type ApprovedItem = ApprovedItemModel & {
+  authors?: ApprovedItemAuthor[];
+};
+
 // Data for the events that are fired on changes to curated items
 export type ReviewedCorpusItemPayload = {
   reviewedCorpusItem: ApprovedItem | RejectedCuratedCorpusItem;
@@ -50,7 +61,7 @@ export type ScheduledItemEventBusPayload = BaseEventBusPayload &
   Pick<ScheduledItemModel, 'createdBy' | 'scheduledSurfaceGuid'> &
   Pick<
     ApprovedItem,
-    'topic' | 'isSyndicated' | keyof Omit<CorpusItem, 'id' | 'authors'>
+    'topic' | 'isSyndicated' | keyof Omit<CorpusItem, 'id'>
   > & {
     scheduledItemExternalId: string; // externalId of ScheduledItem
     approvedItemExternalId: string; // externalId of ApprovedItem
