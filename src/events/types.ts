@@ -1,13 +1,8 @@
 import {
-  ApprovedItem as ApprovedItemModel,
   RejectedCuratedCorpusItem,
   ScheduledItem as ScheduledItemModel,
 } from '@prisma/client';
-import {
-  ApprovedItemAuthor,
-  ScheduledItem,
-  CorpusItem,
-} from '../database/types';
+import { ScheduledItem, CorpusItem, ApprovedItem } from '../database/types';
 
 export enum ReviewedCorpusItemEventType {
   ADD_ITEM = 'ADD_ITEM',
@@ -35,10 +30,6 @@ export type BaseEventData = {
   timestamp: number; // epoch time (ms)
   source: string;
   version: string; // semver (e.g. 1.2.33)
-};
-
-export type ApprovedItem = ApprovedItemModel & {
-  authors?: ApprovedItemAuthor[];
 };
 
 // Data for the events that are fired on changes to curated items

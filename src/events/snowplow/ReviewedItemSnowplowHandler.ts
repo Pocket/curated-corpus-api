@@ -1,9 +1,5 @@
 import { CuratedCorpusSnowplowHandler } from './CuratedCorpusSnowplowHandler';
-import {
-  ApprovedItem,
-  BaseEventData,
-  ReviewedCorpusItemPayload,
-} from '../types';
+import { BaseEventData, ReviewedCorpusItemPayload } from '../types';
 import { buildSelfDescribingEvent, Tracker } from '@snowplow/node-tracker';
 import { SelfDescribingJson } from '@snowplow/tracker-core';
 import config from '../../config';
@@ -18,7 +14,7 @@ import { getUnixTimestamp } from '../../shared/utils';
 import { CuratedStatus, RejectedCuratedCorpusItem } from '@prisma/client';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 import { CorpusItemSource } from '../../shared/types';
-import { ApprovedItemAuthor } from '../../database/types';
+import { ApprovedItem, ApprovedItemAuthor } from '../../database/types';
 
 type CuratedCorpusItemUpdateEvent = Omit<SelfDescribingJson, 'data'> & {
   data: CuratedCorpusItemUpdate;
