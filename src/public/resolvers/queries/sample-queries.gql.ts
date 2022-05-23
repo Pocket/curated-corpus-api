@@ -24,6 +24,10 @@ export const GET_SCHEDULED_SURFACE_WITH_ITEMS = gql`
           title
           excerpt
           language
+          authors {
+            name
+            sortOrder
+          }
           publisher
           imageUrl
         }
