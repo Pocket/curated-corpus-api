@@ -60,6 +60,10 @@ type CorpusItem @key(fields: "id") {
     The author names and sort orders associated with this CorpusItem.
     """
     authors: [CorpusItemAuthor!]
+    """
+    The topic associated with the Approved Item.
+    """
+    topic: String
 }
 
 """

@@ -30,6 +30,7 @@ export const GET_SCHEDULED_SURFACE_WITH_ITEMS = gql`
           }
           publisher
           imageUrl
+          topic
         }
       }
     }
