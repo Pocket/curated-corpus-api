@@ -160,6 +160,7 @@ export type CorpusItem = {
   language: string;
   publisher: string;
   imageUrl: string;
+  topic?: string;
 };
 
 export type ScheduledSurfaceItem = {

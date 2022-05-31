@@ -129,6 +129,14 @@ export async function getItemsForScheduledSurface(
         language: scheduledItem.approvedItem.language,
         publisher: scheduledItem.approvedItem.publisher,
         imageUrl: scheduledItem.approvedItem.imageUrl,
+        // so the type definition in /src/database/types has topic as optional,
+        // which typescript resolves as `string | undefined`. however, if the
+        // topic is missing in the db, prisma returns `null` - hence the
+        // nullish coalescing operator below.
+        //
+        // i wonder why typescript won't accept both. is there some deep dark
+        // JS reason? or is it just better practice?
+        topic: scheduledItem.approvedItem.topic ?? undefined,
       },
     };
     return item;
