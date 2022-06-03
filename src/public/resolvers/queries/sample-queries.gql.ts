@@ -1,4 +1,5 @@
 import { gql } from 'apollo-server';
+import {CuratedItemData} from "../../../shared/fragments.gql";
 
 export const GET_SCHEDULED_SURFACE = gql`
   query scheduledSurface($id: ID!) {
@@ -31,6 +32,20 @@ export const GET_SCHEDULED_SURFACE_WITH_ITEMS = gql`
           publisher
           imageUrl
           topic
+        }
+      }
+    }
+  }
+`;
+
+export const CORPUS_ITEM_REFERENCE_RESOLVER = gql`
+  query ($representations: [_Any!]!) {
+    _entities(representations: $representations) {
+      ... on CorpusItem {
+        id
+        title
+        authors {
+          name
         }
       }
     }

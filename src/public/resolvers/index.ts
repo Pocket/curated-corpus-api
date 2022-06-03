@@ -1,7 +1,7 @@
 import { DateResolver } from 'graphql-scalars';
 import { getScheduledSurface } from './queries/ScheduledSurface';
 import { getItemsForScheduledSurface } from './queries/ScheduledSurfaceItem';
-import { getApprovedItemByExternalId } from '../../database/queries/ApprovedItem';
+import { getCorpusItem } from './queries/CorpusItem';
 
 export const resolvers = {
   // The Date resolver enforces the date to be in the YYYY-MM-DD format.
@@ -11,13 +11,7 @@ export const resolvers = {
     items: getItemsForScheduledSurface,
   },
   CorpusItem: {
-    __resolveReference: async (item, { db }) => {
-      const { id } = item;
-
-      /**
-       */
-      return getApprovedItemByExternalId(db, id);
-    },
+    __resolveReference: getCorpusItem,
   },
   Query: {
     // Gets the metadata for a Scheduled Surface (for example, New Tab).
