@@ -8,6 +8,7 @@ import {
   importApprovedItem as dbImportApprovedItem,
   importScheduledItem,
   updateApprovedItem as dbUpdateApprovedItem,
+  updateApprovedItemAuthors as dbUpdateApprovedItemAuthors,
 } from '../../../database/mutations';
 import { getApprovedItemByUrl } from '../../../database/queries';
 import {
@@ -170,6 +171,59 @@ export async function updateApprovedItem(
     context.authenticatedUser.username
   );
 
+  context.emitReviewedCorpusItemEvent(
+    ReviewedCorpusItemEventType.UPDATE_ITEM,
+    approvedItem
+  );
+
+  return approvedItem;
+}
+
+/**
+ * A targeted update operation that only updates an approved item's authors data.
+ * Used to backfill authors for legacy curated items.
+ *
+ * @param parent
+ * @param data
+ * @param context
+ */
+export async function updateApprovedItemAuthors(
+  parent,
+  { data },
+  context: IContext
+): Promise<ApprovedItem> {
+  // Check if the user can perform this mutation
+  if (!context.authenticatedUser.canWriteToCorpus()) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+  // To be able to delete authors associated with a corpus item, we first need
+  // to get the internal (integer) id for the story. This means doing a DB query
+  // to fetch the entire object.
+  const existingItem = await getApprovedItemByExternalId(
+    context.db,
+    data.externalId
+  );
+
+  // Remove the old author(s) from the DB records before we run the update function
+  // Note that we don't expect any authors to be present for any items this mutation
+  // will be run for, but it's a good idea to be thorough anyway.
+  if (existingItem) {
+    await context.db.approvedItemAuthor.deleteMany({
+      where: {
+        approvedItemId: existingItem.id,
+      },
+    });
+  }
+
+  // Update the corpus item with the updated fields sent through, including
+  // any authors.
+  const approvedItem = await dbUpdateApprovedItemAuthors(
+    context.db,
+    data,
+    context.authenticatedUser.username
+  );
+
+  // Emit the update item event
   context.emitReviewedCorpusItemEvent(
     ReviewedCorpusItemEventType.UPDATE_ITEM,
     approvedItem

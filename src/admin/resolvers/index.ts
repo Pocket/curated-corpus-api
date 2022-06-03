@@ -13,6 +13,7 @@ import {
   importApprovedItem,
   rejectApprovedItem,
   updateApprovedItem,
+  updateApprovedItemAuthors,
   uploadApprovedItemImage,
 } from './mutations/ApprovedItem';
 import { createRejectedItem } from './mutations/RejectedItem';
@@ -94,6 +95,7 @@ export const resolvers = {
     createApprovedCorpusItem: createApprovedItem,
     rejectApprovedCorpusItem: rejectApprovedItem,
     updateApprovedCorpusItem: updateApprovedItem,
+    updateApprovedCorpusItemAuthors: updateApprovedItemAuthors,
     createRejectedCorpusItem: createRejectedItem,
     createScheduledCorpusItem: createScheduledItem,
     deleteScheduledCorpusItem: deleteScheduledItem,

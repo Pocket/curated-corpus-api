@@ -2,6 +2,7 @@ export {
   createApprovedItem,
   deleteApprovedItem,
   updateApprovedItem,
+  updateApprovedItemAuthors,
   importApprovedItem,
 } from './ApprovedItem';
 export { createRejectedItem } from './RejectedItem';

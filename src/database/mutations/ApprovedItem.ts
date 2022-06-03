@@ -2,6 +2,7 @@ import { ApprovedItem, PrismaClient } from '@prisma/client';
 import {
   CreateApprovedItemInput,
   ImportApprovedItemInput,
+  UpdateApprovedItemAuthorsInput,
   UpdateApprovedItemInput,
 } from '../types';
 import { ApolloError, UserInputError } from 'apollo-server-errors';
@@ -76,7 +77,41 @@ export async function updateApprovedItem(
       ...data,
       // Use the SSO username here.
       updatedBy: username,
-      // Authors are stored in its own table, so need to have a nested `create`.
+      // Authors are stored in their own table, so need to have a nested `create`.
+      authors: {
+        create: data.authors,
+      },
+    },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
+    },
+  });
+}
+
+/**
+ * A targeted update operation that only updates an approved item's authors data.
+ * Used to backfill authors for legacy curated items.
+ *
+ * @param db
+ * @param data
+ * @param username
+ */
+export async function updateApprovedItemAuthors(
+  db: PrismaClient,
+  data: UpdateApprovedItemAuthorsInput,
+  username: string
+): Promise<ApprovedItem> {
+  if (!data.externalId) {
+    throw new UserInputError('externalId must be provided.');
+  }
+  return db.approvedItem.update({
+    where: { externalId: data.externalId },
+    data: {
+      // Use the SSO username here.
+      updatedBy: username,
+      // Authors are stored in their own table, so need to have a nested `create`.
       authors: {
         create: data.authors,
       },
