@@ -1,6 +1,9 @@
 import { ScheduledSurface, ScheduledSurfaces } from './types';
-import {ApprovedItem, ApprovedItemAuthor, CorpusItem, ScheduledSurfaceItem} from "../database/types";
-import {DateTime} from "luxon";
+import {
+  ApprovedItem,
+  ApprovedItemAuthor,
+  CorpusItem,
+} from '../database/types';
 
 /**
  * Generate an integer Epoch time from a JavaScript Date object.

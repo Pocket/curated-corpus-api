@@ -1,5 +1,4 @@
 import { gql } from 'apollo-server';
-import {CuratedItemData} from "../../../shared/fragments.gql";
 
 export const GET_SCHEDULED_SURFACE = gql`
   query scheduledSurface($id: ID!) {

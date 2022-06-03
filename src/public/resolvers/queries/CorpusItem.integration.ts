@@ -1,10 +1,9 @@
 import { expect } from 'chai';
 import { getServer } from '../../../test/public-server';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
-import {CORPUS_ITEM_REFERENCE_RESOLVER, GET_SCHEDULED_SURFACE} from './sample-queries.gql';
-import {createApprovedItemHelper} from "../../../test/helpers";
-import {db} from "../../../test/admin-server";
-import {APPROVED_ITEM_REFERENCE_RESOLVER} from "../../../admin/resolvers/queries/sample-queries.gql";
+import { CORPUS_ITEM_REFERENCE_RESOLVER } from './sample-queries.gql';
+import { createApprovedItemHelper } from '../../../test/helpers';
+import { db } from '../../../test/admin-server';
 
 describe('CorpusItem reference resolver', () => {
   const server = getServer(new CuratedCorpusEventEmitter());
