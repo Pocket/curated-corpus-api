@@ -1,12 +1,12 @@
-import {CorpusItemSource, MozillaAccessGroup, Topics} from './types';
+import { CorpusItemSource, MozillaAccessGroup, Topics } from './types';
 import {
   getCorpusItemFromApprovedItem,
   getScheduledSurfaceByAccessGroup,
   getScheduledSurfaceByGuid,
   toUtcDateString,
 } from './utils';
-import {ApprovedItem, ApprovedItemAuthor} from "../database/types";
-import {CuratedStatus} from "@prisma/client";
+import { ApprovedItem } from '../database/types';
+import { CuratedStatus } from '@prisma/client';
 
 describe('shared/utils', () => {
   describe('toUtcDateString', () => {
