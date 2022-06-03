@@ -67,7 +67,7 @@ describe('shared/utils', () => {
   });
 
   describe('getCorpusItemFromApprovedItem', () => {
-    it('should map a ApprovedItem to a CorpusItem', () => {
+    it('should map an ApprovedItem to a CorpusItem', () => {
       const approvedItem: ApprovedItem = {
         externalId: '123-abc',
         prospectId: 'abc-123',
