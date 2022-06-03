@@ -10,6 +10,7 @@ export const resolvers = {
     // The `items` subquery pulls in scheduled corpus items for a given date.
     items: getItemsForScheduledSurface,
   },
+  // The `CorpusItem` resolver resolves approved corpus items based on id.
   CorpusItem: {
     __resolveReference: getCorpusItem,
   },

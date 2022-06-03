@@ -6,7 +6,7 @@ import {createApprovedItemHelper} from "../../../test/helpers";
 import {db} from "../../../test/admin-server";
 import {APPROVED_ITEM_REFERENCE_RESOLVER} from "../../../admin/resolvers/queries/sample-queries.gql";
 
-describe('queries: ScheduledSurface', () => {
+describe('CorpusItem reference resolver', () => {
   const server = getServer(new CuratedCorpusEventEmitter());
 
   beforeAll(async () => {
@@ -17,47 +17,52 @@ describe('queries: ScheduledSurface', () => {
     await server.stop();
   });
 
-  describe('CorpusItem reference resolver', () => {
-    it('returns the approved item if it exists', async () => {
-      // Create a few items with known URLs.
-      const corpusItemInput = {
-        title: 'Story one',
-        url: 'https://www.sample-domain.com/what-zombies-can-teach-you-graphql',
-      };
-
-      const approvedItem = await createApprovedItemHelper(db, corpusItemInput);
-      const corpusItemId = approvedItem.externalId;
-
-      const result = await server.executeOperation({
-        query: CORPUS_ITEM_REFERENCE_RESOLVER,
-        variables: {
-          representations: [
-            {
-              __typename: 'CorpusItem',
-              id: corpusItemId,
-            },
-          ],
-        },
-      });
-
-      expect(result.errors).to.be.undefined;
-
-      expect(result.data).to.not.be.null;
-      expect(result.data?._entities).to.have.lengthOf(1);
+  it('returns the corpus item if it exists', async () => {
+    // Create an approved item.
+    const approvedItem = await createApprovedItemHelper(db, {
+      title: 'Story one',
     });
+
+    const result = await server.executeOperation({
+      query: CORPUS_ITEM_REFERENCE_RESOLVER,
+      variables: {
+        representations: [
+          {
+            __typename: 'CorpusItem',
+            id: approvedItem.externalId,
+          },
+        ],
+      },
+    });
+
+    expect(result.errors).to.be.undefined;
+
+    expect(result.data).to.not.be.null;
+    expect(result.data?._entities).to.have.lengthOf(1);
+    expect(result.data?._entities[0].title).to.equal(approvedItem.title);
+    expect(result.data?._entities[0].authors).to.have.lengthOf(
+      <number>approvedItem.authors?.length
+    );
   });
 
-  it('should throw an error if the GUID provided is not known', async () => {
+  it('should throw an error if the id provided is not known', async () => {
     const result = await server.executeOperation({
-      query: GET_SCHEDULED_SURFACE,
-      variables: { id: 'ABRACADABRA' },
+      query: CORPUS_ITEM_REFERENCE_RESOLVER,
+      variables: {
+        representations: [
+          {
+            __typename: 'CorpusItem',
+            id: 'ABRACADABRA',
+          },
+        ],
+      },
     });
 
     // There should be errors
     expect(result.errors).not.to.be.null;
 
     expect(result.errors?.[0].message).to.contain(
-      `Could not find Scheduled Surface with id of "ABRACADABRA"`
+      `Could not find Corpus Item with id of "ABRACADABRA"`
     );
     expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
   });

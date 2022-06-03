@@ -4,7 +4,7 @@ import { getCorpusItemFromApprovedItem } from '../../../shared/utils';
 import { UserInputError } from 'apollo-server-errors';
 
 /**
- * Pulls in scheduled items for a given date and surface (e.g., NEW_TAB_EN_US).
+ * Pulls in approved corpus items for a given id.
  *
  * @param item
  * @param db
