@@ -2,7 +2,7 @@ import config from '../../../config';
 import { CuratedStatus } from '@prisma/client';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { db, getServer } from '../../../test/admin-server';
+import { db } from '../../../test/admin-server';
 import {
   clearDb,
   createApprovedItemHelper,
@@ -35,7 +35,6 @@ import { Upload } from 'graphql-upload';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import { GET_REJECTED_ITEMS } from '../queries/sample-queries.gql';
 import {
-  ACCESS_DENIED_ERROR,
   CorpusItemSource,
   MozillaAccessGroup,
   Topics,
