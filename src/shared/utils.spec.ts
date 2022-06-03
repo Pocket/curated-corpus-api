@@ -88,6 +88,7 @@ describe('shared/utils', () => {
         createdBy: 'Anyone',
         updatedAt: new Date(),
         updatedBy: null,
+        authors: [{ name: 'A.U. Thur', sortOrder: 0 }],
       };
 
       const result = getCorpusItemFromApprovedItem(approvedItem);
