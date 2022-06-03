@@ -1,9 +1,12 @@
-import { MozillaAccessGroup } from './types';
+import {CorpusItemSource, MozillaAccessGroup, Topics} from './types';
 import {
+  getCorpusItemFromApprovedItem,
   getScheduledSurfaceByAccessGroup,
   getScheduledSurfaceByGuid,
   toUtcDateString,
 } from './utils';
+import {ApprovedItem, ApprovedItemAuthor} from "../database/types";
+import {CuratedStatus} from "@prisma/client";
 
 describe('shared/utils', () => {
   describe('toUtcDateString', () => {
@@ -60,6 +63,46 @@ describe('shared/utils', () => {
 
     it('should return undefined for an invalid guid', () => {
       expect(getScheduledSurfaceByGuid('STONE_CUTTERS')).toBeUndefined();
+    });
+  });
+
+  describe('getCorpusItemFromApprovedItem', () => {
+    it('should map a ApprovedItem to a CorpusItem', () => {
+      const approvedItem: ApprovedItem = {
+        externalId: '123-abc',
+        prospectId: 'abc-123',
+        url: 'https://test.com',
+        status: CuratedStatus.CORPUS,
+        id: 123,
+        title: 'Test title',
+        excerpt: 'An excerpt',
+        language: 'EN',
+        publisher: 'The Times of Narnia',
+        imageUrl: 'https://test.com/image.png',
+        topic: Topics.EDUCATION,
+        source: CorpusItemSource.PROSPECT,
+        isCollection: false,
+        isTimeSensitive: false,
+        isSyndicated: false,
+        createdAt: new Date(),
+        createdBy: 'Anyone',
+        updatedAt: new Date(),
+        updatedBy: null,
+      };
+
+      const result = getCorpusItemFromApprovedItem(approvedItem);
+
+      expect(result).not.toBeUndefined();
+
+      expect(result.id).toEqual(approvedItem.externalId);
+      expect(result.url).toEqual(approvedItem.url);
+      expect(result.title).toEqual(approvedItem.title);
+      expect(result.excerpt).toEqual(approvedItem.excerpt);
+      expect(result.authors).toEqual(approvedItem.authors);
+      expect(result.language).toEqual(approvedItem.language);
+      expect(result.publisher).toEqual(approvedItem.publisher);
+      expect(result.imageUrl).toEqual(approvedItem.imageUrl);
+      expect(result.topic).toEqual(approvedItem.topic);
     });
   });
 });
