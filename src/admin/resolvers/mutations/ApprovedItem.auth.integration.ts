@@ -20,8 +20,6 @@ import {
   getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import { db, getServer } from '../../../test/admin-server';
-import sinon from 'sinon';
-import { ReviewedCorpusItemEventType } from '../../../events/types';
 import {
   CREATE_APPROVED_ITEM,
   REJECT_APPROVED_ITEM,
@@ -63,10 +61,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
 
   describe('createApprovedCorpusItem mutation', () => {
     it('should succeed if user has access to one of scheduled surfaces', async () => {
-      // set up event tracking
-      const eventTracker = sinon.fake();
-      eventEmitter.on(ReviewedCorpusItemEventType.ADD_ITEM, eventTracker);
-
       // Set up auth headers with access to a single Scheduled Surface
       const headers = {
         name: 'Test User',
@@ -75,7 +69,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       };
 
       const server = getServerWithMockedHeaders(headers, eventEmitter);
-      await server.start();
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
@@ -88,26 +81,11 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       // Expect to see all the input data we supplied in the Approved Item
       // returned by the mutation
       expect(result.data?.createApprovedCorpusItem).to.deep.include(input);
-
-      // Check that the ADD_ITEM event was fired successfully:
-      // 1 - Event was fired once!
-      expect(eventTracker.callCount).to.equal(1);
-      // 2 - Event has the right type.
-      expect(await eventTracker.getCall(0).args[0].eventType).to.equal(
-        ReviewedCorpusItemEventType.ADD_ITEM
-      );
-      // 3- Event has the right entity passed to it.
-      expect(
-        await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(result.data?.createApprovedCorpusItem.externalId);
-
-      await server.stop();
     });
 
     it('should fail if request headers are not supplied', async () => {
       // With the default context, the headers are empty
       const server = getServer(eventEmitter);
-      await server.start();
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
@@ -117,8 +95,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.data).to.be.null;
       expect(result.errors).not.to.be.null;
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
 
     it("should fail if user doesn't have access to any of scheduled surfaces", async () => {
@@ -130,7 +106,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       };
 
       const server = getServerWithMockedHeaders(headers, eventEmitter);
-      await server.start();
 
       const result = await server.executeOperation({
         query: CREATE_APPROVED_ITEM,
@@ -140,8 +115,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.data).to.be.null;
       expect(result.errors).not.to.be.null;
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
 
     it('should fail optional scheduling if user has no access to relevant scheduled surface', async () => {
@@ -152,7 +125,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       };
 
       const server = getServerWithMockedHeaders(headers, eventEmitter);
-      await server.start();
 
       // extra inputs for scheduling - note attempting to schedule onto the US New Tab
       // while only having access to the German New Tab
@@ -167,8 +139,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.data).to.be.null;
       expect(result.errors).not.to.be.null;
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
   });
 
@@ -219,11 +189,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       };
 
       const server = getServerWithMockedHeaders(headers, eventEmitter);
-      await server.start();
-
-      // Set up event tracking
-      const eventTracker = sinon.fake();
-      eventEmitter.on(ReviewedCorpusItemEventType.UPDATE_ITEM, eventTracker);
 
       const res = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
@@ -247,26 +212,11 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(data?.updateApprovedCorpusItem.updatedBy).to.equal(
         headers.username
       );
-
-      // Check that the UPDATE_ITEM event was fired successfully:
-      // 1 - Event was fired once!
-      expect(eventTracker.callCount).to.equal(1);
-      // 2 - Event has the right type.
-      expect(await eventTracker.getCall(0).args[0].eventType).to.equal(
-        ReviewedCorpusItemEventType.UPDATE_ITEM
-      );
-      // 3- Event has the right entity passed to it.
-      expect(
-        await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(data?.updateApprovedCorpusItem.externalId);
-
-      await server.stop();
     });
 
     it('should fail if request headers are not supplied', async () => {
       // With the default context, the headers are empty
       const server = getServer(eventEmitter);
-      await server.start();
 
       const result = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
@@ -276,8 +226,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.data).to.be.null;
       expect(result.errors).not.to.be.null;
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
 
     it("should fail if user doesn't have access to any of scheduled surfaces", async () => {
@@ -289,7 +237,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       };
 
       const server = getServerWithMockedHeaders(headers, eventEmitter);
-      await server.start();
 
       const result = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM,
@@ -299,8 +246,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.data).to.be.null;
       expect(result.errors).not.to.be.null;
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
   });
 
@@ -336,11 +281,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       };
 
       const server = getServerWithMockedHeaders(headers, eventEmitter);
-      await server.start();
-
-      // Set up event tracking
-      const eventTracker = sinon.fake();
-      eventEmitter.on(ReviewedCorpusItemEventType.UPDATE_ITEM, eventTracker);
 
       const res = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM_AUTHORS,
@@ -366,26 +306,11 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(data?.updateApprovedCorpusItemAuthors.updatedBy).to.equal(
         headers.username
       );
-
-      // Check that the UPDATE_ITEM event was fired successfully:
-      // 1 - Event was fired once!
-      expect(eventTracker.callCount).to.equal(1);
-      // 2 - Event has the right type.
-      expect(await eventTracker.getCall(0).args[0].eventType).to.equal(
-        ReviewedCorpusItemEventType.UPDATE_ITEM
-      );
-      // 3- Event has the right entity passed to it.
-      expect(
-        await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(data?.updateApprovedCorpusItemAuthors.externalId);
-
-      await server.stop();
     });
 
     it('should fail if request headers are not supplied', async () => {
       // With the default context, the headers are empty
       const server = getServer(eventEmitter);
-      await server.start();
 
       const result = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM_AUTHORS,
@@ -395,8 +320,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.data).not.to.exist;
       expect(result.errors).to.exist;
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
 
     it("should fail if user doesn't have access to any of scheduled surfaces", async () => {
@@ -408,7 +331,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       };
 
       const server = getServerWithMockedHeaders(headers, eventEmitter);
-      await server.start();
 
       const result = await server.executeOperation({
         query: UPDATE_APPROVED_ITEM_AUTHORS,
@@ -418,8 +340,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.data).not.to.exist;
       expect(result.errors).to.exist;
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
   });
 
@@ -433,7 +353,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const item = await createApprovedItemHelper(db, {
         title: '15 Unheard Ways To Achieve Greater Terraform',
@@ -459,8 +378,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.data?.rejectApprovedCorpusItem.externalId).to.equal(
         item.externalId
       );
-
-      await server.stop();
     });
 
     it('should throw an error when the user has no access any scheduled surface', async () => {
@@ -472,7 +389,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const input: RejectApprovedItemInput = {
         externalId: 'test-id',
@@ -488,8 +404,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.data).to.be.null;
 
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
 
     it('should throw an error when the user has only read-only access', async () => {
@@ -501,7 +415,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const input: RejectApprovedItemInput = {
         externalId: 'test-id',
@@ -517,14 +430,11 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.data).to.be.null;
 
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
 
     it('should throw an error when the request headers are undefined', async () => {
       // pass in empty object for headers
       const server = getServerWithMockedHeaders({});
-      await server.start();
 
       const input: RejectApprovedItemInput = {
         externalId: 'test-id',
@@ -540,8 +450,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.data).to.be.null;
 
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
   });
 
@@ -564,7 +472,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const image: Upload = new Upload();
 
@@ -585,8 +492,6 @@ describe('mutations: ApprovedItem - authentication checks', () => {
       expect(result.data).to.be.null;
       expect(result.errors).not.to.be.null;
       expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
     });
   });
 });

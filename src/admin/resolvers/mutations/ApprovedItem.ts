@@ -155,13 +155,11 @@ export async function updateApprovedItem(
   );
 
   // Remove the old author(s) from the DB records before we run the update function
-  if (existingItem) {
-    await context.db.approvedItemAuthor.deleteMany({
-      where: {
-        approvedItemId: existingItem.id,
-      },
-    });
-  }
+  await context.db.approvedItemAuthor.deleteMany({
+    where: {
+      approvedItemId: existingItem?.id,
+    },
+  });
 
   // Update the corpus item with the updated fields sent through, including
   // any authors.
@@ -207,13 +205,11 @@ export async function updateApprovedItemAuthors(
   // Remove the old author(s) from the DB records before we run the update function
   // Note that we don't expect any authors to be present for any items this mutation
   // will be run for, but it's a good idea to be thorough anyway.
-  if (existingItem) {
-    await context.db.approvedItemAuthor.deleteMany({
-      where: {
-        approvedItemId: existingItem.id,
-      },
-    });
-  }
+  await context.db.approvedItemAuthor.deleteMany({
+    where: {
+      approvedItemId: existingItem?.id,
+    },
+  });
 
   // Update the corpus item with the updated fields sent through, including
   // any authors.

@@ -53,13 +53,8 @@ describe('mutations: ApprovedItem', () => {
 
   const server = getServerWithMockedHeaders(headers, eventEmitter);
 
-  beforeAll(async () => {
-    await server.start();
-  });
-
   afterAll(async () => {
     await db.$disconnect();
-    await server.stop();
   });
 
   beforeEach(async () => {
@@ -421,7 +416,7 @@ describe('mutations: ApprovedItem', () => {
       };
     });
 
-    it('should succeed if user has full access', async () => {
+    it('should succeed on the happy path (full access, valid input)', async () => {
       // Set up event tracking
       const eventTracker = sinon.fake();
       eventEmitter.on(ReviewedCorpusItemEventType.UPDATE_ITEM, eventTracker);
