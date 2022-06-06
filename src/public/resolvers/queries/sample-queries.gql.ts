@@ -36,3 +36,17 @@ export const GET_SCHEDULED_SURFACE_WITH_ITEMS = gql`
     }
   }
 `;
+
+export const CORPUS_ITEM_REFERENCE_RESOLVER = gql`
+  query ($representations: [_Any!]!) {
+    _entities(representations: $representations) {
+      ... on CorpusItem {
+        id
+        title
+        authors {
+          name
+        }
+      }
+    }
+  }
+`;

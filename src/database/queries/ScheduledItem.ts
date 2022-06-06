@@ -6,7 +6,10 @@ import {
   ScheduledItemsResult,
   ScheduledSurfaceItem,
 } from '../types';
-import { scheduledSurfaceAllowedValues } from '../../shared/utils';
+import {
+  getCorpusItemFromApprovedItem,
+  scheduledSurfaceAllowedValues,
+} from '../../shared/utils';
 import { groupBy } from '../../shared/utils';
 import { UserInputError } from 'apollo-server-errors';
 
@@ -120,24 +123,7 @@ export async function getItemsForScheduledSurface(
       scheduledDate: DateTime.fromJSDate(scheduledItem.scheduledDate).toFormat(
         'yyyy-MM-dd'
       ),
-      corpusItem: {
-        id: scheduledItem.approvedItem.externalId,
-        url: scheduledItem.approvedItem.url,
-        title: scheduledItem.approvedItem.title,
-        excerpt: scheduledItem.approvedItem.excerpt,
-        authors: scheduledItem.approvedItem.authors,
-        language: scheduledItem.approvedItem.language,
-        publisher: scheduledItem.approvedItem.publisher,
-        imageUrl: scheduledItem.approvedItem.imageUrl,
-        // so the type definition in /src/database/types has topic as optional,
-        // which typescript resolves as `string | undefined`. however, if the
-        // topic is missing in the db, prisma returns `null` - hence the
-        // nullish coalescing operator below.
-        //
-        // i wonder why typescript won't accept both. is there some deep dark
-        // JS reason? or is it just better practice?
-        topic: scheduledItem.approvedItem.topic ?? undefined,
-      },
+      corpusItem: getCorpusItemFromApprovedItem(scheduledItem.approvedItem),
     };
     return item;
   });
