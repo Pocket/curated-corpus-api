@@ -3,7 +3,8 @@
 export enum ProspectType {
   GLOBAL = 'GLOBAL',
   ORGANIC_TIMESPENT = 'ORGANIC_TIMESPENT',
-  SYNDICATED = 'SYNDICATED',
+  SYNDICATED_NEW = 'SYNDICATED_NEW',
+  SYNDICATED_RERUN = 'SYNDICATED_RERUN',
   TOP_SAVED = 'TOP_SAVED',
   DOMAIN_ALLOWLIST = 'DOMAIN_ALLOWLIST',
   COUNTS_LOGISTIC_APPROVAL = 'COUNTS_LOGISTIC_APPROVAL',
@@ -40,7 +41,8 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
     prospectTypes: [
       ProspectType.GLOBAL,
       ProspectType.ORGANIC_TIMESPENT,
-      ProspectType.SYNDICATED,
+      ProspectType.SYNDICATED_NEW,
+      ProspectType.SYNDICATED_RERUN,
       ProspectType.COUNTS_LOGISTIC_APPROVAL,
       ProspectType.HYBRID_LOGISTIC_APPROVAL,
     ],
