@@ -115,6 +115,11 @@ export async function getApprovedItemByExternalId(
 ): Promise<ApprovedItem | null> {
   return db.approvedItem.findUnique({
     where: { externalId },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
+    },
   });
 }
 
