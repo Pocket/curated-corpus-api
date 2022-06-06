@@ -71,7 +71,8 @@ by the Curation Admin Tools frontend to filter prospects.
 enum ProspectType {
     GLOBAL
     ORGANIC_TIMESPENT
-    SYNDICATED
+    SYNDICATED_NEW
+    SYNDICATED_RERUN
     TOP_SAVED
     DOMAIN_ALLOWLIST
     COUNTS_LOGISTIC_APPROVAL
@@ -205,8 +206,9 @@ type ApprovedCorpusItem @key(fields: "url") {
     """
     Subquery to get the log of scheduled entries to display for a given Approved Item, most recent first.
     """
-    scheduledSurfaceHistory(filters: ApprovedCorpusItemScheduledSurfaceHistoryFilters):
-        [ApprovedCorpusItemScheduledSurfaceHistory!]!
+    scheduledSurfaceHistory(
+        filters: ApprovedCorpusItemScheduledSurfaceHistoryFilters
+    ): [ApprovedCorpusItemScheduledSurfaceHistory!]!
 }
 
 """
@@ -457,7 +459,6 @@ input ApprovedCorpusItemScheduledSurfaceHistoryFilters {
     """
     scheduledSurfaceGuid: ID
 }
-
 
 """
 Available fields for filtering Rejected Items.
