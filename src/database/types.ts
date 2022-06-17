@@ -151,7 +151,7 @@ export type RescheduleScheduledItemInput = {
 };
 
 export type ApprovedItem = ApprovedItemModel & {
-  authors?: ApprovedItemAuthor[];
+  authors: ApprovedItemAuthor[];
 };
 
 // Types for the public `scheduledSurface` query.

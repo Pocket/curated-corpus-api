@@ -1,11 +1,15 @@
 // need this to be able to use Prisma-native types for orderBy and filter clauses
 import * as prisma from '@prisma/client';
-import { ApprovedItem, PrismaClient } from '@prisma/client';
+import {
+  ApprovedItem as PrismaApprovedItem,
+  PrismaClient,
+} from '@prisma/client';
 import {
   Connection,
   findManyCursorConnection,
 } from '@devoxa/prisma-relay-cursor-connection';
 import {
+  ApprovedItem,
   ApprovedItemFilter,
   ApprovedItemScheduledSurfaceHistory,
   PaginationInput,
@@ -52,10 +56,29 @@ export async function getApprovedItems(
   //
   // Step 1: Provide at least two types - ApprovedItem as the record/entity we're using, and
   // ApprovedItemCursor defined at the top of this file to specify a custom field for the cursor.
-  return findManyCursorConnection<ApprovedItem, ApprovedItemCursor>(
+  return findManyCursorConnection<
+    // this is the type returned by Step 2 below - it must be a native Prisma type
+    PrismaApprovedItem,
+    ApprovedItemCursor,
+    // this is the type we need to conform to for each node to satisfy the graphql
+    // schema (which uses our custom ApprovedItem type (that contains authors))
+    // (afaict - the docs aren't great)
+    ApprovedItem,
+    // this is the return structure of this function
+    // (afaict - the docs aren't great)
+    {
+      cursor: string;
+      node: ApprovedItem;
+    }
+  >(
     // Step 2: the function will generate cursor/take/skip arguments for us in `args`,
     // need to add our own to that.
-    (args) => db.approvedItem.findMany({ ...args, ...baseArgs }),
+    (args) => {
+      return db.approvedItem.findMany({
+        ...args,
+        ...baseArgs,
+      });
+    },
     () => db.approvedItem.count({ where: baseArgs.where }),
     // Step 3: Pass the PaginationInput here exactly as it arrives all the way from
     // the query - the types are 100% compatible.
@@ -77,6 +100,17 @@ export async function getApprovedItems(
       // sending it along as the now-decoded `externalId` value to Prisma.
       decodeCursor: (cursor) =>
         JSON.parse(Buffer.from(cursor, 'base64').toString('ascii')),
+      // to conform to the custom, non-prisma type, we need to explicitly define
+      // the structure of each node.
+      recordToEdge: (record) => {
+        return {
+          // typescript is making this more difficult than it needs to be. authors
+          // is returned based on `baseArgs` above, but because this property isn't
+          // in the prisma ApprovedItem type, we have to cast the variable as our
+          // custom ApprovedItem type (which *does* contain authors data).
+          node: record as ApprovedItem,
+        };
+      },
     }
   );
 }

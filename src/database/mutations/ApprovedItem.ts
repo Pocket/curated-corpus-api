@@ -1,5 +1,6 @@
-import { ApprovedItem, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import {
+  ApprovedItem,
   CreateApprovedItemInput,
   ImportApprovedItemInput,
   UpdateApprovedItemAuthorsInput,
@@ -53,7 +54,14 @@ export async function importApprovedItem(
   db: PrismaClient,
   data: ImportApprovedItemInput
 ): Promise<ApprovedItem> {
-  return db.approvedItem.create({ data });
+  return db.approvedItem.create({
+    data,
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
+    },
+  });
 }
 
 /**

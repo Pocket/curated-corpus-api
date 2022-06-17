@@ -8,11 +8,8 @@ import {
 import config from '../config';
 import sinon from 'sinon';
 import { getUnixTimestamp } from '../shared/utils';
-import {
-  ApprovedItem,
-  CuratedStatus,
-  RejectedCuratedCorpusItem,
-} from '@prisma/client';
+import { ApprovedItem } from '../database/types';
+import { CuratedStatus, RejectedCuratedCorpusItem } from '@prisma/client';
 import { CorpusItemSource, Topics } from '../shared/types';
 
 describe('CuratedCorpusEventEmitter', () => {
@@ -50,6 +47,7 @@ describe('CuratedCorpusEventEmitter', () => {
     createdBy: 'Anyone',
     updatedAt: new Date(),
     updatedBy: null,
+    authors: [{ name: 'Octavia Butler', sortOrder: 1 }],
   };
 
   const approvedItemPayload: ReviewedCorpusItemPayload = {

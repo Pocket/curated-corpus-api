@@ -1,12 +1,8 @@
 import { S3 } from 'aws-sdk';
 import { IncomingHttpHeaders } from 'http';
-import {
-  ApprovedItem,
-  PrismaClient,
-  RejectedCuratedCorpusItem,
-} from '@prisma/client';
+import { PrismaClient, RejectedCuratedCorpusItem } from '@prisma/client';
 import { client } from '../database/client';
-import { ScheduledItem } from '../database/types';
+import { ApprovedItem, ScheduledItem } from '../database/types';
 import { CuratedCorpusEventEmitter } from '../events/curatedCorpusEventEmitter';
 import {
   ReviewedCorpusItemEventType,

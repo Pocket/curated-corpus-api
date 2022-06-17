@@ -72,6 +72,12 @@ const payloadBuilders = {
       updatedAt: data.scheduledCorpusItem.updatedAt.toUTCString(),
       scheduledSurfaceGuid: data.scheduledCorpusItem.scheduledSurfaceGuid,
       scheduledDate: toUtcDateString(data.scheduledCorpusItem.scheduledDate),
+      // 2022-06-21: authors are included as an array of objects matching the
+      // ApprovedItemAuthor type definition in /src/database/types.ts
+      // as of this writing, this data is not expected by event bridge and
+      // will be discarded. it is added now only for potential future use
+      // by clients consuming from event bridge.
+      authors: data.scheduledCorpusItem.approvedItem.authors,
     };
   },
   approvedItemEvent(
@@ -98,6 +104,12 @@ const payloadBuilders = {
         'updatedAt' in item
           ? item.updatedAt.toUTCString()
           : new Date().toUTCString(),
+      // 2022-06-21: authors are included as an array of objects matching the
+      // ApprovedItemAuthor type definition in /src/database/types.ts
+      // as of this writing, this data is not expected by event bridge and
+      // will be discarded. it is added now only for potential future use
+      // by clients consuming from event bridge.
+      authors: 'authors' in item ? item.authors : undefined,
     };
   },
 };

@@ -154,6 +154,9 @@ describe('queries: ApprovedCorpusItem', () => {
       expect(firstItem.isCollection).to.be.a('boolean');
       expect(firstItem.isTimeSensitive).to.be.a('boolean');
       expect(firstItem.isSyndicated).to.be.a('boolean');
+      expect(firstItem.authors.length).to.be.greaterThan(0);
+      expect(firstItem.authors[0].name).to.be.not.undefined;
+      expect(firstItem.authors[0].sortOrder).to.be.not.undefined;
     });
 
     it('should respect pagination', async () => {
