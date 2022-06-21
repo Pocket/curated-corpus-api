@@ -45,6 +45,7 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
       ProspectType.SYNDICATED_RERUN,
       ProspectType.COUNTS_LOGISTIC_APPROVAL,
       ProspectType.HYBRID_LOGISTIC_APPROVAL,
+      ProspectType.APPROVED,
     ],
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ENUS,
   },
