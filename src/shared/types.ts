@@ -10,6 +10,7 @@ export enum ProspectType {
   COUNTS_LOGISTIC_APPROVAL = 'COUNTS_LOGISTIC_APPROVAL',
   HYBRID_LOGISTIC_APPROVAL = 'HYBRID_LOGISTIC_APPROVAL',
   APPROVED = 'APPROVED',
+  TIMESPENT_LOGISTIC_APPROVAL = 'TIMESPENT_LOGISTIC_APPROVAL',
 }
 
 export enum MozillaAccessGroup {
@@ -46,6 +47,7 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
       ProspectType.COUNTS_LOGISTIC_APPROVAL,
       ProspectType.HYBRID_LOGISTIC_APPROVAL,
       ProspectType.APPROVED,
+      ProspectType.TIMESPENT_LOGISTIC_APPROVAL,
     ],
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ENUS,
   },
