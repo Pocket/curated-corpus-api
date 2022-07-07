@@ -148,7 +148,7 @@ type ApprovedCorpusItem @key(fields: "url") {
     """
     The authors associated with this ApprovedCorpusItem.
     """
-    authors: [CorpusItemAuthor!]
+    authors: [CorpusItemAuthor!]!
     """
     The outcome of the curators' review.
     """

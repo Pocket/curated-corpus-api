@@ -59,7 +59,7 @@ type CorpusItem @key(fields: "id") {
     """
     The author names and sort orders associated with this CorpusItem.
     """
-    authors: [CorpusItemAuthor!]
+    authors: [CorpusItemAuthor!]!
     """
     The topic associated with the Approved Item.
     """

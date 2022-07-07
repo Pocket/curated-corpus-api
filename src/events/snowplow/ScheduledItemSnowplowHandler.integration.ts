@@ -56,6 +56,7 @@ const scheduledCorpusItem: ScheduledItem = {
     createdBy: 'Amy',
     updatedAt: new Date(),
     updatedBy: 'Amy',
+    authors: [{ name: 'Octavia Butler', sortOrder: 1 }],
   },
 };
 

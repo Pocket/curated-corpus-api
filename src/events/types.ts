@@ -74,6 +74,7 @@ export type ApprovedItemEventBusPayload = BaseEventBusPayload &
       | 'topic'
       | 'isSyndicated'
       | 'createdBy'
+      | 'authors'
     >
   > & {
     approvedItemExternalId: string; // externalId of ApprovedItem

@@ -1,5 +1,4 @@
 import { Connection } from '@devoxa/prisma-relay-cursor-connection';
-import { ApprovedItem } from '@prisma/client';
 import { AuthenticationError, UserInputError } from 'apollo-server-errors';
 import config from '../../../config';
 import {
@@ -9,7 +8,10 @@ import {
 } from '../../../database/queries';
 import { ACCESS_DENIED_ERROR, ScheduledSurfaces } from '../../../shared/types';
 import { IContext } from '../../context';
-import { ApprovedItemScheduledSurfaceHistory } from '../../../database/types';
+import {
+  ApprovedItem,
+  ApprovedItemScheduledSurfaceHistory,
+} from '../../../database/types';
 
 /**
  * This query retrieves approved items from the database.

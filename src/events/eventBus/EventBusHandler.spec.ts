@@ -51,6 +51,7 @@ const scheduledCorpusItem: ScheduledItem = {
     createdBy: 'Amy',
     updatedAt: new Date(1648225373000),
     updatedBy: 'Amy',
+    authors: [{ name: 'Octavia Butler', sortOrder: 1 }],
   },
 };
 
@@ -99,6 +100,7 @@ describe('EventBusHandler', () => {
         createdBy: 'Amy',
         updatedAt: new Date(1648225373000).toUTCString(),
         eventType: config.eventBridge.updateApprovedItemEventType,
+        authors: scheduledCorpusItem.approvedItem.authors,
       };
       emitter.emit(ReviewedCorpusItemEventType.UPDATE_ITEM, {
         reviewedCorpusItem: scheduledCorpusItem.approvedItem,
@@ -148,6 +150,12 @@ describe('EventBusHandler', () => {
       updatedAt: new Date(1648225373000).toUTCString(),
       scheduledSurfaceGuid: 'NEW_TAB_EN_US',
       scheduledDate: '2030-01-01',
+      authors: [
+        {
+          name: 'Octavia Butler',
+          sortOrder: 1,
+        },
+      ],
     };
     it.each([
       [
