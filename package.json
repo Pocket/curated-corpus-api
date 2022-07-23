@@ -75,7 +75,7 @@
     "@faker-js/faker": "6.0.0",
     "@pocket-tools/eslint-config": "2.0.0",
     "@types/chai": "4.3.1",
-    "@types/faker": "5.5.9",
+    "@types/faker": "6.6.8",
     "@types/graphql-upload": "8.0.7",
     "@types/jest": "28.1.6",
     "@types/node": "16.11.45",
