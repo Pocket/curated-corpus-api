@@ -81,6 +81,15 @@ export const GET_APPROVED_ITEM_BY_URL = gql`
   ${CuratedItemData}
 `;
 
+export const GET_APPROVED_ITEM_BY_EXTERNAL_ID = gql`
+  query approvedCorpusItem($externalId: ID!) {
+    approvedCorpusItem(externalId: $externalId) {
+      ...CuratedItemData
+    }
+  }
+  ${CuratedItemData}
+`;
+
 export const GET_APPROVED_ITEM_WITH_SCHEDULING_HISTORY = gql`
   query getApprovedCorpusItemByUrl(
     $url: String!

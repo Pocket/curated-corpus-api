@@ -863,6 +863,16 @@ type Query {
     ): ApprovedCorpusItem
 
     """
+    Retrieves an approved item with the given external ID.
+    """
+    approvedCorpusItem(
+        """
+        ID of the approved item. A string in UUID format.
+        """
+        externalId: ID!
+    ): ApprovedCorpusItem
+
+    """
     Retrieves all ScheduledSurfaces available to the given SSO user. Requires an Authorization header.
     """
     getScheduledSurfacesForUser: [ScheduledSurface!]!

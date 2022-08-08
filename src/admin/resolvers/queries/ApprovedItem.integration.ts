@@ -9,6 +9,7 @@ import {
 } from '../../../test/helpers';
 import {
   APPROVED_ITEM_REFERENCE_RESOLVER,
+  GET_APPROVED_ITEM_BY_EXTERNAL_ID,
   GET_APPROVED_ITEM_BY_URL,
   GET_APPROVED_ITEM_WITH_SCHEDULING_HISTORY,
   GET_APPROVED_ITEMS,
@@ -362,7 +363,6 @@ describe('queries: ApprovedCorpusItem', () => {
 
       // Does the query return all the properties of an Approved Item?
       expect(item.externalId).to.be.not.undefined;
-      expect(item.externalId).to.be.not.undefined;
       expect(item.prospectId).to.be.not.undefined;
       expect(item.title).to.be.not.undefined;
       expect(item.language).to.be.not.undefined;
@@ -391,6 +391,81 @@ describe('queries: ApprovedCorpusItem', () => {
 
       // There should be no data returned
       expect(result.data?.getApprovedCorpusItemByUrl).to.be.null;
+
+      // There should be no errors
+      expect(result.errors).to.be.undefined;
+    });
+  });
+
+  describe('approvedCorpusItem query', () => {
+    const items: ApprovedItem[] = [];
+
+    beforeAll(async () => {
+      // Create a few corpus items
+      const storyInput = [
+        {
+          title: 'Story one',
+        },
+        {
+          title: 'Story two',
+        },
+        {
+          title: 'Story three',
+        },
+      ];
+
+      for (const input of storyInput) {
+        const item = await createApprovedItemHelper(db, input);
+        items.push(item);
+      }
+    });
+
+    it('should get an existing approved item by externalId', async () => {
+      // Let's use a known external ID from the sample subset above
+      const result = await server.executeOperation({
+        query: GET_APPROVED_ITEM_BY_EXTERNAL_ID,
+        variables: {
+          externalId: items[0].externalId,
+        },
+      });
+
+      // There should be no errors
+      expect(result.errors).to.be.undefined;
+
+      // Proceed with verifying the data
+      // Is this really the item we wanted to retrieve?
+      const item = result.data?.approvedCorpusItem;
+      expect(item.externalId).to.equal(items[0].externalId);
+      expect(item.url).to.equal(items[0].url);
+
+      // Does the query return all the other properties of an Approved Item?
+      expect(item.externalId).to.be.not.undefined;
+      expect(item.prospectId).to.be.not.undefined;
+      expect(item.title).to.be.not.undefined;
+      expect(item.language).to.be.not.undefined;
+      expect(item.publisher).to.be.not.undefined;
+      expect(item.imageUrl).to.be.not.undefined;
+      expect(item.excerpt).to.be.not.undefined;
+      expect(item.status).to.be.not.undefined;
+      expect(item.topic).to.be.not.undefined;
+      expect(item.source).to.be.not.undefined;
+      expect(item.isCollection).to.be.a('boolean');
+      expect(item.isTimeSensitive).to.be.a('boolean');
+      expect(item.isSyndicated).to.be.a('boolean');
+    });
+
+    it('should return null when nothing for a given externalId is found', async () => {
+      const result = await server.executeOperation({
+        query: GET_APPROVED_ITEM_BY_EXTERNAL_ID,
+        variables: {
+          externalId: 'this-id-does-not-exist',
+        },
+      });
+
+      expect(result.data).to.have.property('approvedCorpusItem');
+
+      // There should be no data returned
+      expect(result.data?.approvedCorpusItem).to.be.null;
 
       // There should be no errors
       expect(result.errors).to.be.undefined;
