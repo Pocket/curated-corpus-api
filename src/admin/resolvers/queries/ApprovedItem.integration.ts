@@ -559,7 +559,7 @@ describe('queries: ApprovedCorpusItem', () => {
       expect(result.errors).to.be.undefined;
 
       // There should be no data returned for the subquery (an empty array),
-      // since the this story doesn't have any entries on the UK New Tab
+      // since this story doesn't have any entries on the UK New Tab
       expect(
         result.data?.getApprovedCorpusItemByUrl.scheduledSurfaceHistory
       ).to.have.lengthOf(0);
