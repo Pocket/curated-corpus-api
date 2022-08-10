@@ -865,7 +865,7 @@ type Query {
     """
     Retrieves an approved item with the given external ID.
     """
-    approvedCorpusItem(
+    approvedCorpusItemByExternalId(
         """
         ID of the approved item. A string in UUID format.
         """

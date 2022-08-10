@@ -301,7 +301,7 @@ describe('queries: approvedCorpusItem - authentication', () => {
         },
       });
 
-      expect(result.data?.approvedCorpusItem).to.be.null;
+      expect(result.data?.approvedCorpusItemByExternalId).to.be.null;
       expect(result.errors).not.to.be.undefined;
 
       // check if the error we get is access denied error
@@ -326,7 +326,7 @@ describe('queries: approvedCorpusItem - authentication', () => {
         },
       });
 
-      expect(result.data?.approvedCorpusItem).to.be.null;
+      expect(result.data?.approvedCorpusItemByExternalId).to.be.null;
       expect(result.errors).not.to.be.undefined;
 
       // check if the error we get is access denied error

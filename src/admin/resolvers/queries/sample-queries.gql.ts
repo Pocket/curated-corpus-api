@@ -82,8 +82,8 @@ export const GET_APPROVED_ITEM_BY_URL = gql`
 `;
 
 export const GET_APPROVED_ITEM_BY_EXTERNAL_ID = gql`
-  query approvedCorpusItem($externalId: ID!) {
-    approvedCorpusItem(externalId: $externalId) {
+  query approvedCorpusItemByExternalId($externalId: ID!) {
+    approvedCorpusItemByExternalId(externalId: $externalId) {
       ...CuratedItemData
     }
   }

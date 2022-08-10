@@ -397,7 +397,7 @@ describe('queries: ApprovedCorpusItem', () => {
     });
   });
 
-  describe('approvedCorpusItem query', () => {
+  describe('approvedCorpusItemByExternalId query', () => {
     const items: ApprovedItem[] = [];
 
     beforeAll(async () => {
@@ -434,7 +434,7 @@ describe('queries: ApprovedCorpusItem', () => {
 
       // Proceed with verifying the data
       // Is this really the item we wanted to retrieve?
-      const item = result.data?.approvedCorpusItem;
+      const item = result.data?.approvedCorpusItemByExternalId;
       expect(item.externalId).to.equal(items[0].externalId);
       expect(item.url).to.equal(items[0].url);
 
@@ -462,10 +462,10 @@ describe('queries: ApprovedCorpusItem', () => {
         },
       });
 
-      expect(result.data).to.have.property('approvedCorpusItem');
+      expect(result.data).to.have.property('approvedCorpusItemByExternalId');
 
       // There should be no data returned
-      expect(result.data?.approvedCorpusItem).to.be.null;
+      expect(result.data?.approvedCorpusItemByExternalId).to.be.null;
 
       // There should be no errors
       expect(result.errors).to.be.undefined;

@@ -85,7 +85,7 @@ export const resolvers = {
   },
   // The queries available
   Query: {
-    approvedCorpusItem: getApprovedItemByExternalId,
+    approvedCorpusItemByExternalId: getApprovedItemByExternalId,
     getApprovedCorpusItems: getApprovedItems,
     getRejectedCorpusItems: getRejectedItems,
     getScheduledCorpusItems: getScheduledItems,
