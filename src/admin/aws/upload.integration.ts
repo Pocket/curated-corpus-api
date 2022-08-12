@@ -1,6 +1,6 @@
 import { uploadImageToS3, uploadImageToS3FromUrl } from './upload';
 import s3 from './s3';
-import { FileUpload } from 'graphql-upload';
+import Upload from 'graphql-upload/Upload.js';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import config from '../../config';
 import nock from 'nock';

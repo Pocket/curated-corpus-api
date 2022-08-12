@@ -62,7 +62,7 @@
     "dataloader": "2.1.0",
     "date-fns": "2.29.1",
     "graphql-scalars": "1.18.0",
-    "graphql-upload": "13.0.0",
+    "graphql-upload": "15.0.2",
     "luxon": "2.5.0",
     "node-fetch": "2.6.7"
   },

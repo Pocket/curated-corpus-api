@@ -29,7 +29,7 @@ import {
 } from './sample-mutations.gql';
 import { expect } from 'chai';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
-import { Upload } from 'graphql-upload';
+import Upload from 'graphql-upload/Upload.js';
 
 describe('mutations: ApprovedItem - authentication checks', () => {
   const eventEmitter = new CuratedCorpusEventEmitter();
