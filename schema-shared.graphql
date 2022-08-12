@@ -38,7 +38,7 @@ type CorpusItemAuthor {
 """
 Information about pagination in a connection.
 """
-type PageInfo {
+type PageInfo @shareable {
     """
     When paginating forwards, the cursor to continue.
     """
