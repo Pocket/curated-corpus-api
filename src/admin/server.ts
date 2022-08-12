@@ -1,7 +1,7 @@
 import { UserInputError } from 'apollo-server';
 import { ApolloServer } from 'apollo-server-express';
 import { Request } from 'express';
-import { buildSubgraphSchema } from '@apollo/federation';
+import { buildSubgraphSchema } from '@apollo/subgraph';
 import { typeDefsAdmin } from '../typeDefs';
 import { resolvers as resolversAdmin } from './resolvers';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
@@ -26,9 +26,10 @@ interface ContextFactory {
  */
 export function getServer(contextFactory: ContextFactory): ApolloServer {
   return new ApolloServer({
-    schema: buildSubgraphSchema([
-      { typeDefs: typeDefsAdmin, resolvers: resolversAdmin },
-    ]),
+    schema: buildSubgraphSchema({
+      typeDefs: typeDefsAdmin,
+      resolvers: resolversAdmin,
+    }),
     plugins: [
       // Copied from Apollo docs, the sessionID signifies if we should separate out caches by user.
       responseCachePlugin({

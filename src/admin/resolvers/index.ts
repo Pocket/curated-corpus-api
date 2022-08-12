@@ -23,15 +23,12 @@ import {
   deleteScheduledItem,
   rescheduleScheduledItem,
 } from './mutations/ScheduledItem';
-import { GraphQLUpload } from 'graphql-upload';
 import {
   getApprovedItemByUrl as dbGetApprovedItemByUrl,
   getRejectedItemByUrl as dbGetRejectedItemByUrl,
 } from '../../database/queries';
 
 export const resolvers = {
-  // Map the Upload scalar to graphql-upload
-  Upload: GraphQLUpload,
   // The custom scalars from GraphQL-Scalars that we find useful.
   Date: DateResolver,
   NonNegativeInt: NonNegativeIntResolver,

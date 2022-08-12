@@ -1,5 +1,5 @@
 import { ApolloServer } from 'apollo-server-express';
-import { buildSubgraphSchema } from '@apollo/federation';
+import { buildSubgraphSchema } from '@apollo/subgraph';
 import { typeDefsPublic } from '../typeDefs';
 import { resolvers } from './resolvers';
 import responseCachePlugin from 'apollo-server-plugin-response-cache';
@@ -12,7 +12,7 @@ import {
 import { client } from '../database/client';
 
 export const server = new ApolloServer({
-  schema: buildSubgraphSchema([{ typeDefs: typeDefsPublic, resolvers }]),
+  schema: buildSubgraphSchema({ typeDefs: typeDefsPublic, resolvers }),
   plugins: [
     //Copied from Apollo docs, the sessionID signifies if we should separate out caches by user.
     responseCachePlugin({
