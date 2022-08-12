@@ -1,5 +1,4 @@
 type Image @key(fields: "url") {
-    "Absolute url to the image"
     url: Url!
 }
 

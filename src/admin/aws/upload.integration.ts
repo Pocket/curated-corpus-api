@@ -27,8 +27,8 @@ describe('Upload', () => {
     unlinkSync(testFilePath);
   });
 
-  it('uploads an image to s3 using graphql FileUpload type', async () => {
-    const image: FileUpload = {
+  it('uploads an image to s3 using graphql Upload type', async () => {
+    const image: Upload = {
       filename: 'test.jpeg',
       mimetype: 'image/jpeg',
       encoding: '7bit',
