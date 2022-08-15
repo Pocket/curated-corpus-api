@@ -61,7 +61,7 @@ describe('CorpusItem reference resolver', () => {
     expect(result.errors).not.to.be.null;
 
     expect(result.errors?.[0].message).to.contain(
-      `Could not find Corpus Item with id of "ABRACADABRA"`
+      `Could not find Corpus Item with ID of "ABRACADABRA"`
     );
     expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
   });

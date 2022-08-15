@@ -2,6 +2,7 @@ import { DateResolver, NonNegativeIntResolver } from 'graphql-scalars';
 import { UnixTimestampResolver } from './fields/UnixTimestamp';
 import {
   getApprovedItems,
+  getApprovedItemByExternalId,
   getApprovedItemByUrl,
   getScheduledSurfaceHistory,
 } from './queries/ApprovedItem';
@@ -84,6 +85,7 @@ export const resolvers = {
   },
   // The queries available
   Query: {
+    approvedCorpusItemByExternalId: getApprovedItemByExternalId,
     getApprovedCorpusItems: getApprovedItems,
     getRejectedCorpusItems: getRejectedItems,
     getScheduledCorpusItems: getScheduledItems,

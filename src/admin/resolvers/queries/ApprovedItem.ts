@@ -4,6 +4,7 @@ import config from '../../../config';
 import {
   getApprovedItems as dbGetApprovedItems,
   getApprovedItemByUrl as dbGetApprovedItemByUrl,
+  getApprovedItemByExternalId as dbGetApprovedItemByExternalId,
   getScheduledSurfaceHistory as dbGetScheduledSurfaceHistory,
 } from '../../../database/queries';
 import { ACCESS_DENIED_ERROR, ScheduledSurfaces } from '../../../shared/types';
@@ -79,6 +80,31 @@ export async function getApprovedItemByUrl(
   }
 
   return await dbGetApprovedItemByUrl(context.db, args.url);
+}
+
+/**
+ * This query returns an approved item with a given external ID if it finds one
+ * in the Curated Corpus (among approved items only), or return null
+ * if the external ID is not found
+ *
+ * @param parent
+ * @param args
+ * @param context
+ */
+export async function getApprovedItemByExternalId(
+  parent,
+  args,
+  context: IContext
+): Promise<ApprovedItem | null> {
+  //check if the user does not have the permissions to access this query
+  if (
+    !context.authenticatedUser.hasReadOnly &&
+    !context.authenticatedUser.canWriteToCorpus()
+  ) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+
+  return await dbGetApprovedItemByExternalId(context.db, args.externalId);
 }
 
 /**

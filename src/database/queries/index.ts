@@ -1,6 +1,7 @@
 export {
   getApprovedItems,
   getApprovedItemByUrl,
+  getApprovedItemByExternalId,
   getScheduledSurfaceHistory,
 } from './ApprovedItem';
 export {
