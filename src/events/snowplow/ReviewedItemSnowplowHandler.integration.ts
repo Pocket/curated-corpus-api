@@ -94,6 +94,7 @@ function assertValidSnowplowApprovedItemEvents(eventContext) {
         url: approvedItem.url,
         title: approvedItem.title,
         excerpt: approvedItem.excerpt,
+        publisher: approvedItem.publisher,
         authors:
           approvedItem.authors?.map(
             (author: ApprovedItemAuthor) => author.name

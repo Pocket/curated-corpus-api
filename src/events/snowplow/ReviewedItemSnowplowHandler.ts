@@ -135,6 +135,7 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       title: item.title,
       language: item.language,
       excerpt: item.excerpt,
+      publisher: item.publisher,
       // we only send author name to snowplow, not the sort order
       authors: item.authors.map((author: ApprovedItemAuthor) => author.name),
       image_url: item.imageUrl,
