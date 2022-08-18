@@ -31,7 +31,7 @@ import {
   ReviewedCorpusItemEventType,
   ScheduledCorpusItemEventType,
 } from '../../../events/types';
-import { Upload } from 'graphql-upload';
+import Upload from 'graphql-upload/Upload.js';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import { GET_REJECTED_ITEMS } from '../queries/sample-queries.gql';
 import {

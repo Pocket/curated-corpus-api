@@ -91,6 +91,9 @@ export const getCorpusItemFromApprovedItem = (
     language: approvedItem.language,
     publisher: approvedItem.publisher,
     imageUrl: approvedItem.imageUrl,
+    image: {
+      url: approvedItem.imageUrl,
+    },
     // so the type definition in /src/database/types has topic as optional,
     // which typescript resolves as `string | undefined`. however, if the
     // topic is missing in the db, prisma returns `null` - hence the

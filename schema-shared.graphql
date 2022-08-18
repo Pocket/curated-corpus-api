@@ -1,3 +1,9 @@
+extend schema
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.0"
+    import: ["@key", "@shareable", "@requires", "@external"]
+  )
+
 """
 A URL - usually, for an interesting story on the internet that's worth saving to Pocket.
 """
@@ -32,7 +38,7 @@ type CorpusItemAuthor {
 """
 Information about pagination in a connection.
 """
-type PageInfo {
+type PageInfo @shareable {
     """
     When paginating forwards, the cursor to continue.
     """

@@ -52,7 +52,7 @@ export type ScheduledItemEventBusPayload = BaseEventBusPayload &
   Pick<ScheduledItemModel, 'createdBy' | 'scheduledSurfaceGuid'> &
   Pick<
     ApprovedItem,
-    'topic' | 'isSyndicated' | keyof Omit<CorpusItem, 'id'>
+    'topic' | 'isSyndicated' | keyof Omit<CorpusItem, 'id' | 'image'>
   > & {
     scheduledItemExternalId: string; // externalId of ScheduledItem
     approvedItemExternalId: string; // externalId of ApprovedItem

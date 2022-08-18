@@ -1,3 +1,7 @@
+type Image @key(fields: "url") {
+    url: Url!
+}
+
 """
 A scheduled entry for an CorpusItem to appear on a Scheduled Surface.
 For example, a story that is scheduled to appear on December 31st, 2021 on the Scheduled Surface in Firefox for the US audience.
@@ -56,6 +60,12 @@ type CorpusItem @key(fields: "id") {
     The image URL for this item's accompanying picture.
     """
     imageUrl: Url!
+
+    """
+    The image for this item's accompanying picture.
+    """
+    image: Image!
+
     """
     The author names and sort orders associated with this CorpusItem.
     """

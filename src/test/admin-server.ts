@@ -1,6 +1,6 @@
 import { UserInputError } from 'apollo-server';
 import { ApolloServer } from 'apollo-server-express';
-import { buildSubgraphSchema } from '@apollo/federation';
+import { buildSubgraphSchema } from '@apollo/subgraph';
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginInlineTraceDisabled,
@@ -22,9 +22,10 @@ export const getServer = (
   context?: ContextManager
 ) => {
   return new ApolloServer({
-    schema: buildSubgraphSchema([
-      { typeDefs: typeDefsAdmin, resolvers: adminResolvers },
-    ]),
+    schema: buildSubgraphSchema({
+      typeDefs: typeDefsAdmin,
+      resolvers: adminResolvers,
+    }),
     context: () => {
       // If context has been provided, use that instead.
       return (

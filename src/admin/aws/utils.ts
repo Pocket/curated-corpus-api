@@ -1,4 +1,4 @@
-import { FileUpload } from 'graphql-upload';
+import Upload from 'graphql-upload/Upload.js';
 import fetch from 'node-fetch';
 import mime from 'mime-types';
 import { InvalidImageUrl } from './errors';
@@ -7,7 +7,7 @@ import { InvalidImageUrl } from './errors';
  * Fetch image from URL and transform into a GraphQL FileUpload object
  * @param url
  */
-export async function getFileUploadFromUrl(url: string): Promise<FileUpload> {
+export async function getFileUploadFromUrl(url: string): Promise<Upload> {
   try {
     const res = await fetch(getPocketCacheUrl(url));
     const contentType = res.headers.get('content-type');

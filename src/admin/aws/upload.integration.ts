@@ -1,6 +1,6 @@
 import { uploadImageToS3, uploadImageToS3FromUrl } from './upload';
 import s3 from './s3';
-import { FileUpload } from 'graphql-upload';
+import Upload from 'graphql-upload/Upload.js';
 import { createReadStream, unlinkSync, writeFileSync } from 'fs';
 import config from '../../config';
 import nock from 'nock';
@@ -27,8 +27,8 @@ describe('Upload', () => {
     unlinkSync(testFilePath);
   });
 
-  it('uploads an image to s3 using graphql FileUpload type', async () => {
-    const image: FileUpload = {
+  it('uploads an image to s3 using graphql Upload type', async () => {
+    const image: Upload = {
       filename: 'test.jpeg',
       mimetype: 'image/jpeg',
       encoding: '7bit',

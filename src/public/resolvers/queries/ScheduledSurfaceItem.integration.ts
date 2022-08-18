@@ -135,6 +135,9 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
         expect(item.corpusItem.authors).to.exist;
         expect(item.corpusItem.language).to.exist;
         expect(item.corpusItem.imageUrl).to.exist;
+        expect(item.corpusItem.image).to.exist;
+        expect(item.corpusItem.image.url).to.exist;
+        expect(item.corpusItem.imageUrl).to.equal(item.corpusItem.image.url);
         expect(item.corpusItem.publisher).to.exist;
         expect(item.corpusItem.topic).to.exist;
       });

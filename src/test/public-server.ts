@@ -1,5 +1,5 @@
 import { ApolloServer } from 'apollo-server-express';
-import { buildSubgraphSchema } from '@apollo/federation';
+import { buildSubgraphSchema } from '@apollo/subgraph';
 import {
   ApolloServerPluginLandingPageDisabled,
   ApolloServerPluginInlineTraceDisabled,
@@ -17,7 +17,7 @@ export const db = client();
 
 export const getServer = (eventEmitter: CuratedCorpusEventEmitter) => {
   return new ApolloServer({
-    schema: buildSubgraphSchema([{ typeDefs: typeDefsPublic, resolvers }]),
+    schema: buildSubgraphSchema({ typeDefs: typeDefsPublic, resolvers }),
     context: () => {
       return new ContextManager({
         request: {
