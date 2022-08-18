@@ -321,8 +321,9 @@ export async function uploadApprovedItemImage(
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
 
-  const image = await data;
-  return await uploadImageToS3(context.s3, image);
+  const { image } = data;
+  await data.image.promise;
+  return await uploadImageToS3(context.s3, image.file);
 }
 
 /**
