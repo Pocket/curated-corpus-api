@@ -1,7 +1,7 @@
 import { db } from '../../../test/admin-server';
 import {
   clearDb,
-  createRejectedCuratedCorpusItemHelper,
+  createRejectedItemHelper,
   getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
@@ -40,7 +40,7 @@ describe('queries: RejectedCorpusItem (authentication)', () => {
     await clearDb(db);
 
     for (const item of rejectedCorpusItems) {
-      await createRejectedCuratedCorpusItemHelper(db, item);
+      await createRejectedItemHelper(db, item);
     }
   });
 

@@ -1,6 +1,6 @@
 import { S3 } from 'aws-sdk';
 import { IncomingHttpHeaders } from 'http';
-import { PrismaClient, RejectedCuratedCorpusItem } from '@prisma/client';
+import { PrismaClient, RejectedItem } from '@prisma/client';
 import { client } from '../database/client';
 import { ApprovedItem, ScheduledItem } from '../database/types';
 import { CuratedCorpusEventEmitter } from '../events/curatedCorpusEventEmitter';
@@ -41,7 +41,7 @@ export interface IContext {
 
   emitReviewedCorpusItemEvent(
     event: ReviewedCorpusItemEventType,
-    reviewedCorpusItem: ApprovedItem | RejectedCuratedCorpusItem
+    reviewedCorpusItem: ApprovedItem | RejectedItem
   ): void;
 
   emitScheduledCorpusItemEvent(
@@ -136,7 +136,7 @@ export class ContextManager implements IContext {
 
   emitReviewedCorpusItemEvent(
     event: ReviewedCorpusItemEventType,
-    reviewedCorpusItem: ApprovedItem | RejectedCuratedCorpusItem
+    reviewedCorpusItem: ApprovedItem | RejectedItem
   ): void {
     this.eventEmitter.emitEvent<ReviewedCorpusItemPayload>(event, {
       reviewedCorpusItem,

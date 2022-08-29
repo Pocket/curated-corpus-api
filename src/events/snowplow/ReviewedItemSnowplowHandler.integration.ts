@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { CuratedStatus, RejectedCuratedCorpusItem } from '@prisma/client';
+import { CuratedStatus, RejectedItem } from '@prisma/client';
 import {
   assertValidSnowplowObjectUpdateEvents,
   getAllSnowplowEvents,
@@ -50,7 +50,7 @@ const approvedItem: ApprovedItem = {
   updatedBy: 'Amy',
 };
 
-const rejectedItem: RejectedCuratedCorpusItem = {
+const rejectedItem: RejectedItem = {
   id: 123,
   externalId: '123-abc',
   prospectId: '456-dfg',

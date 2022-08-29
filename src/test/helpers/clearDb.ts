@@ -10,5 +10,5 @@ export async function clearDb(prisma: PrismaClient): Promise<void> {
   // Delete data from each table, starting with tables that contain foreign keys
   await prisma.scheduledItem.deleteMany({});
   await prisma.approvedItem.deleteMany({});
-  await prisma.rejectedCuratedCorpusItem.deleteMany({});
+  await prisma.rejectedItem.deleteMany({});
 }

@@ -4,10 +4,7 @@ export {
   getApprovedItemByExternalId,
   getScheduledSurfaceHistory,
 } from './ApprovedItem';
-export {
-  getRejectedCuratedCorpusItems,
-  getRejectedItemByUrl,
-} from './RejectedCuratedCorpusItem';
+export { getRejectedItems, getRejectedItemByUrl } from './RejectedItem';
 export {
   getScheduledItems,
   getItemsForScheduledSurface,

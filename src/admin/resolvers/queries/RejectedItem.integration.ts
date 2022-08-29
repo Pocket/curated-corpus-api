@@ -1,10 +1,7 @@
 import { expect } from 'chai';
-import { RejectedCuratedCorpusItem as dbRejectedCuratedCorpusItem } from '@prisma/client';
+import { RejectedItem as dbRejectedItem } from '@prisma/client';
 import { db } from '../../../test/admin-server';
-import {
-  clearDb,
-  createRejectedCuratedCorpusItemHelper,
-} from '../../../test/helpers';
+import { clearDb, createRejectedItemHelper } from '../../../test/helpers';
 import {
   GET_REJECTED_ITEMS,
   REJECTED_ITEM_REFERENCE_RESOLVER,
@@ -37,7 +34,7 @@ describe('queries: RejectedCorpusItem', () => {
 
   describe('getRejectedCorpusItem query', () => {
     // Fake sample Rejected Curated Corpus items
-    const rejectedCuratedCorpusItems = [
+    const rejectedItems = [
       {
         title: '10 Unforgivable Sins Of PHP',
         language: 'EN',
@@ -85,8 +82,8 @@ describe('queries: RejectedCorpusItem', () => {
     ];
 
     beforeAll(async () => {
-      for (const item of rejectedCuratedCorpusItems) {
-        await createRejectedCuratedCorpusItemHelper(db, item);
+      for (const item of rejectedItems) {
+        await createRejectedItemHelper(db, item);
       }
     });
 
@@ -99,10 +96,10 @@ describe('queries: RejectedCorpusItem', () => {
       });
 
       expect(data?.getRejectedCorpusItems.edges).to.have.length(
-        rejectedCuratedCorpusItems.length
+        rejectedItems.length
       );
       expect(data?.getRejectedCorpusItems.totalCount).to.equal(
-        rejectedCuratedCorpusItems.length
+        rejectedItems.length
       );
     });
 
@@ -125,7 +122,7 @@ describe('queries: RejectedCorpusItem', () => {
         },
       });
 
-      const firstItem: dbRejectedCuratedCorpusItem =
+      const firstItem: dbRejectedItem =
         data?.getRejectedCorpusItems.edges[0].node;
       // The important thing to test here is that the query returns all of these
       // properties without falling over, and not that they hold any specific value.
@@ -219,7 +216,7 @@ describe('queries: RejectedCorpusItem', () => {
         },
       });
 
-      const germanItems = rejectedCuratedCorpusItems.filter(
+      const germanItems = rejectedItems.filter(
         (item) => item.language === 'DE'
       );
       // we only have three stories in German set up before each test
@@ -344,7 +341,7 @@ describe('queries: RejectedCorpusItem', () => {
       ];
 
       for (const input of storyInput) {
-        await createRejectedCuratedCorpusItemHelper(db, input);
+        await createRejectedItemHelper(db, input);
       }
     });
 

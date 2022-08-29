@@ -1,17 +1,17 @@
-import { RejectedCuratedCorpusItem, PrismaClient } from '@prisma/client';
+import { RejectedItem, PrismaClient } from '@prisma/client';
 // need this to be able to use Prisma-native types for orderBy and filter clauses
 import { Prisma } from '@prisma/client';
 import {
   findManyCursorConnection,
   Connection,
 } from '@devoxa/prisma-relay-cursor-connection';
-import { RejectedCuratedCorpusItemFilter, PaginationInput } from '../types';
+import { RejectedItemFilter, PaginationInput } from '../types';
 
 /**
- * A dedicated type for the unique cursor value used in the getRejectedCuratedCorpusItems query.
+ * A dedicated type for the unique cursor value used in the getRejectedCorpusItems query.
  * Essential to get findManyCursorConnection to work as expected.
  */
-type RejectedCuratedCorpusItemCursor = {
+type RejectedItemCursor = {
   externalId: string;
 };
 
@@ -22,14 +22,14 @@ type RejectedCuratedCorpusItemCursor = {
  * @param pagination
  * @param filters
  */
-export async function getRejectedCuratedCorpusItems(
+export async function getRejectedItems(
   db: PrismaClient,
   pagination: PaginationInput,
-  filters: RejectedCuratedCorpusItemFilter
-): Promise<Connection<RejectedCuratedCorpusItem>> {
+  filters: RejectedItemFilter
+): Promise<Connection<RejectedItem>> {
   // Set up the SQL clauses with our defaults (orderBy) and any filters supplied
   // by the client.
-  const baseArgs: Prisma.RejectedCuratedCorpusItemFindManyArgs = {
+  const baseArgs: Prisma.RejectedItemFindManyArgs = {
     orderBy: { createdAt: 'desc' },
     where: constructWhereClauseFromFilters(filters),
   };
@@ -40,13 +40,9 @@ export async function getRejectedCuratedCorpusItems(
    * The Relay-style pagination implemented for this query is the same as the getApprovedItems query.
    * Detailed comments explaining the callback function below are in ApprovedItem.ts
    */
-
-  return findManyCursorConnection<
-    RejectedCuratedCorpusItem,
-    RejectedCuratedCorpusItemCursor
-  >(
-    (args) => db.rejectedCuratedCorpusItem.findMany({ ...args, ...baseArgs }),
-    () => db.rejectedCuratedCorpusItem.count({ where: baseArgs.where }),
+  return findManyCursorConnection<RejectedItem, RejectedItemCursor>(
+    (args) => db.rejectedItem.findMany({ ...args, ...baseArgs }),
+    () => db.rejectedItem.count({ where: baseArgs.where }),
     pagination,
     {
       getCursor: (record) => ({
@@ -67,8 +63,8 @@ export async function getRejectedCuratedCorpusItems(
  * @param filters
  */
 const constructWhereClauseFromFilters = (
-  filters: RejectedCuratedCorpusItemFilter
-): Prisma.RejectedCuratedCorpusItemWhereInput => {
+  filters: RejectedItemFilter
+): Prisma.RejectedItemWhereInput => {
   // Early exit if no filters are provided
   if (!filters) return {};
 
@@ -93,6 +89,6 @@ const constructWhereClauseFromFilters = (
 export async function getRejectedItemByUrl(
   db: PrismaClient,
   url: string
-): Promise<RejectedCuratedCorpusItem | null> {
-  return db.rejectedCuratedCorpusItem.findUnique({ where: { url } });
+): Promise<RejectedItem | null> {
+  return db.rejectedItem.findUnique({ where: { url } });
 }

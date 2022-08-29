@@ -25,7 +25,7 @@ export const checkCorpusUrl = async (
   // Do another check to make sure it hasn't already been added by another user
   // to the Rejected Corpus - an edge case the frontend should never allow but
   // that we should cater for nevertheless.
-  const rejectedUrlExists = await db.rejectedCuratedCorpusItem.count({
+  const rejectedUrlExists = await db.rejectedItem.count({
     where: { url },
   });
 

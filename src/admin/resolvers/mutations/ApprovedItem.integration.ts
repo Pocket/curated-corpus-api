@@ -6,7 +6,7 @@ import { db } from '../../../test/admin-server';
 import {
   clearDb,
   createApprovedItemHelper,
-  createRejectedCuratedCorpusItemHelper,
+  createRejectedItemHelper,
   createScheduledItemHelper,
   getServerWithMockedHeaders,
 } from '../../../test/helpers';
@@ -202,7 +202,7 @@ describe('mutations: ApprovedItem', () => {
       eventEmitter.on(ReviewedCorpusItemEventType.ADD_ITEM, eventTracker);
 
       // Create an approved item with a set URL
-      await createRejectedCuratedCorpusItemHelper(db, {
+      await createRejectedItemHelper(db, {
         title: 'I was here first!',
         url: 'https://test.com/docker',
       });

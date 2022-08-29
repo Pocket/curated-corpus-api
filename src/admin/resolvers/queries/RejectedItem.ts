@@ -1,9 +1,9 @@
 import { Connection } from '@devoxa/prisma-relay-cursor-connection';
-import { RejectedCuratedCorpusItem } from '@prisma/client';
+import { RejectedItem } from '@prisma/client';
 import config from '../../../config';
 import {
   getRejectedItemByUrl as dbGetRejectedItemByUrl,
-  getRejectedCuratedCorpusItems as dbGetRejectedCuratedCorpusItems,
+  getRejectedItems as dbGetRejectedItems,
 } from '../../../database/queries';
 import { IContext } from '../../context';
 import { AuthenticationError } from 'apollo-server-errors';
@@ -20,7 +20,7 @@ export async function getRejectedItems(
   parent,
   args,
   context: IContext
-): Promise<Connection<RejectedCuratedCorpusItem>> {
+): Promise<Connection<RejectedItem>> {
   //check if the user has the required permissions to access this query
   if (
     !context.authenticatedUser.hasReadOnly &&
@@ -51,11 +51,7 @@ export async function getRejectedItems(
     }
   }
 
-  return await dbGetRejectedCuratedCorpusItems(
-    context.db,
-    pagination,
-    args.filters
-  );
+  return await dbGetRejectedItems(context.db, pagination, args.filters);
 }
 
 /**
@@ -71,7 +67,7 @@ export async function getRejectedItemByUrl(
   parent,
   args,
   context: IContext
-): Promise<RejectedCuratedCorpusItem | null> {
+): Promise<RejectedItem | null> {
   //check if the user does not have the permissions to access this query
   if (
     !context.authenticatedUser.hasReadOnly &&

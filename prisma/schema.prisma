@@ -63,14 +63,14 @@ model ApprovedItem {
   @@unique([url])
 }
 
-model RejectedCuratedCorpusItem {
+model RejectedItem {
   // fields
   id         Int      @id @default(autoincrement())
   externalId String   @default(uuid()) @db.VarChar(255)
   prospectId String?  @db.VarChar(255)
   url        String   @db.VarChar(500)
   title      String?  @db.VarChar(255)
-  topic      String   @db.VarChar(255)
+  topic      String?   @db.VarChar(255)
   language   String?  @db.VarChar(2)
   publisher  String?  @db.VarChar(255)
   // Can be multiple reasons. For the MVP, Snowplow and the frontend

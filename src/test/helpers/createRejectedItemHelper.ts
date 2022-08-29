@@ -1,16 +1,12 @@
-import {
-  RejectedCuratedCorpusItem,
-  Prisma,
-  PrismaClient,
-} from '@prisma/client';
+import { RejectedItem, Prisma, PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 // the minimum of data required to create a rejected item
-interface CreateRejectedCuratedCorpusItemHelperRequiredInput {
+interface CreateRejectedItemHelperRequiredInput {
   title: string;
 }
 
 // optional information you can provide when creating a curated item
-interface CreateRejectedCuratedCorpusItemHelperOptionalInput {
+interface CreateRejectedItemHelperOptionalInput {
   prospectId?: string;
   url?: string;
   topic?: string;
@@ -20,35 +16,34 @@ interface CreateRejectedCuratedCorpusItemHelperOptionalInput {
 }
 
 // the input type the helper function expects - a combo of required and optional parameters
-export type CreateRejectedCuratedCorpusItemHelperInput =
-  CreateRejectedCuratedCorpusItemHelperRequiredInput &
-    CreateRejectedCuratedCorpusItemHelperOptionalInput;
+export type CreateRejectedItemHelperInput =
+  CreateRejectedItemHelperRequiredInput & CreateRejectedItemHelperOptionalInput;
 
 /**
  * A helper function that creates a sample curated item for testing or local development.
  * @param prisma
  * @param data
  */
-export async function createRejectedCuratedCorpusItemHelper(
+export async function createRejectedItemHelper(
   prisma: PrismaClient,
-  data: CreateRejectedCuratedCorpusItemHelperInput
-): Promise<RejectedCuratedCorpusItem> {
+  data: CreateRejectedItemHelperInput
+): Promise<RejectedItem> {
   // defaults for optional properties
-  const createRejectedCuratedCorpusItemDefaults = {
+  const createRejectedItemDefaults = {
     prospectId: faker.datatype.uuid(),
     url: faker.internet.url(),
     topic: faker.lorem.words(2),
-    language: faker.random.arrayElement(['EN', 'DE']),
+    language: faker.helpers.arrayElement(['EN', 'DE']),
     publisher: faker.company.companyName(),
     reason: faker.lorem.word(),
     createdAt: faker.date.recent(14),
     createdBy: faker.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
   };
 
-  const inputs: Prisma.RejectedCuratedCorpusItemCreateInput = {
-    ...createRejectedCuratedCorpusItemDefaults,
+  const inputs: Prisma.RejectedItemCreateInput = {
+    ...createRejectedItemDefaults,
     ...data,
   };
 
-  return await prisma.rejectedCuratedCorpusItem.create({ data: inputs });
+  return await prisma.rejectedItem.create({ data: inputs });
 }

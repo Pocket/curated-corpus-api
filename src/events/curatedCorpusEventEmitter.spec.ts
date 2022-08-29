@@ -9,7 +9,7 @@ import config from '../config';
 import sinon from 'sinon';
 import { getUnixTimestamp } from '../shared/utils';
 import { ApprovedItem } from '../database/types';
-import { CuratedStatus, RejectedCuratedCorpusItem } from '@prisma/client';
+import { CuratedStatus, RejectedItem } from '@prisma/client';
 import { CorpusItemSource, Topics } from '../shared/types';
 
 describe('CuratedCorpusEventEmitter', () => {
@@ -140,7 +140,7 @@ describe('CuratedCorpusEventEmitter', () => {
 
   it('should emit a REJECT_ITEM event with expected data', () => {
     // This event returns the data stored in RejectedItem entity internally
-    const rejectedItem: RejectedCuratedCorpusItem = {
+    const rejectedItem: RejectedItem = {
       id: 123,
       externalId: '345-abc',
       prospectId: 'abc-543',

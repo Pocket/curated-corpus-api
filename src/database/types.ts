@@ -48,7 +48,7 @@ export type ApprovedItemFilter = {
   url?: string;
 };
 
-export type RejectedCuratedCorpusItemFilter = {
+export type RejectedItemFilter = {
   url?: string;
   title?: string;
   topic?: string;

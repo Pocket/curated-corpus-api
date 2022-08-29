@@ -1,4 +1,4 @@
-import { PrismaClient, RejectedCuratedCorpusItem } from '@prisma/client';
+import { PrismaClient, RejectedItem } from '@prisma/client';
 import { CreateRejectedItemInput } from '../types';
 import { checkCorpusUrl } from '../helpers/checkCorpusUrl';
 
@@ -13,11 +13,11 @@ export async function createRejectedItem(
   db: PrismaClient,
   data: CreateRejectedItemInput,
   username: string
-): Promise<RejectedCuratedCorpusItem> {
+): Promise<RejectedItem> {
   // Check if an item with this URL has already been created in the Curated Corpus.
   await checkCorpusUrl(db, data.url);
 
-  return db.rejectedCuratedCorpusItem.create({
+  return db.rejectedItem.create({
     data: {
       ...data,
       // Use the SSO username here.

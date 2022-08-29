@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import {
   createApprovedItemHelper,
+  createRejectedItemHelper,
   createScheduledItemHelper,
-  createRejectedCuratedCorpusItemHelper,
 } from '../src/test/helpers';
 import { faker } from '@faker-js/faker';
 
@@ -42,7 +42,7 @@ async function main() {
   ];
 
   for (const title of rejectedItemTitles) {
-    await createRejectedCuratedCorpusItemHelper(prisma, { title });
+    await createRejectedItemHelper(prisma, { title });
   }
 }
 

@@ -1,5 +1,5 @@
 import {
-  RejectedCuratedCorpusItem,
+  RejectedItem,
   ScheduledItem as ScheduledItemModel,
 } from '@prisma/client';
 import { ScheduledItem, CorpusItem, ApprovedItem } from '../database/types';
@@ -34,7 +34,7 @@ export type BaseEventData = {
 
 // Data for the events that are fired on changes to curated items
 export type ReviewedCorpusItemPayload = {
-  reviewedCorpusItem: ApprovedItem | RejectedCuratedCorpusItem;
+  reviewedCorpusItem: ApprovedItem | RejectedItem;
 };
 
 // Data for the events that are fired on updates to Scheduled Surface schedule

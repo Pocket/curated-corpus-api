@@ -4,7 +4,7 @@ import { db } from '../../../test/admin-server';
 import {
   clearDb,
   createApprovedItemHelper,
-  createRejectedCuratedCorpusItemHelper,
+  createRejectedItemHelper,
   getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import { CREATE_REJECTED_ITEM } from './sample-mutations.gql';
@@ -155,7 +155,7 @@ describe('mutations: RejectedItem', () => {
       eventEmitter.on(ReviewedCorpusItemEventType.REJECT_ITEM, eventTracker);
 
       // Create a rejected item with a set URL
-      await createRejectedCuratedCorpusItemHelper(db, {
+      await createRejectedItemHelper(db, {
         title: 'I was here first!',
         url: 'https://test.com/docker',
       });

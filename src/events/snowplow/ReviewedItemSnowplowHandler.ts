@@ -11,7 +11,7 @@ import {
   ReviewedCorpusItem,
 } from './schema';
 import { getUnixTimestamp } from '../../shared/utils';
-import { CuratedStatus, RejectedCuratedCorpusItem } from '@prisma/client';
+import { CuratedStatus, RejectedItem } from '@prisma/client';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 import { CorpusItemSource } from '../../shared/types';
 import { ApprovedItem, ApprovedItemAuthor } from '../../database/types';
@@ -118,7 +118,7 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
       );
     } else {
       context = ReviewedItemSnowplowHandler.generateRejectedItemContext(
-        item as RejectedCuratedCorpusItem,
+        item as RejectedItem,
         context
       );
     }
@@ -152,7 +152,7 @@ export class ReviewedItemSnowplowHandler extends CuratedCorpusSnowplowHandler {
   }
 
   private static generateRejectedItemContext(
-    item: RejectedCuratedCorpusItem,
+    item: RejectedItem,
     context: ReviewedCorpusItemContext
   ): ReviewedCorpusItemContext {
     context.data = {

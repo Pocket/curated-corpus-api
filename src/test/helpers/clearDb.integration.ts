@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { clearDb } from './clearDb';
 import { createApprovedItemHelper } from './createApprovedItemHelper';
 import { createScheduledItemHelper } from './createScheduledItemHelper';
-import { createRejectedCuratedCorpusItemHelper } from './createRejectedCuratedCorpusItemHelper';
+import { createRejectedItemHelper } from './createRejectedItemHelper';
 
 const db = new PrismaClient();
 
@@ -30,7 +30,7 @@ describe('clearDb', () => {
       approvedItem,
     });
 
-    await createRejectedCuratedCorpusItemHelper(db, {
+    await createRejectedItemHelper(db, {
       title: '7 Life-Saving Tips About PHP',
     });
 
@@ -39,7 +39,7 @@ describe('clearDb', () => {
     expect(items).toHaveLength(2);
     const scheduledItems = await db.scheduledItem.findMany({});
     expect(scheduledItems).toHaveLength(1);
-    const rejectedItems = await db.rejectedCuratedCorpusItem.findMany({});
+    const rejectedItems = await db.rejectedItem.findMany({});
     expect(rejectedItems).toHaveLength(1);
 
     // Remove all the records
