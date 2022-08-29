@@ -231,20 +231,20 @@ type RejectedCorpusItem @key(fields: "url") {
     """
     The title of the story.
     """
-    title: String!
+    title: String
     """
     A topic this story best fits in.
     Temporarily a string value that will be provided by Prospect API, possibly an enum in the future.
     """
-    topic: String!
+    topic: String
     """
     What language this story is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: CorpusLanguage!
+    language: CorpusLanguage
     """
     The name of the online publication that published this story.
     """
-    publisher: String!
+    publisher: String
     """
     Reason why it was rejected. Can be multiple reasons. Will likely be stored either as comma-separated values or JSON.
     """
