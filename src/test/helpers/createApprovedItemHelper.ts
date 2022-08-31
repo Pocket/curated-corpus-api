@@ -59,20 +59,20 @@ export async function createApprovedItemHelper(
     authors: {
       create: authors,
     },
-    status: faker.random.arrayElement([
+    status: faker.helpers.arrayElement([
       CuratedStatus.RECOMMENDATION,
       CuratedStatus.CORPUS,
     ]),
-    language: faker.random.arrayElement(['EN', 'DE']),
+    language: faker.helpers.arrayElement(['EN', 'DE']),
     publisher: faker.company.companyName(),
-    imageUrl: faker.random.arrayElement([
+    imageUrl: faker.helpers.arrayElement([
       `${faker.image.nature()}?random=${random}`,
       `${faker.image.city()}?random=${random}`,
       `${faker.image.food()}?random=${random}`,
     ]),
     // Plain strings for now, but we may be able to consume some sort of enum
     // from a "source of truth" API further down the track.
-    topic: faker.random.arrayElement([
+    topic: faker.helpers.arrayElement([
       'BUSINESS',
       'CAREER',
       'CORONAVIRUS',
@@ -90,7 +90,7 @@ export async function createApprovedItemHelper(
       'TECHNOLOGY',
       'TRAVEL',
     ]),
-    source: faker.random.arrayElement([
+    source: faker.helpers.arrayElement([
       CorpusItemSource.PROSPECT,
       CorpusItemSource.MANUAL,
       CorpusItemSource.BACKFILL,
