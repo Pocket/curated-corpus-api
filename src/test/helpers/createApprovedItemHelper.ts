@@ -1,11 +1,7 @@
-import {
-  ApprovedItem,
-  CuratedStatus,
-  Prisma,
-  PrismaClient,
-} from '@prisma/client';
+import { CuratedStatus, Prisma, PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import { CorpusItemSource } from '../../shared/types';
+import { ApprovedItemAuthor, ApprovedItem } from '../../database/types';
 
 // the minimum of data required to create a approved curated item
 interface CreateApprovedItemHelperRequiredInput {
@@ -44,6 +40,14 @@ export async function createApprovedItemHelper(
 ): Promise<ApprovedItem> {
   const random = Math.round(Math.random() * 1000);
 
+  // randomize number of authors
+  const authorCount = faker.datatype.number({ min: 1, max: 3 });
+  const authors: ApprovedItemAuthor[] = [];
+
+  for (let i = 0; i < authorCount; i++) {
+    authors.push({ name: faker.name.findName(), sortOrder: i });
+  }
+
   // defaults for optional properties
   const createApprovedItemDefaults = {
     prospectId: faker.datatype.uuid(),
@@ -52,20 +56,23 @@ export async function createApprovedItemHelper(
     // so the URL needs a little more to stay reliably unique.
     url: `${faker.internet.url()}/${faker.lorem.slug()}/${faker.datatype.uuid()}`,
     excerpt: faker.lorem.sentence(15),
-    status: faker.random.arrayElement([
+    authors: {
+      create: authors,
+    },
+    status: faker.helpers.arrayElement([
       CuratedStatus.RECOMMENDATION,
       CuratedStatus.CORPUS,
     ]),
-    language: faker.random.arrayElement(['EN', 'DE']),
+    language: faker.helpers.arrayElement(['EN', 'DE']),
     publisher: faker.company.companyName(),
-    imageUrl: faker.random.arrayElement([
+    imageUrl: faker.helpers.arrayElement([
       `${faker.image.nature()}?random=${random}`,
       `${faker.image.city()}?random=${random}`,
       `${faker.image.food()}?random=${random}`,
     ]),
     // Plain strings for now, but we may be able to consume some sort of enum
     // from a "source of truth" API further down the track.
-    topic: faker.random.arrayElement([
+    topic: faker.helpers.arrayElement([
       'BUSINESS',
       'CAREER',
       'CORONAVIRUS',
@@ -83,7 +90,7 @@ export async function createApprovedItemHelper(
       'TECHNOLOGY',
       'TRAVEL',
     ]),
-    source: faker.random.arrayElement([
+    source: faker.helpers.arrayElement([
       CorpusItemSource.PROSPECT,
       CorpusItemSource.MANUAL,
       CorpusItemSource.BACKFILL,
@@ -103,5 +110,8 @@ export async function createApprovedItemHelper(
     ...data,
   };
 
-  return await prisma.approvedItem.create({ data: inputs });
+  return await prisma.approvedItem.create({
+    data: inputs,
+    include: { authors: { orderBy: [{ sortOrder: 'asc' }] } },
+  });
 }

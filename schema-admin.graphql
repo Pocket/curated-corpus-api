@@ -71,11 +71,14 @@ by the Curation Admin Tools frontend to filter prospects.
 enum ProspectType {
     GLOBAL
     ORGANIC_TIMESPENT
-    SYNDICATED
+    SYNDICATED_NEW
+    SYNDICATED_RERUN
     TOP_SAVED
     DOMAIN_ALLOWLIST
     COUNTS_LOGISTIC_APPROVAL
     HYBRID_LOGISTIC_APPROVAL
+    APPROVED
+    TIMESPENT_LOGISTIC_APPROVAL
 }
 
 """
@@ -119,13 +122,6 @@ type ScheduledSurface {
 }
 
 """
-Temp type to pacify federation checks
-"""
-type ApprovedCuratedCorpusItem @key(fields: "url") {
-    url: Url!
-}
-
-"""
 A prospective story that has been reviewed by the curators and saved to the corpus.
 """
 type ApprovedCorpusItem @key(fields: "url") {
@@ -149,6 +145,10 @@ type ApprovedCorpusItem @key(fields: "url") {
     The excerpt of the story.
     """
     excerpt: String!
+    """
+    The authors associated with this ApprovedCorpusItem.
+    """
+    authors: [CorpusItemAuthor!]!
     """
     The outcome of the curators' review.
     """
@@ -204,12 +204,18 @@ type ApprovedCorpusItem @key(fields: "url") {
     A single sign-on user identifier of the user who last updated this entity. Null on creation.
     """
     updatedBy: String
+    """
+    Subquery to get the log of scheduled entries to display for a given Approved Item, most recent first.
+    """
+    scheduledSurfaceHistory(
+        filters: ApprovedCorpusItemScheduledSurfaceHistoryFilters
+    ): [ApprovedCorpusItemScheduledSurfaceHistory!]!
 }
 
 """
 A prospective story that has been rejected by the curators.
 """
-type RejectedCorpusItem {
+type RejectedCorpusItem @key(fields: "url") {
     """
     An alternative primary key in UUID format that is generated on creation.
     """
@@ -225,20 +231,20 @@ type RejectedCorpusItem {
     """
     The title of the story.
     """
-    title: String!
+    title: String
     """
     A topic this story best fits in.
     Temporarily a string value that will be provided by Prospect API, possibly an enum in the future.
     """
-    topic: String!
+    topic: String
     """
     What language this story is in. This is a two-letter code, for example, 'EN' for English.
     """
-    language: CorpusLanguage!
+    language: CorpusLanguage
     """
     The name of the online publication that published this story.
     """
-    publisher: String!
+    publisher: String
     """
     Reason why it was rejected. Can be multiple reasons. Will likely be stored either as comma-separated values or JSON.
     """
@@ -417,6 +423,44 @@ input ApprovedCorpusItemFilter {
     language: CorpusLanguage
 }
 
+type ApprovedCorpusItemScheduledSurfaceHistory {
+    """
+    An alternative primary key in UUID format that is generated on creation.
+    Note: this is the external ID of the scheduled entry, not the approved item.
+    """
+    externalId: ID!
+    """
+    A single sign-on user identifier of the user who created this entry.
+    """
+    createdBy: String!
+    """
+    The date the associated Approved Item is scheduled to appear on a Scheduled Surface.
+    This date is relative to the time zone of the Scheduled Surface. Format: YYYY-MM-DD.
+    """
+    scheduledDate: Date!
+    """
+    The GUID of the scheduledSurface to which the associated Approved Item is scheduled.
+    Example: 'NEW_TAB_EN_US'.
+    """
+    scheduledSurfaceGuid: ID!
+}
+
+"""
+Available fields for filtering an Approved Item's history of being scheduled onto one or more
+scheduled surfaces.
+"""
+input ApprovedCorpusItemScheduledSurfaceHistoryFilters {
+    """
+    The maximum number of results to be returned. Default: 10.
+    """
+    limit: NonNegativeInt
+    """
+    The scheduled surface the results should be filtered to. Omitting this filter will
+    fetch results from all scheduled surfaces.
+    """
+    scheduledSurfaceGuid: ID
+}
+
 """
 Available fields for filtering Rejected Items.
 """
@@ -459,6 +503,14 @@ input ScheduledCorpusItemsFilterInput {
 }
 
 """
+An author associated with a CorpusItem.
+"""
+input CorpusItemAuthorInput {
+    name: String!
+    sortOrder: Int!
+}
+
+"""
 Input data for creating an Approved Item and optionally scheduling this item to appear on a Scheduled Surface.
 """
 input CreateApprovedCorpusItemInput {
@@ -478,6 +530,10 @@ input CreateApprovedCorpusItemInput {
     The excerpt of the Approved Item.
     """
     excerpt: String!
+    """
+    A name and sort order for each author.
+    """
+    authors: [CorpusItemAuthorInput!]!
     """
     The outcome of the curators' review of the Approved Item.
     """
@@ -632,6 +688,10 @@ input UpdateApprovedCorpusItemInput {
     """
     excerpt: String!
     """
+    A name and sort order for each author.
+    """
+    authors: [CorpusItemAuthorInput!]!
+    """
     The outcome of the curators' review of the Approved Item.
     """
     status: CuratedStatus!
@@ -657,6 +717,20 @@ input UpdateApprovedCorpusItemInput {
     Example: a story covering an election, or "The best of 202x" collection.
     """
     isTimeSensitive: Boolean!
+}
+
+"""
+Input data for updating an Approved Item's author data.
+"""
+input UpdateApprovedCorpusItemAuthorsInput {
+    """
+    Approved Item ID.
+    """
+    externalId: ID!
+    """
+    A name and sort order for each author.
+    """
+    authors: [CorpusItemAuthorInput!]!
 }
 
 """
@@ -789,6 +863,16 @@ type Query {
     ): ApprovedCorpusItem
 
     """
+    Retrieves an approved item with the given external ID.
+    """
+    approvedCorpusItemByExternalId(
+        """
+        ID of the approved item. A string in UUID format.
+        """
+        externalId: ID!
+    ): ApprovedCorpusItem
+
+    """
     Retrieves all ScheduledSurfaces available to the given SSO user. Requires an Authorization header.
     """
     getScheduledSurfacesForUser: [ScheduledSurface!]!
@@ -825,6 +909,13 @@ type Mutation {
     ): ApprovedCorpusItem!
 
     """
+    Updates authors for an Approved Item.
+    """
+    updateApprovedCorpusItemAuthors(
+        data: UpdateApprovedCorpusItemAuthorsInput!
+    ): ApprovedCorpusItem!
+
+    """
     Rejects an Approved Item: deletes it from the corpus and creates a Rejected Item instead.
     """
     rejectApprovedCorpusItem(
@@ -855,7 +946,5 @@ type Mutation {
     """
     Uploads an image to S3 for an Approved Item
     """
-    uploadApprovedCorpusItemImage(
-        data: Upload!
-    ): ApprovedCorpusImageUrl!
+    uploadApprovedCorpusItemImage(data: Upload!): ApprovedCorpusImageUrl!
 }

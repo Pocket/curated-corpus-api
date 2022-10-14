@@ -1,5 +1,4 @@
-import { UserInputError } from 'apollo-server';
-import { ApprovedItem } from '@prisma/client';
+import { UserInputError } from 'apollo-server-errors';
 import {
   createApprovedItem as dbCreateApprovedItem,
   createRejectedItem,
@@ -8,7 +7,9 @@ import {
   importApprovedItem as dbImportApprovedItem,
   importScheduledItem,
   updateApprovedItem as dbUpdateApprovedItem,
+  updateApprovedItemAuthors as dbUpdateApprovedItemAuthors,
 } from '../../../database/mutations';
+import { getApprovedItemByUrl } from '../../../database/queries';
 import {
   ReviewedCorpusItemEventType,
   ScheduledCorpusItemEventType,
@@ -22,10 +23,11 @@ import {
   ACCESS_DENIED_ERROR,
   ApprovedItemS3ImageUrl,
   RejectionReason,
-  scheduledSurfaceAllowedValues,
   Topics,
 } from '../../../shared/types';
+import { scheduledSurfaceAllowedValues } from '../../../shared/utils';
 import {
+  ApprovedItem,
   CreateRejectedItemInput,
   ImportApprovedItemInput,
   ImportScheduledItemInput,
@@ -33,10 +35,10 @@ import {
 } from '../../../database/types';
 import { AuthenticationError } from 'apollo-server-errors';
 import { IContext } from '../../context';
-import { getApprovedItemByUrl } from '../../../database/queries';
 import { getScheduledItemByUniqueAttributes } from '../../../database/queries/ScheduledItem';
 import { fromUnixTime } from 'date-fns';
 import { InvalidImageUrl } from '../../aws/errors';
+import { getApprovedItemByExternalId } from '../../../database/queries/ApprovedItem';
 
 /**
  * Creates an approved curated item with data supplied. Optionally, schedules the freshly
@@ -144,12 +146,80 @@ export async function updateApprovedItem(
     );
   }
 
+  // To be able to delete authors associated with a corpus item, we first need
+  // to get the internal (integer) id for the story. This means doing a DB query
+  // to fetch the entire object.
+  const existingItem = await getApprovedItemByExternalId(
+    context.db,
+    data.externalId
+  );
+
+  // Remove the old author(s) from the DB records before we run the update function
+  await context.db.approvedItemAuthor.deleteMany({
+    where: {
+      approvedItemId: existingItem?.id,
+    },
+  });
+
+  // Update the corpus item with the updated fields sent through, including
+  // any authors.
   const approvedItem = await dbUpdateApprovedItem(
     context.db,
     data,
     context.authenticatedUser.username
   );
 
+  context.emitReviewedCorpusItemEvent(
+    ReviewedCorpusItemEventType.UPDATE_ITEM,
+    approvedItem
+  );
+
+  return approvedItem;
+}
+
+/**
+ * A targeted update operation that only updates an approved item's authors data.
+ * Used to backfill authors for legacy curated items.
+ *
+ * @param parent
+ * @param data
+ * @param context
+ */
+export async function updateApprovedItemAuthors(
+  parent,
+  { data },
+  context: IContext
+): Promise<ApprovedItem> {
+  // Check if the user can perform this mutation
+  if (!context.authenticatedUser.canWriteToCorpus()) {
+    throw new AuthenticationError(ACCESS_DENIED_ERROR);
+  }
+  // To be able to delete authors associated with a corpus item, we first need
+  // to get the internal (integer) id for the story. This means doing a DB query
+  // to fetch the entire object.
+  const existingItem = await getApprovedItemByExternalId(
+    context.db,
+    data.externalId
+  );
+
+  // Remove the old author(s) from the DB records before we run the update function
+  // Note that we don't expect any authors to be present for any items this mutation
+  // will be run for, but it's a good idea to be thorough anyway.
+  await context.db.approvedItemAuthor.deleteMany({
+    where: {
+      approvedItemId: existingItem?.id,
+    },
+  });
+
+  // Update the corpus item with the updated fields sent through, including
+  // any authors.
+  const approvedItem = await dbUpdateApprovedItemAuthors(
+    context.db,
+    data,
+    context.authenticatedUser.username
+  );
+
+  // Emit the update item event
   context.emitReviewedCorpusItemEvent(
     ReviewedCorpusItemEventType.UPDATE_ITEM,
     approvedItem
@@ -251,7 +321,7 @@ export async function uploadApprovedItemImage(
     throw new AuthenticationError(ACCESS_DENIED_ERROR);
   }
 
-  const image = await data;
+  const image = await data.promise;
   return await uploadImageToS3(context.s3, image);
 }
 

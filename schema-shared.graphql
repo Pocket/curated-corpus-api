@@ -1,3 +1,8 @@
+extend schema
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.0"
+    import: ["@key", "@shareable", "@requires", "@external"]
+  )
 
 """
 A URL - usually, for an interesting story on the internet that's worth saving to Pocket.
@@ -7,6 +12,10 @@ scalar Url
 A date in the YYYY-MM-DD format.
 """
 scalar Date
+"""
+A positive integer number.
+"""
+scalar NonNegativeInt
 
 """
 Valid language codes for curated corpus items.
@@ -19,9 +28,17 @@ enum CorpusLanguage {
 }
 
 """
+An author associated with a CorpusItem.
+"""
+type CorpusItemAuthor {
+    name: String!
+    sortOrder: Int!
+}
+
+"""
 Information about pagination in a connection.
 """
-type PageInfo {
+type PageInfo @shareable {
     """
     When paginating forwards, the cursor to continue.
     """

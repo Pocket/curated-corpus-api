@@ -6,8 +6,12 @@ import {
   ScheduledItemsResult,
   ScheduledSurfaceItem,
 } from '../types';
-import { scheduledSurfaceAllowedValues } from '../../shared/types';
+import {
+  getCorpusItemFromApprovedItem,
+  scheduledSurfaceAllowedValues,
+} from '../../shared/utils';
 import { groupBy } from '../../shared/utils';
+import { UserInputError } from 'apollo-server-errors';
 
 /**
  * @param db
@@ -21,14 +25,16 @@ export async function getScheduledItems(
 
   // validate scheduledSurfaceGuid
   if (!scheduledSurfaceAllowedValues.includes(scheduledSurfaceGuid)) {
-    throw new Error(
+    throw new UserInputError(
       `${scheduledSurfaceGuid} is not a valid Scheduled Surface GUID`
     );
   }
 
   // Get a flat array of scheduled items from Prisma
   const items = await db.scheduledItem.findMany({
-    orderBy: { scheduledDate: 'asc' },
+    // we need to order by scheduleDate first, as we perform a programmatic
+    // groupBy below on that field
+    orderBy: [{ scheduledDate: 'asc' }, { updatedAt: 'asc' }],
     where: {
       scheduledSurfaceGuid: { equals: scheduledSurfaceGuid },
       scheduledDate: {
@@ -37,7 +43,13 @@ export async function getScheduledItems(
       },
     },
     include: {
-      approvedItem: true,
+      approvedItem: {
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+      },
     },
   });
 
@@ -86,12 +98,19 @@ export async function getItemsForScheduledSurface(
 ): Promise<ScheduledSurfaceItem[]> {
   // Get a flat array of scheduled items from Prisma
   const items = await db.scheduledItem.findMany({
+    orderBy: { updatedAt: 'asc' },
     where: {
       scheduledSurfaceGuid: { equals: id },
       scheduledDate: date,
     },
     include: {
-      approvedItem: true,
+      approvedItem: {
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+      },
     },
   });
 
@@ -104,15 +123,7 @@ export async function getItemsForScheduledSurface(
       scheduledDate: DateTime.fromJSDate(scheduledItem.scheduledDate).toFormat(
         'yyyy-MM-dd'
       ),
-      corpusItem: {
-        id: scheduledItem.approvedItem.externalId,
-        url: scheduledItem.approvedItem.url,
-        title: scheduledItem.approvedItem.title,
-        excerpt: scheduledItem.approvedItem.excerpt,
-        language: scheduledItem.approvedItem.language,
-        publisher: scheduledItem.approvedItem.publisher,
-        imageUrl: scheduledItem.approvedItem.imageUrl,
-      },
+      corpusItem: getCorpusItemFromApprovedItem(scheduledItem.approvedItem),
     };
     return item;
   });
@@ -136,7 +147,13 @@ export async function getScheduledItemByUniqueAttributes(
       },
     },
     include: {
-      approvedItem: true,
+      approvedItem: {
+        include: {
+          authors: {
+            orderBy: [{ sortOrder: 'asc' }],
+          },
+        },
+      },
     },
   });
 }

@@ -1,14 +1,17 @@
 import { expect } from 'chai';
-import { CuratedStatus } from '@prisma/client';
+import { ApprovedItem, CuratedStatus } from '@prisma/client';
 import { db } from '../../../test/admin-server';
 import {
   clearDb,
   createApprovedItemHelper,
+  createScheduledItemHelper,
   getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import {
   APPROVED_ITEM_REFERENCE_RESOLVER,
+  GET_APPROVED_ITEM_BY_EXTERNAL_ID,
   GET_APPROVED_ITEM_BY_URL,
+  GET_APPROVED_ITEM_WITH_SCHEDULING_HISTORY,
   GET_APPROVED_ITEMS,
 } from './sample-queries.gql';
 import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
@@ -152,6 +155,9 @@ describe('queries: ApprovedCorpusItem', () => {
       expect(firstItem.isCollection).to.be.a('boolean');
       expect(firstItem.isTimeSensitive).to.be.a('boolean');
       expect(firstItem.isSyndicated).to.be.a('boolean');
+      expect(firstItem.authors.length).to.be.greaterThan(0);
+      expect(firstItem.authors[0].name).to.be.not.undefined;
+      expect(firstItem.authors[0].sortOrder).to.be.not.undefined;
     });
 
     it('should respect pagination', async () => {
@@ -357,7 +363,6 @@ describe('queries: ApprovedCorpusItem', () => {
 
       // Does the query return all the properties of an Approved Item?
       expect(item.externalId).to.be.not.undefined;
-      expect(item.externalId).to.be.not.undefined;
       expect(item.prospectId).to.be.not.undefined;
       expect(item.title).to.be.not.undefined;
       expect(item.language).to.be.not.undefined;
@@ -389,6 +394,257 @@ describe('queries: ApprovedCorpusItem', () => {
 
       // There should be no errors
       expect(result.errors).to.be.undefined;
+    });
+  });
+
+  describe('approvedCorpusItemByExternalId query', () => {
+    const items: ApprovedItem[] = [];
+
+    beforeAll(async () => {
+      // Create a few corpus items
+      const storyInput = [
+        {
+          title: 'Story one',
+        },
+        {
+          title: 'Story two',
+        },
+        {
+          title: 'Story three',
+        },
+      ];
+
+      for (const input of storyInput) {
+        const item = await createApprovedItemHelper(db, input);
+        items.push(item);
+      }
+    });
+
+    it('should get an existing approved item by externalId', async () => {
+      // Let's use a known external ID from the sample subset above
+      const result = await server.executeOperation({
+        query: GET_APPROVED_ITEM_BY_EXTERNAL_ID,
+        variables: {
+          externalId: items[0].externalId,
+        },
+      });
+
+      // There should be no errors
+      expect(result.errors).to.be.undefined;
+
+      // Proceed with verifying the data
+      // Is this really the item we wanted to retrieve?
+      const item = result.data?.approvedCorpusItemByExternalId;
+      expect(item.externalId).to.equal(items[0].externalId);
+      expect(item.url).to.equal(items[0].url);
+
+      // Does the query return all the other properties of an Approved Item?
+      expect(item.externalId).to.be.not.undefined;
+      expect(item.prospectId).to.be.not.undefined;
+      expect(item.title).to.be.not.undefined;
+      expect(item.language).to.be.not.undefined;
+      expect(item.publisher).to.be.not.undefined;
+      expect(item.imageUrl).to.be.not.undefined;
+      expect(item.excerpt).to.be.not.undefined;
+      expect(item.status).to.be.not.undefined;
+      expect(item.topic).to.be.not.undefined;
+      expect(item.source).to.be.not.undefined;
+      expect(item.isCollection).to.be.a('boolean');
+      expect(item.isTimeSensitive).to.be.a('boolean');
+      expect(item.isSyndicated).to.be.a('boolean');
+    });
+
+    it('should return null when nothing for a given externalId is found', async () => {
+      const result = await server.executeOperation({
+        query: GET_APPROVED_ITEM_BY_EXTERNAL_ID,
+        variables: {
+          externalId: 'this-id-does-not-exist',
+        },
+      });
+
+      expect(result.data).to.have.property('approvedCorpusItemByExternalId');
+
+      // There should be no data returned
+      expect(result.data?.approvedCorpusItemByExternalId).to.be.null;
+
+      // There should be no errors
+      expect(result.errors).to.be.undefined;
+    });
+  });
+
+  describe('getScheduledSurfaceHistory subquery', () => {
+    beforeAll(async () => {
+      // Create a few items with known URLs.
+      const storyInput = [
+        {
+          title: 'Story one',
+          url: 'https://www.test-domain.com/story-one',
+        },
+        {
+          title: 'Story two',
+          url: 'https://www.test-domain.com/story-two',
+        },
+        {
+          title: 'Story three',
+          url: 'https://www.test-domain.com/story-three',
+        },
+      ];
+
+      const stories: ApprovedItem[] = [];
+
+      for (const input of storyInput) {
+        const story = await createApprovedItemHelper(db, input);
+        stories.push(story);
+      }
+
+      // Destructure the first two stories to be able to create scheduled
+      // entries for them
+      const [storyOne, storyTwo] = stories;
+
+      // Set up some scheduled entries for story #1
+      // US New Tab, date in 2050
+      for (let i = 21; i <= 30; i++) {
+        await createScheduledItemHelper(db, {
+          scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+          approvedItem: storyOne,
+          scheduledDate: new Date(`2050-01-${i}`).toISOString(),
+        });
+      }
+      // DE New Tab, same dates
+      for (let i = 11; i <= 20; i++) {
+        await createScheduledItemHelper(db, {
+          scheduledSurfaceGuid: 'NEW_TAB_DE_DE',
+          approvedItem: storyOne,
+          scheduledDate: new Date(`2050-01-${i}`).toISOString(),
+        });
+      }
+      // Set up more scheduled entries for story #2
+      for (let i = 1; i <= 10; i++) {
+        await createScheduledItemHelper(db, {
+          scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+          approvedItem: storyTwo,
+          scheduledDate: new Date(`2050-01-${i}`).toISOString(),
+        });
+      }
+    });
+
+    it('returns an empty array if an Approved Item has not been scheduled onto any surface', async () => {
+      const result = await server.executeOperation({
+        query: GET_APPROVED_ITEM_WITH_SCHEDULING_HISTORY,
+        variables: {
+          url: 'https://www.test-domain.com/story-three',
+        },
+      });
+
+      // There should be no errors
+      expect(result.errors).to.be.undefined;
+
+      // There should be no data returned for the subquery (an empty array),
+      // since the third story doesn't have any scheduled entries in this test suite.
+      expect(
+        result.data?.getApprovedCorpusItemByUrl.scheduledSurfaceHistory
+      ).to.have.lengthOf(0);
+    });
+
+    it('returns an empty array if an Approved item has not been scheduled onto a particular surface', async () => {
+      const result = await server.executeOperation({
+        query: GET_APPROVED_ITEM_WITH_SCHEDULING_HISTORY,
+        variables: {
+          url: 'https://www.test-domain.com/story-two',
+          scheduledSurfaceGuid: 'NEW_TAB_EN_GB',
+        },
+      });
+
+      // There should be no errors
+      expect(result.errors).to.be.undefined;
+
+      // There should be no data returned for the subquery (an empty array),
+      // since this story doesn't have any entries on the UK New Tab
+      expect(
+        result.data?.getApprovedCorpusItemByUrl.scheduledSurfaceHistory
+      ).to.have.lengthOf(0);
+    });
+
+    it('respects the limit on results', async () => {
+      const result = await server.executeOperation({
+        query: GET_APPROVED_ITEM_WITH_SCHEDULING_HISTORY,
+        variables: {
+          url: 'https://www.test-domain.com/story-two',
+          scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+          limit: 3,
+        },
+      });
+
+      // There should be no errors
+      expect(result.errors).to.be.undefined;
+
+      expect(
+        result.data?.getApprovedCorpusItemByUrl.scheduledSurfaceHistory
+      ).to.have.lengthOf(3);
+    });
+
+    it('returns results for a specified scheduled surface only', async () => {
+      const result = await server.executeOperation({
+        query: GET_APPROVED_ITEM_WITH_SCHEDULING_HISTORY,
+        variables: {
+          url: 'https://www.test-domain.com/story-one',
+          scheduledSurfaceGuid: 'NEW_TAB_DE_DE',
+        },
+      });
+
+      // There should be no errors.
+      expect(result.errors).to.be.undefined;
+
+      // We've got ten of these seeded for this test suite.
+      const history =
+        result.data?.getApprovedCorpusItemByUrl.scheduledSurfaceHistory;
+      expect(history).to.have.lengthOf(10);
+
+      // Let's verify they're all scheduled for DE_DE
+      history.forEach((entry) => {
+        expect(entry.scheduledSurfaceGuid).to.equal('NEW_TAB_DE_DE');
+      });
+    });
+
+    it('returns all entries for a given approved item', async () => {
+      const result = await server.executeOperation({
+        query: GET_APPROVED_ITEM_WITH_SCHEDULING_HISTORY,
+        variables: {
+          url: 'https://www.test-domain.com/story-one',
+          limit: 100,
+        },
+      });
+
+      // There should be no errors.
+      expect(result.errors).to.be.undefined;
+
+      // There's a total of 20 entries for the first story
+      expect(
+        result.data?.getApprovedCorpusItemByUrl.scheduledSurfaceHistory
+      ).to.have.lengthOf(20);
+    });
+
+    it('returns the scheduled entries in descending order', async () => {
+      const result = await server.executeOperation({
+        query: GET_APPROVED_ITEM_WITH_SCHEDULING_HISTORY,
+        variables: {
+          url: 'https://www.test-domain.com/story-one',
+          scheduledSurfaceGuid: 'NEW_TAB_DE_DE',
+        },
+      });
+
+      // There should be no errors.
+      expect(result.errors).to.be.undefined;
+
+      // We've got ten of these seeded for this test suite.
+      const history =
+        result.data?.getApprovedCorpusItemByUrl.scheduledSurfaceHistory;
+      expect(history).to.have.lengthOf(10);
+
+      // Let's verify that the results are being returned in descending order
+      expect(history[0].scheduledDate).to.equal('2050-01-20');
+      expect(history[1].scheduledDate).to.equal('2050-01-19');
+      expect(history[2].scheduledDate).to.equal('2050-01-18');
     });
   });
 

@@ -51,6 +51,7 @@ const scheduledCorpusItem: ScheduledItem = {
     createdBy: 'Amy',
     updatedAt: new Date(1648225373000),
     updatedBy: 'Amy',
+    authors: [{ name: 'Octavia Butler', sortOrder: 1 }],
   },
 };
 
@@ -86,7 +87,7 @@ describe('EventBusHandler', () => {
   describe('approved item events', () => {
     it('update-approved-item should send event with proper data', async () => {
       const expectedEvent: ApprovedItemEventBusPayload = {
-        approvedItemId: '123-abc',
+        approvedItemExternalId: '123-abc',
         url: 'https://test.com/a-story',
         title: 'Everything you need to know about React',
         excerpt: 'Something here',
@@ -99,6 +100,7 @@ describe('EventBusHandler', () => {
         createdBy: 'Amy',
         updatedAt: new Date(1648225373000).toUTCString(),
         eventType: config.eventBridge.updateApprovedItemEventType,
+        authors: scheduledCorpusItem.approvedItem.authors,
       };
       emitter.emit(ReviewedCorpusItemEventType.UPDATE_ITEM, {
         reviewedCorpusItem: scheduledCorpusItem.approvedItem,
@@ -133,8 +135,8 @@ describe('EventBusHandler', () => {
       ScheduledItemEventBusPayload,
       'eventType'
     > = {
-      scheduledItemId: '789-xyz',
-      approvedItemId: '123-abc',
+      scheduledItemExternalId: '789-xyz',
+      approvedItemExternalId: '123-abc',
       url: 'https://test.com/a-story',
       title: 'Everything you need to know about React',
       excerpt: 'Something here',
@@ -148,6 +150,12 @@ describe('EventBusHandler', () => {
       updatedAt: new Date(1648225373000).toUTCString(),
       scheduledSurfaceGuid: 'NEW_TAB_EN_US',
       scheduledDate: '2030-01-01',
+      authors: [
+        {
+          name: 'Octavia Butler',
+          sortOrder: 1,
+        },
+      ],
     };
     it.each([
       [

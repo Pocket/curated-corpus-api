@@ -97,9 +97,7 @@ describe('mutations: ScheduledItem', () => {
       expect(result.errors?.[0].message).to.contain(
         `Cannot create a scheduled entry: Approved Item with id "not-a-valid-id-at-all" does not exist.`
       );
-      expect(result.errors?.[0].extensions?.code).to.equal(
-        'INTERNAL_SERVER_ERROR'
-      );
+      expect(result.errors?.[0].extensions?.code).to.equal('NOT_FOUND');
 
       // Check that the ADD_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -194,10 +192,16 @@ describe('mutations: ScheduledItem', () => {
       // Need to destructure timestamps and compare them separately
       // as Prisma will convert to ISO string for comparison
       // and GraphQL server returns Unix timestamps.
-      const { createdAt, updatedAt, ...otherApprovedItemProps } = approvedItem;
+      const {
+        createdAt,
+        updatedAt,
+        authors: approvedItemAuthors,
+        ...otherApprovedItemProps
+      } = approvedItem;
       const {
         createdAt: createdAtReturned,
         updatedAt: updatedAtReturned,
+        authors: authorsReturned,
         ...otherReturnedApprovedItemProps
       } = scheduledItem.approvedItem;
       expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
@@ -205,6 +209,22 @@ describe('mutations: ScheduledItem', () => {
       expect(otherApprovedItemProps).to.deep.include(
         otherReturnedApprovedItemProps
       );
+
+      // check authors
+      // note that approvedItemAuthors does not go through our graphql interface,
+      // so it has *all* db properties, including externalId and approvedItemId.
+      // these properties are *not* present in authorsReturned, so we need to do
+      // a custom comparison
+      if (approvedItemAuthors) {
+        const approvedItemAuthorsMapped = approvedItemAuthors.map((aia) => {
+          return {
+            name: aia.name,
+            sortOrder: aia.sortOrder,
+          };
+        });
+
+        expect(approvedItemAuthorsMapped).to.deep.equal(authorsReturned);
+      }
 
       // Check that the ADD_SCHEDULE event was fired successfully:
       // 1 - Event was fired once!
@@ -341,9 +361,7 @@ describe('mutations: ScheduledItem', () => {
       expect(result.errors?.[0].message).to.contain(
         `Item with ID of '${input.externalId}' could not be found.`
       );
-      expect(result.errors?.[0].extensions?.code).to.equal(
-        'INTERNAL_SERVER_ERROR'
-      );
+      expect(result.errors?.[0].extensions?.code).to.equal('NOT_FOUND');
 
       // Check that the REMOVE_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -396,10 +414,16 @@ describe('mutations: ScheduledItem', () => {
       // Need to destructure timestamps and compare them separately
       // as Prisma will convert to ISO string for comparison
       // and GraphQL server returns Unix timestamps.
-      const { createdAt, updatedAt, ...otherApprovedItemProps } = approvedItem;
+      const {
+        createdAt,
+        updatedAt,
+        authors: approvedItemAuthors,
+        ...otherApprovedItemProps
+      } = approvedItem;
       const {
         createdAt: createdAtReturned,
         updatedAt: updatedAtReturned,
+        authors: authorsReturned,
         ...otherReturnedApprovedItemProps
       } = returnedItem.approvedItem;
       expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
@@ -407,6 +431,22 @@ describe('mutations: ScheduledItem', () => {
       expect(otherApprovedItemProps).to.deep.include(
         otherReturnedApprovedItemProps
       );
+
+      // check authors
+      // note that approvedItemAuthors does not go through our graphql interface,
+      // so it has *all* db properties, including externalId and approvedItemId.
+      // these properties are *not* present in authorsReturned, so we need to do
+      // a custom comparison
+      if (approvedItemAuthors) {
+        const approvedItemAuthorsMapped = approvedItemAuthors.map((aia) => {
+          return {
+            name: aia.name,
+            sortOrder: aia.sortOrder,
+          };
+        });
+
+        expect(approvedItemAuthorsMapped).to.deep.equal(authorsReturned);
+      }
 
       // Check that the REMOVE_SCHEDULE event was fired successfully:
       // 1 - Event was fired once!
@@ -539,9 +579,7 @@ describe('mutations: ScheduledItem', () => {
         `Item with ID of '${input.externalId}' could not be found.`
       );
 
-      expect(result.errors?.[0].extensions?.code).to.equal(
-        'INTERNAL_SERVER_ERROR'
-      );
+      expect(result.errors?.[0].extensions?.code).to.equal('NOT_FOUND');
 
       // Check that the REMOVE_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -596,10 +634,16 @@ describe('mutations: ScheduledItem', () => {
       // Need to destructure timestamps and compare them separately
       // as Prisma will convert to ISO string for comparison
       // and GraphQL server returns Unix timestamps.
-      const { createdAt, updatedAt, ...otherApprovedItemProps } = approvedItem;
+      const {
+        createdAt,
+        updatedAt,
+        authors: approvedItemAuthors,
+        ...otherApprovedItemProps
+      } = approvedItem;
       const {
         createdAt: createdAtReturned,
         updatedAt: updatedAtReturned,
+        authors: authorsReturned,
         ...otherReturnedApprovedItemProps
       } = returnedItem.approvedItem;
       expect(getUnixTimestamp(createdAt)).to.equal(createdAtReturned);
@@ -607,6 +651,22 @@ describe('mutations: ScheduledItem', () => {
       expect(otherApprovedItemProps).to.deep.include(
         otherReturnedApprovedItemProps
       );
+
+      // check authors
+      // note that approvedItemAuthors does not go through our graphql interface,
+      // so it has *all* db properties, including externalId and approvedItemId.
+      // these properties are *not* present in authorsReturned, so we need to do
+      // a custom comparison
+      if (approvedItemAuthors) {
+        const approvedItemAuthorsMapped = approvedItemAuthors.map((aia) => {
+          return {
+            name: aia.name,
+            sortOrder: aia.sortOrder,
+          };
+        });
+
+        expect(approvedItemAuthorsMapped).to.deep.equal(authorsReturned);
+      }
 
       // Check that the RESCHEDULE event was fired successfully:
       // 1 - Event was fired once!

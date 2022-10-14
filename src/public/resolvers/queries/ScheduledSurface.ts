@@ -1,6 +1,6 @@
 import { ScheduledSurface } from '../../../database/types';
 import { ScheduledSurfaces } from '../../../shared/types';
-import { UserInputError } from 'apollo-server';
+import { UserInputError } from 'apollo-server-errors';
 
 /**
  * Retrieves a Scheduled Surface (for example, New Tab) for a given GUID.

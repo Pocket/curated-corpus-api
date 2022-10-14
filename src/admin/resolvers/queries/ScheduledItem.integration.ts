@@ -151,6 +151,32 @@ describe('queries: ScheduledCorpusItem', () => {
       expect(resultArray[1].scheduledDate).to.equal('2050-01-01');
     });
 
+    it('should sort items by scheduleDate asc and updatedAt asc', async () => {
+      const result = await server.executeOperation({
+        query: GET_SCHEDULED_ITEMS,
+        variables: {
+          filters: {
+            scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+            startDate: '2050-01-01',
+            endDate: '2050-01-01',
+          },
+        },
+      });
+
+      const resultArray = result.data?.getScheduledCorpusItems;
+
+      // get an array of the createdAt values in the order they were returned
+      const updatedAtDates = resultArray[0].items.map((item) => {
+        return item.updatedAt;
+      });
+
+      // sort those createdAt values
+      const sortedUpdatedAtDates = updatedAtDates.sort();
+
+      // the returned order should match the sorted order
+      expect(updatedAtDates).to.deep.equal(sortedUpdatedAtDates);
+    });
+
     it('should fail on invalid Scheduled Surface GUID', async () => {
       const invalidId = 'not-a-valid-id-by-any-means';
 

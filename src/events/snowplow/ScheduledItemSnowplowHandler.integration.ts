@@ -17,11 +17,8 @@ import { ScheduledItemSnowplowHandler } from './ScheduledItemSnowplowHandler';
 import { tracker } from './tracker';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 import { getUnixTimestamp } from '../../shared/utils';
-import {
-  CorpusItemSource,
-  getScheduledSurfaceByGuid,
-  Topics,
-} from '../../shared/types';
+import { CorpusItemSource, Topics } from '../../shared/types';
+import { getScheduledSurfaceByGuid } from '../../shared/utils';
 import { ScheduledItem } from '../../database/types';
 
 /**
@@ -59,6 +56,7 @@ const scheduledCorpusItem: ScheduledItem = {
     createdBy: 'Amy',
     updatedAt: new Date(),
     updatedBy: 'Amy',
+    authors: [{ name: 'Octavia Butler', sortOrder: 1 }],
   },
 };
 

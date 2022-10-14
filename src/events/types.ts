@@ -1,6 +1,8 @@
-import { ApprovedItem, RejectedCuratedCorpusItem } from '@prisma/client';
-import { ScheduledItem, CorpusItem } from '../database/types';
-import { ScheduledItem as ScheduledItemModel } from '@prisma/client';
+import {
+  RejectedCuratedCorpusItem,
+  ScheduledItem as ScheduledItemModel,
+} from '@prisma/client';
+import { ScheduledItem, CorpusItem, ApprovedItem } from '../database/types';
 
 export enum ReviewedCorpusItemEventType {
   ADD_ITEM = 'ADD_ITEM',
@@ -50,10 +52,10 @@ export type ScheduledItemEventBusPayload = BaseEventBusPayload &
   Pick<ScheduledItemModel, 'createdBy' | 'scheduledSurfaceGuid'> &
   Pick<
     ApprovedItem,
-    'topic' | 'isSyndicated' | keyof Omit<CorpusItem, 'id'>
+    'topic' | 'isSyndicated' | keyof Omit<CorpusItem, 'id' | 'image'>
   > & {
-    scheduledItemId: string; // externalId of ScheduledItem
-    approvedItemId: string; // externalId of ApprovedItem
+    scheduledItemExternalId: string; // externalId of ScheduledItem
+    approvedItemExternalId: string; // externalId of ApprovedItem
     scheduledDate: string; // UTC Date string YYYY-MM-DD
     createdAt: string; // UTC timestamp string
     updatedAt: string; // UTC timestamp string
@@ -72,9 +74,10 @@ export type ApprovedItemEventBusPayload = BaseEventBusPayload &
       | 'topic'
       | 'isSyndicated'
       | 'createdBy'
+      | 'authors'
     >
   > & {
-    approvedItemId: string; // externalId of ApprovedItem
+    approvedItemExternalId: string; // externalId of ApprovedItem
     createdAt?: string; // UTC timestamp string
     updatedAt: string; // UTC timestamp string;
   };

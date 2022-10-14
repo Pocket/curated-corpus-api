@@ -1,6 +1,3 @@
-// TODO: ask kenny/d&l to update schema to reference scheduled surface instead of new tab,
-// then come back and update this file (and other related files, probably)
-
 // Helper types and enums used in the schema
 import { CorpusItemSource } from '../../shared/types';
 
@@ -33,6 +30,9 @@ export type CuratedCorpusItemUpdate = {
  * Entity to describe an item that has been reviewed for the Pocket
  * recommendation corpus. Expected (new and old) on all object_update
  * events where object = reviewed_corpus_item.
+ *
+ * Note that many of the properties below are optional because a reviewed
+ * corpus item may mean rejected, in which case many properties may be absent.
  */
 export type ReviewedCorpusItem = {
   /**
@@ -82,6 +82,14 @@ export type ReviewedCorpusItem = {
    * The excerpt for the reviewed corpus item.
    */
   excerpt?: string;
+  /**
+   * The publisher for the reviewed corpus item.
+   */
+  publisher?: string;
+  /**
+   * The list of authors for the reviewed corpus item.
+   */
+  authors?: string[];
   /**
    * The url of the main image of the reviewed corpus item.
    */

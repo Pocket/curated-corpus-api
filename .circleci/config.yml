@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   aws-ecs: circleci/aws-ecs@2.2.1
-  pocket: pocket/circleci-orbs@1.2.5
+  pocket: pocket/circleci-orbs@1.2.8
 
 # Workflow shortcuts
 not_main: &not_main
@@ -46,7 +46,7 @@ only_dev: &only_dev
 jobs:
   apollo:
     docker:
-      - image: cimg/node:current@sha256:32d18d03b5bbb7130e29c45e5e0f39242f01ee79a37d634844085bed535eb138
+      - image: cimg/node:current@sha256:92d8634c392485ac5b70b4b1d8ea0e0fb1fc71f7e70073446a6f72ff142eaeae
     steps:
       - checkout
       - run:
@@ -105,7 +105,7 @@ jobs:
 
   build:
     docker:
-      - image: cimg/node:current@sha256:32d18d03b5bbb7130e29c45e5e0f39242f01ee79a37d634844085bed535eb138
+      - image: cimg/node:current@sha256:92d8634c392485ac5b70b4b1d8ea0e0fb1fc71f7e70073446a6f72ff142eaeae
     steps:
       - checkout
       # Define the working directory for this job
@@ -153,7 +153,7 @@ jobs:
         description: 'Integration tests'
         type: string
     docker:
-      - image: cimg/node:current@sha256:32d18d03b5bbb7130e29c45e5e0f39242f01ee79a37d634844085bed535eb138
+      - image: cimg/node:current@sha256:92d8634c392485ac5b70b4b1d8ea0e0fb1fc71f7e70073446a6f72ff142eaeae
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -161,14 +161,14 @@ jobs:
           NODE_ENV: test
           AWS_XRAY_LOG_LEVEL: silent
           AWS_XRAY_CONTEXT_MISSING: LOG_ERROR
-      - image: mysql:5.7@sha256:1a73b6a8f507639a8f91ed01ace28965f4f74bb62a9d9b9e7378d5f07fab79dc
+      - image: mysql:5.7@sha256:94176d0ad4ed85767fc0d74b8071387109a0390e7c1afd39788269c96d2dad74
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           TZ: 'UTC'
-      - image: localstack/localstack@sha256:fa6b99281592b6efb32c6134ddd53bef2454fb7af3702f7b1ea9ed5e9d515d76
+      - image: localstack/localstack@sha256:752ed233a1ae35775689132dbc384fd61b6451e0d4c70f206f4b8c8ea9c80ee0
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD

@@ -23,6 +23,7 @@ export default {
       approvedItemsPerPage: 30,
       rejectedItemsPerPage: 30,
       maxAllowedResults: 100,
+      scheduledSurfaceHistory: 10,
     },
     upload: {
       maxSize: 10000000, // in bytes => 10MB
@@ -42,7 +43,6 @@ export default {
   },
   events: {
     source: 'curated-corpus-api',
-    // TODO: what should this value be? See list-api, user-api with similar comments
     version: '0.0.2',
   },
   eventBridge: {
@@ -69,7 +69,7 @@ export default {
     schemas: {
       objectUpdate: 'iglu:com.pocket/object_update/jsonschema/1-0-5',
       reviewedCorpusItem:
-        'iglu:com.pocket/reviewed_corpus_item/jsonschema/1-0-2',
+        'iglu:com.pocket/reviewed_corpus_item/jsonschema/1-0-4',
       scheduledCorpusItem:
         'iglu:com.pocket/scheduled_corpus_item/jsonschema/1-0-2',
     },

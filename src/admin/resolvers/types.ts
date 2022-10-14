@@ -1,4 +1,5 @@
-import { ApprovedItem, CuratedStatus, ScheduledItem } from '@prisma/client';
+import { CuratedStatus, ScheduledItem } from '@prisma/client';
+import { ApprovedItem } from '../../database/types';
 import { CorpusItemSource } from '../../shared/types';
 
 export type ImportApprovedCorpusItemPayload = {

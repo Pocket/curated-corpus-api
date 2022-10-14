@@ -1,6 +1,6 @@
 import nock from 'nock';
 import { unlinkSync, writeFileSync } from 'fs';
-import { FileUpload } from 'graphql-upload';
+import Upload from 'graphql-upload/Upload.js';
 import { getFileUploadFromUrl, getPocketCacheUrl } from './utils';
 import { InvalidImageUrl } from './errors';
 
@@ -30,7 +30,7 @@ describe('Upload Utils', () => {
         'Content-Type': 'image/jpeg',
       });
 
-    const image: FileUpload = await getFileUploadFromUrl(
+    const image: Upload = await getFileUploadFromUrl(
       'https://pocket-image-cache.com/dancing-in-the-air.jpeg'
     );
 

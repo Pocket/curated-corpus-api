@@ -10,7 +10,7 @@ import {
   ScheduledCorpusItem,
 } from './schema';
 import { getUnixTimestamp } from '../../shared/utils';
-import { getScheduledSurfaceByGuid } from '../../shared/types';
+import { getScheduledSurfaceByGuid } from '../../shared/utils';
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
 
 type CuratedCorpusItemUpdateEvent = Omit<SelfDescribingJson, 'data'> & {

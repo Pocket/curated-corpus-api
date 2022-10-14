@@ -81,6 +81,36 @@ export const GET_APPROVED_ITEM_BY_URL = gql`
   ${CuratedItemData}
 `;
 
+export const GET_APPROVED_ITEM_BY_EXTERNAL_ID = gql`
+  query approvedCorpusItemByExternalId($externalId: ID!) {
+    approvedCorpusItemByExternalId(externalId: $externalId) {
+      ...CuratedItemData
+    }
+  }
+  ${CuratedItemData}
+`;
+
+export const GET_APPROVED_ITEM_WITH_SCHEDULING_HISTORY = gql`
+  query getApprovedCorpusItemByUrl(
+    $url: String!
+    $scheduledSurfaceGuid: ID
+    $limit: NonNegativeInt
+  ) {
+    getApprovedCorpusItemByUrl(url: $url) {
+      ...CuratedItemData
+      scheduledSurfaceHistory(
+        filters: { scheduledSurfaceGuid: $scheduledSurfaceGuid, limit: $limit }
+      ) {
+        externalId
+        createdBy
+        scheduledDate
+        scheduledSurfaceGuid
+      }
+    }
+  }
+  ${CuratedItemData}
+`;
+
 export const GET_SCHEDULED_SURFACES_FOR_USER = gql`
   query getScheduledSurfacesForUser {
     getScheduledSurfacesForUser {
@@ -101,4 +131,15 @@ export const APPROVED_ITEM_REFERENCE_RESOLVER = gql`
     }
   }
   ${CuratedItemData}
+`;
+
+export const REJECTED_ITEM_REFERENCE_RESOLVER = gql`
+  query ($representations: [_Any!]!) {
+    _entities(representations: $representations) {
+      ... on RejectedCorpusItem {
+        ...RejectedItemData
+      }
+    }
+  }
+  ${RejectedItemData}
 `;

@@ -1,10 +1,12 @@
-import { ApprovedItem, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import {
+  ApprovedItem,
   CreateApprovedItemInput,
   ImportApprovedItemInput,
+  UpdateApprovedItemAuthorsInput,
   UpdateApprovedItemInput,
 } from '../types';
-import { ApolloError, UserInputError } from 'apollo-server';
+import { ApolloError, UserInputError } from 'apollo-server-errors';
 import { checkCorpusUrl } from '../helpers/checkCorpusUrl';
 
 /**
@@ -27,6 +29,15 @@ export async function createApprovedItem(
       ...data,
       // Use the SSO username here.
       createdBy: username,
+      // Authors are stored in its own table, so need to have a nested `create`.
+      authors: {
+        create: data.authors,
+      },
+    },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
     },
   });
 }
@@ -43,7 +54,14 @@ export async function importApprovedItem(
   db: PrismaClient,
   data: ImportApprovedItemInput
 ): Promise<ApprovedItem> {
-  return db.approvedItem.create({ data });
+  return db.approvedItem.create({
+    data,
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
+    },
+  });
 }
 
 /**
@@ -67,6 +85,49 @@ export async function updateApprovedItem(
       ...data,
       // Use the SSO username here.
       updatedBy: username,
+      // Authors are stored in their own table, so need to have a nested `create`.
+      authors: {
+        create: data.authors,
+      },
+    },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
+    },
+  });
+}
+
+/**
+ * A targeted update operation that only updates an approved item's authors data.
+ * Used to backfill authors for legacy curated items.
+ *
+ * @param db
+ * @param data
+ * @param username
+ */
+export async function updateApprovedItemAuthors(
+  db: PrismaClient,
+  data: UpdateApprovedItemAuthorsInput,
+  username: string
+): Promise<ApprovedItem> {
+  if (!data.externalId) {
+    throw new UserInputError('externalId must be provided.');
+  }
+  return db.approvedItem.update({
+    where: { externalId: data.externalId },
+    data: {
+      // Use the SSO username here.
+      updatedBy: username,
+      // Authors are stored in their own table, so need to have a nested `create`.
+      authors: {
+        create: data.authors,
+      },
+    },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
     },
   });
 }
@@ -85,6 +146,11 @@ export async function deleteApprovedItem(
   // returned to the resolver as the result of the mutation.
   const approvedItem = await db.approvedItem.findUnique({
     where: { externalId },
+    include: {
+      authors: {
+        orderBy: [{ sortOrder: 'asc' }],
+      },
+    },
   });
 
   // Fail early if item wasn't found.
@@ -94,7 +160,7 @@ export async function deleteApprovedItem(
     );
   }
 
-  // Check for scheduled entries for this approved item
+  // Check for scheduled entries for this approved item.
   const scheduledItems = await db.scheduledItem.findMany({
     where: { approvedItemId: approvedItem.id },
   });
@@ -103,6 +169,13 @@ export async function deleteApprovedItem(
       `Cannot remove item from approved corpus - scheduled entries exist.`
     );
   }
+
+  // Delete the authors associated with this approved item.
+  await db.approvedItemAuthor.deleteMany({
+    where: {
+      approvedItemId: approvedItem.id,
+    },
+  });
 
   // Hard delete the Approved Item if we got past this point.
   await db.approvedItem.delete({

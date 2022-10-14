@@ -57,7 +57,6 @@ describe('queries: RejectedCorpusItem (authentication)', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_REJECTED_ITEMS,
@@ -68,8 +67,6 @@ describe('queries: RejectedCorpusItem (authentication)', () => {
 
       // should return all four items - the entire corpus should be accessible
       expect(result.data?.getRejectedCorpusItems.edges).to.have.length(4);
-
-      await server.stop();
     });
 
     it('should get all items when user has only one scheduled surface access', async () => {
@@ -80,7 +77,6 @@ describe('queries: RejectedCorpusItem (authentication)', () => {
       };
 
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_REJECTED_ITEMS,
@@ -91,8 +87,6 @@ describe('queries: RejectedCorpusItem (authentication)', () => {
 
       // should return all four items - the entire corpus should be accessible
       expect(result.data?.getRejectedCorpusItems.edges).to.have.length(4);
-
-      await server.stop();
     });
 
     it('should throw an error when user does not have the required access', async () => {
@@ -102,7 +96,6 @@ describe('queries: RejectedCorpusItem (authentication)', () => {
         groups: `this,that`,
       };
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_REJECTED_ITEMS,
@@ -114,15 +107,12 @@ describe('queries: RejectedCorpusItem (authentication)', () => {
       // check if the error we get is the access denied error
       expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
       expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
-
-      await server.stop();
     });
 
     it('should throw an error when request access groups are undefined', async () => {
       // Set up auth headers with no access groups whatsoever (the default
       // on top of the `describe()` block for Rejected Item queries).
       const server = getServerWithMockedHeaders(headers);
-      await server.start();
 
       const result = await server.executeOperation({
         query: GET_REJECTED_ITEMS,
@@ -134,8 +124,6 @@ describe('queries: RejectedCorpusItem (authentication)', () => {
       // check if the error we get is the access denied error
       expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
       expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
-
-      await server.stop();
     });
   });
 });

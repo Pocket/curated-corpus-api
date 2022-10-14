@@ -1,3 +1,10 @@
+import { ScheduledSurface, ScheduledSurfaces } from './types';
+import {
+  ApprovedItem,
+  ApprovedItemAuthor,
+  CorpusItem,
+} from '../database/types';
+
 /**
  * Generate an integer Epoch time from a JavaScript Date object.
  *
@@ -39,3 +46,62 @@ export function toUtcDateString(date: Date) {
   const padDayString = date.getUTCDate().toString().padStart(2, '0');
   return `${date.getUTCFullYear()}-${padMonthString}-${padDayString}`;
 }
+
+// Pocket shared data utility constructs/functions
+
+// array for easy access to scheduled surface guids
+export const scheduledSurfaceAllowedValues = ScheduledSurfaces.map(
+  (surface) => {
+    return surface.guid;
+  }
+);
+
+// array for easy access to scheduled surface access groups
+export const scheduledSurfaceAccessGroups = ScheduledSurfaces.map(
+  (surface: ScheduledSurface) => {
+    return surface.accessGroup;
+  }
+);
+
+export const getScheduledSurfaceByAccessGroup = (
+  group: string
+): ScheduledSurface | undefined => {
+  return ScheduledSurfaces.find(
+    (surface: ScheduledSurface) => surface.accessGroup === group
+  );
+};
+
+export const getScheduledSurfaceByGuid = (
+  guid: string
+): ScheduledSurface | undefined => {
+  return ScheduledSurfaces.find(
+    (surface: ScheduledSurface) => surface.guid === guid
+  );
+};
+
+export const getCorpusItemFromApprovedItem = (
+  approvedItem: ApprovedItem
+): CorpusItem => {
+  return {
+    id: approvedItem.externalId,
+    url: approvedItem.url,
+    title: approvedItem.title,
+    excerpt: approvedItem.excerpt,
+    authors: approvedItem.authors as ApprovedItemAuthor[],
+    language: approvedItem.language,
+    publisher: approvedItem.publisher,
+    imageUrl: approvedItem.imageUrl,
+    image: {
+      url: approvedItem.imageUrl,
+    },
+    // so the type definition in /src/database/types has topic as optional,
+    // which typescript resolves as `string | undefined`. however, if the
+    // topic is missing in the db, prisma returns `null` - hence the
+    // nullish coalescing operator below.
+    //
+    // i wonder why typescript won't accept both. is there some deep dark
+    // JS reason? or is it just better practice?
+    topic: approvedItem.topic ?? undefined,
+  };
+};
+// End Pocket shared data utility constructs/functions
