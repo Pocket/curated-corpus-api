@@ -46,7 +46,7 @@ only_dev: &only_dev
 jobs:
   apollo:
     docker:
-      - image: cimg/node:current@sha256:1efd38c9054de9400b1876e41af6962c8aea2285471a0896811d7f0e8934b7ec
+      - image: cimg/node:current@sha256:11da67abb5d2117eaa65b1f787eab857cf2b5b949bfa8599b35e7b6cfab16718
     steps:
       - checkout
       - run:
@@ -105,7 +105,7 @@ jobs:
 
   build:
     docker:
-      - image: cimg/node:current@sha256:1efd38c9054de9400b1876e41af6962c8aea2285471a0896811d7f0e8934b7ec
+      - image: cimg/node:current@sha256:11da67abb5d2117eaa65b1f787eab857cf2b5b949bfa8599b35e7b6cfab16718
     steps:
       - checkout
       # Define the working directory for this job
@@ -153,7 +153,7 @@ jobs:
         description: 'Integration tests'
         type: string
     docker:
-      - image: cimg/node:current@sha256:1efd38c9054de9400b1876e41af6962c8aea2285471a0896811d7f0e8934b7ec
+      - image: cimg/node:current@sha256:11da67abb5d2117eaa65b1f787eab857cf2b5b949bfa8599b35e7b6cfab16718
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -168,7 +168,7 @@ jobs:
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           TZ: 'UTC'
-      - image: localstack/localstack@sha256:d51b67a2e84a876b211181f180766f7dd8a8ba2f3cf9a7e08ded8f4c1976e651
+      - image: localstack/localstack@sha256:b6af57a2f4162b71794944c22dcb810b70f2a761017493ed1635d7f167faed8a
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
