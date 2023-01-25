@@ -1,23 +1,21 @@
-const config = {
-  NODE_ENV: 'test',
-  AWS_ACCESS_KEY_ID: 'localstack-fake-id',
-  AWS_DEFAULT_REGION: 'us-east-1',
-  AWS_REGION: 'us-east-1',
-  AWS_S3_ENDPOINT: 'http://localstack:4566',
-  AWS_S3_BUCKET: 'curated-corpus-api-local-images',
-  AWS_SECRET_ACCESS_KEY: 'localstack-fake-key',
-  LOCALSTACK_API_KEY: 'another-fake-key',
-  AWS_XRAY_CONTEXT_MISSING: 'LOG_ERROR',
-  AWS_XRAY_LOG_LEVEL: 'silent',
-  DATABASE_URL: 'mysql://root:@mysql:3306/curation_corpus?connect_timeout=300',
-  SNOWPLOW_ENDPOINT: 'snowplow:9090',
-};
+/**
+ * Setup to allow tests to run outside docker compose.
+ *
+ * dotenv will not modify pre-existing environment variables,
+ * so this does nothing when running in containers (all already
+ * set using content from .docker/local.env).  Overrides to
+ * localhost allow interacting with containers without docker
+ * networking or modifications to /etc/hosts
+ */
 
 module.exports = async () => {
-  // ...
-  // Set reference to current env variables in order to restore them during teardown.
-  global.__ENV__ = Object.assign({}, process.env);
-  for (const [key, val] of Object.entries(config)) {
-    process.env[key] = val;
-  }
+  process.env.NODE_ENV = 'test';
+  process.env.AWS_S3_ENDPOINT =
+    process.env.AWS_S3_ENDPOINT ?? 'http://localhost:4566';
+  process.env.DATABASE_URL =
+    process.env.DATABASE_URL ??
+    'mysql://root:@localhost:3306/curation_corpus?connect_timeout=300';
+  process.env.SNOWPLOW_ENDPOINT =
+    process.env.SNOWPLOW_ENDPOINT ?? 'localhost:9090';
+  require('dotenv').config({ path: '../../../.docker/local.env' });
 };
