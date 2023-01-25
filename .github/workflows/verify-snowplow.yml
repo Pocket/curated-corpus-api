@@ -28,7 +28,7 @@ jobs:
         uses: snowplow-product/msc-schema-ci-action/check@afb795c9a9ca1a162a8a2dbd49dbe09f8db3c0f0 # tag=v1
         with:
           organization-id: ${{ secrets.SNOWPLOW_ORG_ID }}
-          api-key: ${{ secrets.SNOWPLOW_API_KEY }}
+          api-key: ${{ secrets.SNOWPLOW_GITHUB_CHECKS }}
           manifest-path: '.github/workflows/snowplow/schemas.json'
           # Note options here are DEV or PROD. These are magic Snowplow words
           # and they don't correspond to traditional Node env values such as
