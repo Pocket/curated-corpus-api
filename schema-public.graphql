@@ -40,7 +40,7 @@ type Collection @key(fields: "slug") {
 TODO: Make this type implement PocketResource when available.
 https://getpocket.atlassian.net/wiki/spaces/PE/pages/2771714049/The+Future+of+Item
 """
-union CorpusParent = SyndicatedArticle | Collection
+union CorpusTarget = SyndicatedArticle | Collection
 
 """
 Represents an item that is in the Corpus and its associated manually edited metadata.
@@ -90,7 +90,7 @@ type CorpusItem @key(fields: "id") {
     """
     topic: String
 
-    parent: CorpusParent
+    target: CorpusTarget
 }
 
 """

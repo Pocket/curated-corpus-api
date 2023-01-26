@@ -3,7 +3,7 @@ import {
   ApprovedItem,
   ApprovedItemAuthor,
   CorpusItem,
-  CorpusParentType,
+  CorpusTargetType,
 } from '../database/types';
 import { parse } from 'url';
 
@@ -84,7 +84,7 @@ export const getScheduledSurfaceByGuid = (
 export const getCorpusItemFromApprovedItem = (
   approvedItem: ApprovedItem
 ): CorpusItem => {
-  const parent = getPocketPath(approvedItem.url);
+  const target = getPocketPath(approvedItem.url);
 
   return {
     id: approvedItem.externalId,
@@ -106,8 +106,8 @@ export const getCorpusItemFromApprovedItem = (
     // i wonder why typescript won't accept both. is there some deep dark
     // JS reason? or is it just better practice?
     topic: approvedItem.topic ?? undefined,
-    parent: parent?.key && {
-      slug: parent.key,
+    target: target?.key && {
+      slug: target.key,
     },
   };
 };
@@ -136,7 +136,7 @@ const dropUrlLocalePath = (path: string): [string, string] => {
  * @param path without locale.
  * @returns
  */
-const getUrlType = (path: string): CorpusParentType => {
+const getUrlType = (path: string): CorpusTargetType => {
   if (path.startsWith('/explore/item/')) {
     return 'SyndicatedArticle';
   } else if (path.startsWith('/collections/')) {
@@ -160,7 +160,7 @@ export const getPocketPath = (
 ): {
   locale: string;
   path: string;
-  type?: CorpusParentType;
+  type?: CorpusTargetType;
   key?: string;
 } => {
   const obj = parse(url, true);
