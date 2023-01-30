@@ -46,7 +46,7 @@ only_dev: &only_dev
 jobs:
   apollo:
     docker:
-      - image: cimg/node:current@sha256:60048477384ccd5c594740396d743d2296e0dd637eafa4a80dc51612fd779b41
+      - image: cimg/node:current@sha256:b4522981c37a649e0c9b6669ca41b7efc0a2fa4f7164c4534f2766a0cbbbd0d2
     steps:
       - checkout
       - run:
@@ -105,7 +105,7 @@ jobs:
 
   build:
     docker:
-      - image: cimg/node:current@sha256:60048477384ccd5c594740396d743d2296e0dd637eafa4a80dc51612fd779b41
+      - image: cimg/node:current@sha256:b4522981c37a649e0c9b6669ca41b7efc0a2fa4f7164c4534f2766a0cbbbd0d2
     steps:
       - checkout
       # Define the working directory for this job
@@ -153,7 +153,7 @@ jobs:
         description: 'Integration tests'
         type: string
     docker:
-      - image: cimg/node:current@sha256:60048477384ccd5c594740396d743d2296e0dd637eafa4a80dc51612fd779b41
+      - image: cimg/node:current@sha256:b4522981c37a649e0c9b6669ca41b7efc0a2fa4f7164c4534f2766a0cbbbd0d2
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
