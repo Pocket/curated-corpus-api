@@ -155,14 +155,14 @@ export type ApprovedItem = ApprovedItemModel & {
 };
 
 /**
- * CorpusParentType probably mase more sense to be a union of all Pocket types
+ * CorpusTargetType probably mase more sense to be a union of all Pocket types
  * or entities. An incremental step in that direction was chosen. If we want to
  * expand this approach for more systems then we can figure out how to best
  * accomplish when that utility is defined.
  */
-export type CorpusParentType = 'SyndicatedArticle' | 'Collection';
+export type CorpusTargetType = 'SyndicatedArticle' | 'Collection';
 
-export type CorpusParent = {
+export type CorpusTarget = {
   slug: string;
 };
 
@@ -179,7 +179,7 @@ export type CorpusItem = {
   imageUrl: string;
   image: Image;
   topic?: string;
-  parent?: CorpusParent;
+  target?: CorpusTarget;
 };
 
 export type Image = {

@@ -3,7 +3,7 @@ import { getScheduledSurface } from './queries/ScheduledSurface';
 import { getItemsForScheduledSurface } from './queries/ScheduledSurfaceItem';
 import { getCorpusItem, getSavedCorpusItem } from './queries/CorpusItem';
 import { getPocketPath } from '../../shared/utils';
-import { CorpusParentType } from '../../database/types';
+import { CorpusTargetType } from '../../database/types';
 
 export const resolvers = {
   // The Date resolver enforces the date to be in the YYYY-MM-DD format.
@@ -24,8 +24,8 @@ export const resolvers = {
     // Gets the metadata for a Scheduled Surface (for example, New Tab).
     scheduledSurface: getScheduledSurface,
   },
-  CorpusParent: {
-    __resolveType({ url }, contextValue, info): CorpusParentType {
+  CorpusTarget: {
+    __resolveType({ url }, contextValue, info): CorpusTargetType {
       if (url) {
         return getPocketPath(url)?.type;
       }
