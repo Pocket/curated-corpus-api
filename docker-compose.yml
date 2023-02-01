@@ -18,7 +18,7 @@ services:
       - snowplow
 
   mysql:
-    image: mysql:5.7@sha256:0e3435e72c493aec752d8274379b1eac4d634f47a7781a7a92b8636fa1dc94c1
+    image: mysql:5.7@sha256:8cf035b14977b26f4a47d98e85949a7dd35e641f88fc24aa4b466b36beecf9d6
     platform: linux/amd64
     env_file:
       - ./.docker/local.env
