@@ -52,7 +52,7 @@ only_dev: &only_dev
 jobs:
   apollo:
     docker:
-      - image: node:16@sha256:496085d0cd8edf49c97ec86ac11bed85b6f965d9b29885887bb0edba26549b07
+      - image: node:16@sha256:27fab5920246070cf13449cf44c25bc4f5adef18ca7482b2bda90b7cf9e64481
     steps:
       - checkout
       - run:
@@ -111,7 +111,7 @@ jobs:
 
   build:
     docker:
-      - image: node:16@sha256:496085d0cd8edf49c97ec86ac11bed85b6f965d9b29885887bb0edba26549b07
+      - image: node:16@sha256:27fab5920246070cf13449cf44c25bc4f5adef18ca7482b2bda90b7cf9e64481
     steps:
       - checkout
       # Define the working directory for this job
@@ -155,7 +155,7 @@ jobs:
         description: 'Integration tests'
         type: string
     docker:
-      - image: node:16@sha256:496085d0cd8edf49c97ec86ac11bed85b6f965d9b29885887bb0edba26549b07
+      - image: node:16@sha256:27fab5920246070cf13449cf44c25bc4f5adef18ca7482b2bda90b7cf9e64481
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
