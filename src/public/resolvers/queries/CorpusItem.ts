@@ -13,17 +13,29 @@ import { UserInputError } from 'apollo-server-errors';
  * @param db
  */
 export async function getCorpusItem(item, { db }): Promise<CorpusItem> {
-  const { id, url } = item;
+  const { id } = item;
 
-  const approvedItem = id
-    ? await getApprovedItemByExternalId(db, id)
-    : await getApprovedItemByUrl(db, url);
+  const approvedItem = await getApprovedItemByExternalId(db, id);
   if (!approvedItem) {
-    if (url)
-      throw new UserInputError(
-        `Could not find Corpus Item with Url of "${url}"`
-      );
+    return null;
+
     throw new UserInputError(`Could not find Corpus Item with ID of "${id}".`);
+  }
+
+  return getCorpusItemFromApprovedItem(approvedItem);
+}
+
+export async function getSavedCorpusItem(
+  item,
+  args,
+  { db }
+): Promise<CorpusItem> {
+  const { url } = item;
+
+  const approvedItem = await getApprovedItemByUrl(db, url);
+  if (!approvedItem) {
+    console.log(`Could not find Corpus Item with Url of "${url}"`);
+    return null;
   }
 
   return getCorpusItemFromApprovedItem(approvedItem);

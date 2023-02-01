@@ -88,13 +88,15 @@ describe('CorpusItem reference resolver', () => {
 
     expect(result.data).to.not.be.null;
     expect(result.data?._entities).to.have.lengthOf(1);
-    expect(result.data?._entities[0].title).to.equal(approvedItem.title);
-    expect(result.data?._entities[0].authors).to.have.lengthOf(
+    expect(result.data?._entities[0].corpusItem.title).to.equal(
+      approvedItem.title
+    );
+    expect(result.data?._entities[0].corpusItem.authors).to.have.lengthOf(
       <number>approvedItem.authors?.length
     );
   });
 
-  it('should throw an error if the url provided is not known', async () => {
+  it('should return null if the url provided is not known', async () => {
     const result = await server.executeOperation({
       query: CORPUS_ITEM_REFERENCE_RESOLVER,
       variables: {
@@ -107,12 +109,8 @@ describe('CorpusItem reference resolver', () => {
       },
     });
 
-    // There should be errors
-    expect(result.errors).not.to.be.null;
-
-    expect(result.errors?.[0].message).to.contain(
-      `Could not find Corpus Item with Url of "ABRACADABRA"`
-    );
-    expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
+    expect(result.errors).to.be.null;
+    expect(result.data?._entities).to.have.lengthOf(1);
+    expect(result.data?._entities[0]).to.be.null;
   });
 });
