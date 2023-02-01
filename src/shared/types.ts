@@ -40,6 +40,7 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
     guid: 'NEW_TAB_EN_US',
     ianaTimezone: 'America/New_York',
     prospectTypes: [
+      ProspectType.TOP_SAVED,
       ProspectType.GLOBAL,
       ProspectType.ORGANIC_TIMESPENT,
       ProspectType.SYNDICATED_NEW,
