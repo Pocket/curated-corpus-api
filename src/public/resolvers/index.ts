@@ -14,6 +14,10 @@ export const resolvers = {
   CorpusItem: {
     __resolveReference: getCorpusItem,
   },
+  // Allow the `SavedItem` to resolve the corpus item
+  SavedItem: {
+    corpusItem: getCorpusItem,
+  },
   Query: {
     // Gets the metadata for a Scheduled Surface (for example, New Tab).
     scheduledSurface: getScheduledSurface,

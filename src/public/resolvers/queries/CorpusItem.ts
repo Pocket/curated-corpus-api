@@ -1,5 +1,5 @@
 import { CorpusItem } from '../../../database/types';
-import { getApprovedItemByExternalId } from '../../../database/queries/ApprovedItem';
+import { getApprovedItemByExternalId, getApprovedItemByUrl } from '../../../database/queries/ApprovedItem';
 import { getCorpusItemFromApprovedItem } from '../../../shared/utils';
 import { UserInputError } from 'apollo-server-errors';
 
@@ -10,10 +10,11 @@ import { UserInputError } from 'apollo-server-errors';
  * @param db
  */
 export async function getCorpusItem(item, { db }): Promise<CorpusItem> {
-  const { id } = item;
+  const { id, givenUrl } = item;
 
-  const approvedItem = await getApprovedItemByExternalId(db, id);
+  const approvedItem = id ? await getApprovedItemByExternalId(db, id) : await getApprovedItemByUrl(db, givenUrl)
   if (!approvedItem) {
+    if(givenUrl) throw new UserInputError(`Could not find Corpus Item with Url of "${givenUrl}"`)
     throw new UserInputError(`Could not find Corpus Item with ID of "${id}".`);
   }
 
