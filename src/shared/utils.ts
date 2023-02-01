@@ -3,7 +3,9 @@ import {
   ApprovedItem,
   ApprovedItemAuthor,
   CorpusItem,
+  CorpusTargetType,
 } from '../database/types';
+import { parse } from 'url';
 
 /**
  * Generate an integer Epoch time from a JavaScript Date object.
@@ -82,6 +84,8 @@ export const getScheduledSurfaceByGuid = (
 export const getCorpusItemFromApprovedItem = (
   approvedItem: ApprovedItem
 ): CorpusItem => {
+  const target = getPocketPath(approvedItem.url);
+
   return {
     id: approvedItem.externalId,
     url: approvedItem.url,
@@ -96,12 +100,90 @@ export const getCorpusItemFromApprovedItem = (
     },
     // so the type definition in /src/database/types has topic as optional,
     // which typescript resolves as `string | undefined`. however, if the
-    // topic is missing in the db, prisma returns `null` - hence the
+    // topic is missing in the db, prisma returns `null` - h
     // nullish coalescing operator below.
     //
     // i wonder why typescript won't accept both. is there some deep dark
     // JS reason? or is it just better practice?
     topic: approvedItem.topic ?? undefined,
+    target: target?.key && {
+      slug: target.key,
+    },
   };
 };
 // End Pocket shared data utility constructs/functions
+
+const slugRegex = /[\w/]+\/([\w-]+)$/;
+const localeRegex = /\/([a-z]{2}(-[A-Z]{2})?)(\/.*)/;
+
+/**
+ *
+ * @param path
+ * @returns [locale, path]
+ */
+const dropUrlLocalePath = (path: string): [string, string] => {
+  const match = path.match(localeRegex);
+
+  if (!match || match.length < 3) {
+    return [null, path];
+  }
+
+  return [match[1], match[3]];
+};
+
+/**
+ *
+ * @param path without locale.
+ * @returns
+ */
+const getUrlType = (path: string): CorpusTargetType => {
+  if (path.startsWith('/explore/item/')) {
+    return 'SyndicatedArticle';
+  } else if (path.startsWith('/collections/')) {
+    return 'Collection';
+  }
+  return null;
+};
+
+export const getUrlId = (path: string): string => {
+  return path.match(slugRegex)[1];
+};
+
+/**
+ *
+ * @param url Fully qualified URL.
+ * @returns {locale, path, type, key} when URL has a known entity type.
+ *          {locale, path} when its a pocket URL but the entities are not known.
+ */
+export const getPocketPath = (
+  url: string
+): {
+  locale: string;
+  path: string;
+  type?: CorpusTargetType;
+  key?: string;
+} => {
+  const obj = parse(url, true);
+
+  // Guard, only process getpocket.com urls.
+  if (obj.host != 'getpocket.com') {
+    return null;
+  }
+
+  // Drop the locale prefix from the path.
+  const [locale, path] = dropUrlLocalePath(obj.pathname);
+  const type = getUrlType(path);
+
+  if (type == null) {
+    return { locale, path };
+  }
+
+  const key = getUrlId(path);
+
+  return {
+    locale,
+    path,
+    type,
+    key,
+  };
+};
