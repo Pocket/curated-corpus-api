@@ -1,16 +1,30 @@
 import { expect } from 'chai';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import {
   clearDb,
   createApprovedItemHelper,
   createScheduledItemHelper,
-  getServerWithMockedHeaders,
 } from '../../../test/helpers';
-import { db } from '../../../test/admin-server';
 import { GET_SCHEDULED_ITEMS } from './sample-queries.gql';
 import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('queries: ScheduledCorpusItem - authentication', () => {
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
+
   beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
     await clearDb(db);
 
     // Create some approved items and schedule them for a date in the future
@@ -39,6 +53,7 @@ describe('queries: ScheduledCorpusItem - authentication', () => {
   });
 
   afterAll(async () => {
+    await server.stop();
     await db.$disconnect();
   });
 
@@ -51,23 +66,24 @@ describe('queries: ScheduledCorpusItem - authentication', () => {
         groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_ITEMS,
-        variables: {
-          filters: {
-            scheduledSurfaceGuid: 'NEW_TAB_EN_US',
-            startDate: '2000-01-01',
-            endDate: '2050-12-31',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_SCHEDULED_ITEMS),
+          variables: {
+            filters: {
+              scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+              startDate: '2000-01-01',
+              endDate: '2050-12-31',
+            },
           },
-        },
-      });
+        });
 
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
-      const resultArray = result.data?.getScheduledCorpusItems;
+      const resultArray = result.body.data?.getScheduledCorpusItems;
       expect(resultArray).to.have.lengthOf(2);
       expect(resultArray[0].totalCount).to.equal(10);
       expect(resultArray[0].items).to.have.lengthOf(10);
@@ -81,24 +97,25 @@ describe('queries: ScheduledCorpusItem - authentication', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
       // even though user has access for DE_DE only, a request for EN_US should work
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_ITEMS,
-        variables: {
-          filters: {
-            scheduledSurfaceGuid: 'NEW_TAB_EN_US',
-            startDate: '2000-01-01',
-            endDate: '2050-12-31',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_SCHEDULED_ITEMS),
+          variables: {
+            filters: {
+              scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+              startDate: '2000-01-01',
+              endDate: '2050-12-31',
+            },
           },
-        },
-      });
+        });
 
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
-      const resultArray = result.data?.getScheduledCorpusItems;
+      const resultArray = result.body.data?.getScheduledCorpusItems;
       expect(resultArray).to.have.lengthOf(2);
       expect(resultArray[0].totalCount).to.equal(10);
       expect(resultArray[0].items).to.have.lengthOf(10);
@@ -112,25 +129,28 @@ describe('queries: ScheduledCorpusItem - authentication', () => {
         groups: `group1,group2`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_ITEMS,
-        variables: {
-          filters: {
-            scheduledSurfaceGuid: 'NEW_TAB_EN_US',
-            startDate: '2000-01-01',
-            endDate: '2050-12-31',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_SCHEDULED_ITEMS),
+          variables: {
+            filters: {
+              scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+              startDate: '2000-01-01',
+              endDate: '2050-12-31',
+            },
           },
-        },
-      });
+        });
 
-      expect(result.data).to.be.null;
-      expect(result.errors).not.to.be.undefined;
+      expect(result.body.data).to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // check if the error we get is access denied error
-      expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
+      expect(result.body.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'UNAUTHENTICATED'
+      );
     });
 
     it('should throw an error when request header groups are undefined', async () => {
@@ -138,28 +158,31 @@ describe('queries: ScheduledCorpusItem - authentication', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: undefined,
+        // explicitly omit groups
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_ITEMS,
-        variables: {
-          filters: {
-            scheduledSurfaceGuid: 'NEW_TAB_EN_US',
-            startDate: '2000-01-01',
-            endDate: '2050-12-31',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_SCHEDULED_ITEMS),
+          variables: {
+            filters: {
+              scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+              startDate: '2000-01-01',
+              endDate: '2050-12-31',
+            },
           },
-        },
-      });
+        });
 
-      expect(result.data).to.be.null;
-      expect(result.errors).not.to.be.undefined;
+      expect(result.body.data).to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // check if the error we get is access denied error
-      expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
+      expect(result.body.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'UNAUTHENTICATED'
+      );
     });
   });
 });

@@ -1,24 +1,39 @@
 import { expect } from 'chai';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import {
   clearDb,
   createApprovedItemHelper,
   createScheduledItemHelper,
 } from '../../../test/helpers';
-import { db, getServer } from '../../../test/public-server';
 import { GET_SCHEDULED_SURFACE_WITH_ITEMS } from './sample-queries.gql';
-import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
+import { startServer } from '../../../express';
+import { IPublicContext } from '../../context';
 
 describe('queries: ScheduledCuratedCorpusItem', () => {
-  const server = getServer(new CuratedCorpusEventEmitter());
+  let app: Express.Application;
+  let server: ApolloServer<IPublicContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
 
   beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({
+      app,
+      publicServer: server,
+      publicUrl: graphQLUrl,
+    } = await startServer(0));
+    db = client();
     await clearDb(db);
-    await server.start();
   });
 
   afterAll(async () => {
-    await db.$disconnect();
     await server.stop();
+    await db.$disconnect();
   });
 
   describe('ScheduledSurface->items subquery', () => {
@@ -75,51 +90,57 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
     });
 
     it('should return all requested items', async () => {
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_SURFACE_WITH_ITEMS,
-        variables: {
-          id: 'NEW_TAB_EN_US',
-          date: '2050-01-01',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_SCHEDULED_SURFACE_WITH_ITEMS),
+          variables: {
+            id: 'NEW_TAB_EN_US',
+            date: '2050-01-01',
+          },
+        });
 
       // Good to check this here before we get into actual return values
-      expect(result.errors).not.to.exist;
-      expect(result.data).to.exist;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
-      expect(result.data?.scheduledSurface.items).to.have.lengthOf(5);
+      expect(result.body.data?.scheduledSurface.items).to.have.lengthOf(5);
     });
 
     it('should return items for requested scheduled surface only', async () => {
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_SURFACE_WITH_ITEMS,
-        variables: {
-          id: 'POCKET_HITS_EN_US',
-          date: '2050-01-01',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_SCHEDULED_SURFACE_WITH_ITEMS),
+          variables: {
+            id: 'POCKET_HITS_EN_US',
+            date: '2050-01-01',
+          },
+        });
 
       // Good to check this here before we get into actual return values
-      expect(result.errors).not.to.exist;
-      expect(result.data).to.exist;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
-      expect(result.data?.scheduledSurface.items).to.have.lengthOf(7);
+      expect(result.body.data?.scheduledSurface.items).to.have.lengthOf(7);
     });
 
     it('should return all expected properties', async () => {
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_SURFACE_WITH_ITEMS,
-        variables: {
-          id: 'NEW_TAB_EN_US',
-          date: '2025-05-05',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_SCHEDULED_SURFACE_WITH_ITEMS),
+          variables: {
+            id: 'NEW_TAB_EN_US',
+            date: '2025-05-05',
+          },
+        });
 
-      expect(result.errors).not.to.exist;
-      expect(result.data).to.exist;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
       // Let's check the props for the first ScheduledSurfaceItem returned.
-      const item = result.data?.scheduledSurface.items[0];
+      const item = result.body.data?.scheduledSurface.items[0];
 
       // Scalar properties of the first item
       expect(item.id).to.exist;
@@ -127,7 +148,7 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
       expect(item.scheduledDate).to.equal('2025-05-05');
 
       // The underlying Corpus Items
-      result.data?.scheduledSurface.items.forEach((item) => {
+      result.body.data?.scheduledSurface.items.forEach((item) => {
         expect(item.corpusItem.id).to.exist;
         expect(item.corpusItem.url).to.exist;
         expect(item.corpusItem.title).to.exist;
@@ -144,29 +165,33 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
     });
 
     it('should return an empty topic when the approved item has no topic', async () => {
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_SURFACE_WITH_ITEMS,
-        variables: {
-          id: 'NEW_TAB_DE_DE',
-          date: '3030-01-01',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_SCHEDULED_SURFACE_WITH_ITEMS),
+          variables: {
+            id: 'NEW_TAB_DE_DE',
+            date: '3030-01-01',
+          },
+        });
 
-      result.data?.scheduledSurface.items.forEach((item) => {
+      result.body.data?.scheduledSurface.items.forEach((item) => {
         expect(item.corpusItem.topic).not.to.exist;
       });
     });
 
     it('should sort the items by updatedAt asc', async () => {
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_SURFACE_WITH_ITEMS,
-        variables: {
-          id: 'NEW_TAB_EN_US',
-          date: '2025-05-05',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_SCHEDULED_SURFACE_WITH_ITEMS),
+          variables: {
+            id: 'NEW_TAB_EN_US',
+            date: '2025-05-05',
+          },
+        });
 
-      const items = result.data?.scheduledSurface.items;
+      const items = result.body.data?.scheduledSurface.items;
 
       const updatedAtDates = items.map((item) => {
         return item.updatedAt;
@@ -178,18 +203,20 @@ describe('queries: ScheduledCuratedCorpusItem', () => {
     });
 
     it('should return an empty result set if nothing is available', async () => {
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_SURFACE_WITH_ITEMS,
-        variables: {
-          id: 'NEW_TAB_EN_US',
-          date: '2100-02-02',
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .send({
+          query: print(GET_SCHEDULED_SURFACE_WITH_ITEMS),
+          variables: {
+            id: 'NEW_TAB_EN_US',
+            date: '2100-02-02',
+          },
+        });
 
-      expect(result.errors).not.to.exist;
-      expect(result.data).to.exist;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
-      expect(result.data?.scheduledSurface.items).to.have.lengthOf(0);
+      expect(result.body.data?.scheduledSurface.items).to.have.lengthOf(0);
     });
   });
 });

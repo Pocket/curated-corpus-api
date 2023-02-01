@@ -1,9 +1,33 @@
 import { expect } from 'chai';
-import { getServerWithMockedHeaders } from '../../../test/helpers';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
+import { clearDb } from '../../../test/helpers';
 import { GET_SCHEDULED_SURFACES_FOR_USER } from './sample-queries.gql';
 import { MozillaAccessGroup } from '../../../shared/types';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('auth: ScheduledSurface', () => {
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
+
+  beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
+    await clearDb(db);
+  });
+
+  afterAll(async () => {
+    await server.stop();
+  });
+
   describe('getScheduledSurfacesForUser query', () => {
     it('should return all available surfaces for read-only users', async () => {
       const headers = {
@@ -12,21 +36,20 @@ describe('auth: ScheduledSurface', () => {
         groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_SCHEDULED_SURFACES_FOR_USER) });
 
-      const { data } = await server.executeOperation({
-        query: GET_SCHEDULED_SURFACES_FOR_USER,
-      });
-
-      const scheduledSurfaces = data?.getScheduledSurfacesForUser;
+      const scheduledSurfaces = result.body.data?.getScheduledSurfacesForUser;
 
       expect(scheduledSurfaces).to.have.lengthOf(scheduledSurfaces.length);
 
       scheduledSurfaces.forEach((scheduledSurface) => {
-        expect(scheduledSurface.guid).not.to.be.undefined;
-        expect(scheduledSurface.name).not.to.be.undefined;
-        expect(scheduledSurface.ianaTimezone).not.to.be.undefined;
-        expect(scheduledSurface.prospectTypes).not.to.be.undefined;
+        expect(scheduledSurface.guid).to.exist;
+        expect(scheduledSurface.name).to.exist;
+        expect(scheduledSurface.ianaTimezone).to.exist;
+        expect(scheduledSurface.prospectTypes).to.exist;
       });
     });
 
@@ -37,21 +60,20 @@ describe('auth: ScheduledSurface', () => {
         groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_SCHEDULED_SURFACES_FOR_USER) });
 
-      const { data } = await server.executeOperation({
-        query: GET_SCHEDULED_SURFACES_FOR_USER,
-      });
-
-      const scheduledSurfaces = data?.getScheduledSurfacesForUser;
+      const scheduledSurfaces = result.body.data?.getScheduledSurfacesForUser;
 
       expect(scheduledSurfaces).to.have.lengthOf(scheduledSurfaces.length);
 
       scheduledSurfaces.forEach((scheduledSurface) => {
-        expect(scheduledSurface.guid).not.to.be.undefined;
-        expect(scheduledSurface.name).not.to.be.undefined;
-        expect(scheduledSurface.ianaTimezone).not.to.be.undefined;
-        expect(scheduledSurface.prospectTypes).not.to.be.undefined;
+        expect(scheduledSurface.guid).to.exist;
+        expect(scheduledSurface.name).to.exist;
+        expect(scheduledSurface.ianaTimezone).to.exist;
+        expect(scheduledSurface.prospectTypes).to.exist;
       });
     });
 
@@ -62,13 +84,12 @@ describe('auth: ScheduledSurface', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_SCHEDULED_SURFACES_FOR_USER) });
 
-      const { data } = await server.executeOperation({
-        query: GET_SCHEDULED_SURFACES_FOR_USER,
-      });
-
-      const scheduledSurfaces = data?.getScheduledSurfacesForUser;
+      const scheduledSurfaces = result.body.data?.getScheduledSurfacesForUser;
 
       expect(scheduledSurfaces).to.have.lengthOf(1);
       expect(scheduledSurfaces[0].guid).to.equal('NEW_TAB_EN_US');
@@ -81,13 +102,12 @@ describe('auth: ScheduledSurface', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS},${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_SCHEDULED_SURFACES_FOR_USER) });
 
-      const { data } = await server.executeOperation({
-        query: GET_SCHEDULED_SURFACES_FOR_USER,
-      });
-
-      const scheduledSurfaces = data?.getScheduledSurfacesForUser;
+      const scheduledSurfaces = result.body.data?.getScheduledSurfacesForUser;
 
       expect(scheduledSurfaces).to.have.lengthOf(2);
       expect(scheduledSurfaces[0].guid).to.equal('NEW_TAB_EN_US');
@@ -101,13 +121,12 @@ describe('auth: ScheduledSurface', () => {
         groups: `group1,group2,group3`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_SCHEDULED_SURFACES_FOR_USER) });
 
-      const { data } = await server.executeOperation({
-        query: GET_SCHEDULED_SURFACES_FOR_USER,
-      });
-
-      const scheduledSurfaces = data?.getScheduledSurfacesForUser;
+      const scheduledSurfaces = result.body.data?.getScheduledSurfacesForUser;
 
       expect(scheduledSurfaces).to.have.lengthOf(0);
     });

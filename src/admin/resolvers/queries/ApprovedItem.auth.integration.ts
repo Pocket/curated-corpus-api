@@ -1,28 +1,38 @@
 import { expect } from 'chai';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import { ApprovedItem, CuratedStatus } from '@prisma/client';
 import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
-import { db } from '../../../test/admin-server';
-import {
-  clearDb,
-  createApprovedItemHelper,
-  getServerWithMockedHeaders,
-} from '../../../test/helpers';
+import { clearDb, createApprovedItemHelper } from '../../../test/helpers';
 import {
   GET_APPROVED_ITEMS,
   GET_APPROVED_ITEM_BY_URL,
   GET_APPROVED_ITEM_BY_EXTERNAL_ID,
 } from './sample-queries.gql';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('queries: approvedCorpusItem - authentication', () => {
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
+
   // Save the sample items in a variable so that we can access their
   // auto-generated props such as `externalId` in tests
   const items: ApprovedItem[] = [];
 
   beforeAll(async () => {
-    // clear out db to start fresh
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
     await clearDb(db);
 
-    // Create some items
+    // seed data
     const stories = [
       {
         title: 'How To Win Friends And Influence People with GraphQL',
@@ -53,6 +63,7 @@ describe('queries: approvedCorpusItem - authentication', () => {
   });
 
   afterAll(async () => {
+    await server.stop();
     await db.$disconnect();
   });
 
@@ -65,17 +76,16 @@ describe('queries: approvedCorpusItem - authentication', () => {
         groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_APPROVED_ITEMS) });
 
-      const result = await server.executeOperation({
-        query: GET_APPROVED_ITEMS,
-      });
-
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
       // should return all 3 items
-      expect(result.data?.getApprovedCorpusItems.edges).to.have.length(3);
+      expect(result.body.data?.getApprovedCorpusItems.edges).to.have.length(3);
     });
 
     it('should get all items when user has only one scheduled surface access', async () => {
@@ -86,17 +96,16 @@ describe('queries: approvedCorpusItem - authentication', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_APPROVED_ITEMS) });
 
-      const result = await server.executeOperation({
-        query: GET_APPROVED_ITEMS,
-      });
-
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
       // should return all 3 items
-      expect(result.data?.getApprovedCorpusItems.edges).to.have.length(3);
+      expect(result.body.data?.getApprovedCorpusItems.edges).to.have.length(3);
     });
 
     it('should throw an error when user does not have the required access', async () => {
@@ -107,21 +116,19 @@ describe('queries: approvedCorpusItem - authentication', () => {
         groups: `group1,group2`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-      await server.start();
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_APPROVED_ITEMS) });
 
-      const result = await server.executeOperation({
-        query: GET_APPROVED_ITEMS,
-      });
-
-      expect(result.data).to.be.null;
-      expect(result.errors).not.to.be.undefined;
+      expect(result.body.data).to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // check if the error we get is access denied error
-      expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
-
-      await server.stop();
+      expect(result.body.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'UNAUTHENTICATED'
+      );
     });
 
     it('should throw an error when request header groups are undefined', async () => {
@@ -129,21 +136,22 @@ describe('queries: approvedCorpusItem - authentication', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: undefined,
+        // groups explicitly omitted
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_APPROVED_ITEMS) });
 
-      const result = await server.executeOperation({
-        query: GET_APPROVED_ITEMS,
-      });
-
-      expect(result.data).to.be.null;
-      expect(result.errors).not.to.be.undefined;
+      expect(result.body.data).to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // check if the error we get is access denied error
-      expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
+      expect(result.body.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'UNAUTHENTICATED'
+      );
     });
   });
 
@@ -156,17 +164,18 @@ describe('queries: approvedCorpusItem - authentication', () => {
         groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_APPROVED_ITEM_BY_URL),
+          variables: {
+            url: 'https://www.test.com/story-two',
+          },
+        });
 
-      const result = await server.executeOperation({
-        query: GET_APPROVED_ITEM_BY_URL,
-        variables: {
-          url: 'https://www.test.com/story-two',
-        },
-      });
-
-      expect(result.data).not.to.be.null;
-      expect(result.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
+      expect(result.body.errors).to.be.undefined;
     });
 
     it('should get item when user has only one scheduled surface access', async () => {
@@ -177,17 +186,18 @@ describe('queries: approvedCorpusItem - authentication', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_APPROVED_ITEM_BY_URL),
+          variables: {
+            url: 'https://www.test.com/story-two',
+          },
+        });
 
-      const result = await server.executeOperation({
-        query: GET_APPROVED_ITEM_BY_URL,
-        variables: {
-          url: 'https://www.test.com/story-two',
-        },
-      });
-
-      expect(result.data).not.to.be.null;
-      expect(result.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
+      expect(result.body.errors).to.be.undefined;
     });
 
     it('should throw an error when user does not have the required access', async () => {
@@ -198,21 +208,24 @@ describe('queries: approvedCorpusItem - authentication', () => {
         groups: `group1,group2`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_APPROVED_ITEM_BY_URL),
+          variables: {
+            url: 'https://www.test.com/story-two',
+          },
+        });
 
-      const result = await server.executeOperation({
-        query: GET_APPROVED_ITEM_BY_URL,
-        variables: {
-          url: 'https://www.test.com/story-two',
-        },
-      });
+      expect(result.body.data?.getApprovedCorpusItemByUrl).to.be.null;
 
-      expect(result.data?.getApprovedCorpusItemByUrl).to.be.null;
-
-      expect(result.errors).not.to.be.undefined;
+      expect(result.body.errors).to.not.be.undefined;
       // check if the error we get is access denied error
-      expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
+      expect(result.body.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'UNAUTHENTICATED'
+      );
     });
 
     it('should throw an error when request header groups are undefined', async () => {
@@ -220,24 +233,27 @@ describe('queries: approvedCorpusItem - authentication', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: undefined,
+        // groups explicitly omitted
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_APPROVED_ITEM_BY_URL),
+          variables: {
+            url: 'https://www.test.com/story-two',
+          },
+        });
 
-      const result = await server.executeOperation({
-        query: GET_APPROVED_ITEM_BY_URL,
-        variables: {
-          url: 'https://www.test.com/story-two',
-        },
-      });
+      expect(result.body.data?.getApprovedCorpusItemByUrl).to.be.null;
 
-      expect(result.data?.getApprovedCorpusItemByUrl).to.be.null;
-
-      expect(result.errors).not.to.be.undefined;
+      expect(result.body.errors).to.not.be.undefined;
       // check if the error we get is access denied error
-      expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
+      expect(result.body.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'UNAUTHENTICATED'
+      );
     });
   });
 
@@ -250,17 +266,18 @@ describe('queries: approvedCorpusItem - authentication', () => {
         groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_APPROVED_ITEM_BY_EXTERNAL_ID),
+          variables: {
+            externalId: items[0].externalId,
+          },
+        });
 
-      const result = await server.executeOperation({
-        query: GET_APPROVED_ITEM_BY_EXTERNAL_ID,
-        variables: {
-          externalId: items[0].externalId,
-        },
-      });
-
-      expect(result.data).not.to.be.null;
-      expect(result.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
+      expect(result.body.errors).to.be.undefined;
     });
 
     it('should get item when user has only one scheduled surface access', async () => {
@@ -271,17 +288,18 @@ describe('queries: approvedCorpusItem - authentication', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_APPROVED_ITEM_BY_EXTERNAL_ID),
+          variables: {
+            externalId: items[1].externalId,
+          },
+        });
 
-      const result = await server.executeOperation({
-        query: GET_APPROVED_ITEM_BY_EXTERNAL_ID,
-        variables: {
-          externalId: items[1].externalId,
-        },
-      });
-
-      expect(result.data).not.to.be.null;
-      expect(result.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
+      expect(result.body.errors).to.be.undefined;
     });
 
     it('should throw an error when user does not have the required access', async () => {
@@ -292,21 +310,24 @@ describe('queries: approvedCorpusItem - authentication', () => {
         groups: `group1,group2`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_APPROVED_ITEM_BY_EXTERNAL_ID),
+          variables: {
+            externalId: items[2].externalId,
+          },
+        });
 
-      const result = await server.executeOperation({
-        query: GET_APPROVED_ITEM_BY_EXTERNAL_ID,
-        variables: {
-          externalId: items[2].externalId,
-        },
-      });
-
-      expect(result.data?.approvedCorpusItemByExternalId).to.be.null;
-      expect(result.errors).not.to.be.undefined;
+      expect(result.body.data?.approvedCorpusItemByExternalId).to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // check if the error we get is access denied error
-      expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
+      expect(result.body.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'UNAUTHENTICATED'
+      );
     });
 
     it('should throw an error when request header groups are undefined', async () => {
@@ -314,24 +335,27 @@ describe('queries: approvedCorpusItem - authentication', () => {
       const headers = {
         name: 'Test User',
         username: 'test.user@test.com',
-        groups: undefined,
+        // groups explicitly omitted
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_APPROVED_ITEM_BY_EXTERNAL_ID),
+          variables: {
+            externalId: items[0].externalId,
+          },
+        });
 
-      const result = await server.executeOperation({
-        query: GET_APPROVED_ITEM_BY_EXTERNAL_ID,
-        variables: {
-          externalId: items[0].externalId,
-        },
-      });
-
-      expect(result.data?.approvedCorpusItemByExternalId).to.be.null;
-      expect(result.errors).not.to.be.undefined;
+      expect(result.body.data?.approvedCorpusItemByExternalId).to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // check if the error we get is access denied error
-      expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
+      expect(result.body.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'UNAUTHENTICATED'
+      );
     });
   });
 });

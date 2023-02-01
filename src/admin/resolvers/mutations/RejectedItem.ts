@@ -1,9 +1,12 @@
-import { AuthenticationError, UserInputError } from 'apollo-server-errors';
+import {
+  AuthenticationError,
+  UserInputError,
+} from '@pocket-tools/apollo-utils';
 import { RejectedCuratedCorpusItem } from '@prisma/client';
 import { createRejectedItem as dbCreateRejectedItem } from '../../../database/mutations';
 import { ReviewedCorpusItemEventType } from '../../../events/types';
 import { RejectionReason, ACCESS_DENIED_ERROR } from '../../../shared/types';
-import { IContext } from '../../context';
+import { IAdminContext } from '../../context';
 
 /**
  * Creates a rejected curated item with data supplied.
@@ -16,7 +19,7 @@ import { IContext } from '../../context';
 export async function createRejectedItem(
   parent,
   { data },
-  context: IContext
+  context: IAdminContext
 ): Promise<RejectedCuratedCorpusItem> {
   // check if user is not authorized to reject an item
   if (!context.authenticatedUser.canWriteToCorpus()) {

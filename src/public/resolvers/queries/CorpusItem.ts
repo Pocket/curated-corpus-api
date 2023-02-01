@@ -1,7 +1,7 @@
 import { CorpusItem } from '../../../database/types';
 import { getApprovedItemByExternalId } from '../../../database/queries/ApprovedItem';
 import { getCorpusItemFromApprovedItem } from '../../../shared/utils';
-import { UserInputError } from 'apollo-server-errors';
+import { UserInputError } from '@pocket-tools/apollo-utils';
 
 /**
  * Pulls in approved corpus items for a given id.

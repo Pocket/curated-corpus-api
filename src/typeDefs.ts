@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { gql } from 'apollo-server';
+import { gql } from 'graphql-tag';
 
 const sharedSchema = fs
   .readFileSync(path.join(__dirname, '..', 'schema-shared.graphql'))

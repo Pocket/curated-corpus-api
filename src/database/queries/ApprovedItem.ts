@@ -206,9 +206,9 @@ export async function getScheduledSurfaceHistory(
     return {
       ...item,
       // Format the scheduled date to YYYY-MM-DD format
-      scheduledDate: DateTime.fromJSDate(item.scheduledDate).toFormat(
-        'yyyy-MM-dd'
-      ),
+      scheduledDate: DateTime.fromJSDate(item.scheduledDate, {
+        zone: 'utc',
+      }).toFormat('yyyy-MM-dd'),
     };
   });
 }
