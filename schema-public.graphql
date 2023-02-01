@@ -110,11 +110,11 @@ type Query {
     surface(id: ID!): Surface!
 }
 
-extend type SavedItem @key(fields: "givenUrl") {
+type SavedItem @key(fields: "url") {
     """
     key field to identify the SavedItem entity in the ListApi service
     """
-    givenUrl: Url! @external
+    url: Url! @external
 
     """
     If the item is in corpus allow the saved item to reference it.  Exposing curated info for consistent UX

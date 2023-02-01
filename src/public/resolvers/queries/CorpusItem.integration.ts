@@ -66,7 +66,6 @@ describe('CorpusItem reference resolver', () => {
     expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
   });
 
-
   it('returns the corpus item if it exists', async () => {
     // Create an approved item.
     const approvedItem = await createApprovedItemHelper(db, {
@@ -79,7 +78,7 @@ describe('CorpusItem reference resolver', () => {
         representations: [
           {
             __typename: 'SavedItem',
-            givenUrl: approvedItem.url,
+            url: approvedItem.url,
           },
         ],
       },
@@ -102,7 +101,7 @@ describe('CorpusItem reference resolver', () => {
         representations: [
           {
             __typename: 'SavedItem',
-            givenUrl: 'ABRACADABRA',
+            url: 'ABRACADABRA',
           },
         ],
       },
