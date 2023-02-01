@@ -128,17 +128,15 @@ docker compose exec app npm run test-integration:watch
 
 If you'd like to be able to run and debug integration tests directly in your IDE, run the following command (note that it may prompt you for your `sudo` password to modify your `/etc/hosts` file):
 
-```bash
-npm run test-setup
-```
-
-Thereafter, you can use
+Tests also run fine outside the container if you want to attach a debugger or run individual tests. Connection strings are swapped to use `localhost` instead of docker host names for this case (see `./src/test/setup/jest.setup.js`). There shouldn't be much difference between this and running in a container, but tests **MUST** pass in the container to make it through CI.
 
 ```bash
 npm run test-integrations
 ```
 
-on the command line or use your IDE to debug individual tests and test suites.
+```bash
+npx jest <path to individual test files>...
+```
 
 ## Making changes to the Prisma schema
 

@@ -62,9 +62,9 @@ export async function getScheduledItems(
     (items: ScheduledItem[]) => {
       // Format the scheduled date to YYYY-MM-DD format
       // the resolver expects to return.
-      const scheduledDate = DateTime.fromJSDate(
-        items[0].scheduledDate
-      ).toFormat('yyyy-MM-dd');
+      const scheduledDate = DateTime.fromJSDate(items[0].scheduledDate, {
+        zone: 'utc',
+      }).toFormat('yyyy-MM-dd');
 
       return {
         scheduledDate,
@@ -120,9 +120,9 @@ export async function getItemsForScheduledSurface(
     const item: ScheduledSurfaceItem = {
       id: scheduledItem.externalId,
       surfaceId: scheduledItem.scheduledSurfaceGuid,
-      scheduledDate: DateTime.fromJSDate(scheduledItem.scheduledDate).toFormat(
-        'yyyy-MM-dd'
-      ),
+      scheduledDate: DateTime.fromJSDate(scheduledItem.scheduledDate, {
+        zone: 'utc',
+      }).toFormat('yyyy-MM-dd'),
       corpusItem: getCorpusItemFromApprovedItem(scheduledItem.approvedItem),
     };
     return item;

@@ -1,7 +1,7 @@
 import { DateResolver } from 'graphql-scalars';
 import { getScheduledSurface } from './queries/ScheduledSurface';
 import { getItemsForScheduledSurface } from './queries/ScheduledSurfaceItem';
-import { getCorpusItem } from './queries/CorpusItem';
+import { getCorpusItem, getSavedCorpusItem } from './queries/CorpusItem';
 import { getPocketPath } from '../../shared/utils';
 import { CorpusParentType } from '../../database/types';
 
@@ -15,6 +15,10 @@ export const resolvers = {
   // The `CorpusItem` resolver resolves approved corpus items based on id.
   CorpusItem: {
     __resolveReference: getCorpusItem,
+  },
+  // Allow the `SavedItem` to resolve the corpus item
+  SavedItem: {
+    corpusItem: getSavedCorpusItem,
   },
   Query: {
     // Gets the metadata for a Scheduled Surface (for example, New Tab).
