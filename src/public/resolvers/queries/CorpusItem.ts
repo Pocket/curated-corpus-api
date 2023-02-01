@@ -17,8 +17,6 @@ export async function getCorpusItem(item, { db }): Promise<CorpusItem> {
 
   const approvedItem = await getApprovedItemByExternalId(db, id);
   if (!approvedItem) {
-    return null;
-
     throw new UserInputError(`Could not find Corpus Item with ID of "${id}".`);
   }
 

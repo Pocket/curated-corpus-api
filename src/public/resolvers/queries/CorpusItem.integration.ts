@@ -109,8 +109,8 @@ describe('CorpusItem reference resolver', () => {
       },
     });
 
-    expect(result.errors).to.be.null;
+    expect(result.errors).to.be.undefined;
     expect(result.data?._entities).to.have.lengthOf(1);
-    expect(result.data?._entities[0]).to.be.null;
+    expect(result.data?._entities[0].corpusItem).to.be.null;
   });
 });
