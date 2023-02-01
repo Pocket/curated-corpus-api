@@ -92,45 +92,49 @@ describe('CorpusItem reference resolver', () => {
       title: 'Story one',
     });
 
-    const result = await server.executeOperation({
-      query: CORPUS_ITEM_REFERENCE_RESOLVER,
-      variables: {
-        representations: [
-          {
-            __typename: 'SavedItem',
-            url: approvedItem.url,
-          },
-        ],
-      },
-    });
+    const result = await request(app)
+      .post(graphQLUrl)
+      .send({
+        query: print(CORPUS_ITEM_REFERENCE_RESOLVER),
+        variables: {
+          representations: [
+            {
+              __typename: 'SavedItem',
+              url: approvedItem.url,
+            },
+          ],
+        },
+      });
 
-    expect(result.errors).to.be.undefined;
+    expect(result.body.errors).to.be.undefined;
 
-    expect(result.data).to.not.be.null;
-    expect(result.data?._entities).to.have.lengthOf(1);
-    expect(result.data?._entities[0].corpusItem.title).to.equal(
+    expect(result.body.data).to.not.be.null;
+    expect(result.body.data?._entities).to.have.lengthOf(1);
+    expect(result.body.data?._entities[0].corpusItem.title).to.equal(
       approvedItem.title
     );
-    expect(result.data?._entities[0].corpusItem.authors).to.have.lengthOf(
+    expect(result.body.data?._entities[0].corpusItem.authors).to.have.lengthOf(
       <number>approvedItem.authors?.length
     );
   });
 
   it('should return null if the url provided is not known', async () => {
-    const result = await server.executeOperation({
-      query: CORPUS_ITEM_REFERENCE_RESOLVER,
-      variables: {
-        representations: [
-          {
-            __typename: 'SavedItem',
-            url: 'ABRACADABRA',
-          },
-        ],
-      },
-    });
+    const result = await request(app)
+      .post(graphQLUrl)
+      .send({
+        query: print(CORPUS_ITEM_REFERENCE_RESOLVER),
+        variables: {
+          representations: [
+            {
+              __typename: 'SavedItem',
+              url: 'ABRACADABRA',
+            },
+          ],
+        },
+      });
 
-    expect(result.errors).to.be.undefined;
-    expect(result.data?._entities).to.have.lengthOf(1);
-    expect(result.data?._entities[0].corpusItem).to.be.null;
+    expect(result.body.errors).to.be.undefined;
+    expect(result.body.data?._entities).to.have.lengthOf(1);
+    expect(result.body.data?._entities[0].corpusItem).to.be.null;
   });
 });
