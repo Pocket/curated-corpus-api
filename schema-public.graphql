@@ -114,7 +114,7 @@ type SavedItem @key(fields: "url") {
     """
     key field to identify the SavedItem entity in the ListApi service
     """
-    url: Url! @external
+    url: String! @external
 
     """
     If the item is in corpus allow the saved item to reference it.  Exposing curated info for consistent UX
