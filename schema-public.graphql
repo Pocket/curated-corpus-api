@@ -110,7 +110,7 @@ type Query {
     surface(id: ID!): Surface!
 }
 
-extend type SavedItem  @key(fields: "givenUrl") {
+extend type SavedItem @key(fields: "givenUrl") {
     """
     key field to identify the SavedItem entity in the ListApi service
     """
@@ -119,7 +119,7 @@ extend type SavedItem  @key(fields: "givenUrl") {
     """
     If the item is in corpus allow the saved item to reference it.  Exposing curated info for consistent UX
     """
-    corpusItem: CorpusItem @requires(fields: "givenUrl")
+    corpusItem: CorpusItem
 }
 
 # Commented out until RecsAPI implements the fields that lets us extend Recommendation

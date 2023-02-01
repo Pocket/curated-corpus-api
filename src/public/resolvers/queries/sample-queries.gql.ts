@@ -53,3 +53,17 @@ export const CORPUS_ITEM_REFERENCE_RESOLVER = gql`
     }
   }
 `;
+
+export const CORPUS_ITEM_SAVED_ITEM_REFERENCE_RESOLVER = gql`
+  query ($representations: [_Any!]!) {
+    _entities(representations: $representations) {
+      ... on CorpusItem {
+        id
+        title
+        authors {
+          name
+        }
+      }
+    }
+  }
+`;
