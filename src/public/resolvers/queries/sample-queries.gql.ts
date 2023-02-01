@@ -50,6 +50,15 @@ export const CORPUS_ITEM_REFERENCE_RESOLVER = gql`
           name
         }
       }
+      ... on SavedItem {
+        corpusItem {
+          id
+          title
+          authors {
+            name
+          }
+        }
+      }
     }
   }
 `;

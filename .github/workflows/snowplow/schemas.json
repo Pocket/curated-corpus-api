@@ -6,13 +6,13 @@
         "vendor": "com.pocket",
         "name": "object_update",
         "format": "jsonschema",
-        "version": "1-0-5"
+        "version": "1-0-9"
       },
       {
         "vendor": "com.pocket",
         "name": "reviewed_corpus_item",
         "format": "jsonschema",
-        "version": "1-0-1"
+        "version": "1-0-4"
       },
       {
         "vendor": "com.pocket",

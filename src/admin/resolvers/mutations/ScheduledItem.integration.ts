@@ -144,13 +144,15 @@ describe('mutations: ScheduledItem', () => {
 
       // This is the date format for the GraphQL mutation.
       const scheduledDate = DateTime.fromJSDate(
-        existingScheduledEntry.scheduledDate
+        existingScheduledEntry.scheduledDate,
+        { zone: 'utc' }
       ).toFormat('yyyy-MM-dd');
 
       // And this human-readable (and cross-locale understandable) format
       // is used in the error message we're anticipating to get.
       const displayDate = DateTime.fromJSDate(
-        existingScheduledEntry.scheduledDate
+        existingScheduledEntry.scheduledDate,
+        { zone: 'utc' }
       ).toFormat('MMM d, y');
 
       // Set up the input for the mutation that contains the exact same values

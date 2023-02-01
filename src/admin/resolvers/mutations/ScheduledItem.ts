@@ -114,6 +114,7 @@ export async function createScheduledItem(
           data.scheduledSurfaceGuid
         } on ${data.scheduledDate.toLocaleString('en-US', {
           dateStyle: 'medium',
+          timeZone: 'UTC',
         })}.`
       );
     }
@@ -171,6 +172,7 @@ export async function rescheduleScheduledItem(
           'en-US',
           {
             dateStyle: 'medium',
+            timeZone: 'UTC',
           }
         )}.`
       );

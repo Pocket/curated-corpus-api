@@ -2,6 +2,8 @@
 
 set -e
 
+apt-get update && apt-get install -y sudo
+
 dir=$(dirname "$0")
 while [[ "$1" ]]; do
    case "$1" in
