@@ -32,7 +32,6 @@ export async function getSavedCorpusItem(
 
   const approvedItem = await getApprovedItemByUrl(db, url);
   if (!approvedItem) {
-    console.log(`Could not find Corpus Item with Url of "${url}"`);
     return null;
   }
 
