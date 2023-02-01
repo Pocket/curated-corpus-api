@@ -8,11 +8,6 @@
  * networking or modifications to /etc/hosts
  */
 
-process.on('unhandledRejection', (error) => {
-  console.log(error);
-  throw error;
-});
-
 module.exports = async () => {
   process.env.NODE_ENV = 'test';
   process.env.AWS_S3_ENDPOINT =
