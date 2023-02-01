@@ -1,5 +1,22 @@
 version: '3.1'
 services:
+  tests:
+    image: node:16@sha256:496085d0cd8edf49c97ec86ac11bed85b6f965d9b29885887bb0edba26549b07
+    entrypoint: /bin/bash
+    env_file:
+      - .docker/local.env
+    environment:
+      - LOCALSTACK_HOST=localstack
+      - NODE_ENV=test
+    tty: true
+    volumes:
+      - ./:/app
+    working_dir: /app
+    depends_on:
+      - mysql
+      - localstack
+      - snowplow
+
   mysql:
     image: mysql:5.7@sha256:0e3435e72c493aec752d8274379b1eac4d634f47a7781a7a92b8636fa1dc94c1
     platform: linux/amd64
