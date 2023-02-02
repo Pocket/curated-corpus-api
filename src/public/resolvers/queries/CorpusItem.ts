@@ -4,20 +4,20 @@ import {
   getApprovedItemByUrl,
 } from '../../../database/queries/ApprovedItem';
 import { getCorpusItemFromApprovedItem } from '../../../shared/utils';
-import { UserInputError } from 'apollo-server-errors';
 
 /**
- * Pulls in approved corpus items for a given id.
+ * Pulls in approved corpus items for a given id or url.
  *
- * @param item
+ * @param item { id, url }
  * @param db
  */
-export async function getCorpusItem(item, { db }): Promise<CorpusItem> {
-  const { id } = item;
+export async function getCorpusItem({ id, url }, { db }): Promise<CorpusItem> {
+  const approvedItem = id
+    ? await getApprovedItemByExternalId(db, id)
+    : await getApprovedItemByUrl(db, url);
 
-  const approvedItem = await getApprovedItemByExternalId(db, id);
   if (!approvedItem) {
-    throw new UserInputError(`Could not find Corpus Item with ID of "${id}".`);
+    return null;
   }
 
   return getCorpusItemFromApprovedItem(approvedItem);

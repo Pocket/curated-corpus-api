@@ -19,7 +19,7 @@ describe('CorpusItem reference resolver', () => {
     await server.stop();
   });
 
-  it('returns the corpus item if it exists', async () => {
+  it('returns the corpus item if it exists by reference resolver id', async () => {
     // Create an approved item.
     const approvedItem = await createApprovedItemHelper(db, {
       title: 'Story one',
@@ -47,7 +47,7 @@ describe('CorpusItem reference resolver', () => {
     );
   });
 
-  it('should throw an error if the id provided is not known', async () => {
+  it('should return null if the reference resolver id provided is not known', async () => {
     const result = await server.executeOperation({
       query: CORPUS_ITEM_REFERENCE_RESOLVER,
       variables: {
@@ -60,13 +60,59 @@ describe('CorpusItem reference resolver', () => {
       },
     });
 
-    // There should be errors
-    expect(result.errors).not.to.be.null;
+    // The entity should be null
+    expect(result.errors).to.be.undefined;
+    expect(result.data).to.not.be.null;
+    expect(result.data?._entities).to.have.lengthOf(1);
+    expect(result.data?._entities[0]).to.be.null;
+  });
 
-    expect(result.errors?.[0].message).to.contain(
-      `Could not find Corpus Item with ID of "ABRACADABRA"`
+  it('returns the corpus item if it exists by reference resolver url', async () => {
+    // Create an approved item.
+    const approvedItem = await createApprovedItemHelper(db, {
+      title: 'Story one',
+    });
+
+    const result = await server.executeOperation({
+      query: CORPUS_ITEM_REFERENCE_RESOLVER,
+      variables: {
+        representations: [
+          {
+            __typename: 'CorpusItem',
+            url: approvedItem.url,
+          },
+        ],
+      },
+    });
+
+    expect(result.errors).to.be.undefined;
+
+    expect(result.data).to.not.be.null;
+    expect(result.data?._entities).to.have.lengthOf(1);
+    expect(result.data?._entities[0].title).to.equal(approvedItem.title);
+    expect(result.data?._entities[0].authors).to.have.lengthOf(
+      <number>approvedItem.authors?.length
     );
-    expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
+  });
+
+  it('should return null if the reference resolver url provided is not known', async () => {
+    const result = await server.executeOperation({
+      query: CORPUS_ITEM_REFERENCE_RESOLVER,
+      variables: {
+        representations: [
+          {
+            __typename: 'CorpusItem',
+            url: 'ABRACADABRA',
+          },
+        ],
+      },
+    });
+
+    // The entity should be null
+    expect(result.errors).to.be.undefined;
+    expect(result.data).to.not.be.null;
+    expect(result.data?._entities).to.have.lengthOf(1);
+    expect(result.data?._entities[0]).to.be.null;
   });
 
   it('returns the corpus item if it exists', async () => {
