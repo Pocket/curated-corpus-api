@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   tests:
-    image: node:16@sha256:496085d0cd8edf49c97ec86ac11bed85b6f965d9b29885887bb0edba26549b07
+    image: node:16@sha256:27fab5920246070cf13449cf44c25bc4f5adef18ca7482b2bda90b7cf9e64481
     entrypoint: /bin/bash
     env_file:
       - .docker/local.env
@@ -18,7 +18,7 @@ services:
       - snowplow
 
   mysql:
-    image: mysql:5.7@sha256:0e3435e72c493aec752d8274379b1eac4d634f47a7781a7a92b8636fa1dc94c1
+    image: mysql:5.7@sha256:8cf035b14977b26f4a47d98e85949a7dd35e641f88fc24aa4b466b36beecf9d6
     platform: linux/amd64
     env_file:
       - ./.docker/local.env
@@ -50,7 +50,7 @@ services:
       - HOSTNAME_EXTERNAL=localstack
 
   app:
-    image: node:16@sha256:496085d0cd8edf49c97ec86ac11bed85b6f965d9b29885887bb0edba26549b07
+    image: node:16@sha256:27fab5920246070cf13449cf44c25bc4f5adef18ca7482b2bda90b7cf9e64481
     platform: linux/amd64
     env_file:
       - .docker/local.env
