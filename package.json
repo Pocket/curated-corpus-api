@@ -63,7 +63,7 @@
     "date-fns": "2.29.3",
     "graphql-scalars": "1.18.0",
     "graphql-upload": "15.0.2",
-    "luxon": "2.5.0",
+    "luxon": "2.5.2",
     "node-fetch": "2.6.7"
   },
   "devDependencies": {

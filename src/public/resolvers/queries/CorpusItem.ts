@@ -4,7 +4,6 @@ import {
   getApprovedItemByUrl,
 } from '../../../database/queries/ApprovedItem';
 import { getCorpusItemFromApprovedItem } from '../../../shared/utils';
-import { UserInputError } from 'apollo-server-errors';
 
 /**
  * Pulls in approved corpus items for a given id or url.
