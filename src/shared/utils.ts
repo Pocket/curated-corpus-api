@@ -108,6 +108,7 @@ export const getCorpusItemFromApprovedItem = (
     topic: approvedItem.topic ?? undefined,
     target: target?.key && {
       slug: target.key,
+      __typename: target.type,
     },
   };
 };

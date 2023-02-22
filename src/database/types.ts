@@ -164,6 +164,7 @@ export type CorpusTargetType = 'SyndicatedArticle' | 'Collection';
 
 export type CorpusTarget = {
   slug: string;
+  __typename: CorpusTargetType;
 };
 
 // Types for the public `scheduledSurface` query.
