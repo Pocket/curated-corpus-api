@@ -1,14 +1,42 @@
-import { db } from '../../../test/admin-server';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import {
   clearDb,
   createRejectedCuratedCorpusItemHelper,
-  getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
 import { GET_REJECTED_ITEMS } from './sample-queries.gql';
 import { expect } from 'chai';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('queries: RejectedCorpusItem (authentication)', () => {
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
+
+  beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
+    await clearDb(db);
+
+    // seed data
+    for (const item of rejectedCorpusItems) {
+      await createRejectedCuratedCorpusItemHelper(db, item);
+    }
+  });
+
+  afterAll(async () => {
+    await server.stop();
+    await db.$disconnect();
+  });
+
   // A few sample Rejected Corpus items - we don't need a lot of these
   // for auth checks
   const rejectedCorpusItems = [
@@ -36,18 +64,6 @@ describe('queries: RejectedCorpusItem (authentication)', () => {
     groups: undefined,
   };
 
-  beforeAll(async () => {
-    await clearDb(db);
-
-    for (const item of rejectedCorpusItems) {
-      await createRejectedCuratedCorpusItemHelper(db, item);
-    }
-  });
-
-  afterAll(async () => {
-    await db.$disconnect();
-  });
-
   describe('getRejectedCorpusItem query', () => {
     it('should get all items when user has read-only access', async () => {
       // Set up auth headers with read-only access
@@ -56,17 +72,16 @@ describe('queries: RejectedCorpusItem (authentication)', () => {
         groups: `this,that,${MozillaAccessGroup.READONLY}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_REJECTED_ITEMS) });
 
-      const result = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-      });
-
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
       // should return all four items - the entire corpus should be accessible
-      expect(result.data?.getRejectedCorpusItems.edges).to.have.length(4);
+      expect(result.body.data?.getRejectedCorpusItems.edges).to.have.length(4);
     });
 
     it('should get all items when user has only one scheduled surface access', async () => {
@@ -76,17 +91,16 @@ describe('queries: RejectedCorpusItem (authentication)', () => {
         groups: `this,that,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_REJECTED_ITEMS) });
 
-      const result = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-      });
-
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
       // should return all four items - the entire corpus should be accessible
-      expect(result.data?.getRejectedCorpusItems.edges).to.have.length(4);
+      expect(result.body.data?.getRejectedCorpusItems.edges).to.have.length(4);
     });
 
     it('should throw an error when user does not have the required access', async () => {
@@ -95,35 +109,39 @@ describe('queries: RejectedCorpusItem (authentication)', () => {
         ...headers,
         groups: `this,that`,
       };
-      const server = getServerWithMockedHeaders(headers);
 
-      const result = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_REJECTED_ITEMS) });
 
-      expect(result.data).to.be.null;
-      expect(result.errors).not.to.be.undefined;
+      expect(result.body.data).to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // check if the error we get is the access denied error
-      expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
+      expect(result.body.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'UNAUTHENTICATED'
+      );
     });
 
     it('should throw an error when request access groups are undefined', async () => {
       // Set up auth headers with no access groups whatsoever (the default
       // on top of the `describe()` block for Rejected Item queries).
-      const server = getServerWithMockedHeaders(headers);
 
-      const result = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_REJECTED_ITEMS) });
 
-      expect(result.data).to.be.null;
-      expect(result.errors).not.to.be.undefined;
+      expect(result.body.data).to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // check if the error we get is the access denied error
-      expect(result.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
-      expect(result.errors?.[0].extensions?.code).to.equal('UNAUTHENTICATED');
+      expect(result.body.errors?.[0].message).to.equal(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'UNAUTHENTICATED'
+      );
     });
   });
 });

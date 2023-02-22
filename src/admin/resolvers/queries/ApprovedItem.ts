@@ -1,5 +1,8 @@
 import { Connection } from '@devoxa/prisma-relay-cursor-connection';
-import { AuthenticationError, UserInputError } from 'apollo-server-errors';
+import {
+  AuthenticationError,
+  UserInputError,
+} from '@pocket-tools/apollo-utils';
 import config from '../../../config';
 import {
   getApprovedItems as dbGetApprovedItems,
@@ -8,7 +11,7 @@ import {
   getScheduledSurfaceHistory as dbGetScheduledSurfaceHistory,
 } from '../../../database/queries';
 import { ACCESS_DENIED_ERROR, ScheduledSurfaces } from '../../../shared/types';
-import { IContext } from '../../context';
+import { IAdminContext } from '../../context';
 import {
   ApprovedItem,
   ApprovedItemScheduledSurfaceHistory,
@@ -24,7 +27,7 @@ import {
 export async function getApprovedItems(
   parent,
   args,
-  context: IContext
+  context: IAdminContext
 ): Promise<Connection<ApprovedItem>> {
   //check if the user does not have the permissions to access this query
   if (
@@ -69,7 +72,7 @@ export async function getApprovedItems(
 export async function getApprovedItemByUrl(
   parent,
   args,
-  context: IContext
+  context: IAdminContext
 ): Promise<ApprovedItem | null> {
   //check if the user does not have the permissions to access this query
   if (
@@ -94,7 +97,7 @@ export async function getApprovedItemByUrl(
 export async function getApprovedItemByExternalId(
   parent,
   args,
-  context: IContext
+  context: IAdminContext
 ): Promise<ApprovedItem | null> {
   //check if the user does not have the permissions to access this query
   if (

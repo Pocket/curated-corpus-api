@@ -11,7 +11,7 @@ import {
   scheduledSurfaceAllowedValues,
 } from '../../shared/utils';
 import { groupBy } from '../../shared/utils';
-import { UserInputError } from 'apollo-server-errors';
+import { UserInputError } from '@pocket-tools/apollo-utils';
 
 /**
  * @param db

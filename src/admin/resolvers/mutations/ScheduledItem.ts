@@ -7,11 +7,13 @@ import { ScheduledItem } from '../../../database/types';
 import { ACCESS_DENIED_ERROR } from '../../../shared/types';
 import { scheduledSurfaceAllowedValues } from '../../../shared/utils';
 import { ScheduledCorpusItemEventType } from '../../../events/types';
-import { UserInputError } from 'apollo-server-errors';
+import {
+  AuthenticationError,
+  UserInputError,
+} from '@pocket-tools/apollo-utils';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
-import { AuthenticationError } from 'apollo-server-errors';
 import { NotFoundError } from '@pocket-tools/apollo-utils';
-import { IContext } from '../../context';
+import { IAdminContext } from '../../context';
 
 /**
  * Deletes an item from the Scheduled Surface schedule.
@@ -23,7 +25,7 @@ import { IContext } from '../../context';
 export async function deleteScheduledItem(
   parent,
   { data },
-  context: IContext
+  context: IAdminContext
 ): Promise<ScheduledItem> {
   // Need to fetch the item first to check access privileges.
   // Note that we do not worry here about an extra hit to the DB
@@ -73,7 +75,7 @@ export async function deleteScheduledItem(
 export async function createScheduledItem(
   parent,
   { data },
-  context: IContext
+  context: IAdminContext
 ): Promise<ScheduledItem> {
   // Check if the user can execute this mutation.
   if (!context.authenticatedUser.canWriteToSurface(data.scheduledSurfaceGuid)) {
@@ -125,7 +127,7 @@ export async function createScheduledItem(
 export async function rescheduleScheduledItem(
   parent,
   { data },
-  context: IContext
+  context: IAdminContext
 ): Promise<ScheduledItem> {
   // Need to fetch the item first to check access privileges.
   // Note that we do not worry here about an extra hit to the DB

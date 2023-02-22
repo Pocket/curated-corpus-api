@@ -28,16 +28,16 @@ describe('createApprovedItemHelper', () => {
     expect(item.title).to.equal(data.title);
 
     // Expect to see the remaining fields filled in for us
-    expect(item.externalId).to.be.not.undefined;
-    expect(item.prospectId).to.be.not.undefined;
-    expect(item.language).to.be.not.undefined;
-    expect(item.publisher).to.be.not.undefined;
-    expect(item.url).to.be.not.undefined;
-    expect(item.imageUrl).to.be.not.undefined;
-    expect(item.excerpt).to.be.not.undefined;
-    expect(item.status).to.be.not.undefined;
-    expect(item.topic).to.be.not.undefined;
-    expect(item.source).to.be.not.undefined;
+    expect(item.externalId).to.exist;
+    expect(item.prospectId).to.exist;
+    expect(item.language).to.exist;
+    expect(item.publisher).to.exist;
+    expect(item.url).to.exist;
+    expect(item.imageUrl).to.exist;
+    expect(item.excerpt).to.exist;
+    expect(item.status).to.exist;
+    expect(item.topic).to.exist;
+    expect(item.source).to.exist;
     expect(item.isCollection).to.be.a('boolean');
     expect(item.isTimeSensitive).to.be.a('boolean');
     expect(item.isSyndicated).to.be.a('boolean');

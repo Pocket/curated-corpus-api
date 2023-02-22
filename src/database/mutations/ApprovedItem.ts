@@ -6,8 +6,9 @@ import {
   UpdateApprovedItemAuthorsInput,
   UpdateApprovedItemInput,
 } from '../types';
-import { ApolloError, UserInputError } from 'apollo-server-errors';
+import { UserInputError } from '@pocket-tools/apollo-utils';
 import { checkCorpusUrl } from '../helpers/checkCorpusUrl';
+import { GraphQLError } from 'graphql';
 
 /**
  * This mutation creates an approved curated item.
@@ -165,7 +166,7 @@ export async function deleteApprovedItem(
     where: { approvedItemId: approvedItem.id },
   });
   if (scheduledItems.length > 0) {
-    throw new ApolloError(
+    throw new GraphQLError(
       `Cannot remove item from approved corpus - scheduled entries exist.`
     );
   }
