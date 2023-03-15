@@ -65,23 +65,6 @@ enum RejectionReason {
 }
 
 """
-Prospect types. This enum is not used anywhere in this schema, however it is used
-by the Curation Admin Tools frontend to filter prospects.
-"""
-enum ProspectType {
-    GLOBAL
-    ORGANIC_TIMESPENT
-    SYNDICATED_NEW
-    SYNDICATED_RERUN
-    TOP_SAVED
-    DOMAIN_ALLOWLIST
-    COUNTS_LOGISTIC_APPROVAL
-    HYBRID_LOGISTIC_APPROVAL
-    APPROVED
-    TIMESPENT_LOGISTIC_APPROVAL
-}
-
-"""
 The source of the corpus item
 """
 enum CorpusItemSource {
@@ -115,10 +98,6 @@ type ScheduledSurface {
     The IANA timezone of the Scheduled Surface, used to determine the start of a day.
     """
     ianaTimezone: String!
-    """
-    An array of associated ProspectTypes.
-    """
-    prospectTypes: [ProspectType!]!
 }
 
 """

@@ -30,7 +30,6 @@ export type ScheduledSurface = {
   name: string;
   guid: string;
   ianaTimezone: string;
-  prospectTypes: ProspectType[];
   accessGroup: string;
 };
 
@@ -39,6 +38,7 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
     name: 'New Tab (en-US)',
     guid: 'NEW_TAB_EN_US',
     ianaTimezone: 'America/New_York',
+<<<<<<< Updated upstream
     prospectTypes: [
       ProspectType.TOP_SAVED,
       ProspectType.GLOBAL,
@@ -50,71 +50,44 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
       ProspectType.APPROVED,
       ProspectType.TIMESPENT_LOGISTIC_APPROVAL,
     ],
+=======
+>>>>>>> Stashed changes
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ENUS,
   },
   {
     name: 'New Tab (de-DE)',
     guid: 'NEW_TAB_DE_DE',
     ianaTimezone: 'Europe/Berlin',
-    prospectTypes: [
-      ProspectType.GLOBAL,
-      ProspectType.ORGANIC_TIMESPENT,
-      ProspectType.DOMAIN_ALLOWLIST,
-    ],
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_DEDE,
   },
   {
     name: 'New Tab (en-GB)',
     guid: 'NEW_TAB_EN_GB',
     ianaTimezone: 'Europe/London',
-    prospectTypes: [
-      ProspectType.GLOBAL,
-      ProspectType.ORGANIC_TIMESPENT,
-      ProspectType.APPROVED,
-    ],
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ENGB,
   },
   {
     name: 'New Tab (en-INTL)',
     guid: 'NEW_TAB_EN_INTL',
     ianaTimezone: 'Asia/Kolkata',
-    prospectTypes: [
-      ProspectType.GLOBAL,
-      ProspectType.ORGANIC_TIMESPENT,
-      ProspectType.APPROVED,
-    ],
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL,
   },
   {
     name: 'Pocket Hits (en-US)',
     guid: 'POCKET_HITS_EN_US',
     ianaTimezone: 'America/New_York',
-    prospectTypes: [
-      ProspectType.TOP_SAVED,
-      ProspectType.GLOBAL,
-      ProspectType.ORGANIC_TIMESPENT,
-      ProspectType.COUNTS_LOGISTIC_APPROVAL,
-      ProspectType.HYBRID_LOGISTIC_APPROVAL,
-    ],
     accessGroup: MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS,
   },
   {
     name: 'Pocket Hits (de-DE)',
     guid: 'POCKET_HITS_DE_DE',
     ianaTimezone: 'Europe/Berlin',
-    prospectTypes: [
-      ProspectType.TOP_SAVED,
-      ProspectType.GLOBAL,
-      ProspectType.ORGANIC_TIMESPENT,
-      ProspectType.DOMAIN_ALLOWLIST,
-    ],
     accessGroup: MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE,
   },
   {
     name: 'Sandbox',
     guid: 'SANDBOX',
     ianaTimezone: 'America/New_York',
-    prospectTypes: [],
     accessGroup: MozillaAccessGroup.CURATOR_SANDBOX,
   },
 ];
