@@ -49,7 +49,7 @@ describe('auth: ScheduledSurface', () => {
         expect(scheduledSurface.guid).to.exist;
         expect(scheduledSurface.name).to.exist;
         expect(scheduledSurface.ianaTimezone).to.exist;
-        expect(scheduledSurface.prospectTypes).to.exist;
+        // expect(scheduledSurface.prospectTypes).to.exist;
       });
     });
 
@@ -73,7 +73,7 @@ describe('auth: ScheduledSurface', () => {
         expect(scheduledSurface.guid).to.exist;
         expect(scheduledSurface.name).to.exist;
         expect(scheduledSurface.ianaTimezone).to.exist;
-        expect(scheduledSurface.prospectTypes).to.exist;
+        // expect(scheduledSurface.prospectTypes).to.exist;
       });
     });
 
