@@ -20,7 +20,7 @@ scalar NonNegativeInt
 """
 Valid language codes for curated corpus items.
 """
-enum CorpusLanguage {
+enum CorpusLanguage @shareable {
     "German"
     DE
     "English"
