@@ -166,19 +166,9 @@ To push changes from a particular branch to Dev, use the name of the branch inst
 git push -f origin your-branch-name:dev
 ```
 
-### Reseeding the database on Dev
+### Resetting Dev
 
-At the initial deployment, and also from time to time as the API evolves, it is necessary to seed some sample data in the Dev database. Note that this operation wipes all the existing data and replaces it with the reseeded data. The steps to take are the following:
+There may come a time when you need to reset the Dev environment. For example, if you were testing a schema change and then want to test a different branch _without_ that schema change, the dev database and Prisma schema will be out of sync.
+Another common scenario is the need to reset all test data to the initial seed data provided by the seed script.
 
-- Make sure you've run `npm ci` locally (outside of Docker).
-- Log in to AWS to find the Dev database connection URL. Look in the Secrets Manager - there will be the full DB URL stored there alongside individual DB connection parameters such as username and password.
-- Put that connection in your local environment file (`PATH_TO_REPOSITORY/.env`) as
-
-```dotenv
-DATABASE_URL=[DB_URL_FROM_SECRETS_MANAGER]
-```
-
-- Authenticate to Dev AWS in your terminal using `$(maws)`.
-- Connect to Pocket VPN Dev.
-- Run `npx prisma migrate reset` in your local terminal. This should use the Dev database connection URL as the target.
-- Log out of all the things/disconnect the VPN.
+To reset the Dev database, [follow the instructions in Confluence](https://getpocket.atlassian.net/wiki/spaces/PE/pages/2938273799/Resetting+Data+for+a+Prisma-based+Subgraph+on+Dev).
