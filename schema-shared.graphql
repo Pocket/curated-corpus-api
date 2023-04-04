@@ -1,7 +1,13 @@
 extend schema
     @link(
         url: "https://specs.apollo.dev/federation/v2.0"
-        import: ["@key", "@shareable", "@requires", "@external"]
+        import: [
+            "@key"
+            "@shareable"
+            "@requires"
+            "@external"
+            "@inaccessible"
+        ]
     )
 
 """
@@ -26,11 +32,11 @@ enum CorpusLanguage @shareable {
     "English"
     EN
     "Italian"
-    IT
+    IT @inaccessible
     "French"
-    FR
+    FR @inaccessible
     "Spanish"
-    ES
+    ES @inaccessible
 }
 
 """
