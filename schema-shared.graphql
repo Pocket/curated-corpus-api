@@ -32,11 +32,11 @@ enum CorpusLanguage {
     "English"
     EN
     "Italian"
-    IT @inaccessible
+    IT
     "French"
-    FR @inaccessible
+    FR
     "Spanish"
-    ES @inaccessible
+    ES
 }
 
 """
