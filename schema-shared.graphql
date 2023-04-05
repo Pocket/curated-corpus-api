@@ -1,8 +1,14 @@
 extend schema
-  @link(
-    url: "https://specs.apollo.dev/federation/v2.0"
-    import: ["@key", "@shareable", "@requires", "@external"]
-  )
+    @link(
+        url: "https://specs.apollo.dev/federation/v2.0"
+        import: [
+            "@key"
+            "@shareable"
+            "@requires"
+            "@external"
+            "@inaccessible"
+        ]
+    )
 
 """
 A URL - usually, for an interesting story on the internet that's worth saving to Pocket.
@@ -25,6 +31,12 @@ enum CorpusLanguage {
     DE
     "English"
     EN
+    "Italian"
+    IT @inaccessible
+    "French"
+    FR @inaccessible
+    "Spanish"
+    ES @inaccessible
 }
 
 """

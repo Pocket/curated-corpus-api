@@ -412,5 +412,85 @@ describe('mutations: RejectedItem', () => {
         'does not exist in "CorpusLanguage" enum.'
       );
     });
+
+    it('should succeed if language code (English) is correct and upper case', async () => {
+      input.language = 'EN';
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(result.body.errors).to.be.undefined;
+      const data = result.body.data;
+      expect(data.createRejectedCorpusItem.language).to.equal('EN');
+    });
+
+    it('should succeed if language code (Deutsch) is correct and upper case', async () => {
+      input.language = 'DE';
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(result.body.errors).to.be.undefined;
+      const data = result.body.data;
+      expect(data.createRejectedCorpusItem.language).to.equal('DE');
+    });
+
+    it('should succeed if language code (Italian) is correct and upper case', async () => {
+      input.language = 'IT';
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(result.body.errors).to.be.undefined;
+      const data = result.body.data;
+      expect(data.createRejectedCorpusItem.language).to.equal('IT');
+    });
+
+    it('should succeed if language code (Spanish) is correct and upper case', async () => {
+      input.language = 'ES';
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(result.body.errors).to.be.undefined;
+      const data = result.body.data;
+      expect(data.createRejectedCorpusItem.language).to.equal('ES');
+    });
+
+    it('should succeed if language code (French) is correct and upper case', async () => {
+      input.language = 'FR';
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(result.body.errors).to.be.undefined;
+      const data = result.body.data;
+      expect(data.createRejectedCorpusItem.language).to.equal('FR');
+    });
   });
 });

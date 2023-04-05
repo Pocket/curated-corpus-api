@@ -44,6 +44,6 @@ initItemEventHandlers(curatedCorpusEventEmitter, [
 
 (async () => {
   const { adminUrl, publicUrl } = await startServer(4025);
-  console.log(`🚀 Public server ready at http://localhost:4004${publicUrl}`);
-  console.log(`🚀 Admin server ready at http://localhost:4004${adminUrl}`);
+  console.log(`🚀 Public server ready at http://localhost:4025${publicUrl}`);
+  console.log(`🚀 Admin server ready at http://localhost:4025${adminUrl}`);
 })();
