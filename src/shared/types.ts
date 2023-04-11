@@ -17,10 +17,13 @@ export enum MozillaAccessGroup {
   READONLY = 'team_pocket', // Read only access to all curation tools
   COLLECTION_CURATOR_FULL = 'mozilliansorg_pocket_collection_curator_full', // Access to full collection tool
   SCHEDULED_SURFACE_CURATOR_FULL = 'mozilliansorg_pocket_scheduled_surface_curator_full', // Access to full corpus tool, implies they have access to all scheduled surfaces.
-  NEW_TAB_CURATOR_ENUS = 'mozilliansorg_pocket_new_tab_curator_enus', // Access to en-us new tab in the corpus tool.
-  NEW_TAB_CURATOR_DEDE = 'mozilliansorg_pocket_new_tab_curator_dede', // Access to de-de new tab in corpus tool.
-  NEW_TAB_CURATOR_ENGB = 'mozilliansorg_pocket_new_tab_curator_engb', // Access to en-gb new tab in corpus tool.
-  NEW_TAB_CURATOR_ENINTL = 'mozilliansorg_pocket_new_tab_curator_enintl', // Access to en-intl new tab in corpus tool.
+  NEW_TAB_CURATOR_ENUS = 'mozilliansorg_pocket_new_tab_curator_enus', // Access to en-US new tab in the corpus tool.
+  NEW_TAB_CURATOR_DEDE = 'mozilliansorg_pocket_new_tab_curator_dede', // Access to de-DE new tab in corpus tool.
+  NEW_TAB_CURATOR_ENGB = 'mozilliansorg_pocket_new_tab_curator_engb', // Access to en-GB new tab in corpus tool.
+  NEW_TAB_CURATOR_FRFR = 'mozilliansorg_pocket_new_tab_curator_frfr', // Access to fr-FR new tab in corpus tool.
+  NEW_TAB_CURATOR_ITIT = 'mozilliansorg_pocket_new_tab_curator_itit', // Access to it-IT new tab in corpus tool.
+  NEW_TAB_CURATOR_ESES = 'mozilliansorg_pocket_new_tab_curator_eses', // Access to es-ES new tab in corpus tool.
+  NEW_TAB_CURATOR_ENINTL = 'mozilliansorg_pocket_new_tab_curator_enintl', // Access to en-INTL new tab in corpus tool.
   POCKET_HITS_CURATOR_ENUS = 'mozilliansorg_pocket_pocket_hits_curator_enus', // Access to en us Pocket Hits in the corpus tool.
   POCKET_HITS_CURATOR_DEDE = 'mozilliansorg_pocket_pocket_hits_curator_dede', // Access to de de Pocket Hits in the corpus tool.
   CURATOR_SANDBOX = 'mozilliansorg_pocket_curator_sandbox', // Access to sandbox test surface in the corpus tool.
@@ -75,6 +78,27 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ENGB,
   },
   {
+    name: 'New Tab (fr-FR)',
+    guid: 'NEW_TAB_FR_FR',
+    ianaTimezone: 'Europe/Paris',
+    prospectTypes: [ProspectType.DOMAIN_ALLOWLIST],
+    accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_FRFR,
+  },
+  {
+    name: 'New Tab (it-IT)',
+    guid: 'NEW_TAB_IT_IT',
+    ianaTimezone: 'Europe/Rome',
+    prospectTypes: [ProspectType.DOMAIN_ALLOWLIST],
+    accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ITIT,
+  },
+  {
+    name: 'New Tab (es-ES)',
+    guid: 'NEW_TAB_ES_ES',
+    ianaTimezone: 'Europe/Madrid',
+    prospectTypes: [ProspectType.DOMAIN_ALLOWLIST],
+    accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ESES,
+  },
+  {
     name: 'New Tab (en-INTL)',
     guid: 'NEW_TAB_EN_INTL',
     ianaTimezone: 'Asia/Kolkata',
@@ -110,6 +134,7 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
     ],
     accessGroup: MozillaAccessGroup.POCKET_HITS_CURATOR_DEDE,
   },
+
   {
     name: 'Sandbox',
     guid: 'SANDBOX',
