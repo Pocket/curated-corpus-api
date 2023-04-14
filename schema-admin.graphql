@@ -948,3 +948,16 @@ type Mutation {
     """
     uploadApprovedCorpusItemImage(data: Upload!): ApprovedCorpusImageUrl!
 }
+
+"""
+Represents an item that is in the Corpus and its associated manually edited metadata.
+TODO: CorpusItem to implement PocketResource when it becomes available.
+not actively required or consumed by admin subgraph
+Only exposed here to avoid conflicts with other admin-subgraph when we extend the field
+"""
+type CorpusItem @key(fields: "url") {
+    """
+    The URL of the Approved Item.
+    """
+    url: Url!
+}
