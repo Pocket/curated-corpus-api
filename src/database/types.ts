@@ -154,6 +154,19 @@ export type ApprovedItem = ApprovedItemModel & {
   authors: ApprovedItemAuthor[];
 };
 
+/**
+ * CorpusTargetType probably mase more sense to be a union of all Pocket types
+ * or entities. An incremental step in that direction was chosen. If we want to
+ * expand this approach for more systems then we can figure out how to best
+ * accomplish when that utility is defined.
+ */
+export type CorpusTargetType = 'SyndicatedArticle' | 'Collection';
+
+export type CorpusTarget = {
+  slug: string;
+  __typename: CorpusTargetType;
+};
+
 // Types for the public `scheduledSurface` query.
 export type CorpusItem = {
   // This is `externalId` in the DB schema and Admin API
@@ -167,6 +180,7 @@ export type CorpusItem = {
   imageUrl: string;
   image: Image;
   topic?: string;
+  target?: CorpusTarget;
 };
 
 export type Image = {

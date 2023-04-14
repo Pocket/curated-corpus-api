@@ -1,7 +1,24 @@
 version: '3.1'
 services:
+  tests:
+    image: node:16@sha256:27fab5920246070cf13449cf44c25bc4f5adef18ca7482b2bda90b7cf9e64481
+    entrypoint: /bin/bash
+    env_file:
+      - .docker/local.env
+    environment:
+      - LOCALSTACK_HOST=localstack
+      - NODE_ENV=test
+    tty: true
+    volumes:
+      - ./:/app
+    working_dir: /app
+    depends_on:
+      - mysql
+      - localstack
+      - snowplow
+
   mysql:
-    image: mysql:5.7@sha256:94176d0ad4ed85767fc0d74b8071387109a0390e7c1afd39788269c96d2dad74
+    image: mysql:5.7@sha256:8cf035b14977b26f4a47d98e85949a7dd35e641f88fc24aa4b466b36beecf9d6
     platform: linux/amd64
     env_file:
       - ./.docker/local.env
@@ -12,7 +29,7 @@ services:
       - TZ=UTC
 
   localstack:
-    image: localstack/localstack@sha256:752ed233a1ae35775689132dbc384fd61b6451e0d4c70f206f4b8c8ea9c80ee0
+    image: localstack/localstack@sha256:c659b389e4a67174d38bc7df6de93397a94e8bc24191c6725d2a16e3767da408
     platform: linux/amd64
     env_file:
       - .docker/local.env
@@ -33,7 +50,7 @@ services:
       - HOSTNAME_EXTERNAL=localstack
 
   app:
-    image: node:16@sha256:6d592fdb89fccdeb880d14f30bf139b8a755f33b376f025b70e50ac5547c8ccf
+    image: node:18@sha256:370db2cf5b89acc950805ef32aa9cbfc69d86769f92ba9f3492a36a6f75e0d92
     platform: linux/amd64
     env_file:
       - .docker/local.env

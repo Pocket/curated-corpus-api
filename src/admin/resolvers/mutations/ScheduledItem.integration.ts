@@ -1,6 +1,11 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { db } from '../../../test/admin-server';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import {
   clearDb,
   createApprovedItemHelper,
@@ -17,26 +22,36 @@ import {
   RescheduleScheduledItemInput,
 } from '../../../database/types';
 import { getUnixTimestamp } from '../fields/UnixTimestamp';
-import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
+import { curatedCorpusEventEmitter as eventEmitter } from '../../../events/init';
 import { ScheduledCorpusItemEventType } from '../../../events/types';
 import { DateTime } from 'luxon';
-import { getServerWithMockedHeaders } from '../../../test/helpers';
 import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('mutations: ScheduledItem', () => {
-  const eventEmitter = new CuratedCorpusEventEmitter();
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
+
+  beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
+    await clearDb(db);
+  });
+
+  afterAll(async () => {
+    await server.stop();
+    await db.$disconnect();
+  });
 
   const headers = {
     name: 'Test User',
     username: 'test.user@test.com',
     groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
   };
-
-  const server = getServerWithMockedHeaders(headers, eventEmitter);
-
-  afterAll(async () => {
-    await db.$disconnect();
-  });
 
   beforeEach(async () => {
     await clearDb(db);
@@ -57,19 +72,24 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate: '2100-01-01',
       };
 
-      const result = await server.executeOperation({
-        query: CREATE_SCHEDULED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_SCHEDULED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.data).to.be.null;
-      expect(result.errors).not.to.be.null;
+      expect(result.body.data).to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // And there is the correct error from the resolvers
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors?.[0].message).to.contain(
         `Cannot create a scheduled entry with Scheduled Surface GUID of "RECSAPI".`
       );
-      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'BAD_USER_INPUT'
+      );
 
       // Check that the ADD_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -86,18 +106,21 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate: '2100-01-01',
       };
 
-      const result = await server.executeOperation({
-        query: CREATE_SCHEDULED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_SCHEDULED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.data).to.be.null;
+      expect(result.body.data).to.be.null;
 
       // And there is the correct error from the resolvers
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors?.[0].message).to.contain(
         `Cannot create a scheduled entry: Approved Item with id "not-a-valid-id-at-all" does not exist.`
       );
-      expect(result.errors?.[0].extensions?.code).to.equal('NOT_FOUND');
+      expect(result.body.errors?.[0].extensions?.code).to.equal('NOT_FOUND');
 
       // Check that the ADD_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -121,13 +144,15 @@ describe('mutations: ScheduledItem', () => {
 
       // This is the date format for the GraphQL mutation.
       const scheduledDate = DateTime.fromJSDate(
-        existingScheduledEntry.scheduledDate
+        existingScheduledEntry.scheduledDate,
+        { zone: 'utc' }
       ).toFormat('yyyy-MM-dd');
 
       // And this human-readable (and cross-locale understandable) format
       // is used in the error message we're anticipating to get.
       const displayDate = DateTime.fromJSDate(
-        existingScheduledEntry.scheduledDate
+        existingScheduledEntry.scheduledDate,
+        { zone: 'utc' }
       ).toFormat('MMM d, y');
 
       // Set up the input for the mutation that contains the exact same values
@@ -138,18 +163,23 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate,
       };
 
-      const result = await server.executeOperation({
-        query: CREATE_SCHEDULED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_SCHEDULED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.data).to.be.null;
+      expect(result.body.data).to.be.null;
 
       // Expecting to see a custom error message from the resolver
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors?.[0].message).to.contain(
         `This story is already scheduled to appear on NEW_TAB_EN_US on ${displayDate}.`
       );
-      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'BAD_USER_INPUT'
+      );
 
       // Check that the ADD_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -170,12 +200,15 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate: '2100-01-01',
       };
 
-      const { data } = await server.executeOperation({
-        query: CREATE_SCHEDULED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_SCHEDULED_ITEM),
+          variables: { data: input },
+        });
 
-      const scheduledItem = data?.createScheduledCorpusItem;
+      const scheduledItem = result.body.data?.createScheduledCorpusItem;
 
       // Expect these fields to return valid values
       expect(scheduledItem.externalId).to.not.be.null;
@@ -246,8 +279,6 @@ describe('mutations: ScheduledItem', () => {
         groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
       const approvedItem = await createApprovedItemHelper(db, {
         title: 'A test story',
       });
@@ -258,18 +289,21 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate: '2100-01-01',
       };
 
-      const result = await server.executeOperation({
-        query: CREATE_SCHEDULED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_SCHEDULED_ITEM),
+          variables: { data: input },
+        });
 
       // ...without success. There is no data
-      expect(result.data).to.be.null;
+      expect(result.body.data).to.be.null;
 
-      expect(result.errors).not.to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // And there is an access denied error
-      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
     });
 
     it("should fail if user doesn't have access to specified scheduled surface", async () => {
@@ -279,8 +313,6 @@ describe('mutations: ScheduledItem', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
       const approvedItem = await createApprovedItemHelper(db, {
         title: 'A test story',
       });
@@ -291,18 +323,21 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate: '2100-01-01',
       };
 
-      const result = await server.executeOperation({
-        query: CREATE_SCHEDULED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_SCHEDULED_ITEM),
+          variables: { data: input },
+        });
 
       // ...without success. There is no data
-      expect(result.data).to.be.null;
+      expect(result.body.data).to.be.null;
 
-      expect(result.errors).not.to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // And there is an access denied error
-      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
     });
 
     it('should succeed if user has access to specified scheduled surface', async () => {
@@ -312,8 +347,6 @@ describe('mutations: ScheduledItem', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
       const approvedItem = await createApprovedItemHelper(db, {
         title: 'A test story',
       });
@@ -324,16 +357,19 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate: '2100-01-01',
       };
 
-      const result = await server.executeOperation({
-        query: CREATE_SCHEDULED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_SCHEDULED_ITEM),
+          variables: { data: input },
+        });
 
       // Hooray! There is data
-      expect(result.data).not.to.be.null;
+      expect(result.body.data).to.not.be.null;
 
       // And no errors, too!
-      expect(result.errors).to.be.undefined;
+      expect(result.body.errors).to.be.undefined;
     });
   });
 
@@ -350,18 +386,21 @@ describe('mutations: ScheduledItem', () => {
         externalId: 'not-a-valid-ID-string',
       };
 
-      const result = await server.executeOperation({
-        query: DELETE_SCHEDULED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(DELETE_SCHEDULED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.data).to.be.null;
+      expect(result.body.data).to.be.null;
 
       // And there is the correct error from the resolvers
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors?.[0].message).to.contain(
         `Item with ID of '${input.externalId}' could not be found.`
       );
-      expect(result.errors?.[0].extensions?.code).to.equal('NOT_FOUND');
+      expect(result.body.errors?.[0].extensions?.code).to.equal('NOT_FOUND');
 
       // Check that the REMOVE_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -384,17 +423,20 @@ describe('mutations: ScheduledItem', () => {
         approvedItem,
       });
 
-      const { data } = await server.executeOperation({
-        query: DELETE_SCHEDULED_ITEM,
-        variables: { data: { externalId: scheduledItem.externalId } },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(DELETE_SCHEDULED_ITEM),
+          variables: { data: { externalId: scheduledItem.externalId } },
+        });
 
       // The shape of the Prisma objects the above helpers return doesn't quite match
       // the type we return in GraphQL (for example, IDs stay internal, we attach an
       // ApprovedItem), so until there is a query to retrieve the scheduled item
       // of the right shape (if it's ever implemented), laborious property-by-property
       // comparison is the go.
-      const returnedItem = data?.deleteScheduledCorpusItem;
+      const returnedItem = result.body.data?.deleteScheduledCorpusItem;
       expect(returnedItem.externalId).to.equal(scheduledItem.externalId);
       expect(returnedItem.createdBy).to.equal(scheduledItem.createdBy);
       expect(returnedItem.updatedBy).to.equal(headers.username);
@@ -468,8 +510,6 @@ describe('mutations: ScheduledItem', () => {
         groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
       const approvedItem = await createApprovedItemHelper(db, {
         title: 'This is a test',
       });
@@ -479,18 +519,21 @@ describe('mutations: ScheduledItem', () => {
         approvedItem,
       });
 
-      const result = await server.executeOperation({
-        query: DELETE_SCHEDULED_ITEM,
-        variables: { data: { externalId: scheduledItem.externalId } },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(DELETE_SCHEDULED_ITEM),
+          variables: { data: { externalId: scheduledItem.externalId } },
+        });
 
       // ...without success. There is no data
-      expect(result.data).to.be.null;
+      expect(result.body.data).to.be.null;
 
-      expect(result.errors).not.to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // And there is an access denied error
-      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
     });
 
     it("should fail if user doesn't have access to specified scheduled surface", async () => {
@@ -500,8 +543,6 @@ describe('mutations: ScheduledItem', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
       const approvedItem = await createApprovedItemHelper(db, {
         title: 'This is a test',
       });
@@ -511,18 +552,21 @@ describe('mutations: ScheduledItem', () => {
         approvedItem,
       });
 
-      const result = await server.executeOperation({
-        query: DELETE_SCHEDULED_ITEM,
-        variables: { data: { externalId: scheduledItem.externalId } },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(DELETE_SCHEDULED_ITEM),
+          variables: { data: { externalId: scheduledItem.externalId } },
+        });
 
       // ...without success. There is no data
-      expect(result.data).to.be.null;
+      expect(result.body.data).to.be.null;
 
-      expect(result.errors).not.to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // And there is an access denied error
-      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
     });
 
     it('should succeed if user has access to specified scheduled surface', async () => {
@@ -532,8 +576,6 @@ describe('mutations: ScheduledItem', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
       const approvedItem = await createApprovedItemHelper(db, {
         title: 'This is a test',
       });
@@ -543,16 +585,19 @@ describe('mutations: ScheduledItem', () => {
         approvedItem,
       });
 
-      const result = await server.executeOperation({
-        query: DELETE_SCHEDULED_ITEM,
-        variables: { data: { externalId: scheduledItem.externalId } },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(DELETE_SCHEDULED_ITEM),
+          variables: { data: { externalId: scheduledItem.externalId } },
+        });
 
       // Hooray! There is data
-      expect(result.data).not.to.be.null;
+      expect(result.body.data).to.not.be.null;
 
       // And no errors, too!
-      expect(result.errors).to.be.undefined;
+      expect(result.body.errors).to.be.undefined;
     });
   });
 
@@ -567,19 +612,22 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate: '2050-05-04',
       };
 
-      const result = await server.executeOperation({
-        query: RESCHEDULE_SCHEDULED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(RESCHEDULE_SCHEDULED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.data).to.be.null;
+      expect(result.body.data).to.be.null;
 
       // And there is the correct error from the resolvers
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors?.[0].message).to.contain(
         `Item with ID of '${input.externalId}' could not be found.`
       );
 
-      expect(result.errors?.[0].extensions?.code).to.equal('NOT_FOUND');
+      expect(result.body.errors?.[0].extensions?.code).to.equal('NOT_FOUND');
 
       // Check that the REMOVE_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -600,22 +648,25 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate: new Date(2050, 4, 4).toISOString(),
       });
 
-      const { data } = await server.executeOperation({
-        query: RESCHEDULE_SCHEDULED_ITEM,
-        variables: {
-          data: {
-            externalId: scheduledItem.externalId,
-            scheduledDate: '2050-05-05',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(RESCHEDULE_SCHEDULED_ITEM),
+          variables: {
+            data: {
+              externalId: scheduledItem.externalId,
+              scheduledDate: '2050-05-05',
+            },
           },
-        },
-      });
+        });
 
       // The shape of the Prisma objects the above helpers return doesn't quite match
       // the type we return in GraphQL (for example, IDs stay internal, we attach an
       // ApprovedItem), so until there is a query to retrieve the scheduled item
       // of the right shape (if it's ever implemented), laborious property-by-property
       // comparison is the go.
-      const returnedItem = data?.rescheduleScheduledCorpusItem;
+      const returnedItem = result.body.data?.rescheduleScheduledCorpusItem;
       expect(returnedItem.externalId).to.equal(scheduledItem.externalId);
       expect(returnedItem.createdBy).to.equal(scheduledItem.createdBy);
       expect(returnedItem.updatedBy).to.equal(headers.username);
@@ -716,19 +767,24 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate: '2050-05-04',
       };
 
-      const result = await server.executeOperation({
-        query: RESCHEDULE_SCHEDULED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(RESCHEDULE_SCHEDULED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.data).to.be.null;
+      expect(result.body.data).to.be.null;
 
       // Expecting to see a custom error message from the resolver
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors?.[0].message).to.contain(
         `This story is already scheduled to appear on ${displayDate}.`
       );
 
-      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'BAD_USER_INPUT'
+      );
 
       // Check that the ADD_SCHEDULE event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -741,8 +797,6 @@ describe('mutations: ScheduledItem', () => {
         groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
       const approvedItem = await createApprovedItemHelper(db, {
         title: 'This is a test',
       });
@@ -753,23 +807,26 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate: new Date(2050, 4, 4).toISOString(),
       });
 
-      const result = await server.executeOperation({
-        query: RESCHEDULE_SCHEDULED_ITEM,
-        variables: {
-          data: {
-            externalId: scheduledItem.externalId,
-            scheduledDate: '2050-05-05',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(RESCHEDULE_SCHEDULED_ITEM),
+          variables: {
+            data: {
+              externalId: scheduledItem.externalId,
+              scheduledDate: '2050-05-05',
+            },
           },
-        },
-      });
+        });
 
       // ...without success. There is no data
-      expect(result.data).to.be.null;
+      expect(result.body.data).to.be.null;
 
-      expect(result.errors).not.to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // And there is an access denied error
-      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
     });
 
     it("should fail if user doesn't have access to specified scheduled surface", async () => {
@@ -779,8 +836,6 @@ describe('mutations: ScheduledItem', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
       const approvedItem = await createApprovedItemHelper(db, {
         title: 'This is a test',
       });
@@ -791,23 +846,26 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate: new Date(2050, 4, 4).toISOString(),
       });
 
-      const result = await server.executeOperation({
-        query: RESCHEDULE_SCHEDULED_ITEM,
-        variables: {
-          data: {
-            externalId: scheduledItem.externalId,
-            scheduledDate: '2050-05-05',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(RESCHEDULE_SCHEDULED_ITEM),
+          variables: {
+            data: {
+              externalId: scheduledItem.externalId,
+              scheduledDate: '2050-05-05',
+            },
           },
-        },
-      });
+        });
 
       // ...without success. There is no data
-      expect(result.data).to.be.null;
+      expect(result.body.data).to.be.null;
 
-      expect(result.errors).not.to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // And there is an access denied error
-      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
+      expect(result.body.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
     });
 
     it('should succeed if user has access to specified scheduled surface', async () => {
@@ -817,8 +875,6 @@ describe('mutations: ScheduledItem', () => {
         groups: `group1,group2,${MozillaAccessGroup.NEW_TAB_CURATOR_ENUS}`,
       };
 
-      const server = getServerWithMockedHeaders(headers);
-
       const approvedItem = await createApprovedItemHelper(db, {
         title: 'This is a test',
       });
@@ -829,21 +885,24 @@ describe('mutations: ScheduledItem', () => {
         scheduledDate: new Date(2050, 4, 4).toISOString(),
       });
 
-      const result = await server.executeOperation({
-        query: RESCHEDULE_SCHEDULED_ITEM,
-        variables: {
-          data: {
-            externalId: scheduledItem.externalId,
-            scheduledDate: '2050-05-05',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(RESCHEDULE_SCHEDULED_ITEM),
+          variables: {
+            data: {
+              externalId: scheduledItem.externalId,
+              scheduledDate: '2050-05-05',
+            },
           },
-        },
-      });
+        });
 
       // Hooray! There is data
-      expect(result.data).not.to.be.null;
+      expect(result.body.data).to.not.be.null;
 
       // And no errors, too!
-      expect(result.errors).to.be.undefined;
+      expect(result.body.errors).to.be.undefined;
     });
   });
 });

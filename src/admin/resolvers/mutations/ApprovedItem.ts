@@ -1,4 +1,7 @@
-import { UserInputError } from 'apollo-server-errors';
+import {
+  AuthenticationError,
+  UserInputError,
+} from '@pocket-tools/apollo-utils';
 import {
   createApprovedItem as dbCreateApprovedItem,
   createRejectedItem,
@@ -33,8 +36,7 @@ import {
   ImportScheduledItemInput,
   ScheduledItem,
 } from '../../../database/types';
-import { AuthenticationError } from 'apollo-server-errors';
-import { IContext } from '../../context';
+import { IAdminContext } from '../../context';
 import { getScheduledItemByUniqueAttributes } from '../../../database/queries/ScheduledItem';
 import { fromUnixTime } from 'date-fns';
 import { InvalidImageUrl } from '../../aws/errors';
@@ -52,7 +54,7 @@ import { getApprovedItemByExternalId } from '../../../database/queries/ApprovedI
 export async function createApprovedItem(
   parent,
   { data },
-  context: IContext
+  context: IAdminContext
 ): Promise<ApprovedItem> {
   const { scheduledDate, scheduledSurfaceGuid, ...approvedItemData } = data;
 
@@ -132,7 +134,7 @@ export async function createApprovedItem(
 export async function updateApprovedItem(
   parent,
   { data },
-  context: IContext
+  context: IAdminContext
 ): Promise<ApprovedItem> {
   // Check if the user can perform this mutation
   if (!context.authenticatedUser.canWriteToCorpus()) {
@@ -188,7 +190,7 @@ export async function updateApprovedItem(
 export async function updateApprovedItemAuthors(
   parent,
   { data },
-  context: IContext
+  context: IAdminContext
 ): Promise<ApprovedItem> {
   // Check if the user can perform this mutation
   if (!context.authenticatedUser.canWriteToCorpus()) {
@@ -239,7 +241,7 @@ export async function updateApprovedItemAuthors(
 export async function rejectApprovedItem(
   parent,
   { data },
-  context: IContext
+  context: IAdminContext
 ): Promise<ApprovedItem> {
   // check if user is not authorized to reject an item
   if (!context.authenticatedUser.canWriteToCorpus()) {
@@ -314,7 +316,7 @@ export async function rejectApprovedItem(
 export async function uploadApprovedItemImage(
   parent,
   { data },
-  context: IContext
+  context: IAdminContext
 ): Promise<ApprovedItemS3ImageUrl> {
   // check if user is allowed to upload images
   if (!context.authenticatedUser.canWriteToCorpus()) {
@@ -337,7 +339,7 @@ export async function uploadApprovedItemImage(
 export async function importApprovedItem(
   parent,
   { data }: { data: ImportApprovedCorpusItemInput },
-  context: IContext
+  context: IAdminContext
 ): Promise<ImportApprovedCorpusItemPayload> {
   // Check if user is authorized to import an item
   if (!context.authenticatedUser.canWriteToCorpus()) {

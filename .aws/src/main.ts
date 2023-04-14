@@ -168,8 +168,15 @@ class CuratedCorpusAPI extends TerraformStack {
     secretsManagerKmsAlias: DataAwsKmsAlias;
     snsTopic: DataAwsSnsTopic;
   }): PocketALBApplication {
-    const { rds, s3, region, caller, secretsManagerKmsAlias, snsTopic } =
-      dependencies;
+    const {
+      rds,
+      s3,
+      pagerDuty,
+      region,
+      caller,
+      secretsManagerKmsAlias,
+      snsTopic,
+    } = dependencies;
 
     return new PocketALBApplication(this, 'application', {
       internal: true,
@@ -311,17 +318,22 @@ class CuratedCorpusAPI extends TerraformStack {
         targetMaxCapacity: 10,
       },
       alarms: {
-        //TODO: Add alarms when the API is ready
+        // A critical alarm will be raised if the endpoint is down
+        // or responds with 5xx errors more than 25% of the time
+        // within a five-minute period four times in a row.
         http5xxErrorPercentage: {
-          threshold: 25,
-          evaluationPeriods: 4,
-          period: 300,
-          actions: [],
+          threshold: 25, // 25%
+          evaluationPeriods: 4, // 20 minutes total
+          period: 300, // 5 minutes
+          actions: config.isDev ? [] : [pagerDuty.snsCriticalAlarmTopic.arn],
         },
+        // A non-critical alarm will be raised if request latency
+        // exceeds 500 ms within a 15-minute period four times in a row.
         httpLatency: {
-          evaluationPeriods: 2,
-          threshold: 500,
-          actions: [],
+          evaluationPeriods: 4, // 1 hr total
+          threshold: 500, // 500 ms
+          period: 900, // 15 minutes
+          actions: config.isDev ? [] : [pagerDuty.snsNonCriticalAlarmTopic.arn],
         },
       },
     });

@@ -1,37 +1,44 @@
 import { expect } from 'chai';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import {
   clearDb,
   createApprovedItemHelper,
   createScheduledItemHelper,
-  getServerWithMockedHeaders,
 } from '../../../test/helpers';
-import { db } from '../../../test/admin-server';
 import { GET_SCHEDULED_ITEMS } from './sample-queries.gql';
-import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import { MozillaAccessGroup } from '../../../shared/types';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('queries: ScheduledCorpusItem', () => {
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
+
+  beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
+    await clearDb(db);
+  });
+
+  afterAll(async () => {
+    await server.stop();
+    await db.$disconnect();
+  });
+
   // adding headers with groups that grant full access
   const headers = {
     name: 'Test User',
     username: 'test.user@test.com',
     groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
   };
-
-  const server = getServerWithMockedHeaders(
-    headers,
-    new CuratedCorpusEventEmitter()
-  );
-
-  beforeAll(async () => {
-    await clearDb(db);
-    await server.start();
-  });
-
-  afterAll(async () => {
-    await db.$disconnect();
-    await server.stop();
-  });
 
   describe('getScheduledCorpusItems query', () => {
     beforeAll(async () => {
@@ -61,86 +68,95 @@ describe('queries: ScheduledCorpusItem', () => {
     });
 
     it('should return all requested items', async () => {
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_ITEMS,
-        variables: {
-          filters: {
-            scheduledSurfaceGuid: 'NEW_TAB_EN_US',
-            startDate: '2000-01-01',
-            endDate: '2050-12-31',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_SCHEDULED_ITEMS),
+          variables: {
+            filters: {
+              scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+              startDate: '2000-01-01',
+              endDate: '2050-12-31',
+            },
           },
-        },
-      });
+        });
 
       // Good to check this here before we get into actual return values
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
-      const resultArray = result.data?.getScheduledCorpusItems;
+      const resultArray = result.body.data?.getScheduledCorpusItems;
       expect(resultArray).to.have.lengthOf(2);
       expect(resultArray[0].totalCount).to.equal(10);
       expect(resultArray[0].items).to.have.lengthOf(10);
     });
 
     it('should return all expected properties', async () => {
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_ITEMS,
-        variables: {
-          filters: {
-            scheduledSurfaceGuid: 'NEW_TAB_EN_US',
-            startDate: '2000-01-01',
-            endDate: '2050-12-31',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_SCHEDULED_ITEMS),
+          variables: {
+            filters: {
+              scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+              startDate: '2000-01-01',
+              endDate: '2050-12-31',
+            },
           },
-        },
-      });
+        });
 
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
-      const resultArray = result.data?.getScheduledCorpusItems;
+      const resultArray = result.body.data?.getScheduledCorpusItems;
 
       // Check the first group of scheduled items
-      expect(resultArray[0].collectionCount).not.to.be.null;
-      expect(resultArray[0].syndicatedCount).not.to.be.null;
-      expect(resultArray[0].totalCount).not.to.be.null;
-      expect(resultArray[0].scheduledDate).not.to.be.null;
+      expect(resultArray[0].collectionCount).to.exist;
+      expect(resultArray[0].syndicatedCount).to.exist;
+      expect(resultArray[0].totalCount).to.exist;
+      expect(resultArray[0].scheduledDate).to.exist;
 
       // Check the first item in the first group
       const firstItem = resultArray[0].items[0];
 
       // Scalar properties
-      expect(firstItem.externalId).not.to.be.null;
-      expect(firstItem.createdAt).not.to.be.null;
-      expect(firstItem.createdBy).not.to.be.null;
-      expect(firstItem.updatedAt).not.to.be.null;
-      expect(firstItem.updatedBy).to.be.null;
-      expect(firstItem.scheduledDate).not.to.be.null;
+      expect(firstItem.externalId).to.exist;
+      expect(firstItem.createdAt).to.exist;
+      expect(firstItem.createdBy).to.exist;
+      expect(firstItem.updatedAt).to.exist;
+      expect(firstItem.updatedBy).to.not.exist;
+      expect(firstItem.scheduledDate).to.exist;
 
       // The underlying Approved Item
-      expect(firstItem.approvedItem.externalId).not.to.be.null;
-      expect(firstItem.approvedItem.title).not.to.be.null;
-      expect(firstItem.approvedItem.url).not.to.be.null;
-      expect(firstItem.approvedItem.excerpt).not.to.be.null;
-      expect(firstItem.approvedItem.imageUrl).not.to.be.null;
-      expect(firstItem.approvedItem.createdBy).not.to.be.null;
+      expect(firstItem.approvedItem.externalId).to.exist;
+      expect(firstItem.approvedItem.title).to.exist;
+      expect(firstItem.approvedItem.url).to.exist;
+      expect(firstItem.approvedItem.excerpt).to.exist;
+      expect(firstItem.approvedItem.imageUrl).to.exist;
+      expect(firstItem.approvedItem.createdBy).to.exist;
     });
 
     it('should group scheduled items by date', async () => {
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_ITEMS,
-        variables: {
-          filters: {
-            scheduledSurfaceGuid: 'NEW_TAB_EN_US',
-            startDate: '2000-01-01',
-            endDate: '2050-12-31',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_SCHEDULED_ITEMS),
+          variables: {
+            filters: {
+              scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+              startDate: '2000-01-01',
+              endDate: '2050-12-31',
+            },
           },
-        },
-      });
+        });
 
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
-      const resultArray = result.data?.getScheduledCorpusItems;
+      const resultArray = result.body.data?.getScheduledCorpusItems;
 
       expect(resultArray[0].totalCount).to.equal(10);
       expect(resultArray[0].items).to.have.lengthOf(10);
@@ -152,18 +168,21 @@ describe('queries: ScheduledCorpusItem', () => {
     });
 
     it('should sort items by scheduleDate asc and updatedAt asc', async () => {
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_ITEMS,
-        variables: {
-          filters: {
-            scheduledSurfaceGuid: 'NEW_TAB_EN_US',
-            startDate: '2050-01-01',
-            endDate: '2050-01-01',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_SCHEDULED_ITEMS),
+          variables: {
+            filters: {
+              scheduledSurfaceGuid: 'NEW_TAB_EN_US',
+              startDate: '2050-01-01',
+              endDate: '2050-01-01',
+            },
           },
-        },
-      });
+        });
 
-      const resultArray = result.data?.getScheduledCorpusItems;
+      const resultArray = result.body.data?.getScheduledCorpusItems;
 
       // get an array of the createdAt values in the order they were returned
       const updatedAtDates = resultArray[0].items.map((item) => {
@@ -180,42 +199,48 @@ describe('queries: ScheduledCorpusItem', () => {
     it('should fail on invalid Scheduled Surface GUID', async () => {
       const invalidId = 'not-a-valid-id-by-any-means';
 
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_ITEMS,
-        variables: {
-          filters: {
-            scheduledSurfaceGuid: invalidId,
-            startDate: '2000-01-01',
-            endDate: '2050-12-31',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_SCHEDULED_ITEMS),
+          variables: {
+            filters: {
+              scheduledSurfaceGuid: invalidId,
+              startDate: '2000-01-01',
+              endDate: '2050-12-31',
+            },
           },
-        },
-      });
+        });
 
-      expect(result.errors).not.to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
-      expect(result.errors?.length).to.equal(1);
-      expect(result.errors?.[0].message).to.equal(
+      expect(result.body.errors?.length).to.equal(1);
+      expect(result.body.errors?.[0].message).to.equal(
         'not-a-valid-id-by-any-means is not a valid Scheduled Surface GUID'
       );
     });
 
     it('should fail on non-existent Scheduled Surface GUID', async () => {
-      const result = await server.executeOperation({
-        query: GET_SCHEDULED_ITEMS,
-        variables: {
-          filters: {
-            // can't believe graphql lets you pass an empty string for a required parameter
-            scheduledSurfaceGuid: '',
-            startDate: '2000-01-01',
-            endDate: '2050-12-31',
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_SCHEDULED_ITEMS),
+          variables: {
+            filters: {
+              // can't believe graphql lets you pass an empty string for a required parameter
+              scheduledSurfaceGuid: '',
+              startDate: '2000-01-01',
+              endDate: '2050-12-31',
+            },
           },
-        },
-      });
+        });
 
-      expect(result.errors).not.to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
-      expect(result.errors?.length).to.equal(1);
-      expect(result.errors?.[0].message).to.equal(
+      expect(result.body.errors?.length).to.equal(1);
+      expect(result.body.errors?.[0].message).to.equal(
         ' is not a valid Scheduled Surface GUID'
       );
     });

@@ -4,6 +4,12 @@ orbs:
   aws-ecs: circleci/aws-ecs@2.2.1
   pocket: pocket/circleci-orbs@1.2.8
 
+parameters:
+  cache-version:
+    default: node-v2
+    description: "Version prefix for the cache name, primarily for node_modules caching in this pipeline."
+    type: string
+
 # Workflow shortcuts
 not_main: &not_main
   filters:
@@ -46,7 +52,7 @@ only_dev: &only_dev
 jobs:
   apollo:
     docker:
-      - image: cimg/node:current@sha256:92d8634c392485ac5b70b4b1d8ea0e0fb1fc71f7e70073446a6f72ff142eaeae
+      - image: node:16@sha256:27fab5920246070cf13449cf44c25bc4f5adef18ca7482b2bda90b7cf9e64481
     steps:
       - checkout
       - run:
@@ -105,7 +111,7 @@ jobs:
 
   build:
     docker:
-      - image: cimg/node:current@sha256:92d8634c392485ac5b70b4b1d8ea0e0fb1fc71f7e70073446a6f72ff142eaeae
+      - image: node:16@sha256:27fab5920246070cf13449cf44c25bc4f5adef18ca7482b2bda90b7cf9e64481
     steps:
       - checkout
       # Define the working directory for this job
@@ -113,24 +119,20 @@ jobs:
           at: /tmp/workspace
       - restore_cache:
           keys:
-            # when lock file changes, use increasingly general patterns to restore cache
-            # If this gets our of sync, you can increment the version (vX).  Just be
-            # sure to match that version when saving the cache as well.
-            - node-v1-{{ checksum "package-lock.json" }}
-            - node-v1-
+            - <<pipeline.parameters.cache-version>>-{{ checksum "package-lock.json" }}-{{ checksum "prisma/schema.prisma" }}
       - run:
           name: install node modules
           command: npm ci
       # Save the cache to avoid extraneous downloads
       - save_cache:
-          key: node-v1-{{ checksum "package-lock.json" }}
+          key: <<pipeline.parameters.cache-version>>-{{ checksum "package-lock.json" }}-{{ checksum "prisma/schema.prisma" }}
           paths:
             - ./node_modules
       - run:
           name: generate prisma client
           command: npm run db:generate-client
       - run:
-          name:
+          name: run build
           command: |
             export NODE_ENV=production
             npm run build
@@ -153,7 +155,7 @@ jobs:
         description: 'Integration tests'
         type: string
     docker:
-      - image: cimg/node:current@sha256:92d8634c392485ac5b70b4b1d8ea0e0fb1fc71f7e70073446a6f72ff142eaeae
+      - image: node:16@sha256:27fab5920246070cf13449cf44c25bc4f5adef18ca7482b2bda90b7cf9e64481
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -161,14 +163,14 @@ jobs:
           NODE_ENV: test
           AWS_XRAY_LOG_LEVEL: silent
           AWS_XRAY_CONTEXT_MISSING: LOG_ERROR
-      - image: mysql:5.7@sha256:94176d0ad4ed85767fc0d74b8071387109a0390e7c1afd39788269c96d2dad74
+      - image: mysql:5.7@sha256:8cf035b14977b26f4a47d98e85949a7dd35e641f88fc24aa4b466b36beecf9d6
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           TZ: 'UTC'
-      - image: localstack/localstack@sha256:752ed233a1ae35775689132dbc384fd61b6451e0d4c70f206f4b8c8ea9c80ee0
+      - image: localstack/localstack@sha256:c659b389e4a67174d38bc7df6de93397a94e8bc24191c6725d2a16e3767da408
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -188,17 +190,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            # when lock file changes, use increasingly general patterns to restore cache
-            # If this gets our of sync, you can increment the version (vX).  Just be
-            # sure to match that version when saving the cache as well.
-            - node-v1-{{ checksum "package-lock.json" }}
-            - node-v1-
+            - <<pipeline.parameters.cache-version>>-{{ checksum "package-lock.json" }}-{{ checksum "prisma/schema.prisma" }}
       - run:
           name: install node modules
-          command: npm install
+          command: npm ci
       # Save the cache to avoid extraneous downloads
       - save_cache:
-          key: node-v1-{{ checksum "package-lock.json" }}
+          key: <<pipeline.parameters.cache-version>>-{{ checksum "package-lock.json" }}-{{ checksum "prisma/schema.prisma" }}
           paths:
             - ./node_modules
       - run:
@@ -210,6 +208,7 @@ jobs:
           command: |
             export $(egrep -v '^#' .docker/local.env | xargs -0)
             npm run migrate:reset -- --skip-seed --force
+            ./node_modules/.bin/prisma --version
             << parameters.command >>
 
 

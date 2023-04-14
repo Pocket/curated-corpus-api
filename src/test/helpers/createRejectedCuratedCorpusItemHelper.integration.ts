@@ -28,13 +28,13 @@ describe('createRejectedCuratedCorpusItemHelper', () => {
     expect(item.title).to.equal(data.title);
 
     // Expect to see the remaining fields filled in for us
-    expect(item.externalId).to.be.not.undefined;
-    expect(item.prospectId).to.be.not.undefined;
-    expect(item.url).to.be.not.undefined;
-    expect(item.topic).to.be.not.undefined;
-    expect(item.publisher).to.be.not.undefined;
-    expect(item.language).to.be.not.undefined;
-    expect(item.reason).to.be.not.undefined;
+    expect(item.externalId).to.exist;
+    expect(item.prospectId).to.exist;
+    expect(item.url).to.exist;
+    expect(item.topic).to.exist;
+    expect(item.publisher).to.exist;
+    expect(item.language).to.exist;
+    expect(item.reason).to.exist;
   });
 
   it('creates a curated item with all properties supplied', async () => {

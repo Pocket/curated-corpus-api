@@ -1,8 +1,8 @@
-import { AuthenticationError } from 'apollo-server-errors';
+import { AuthenticationError } from '@pocket-tools/apollo-utils';
 import { getScheduledItems as dbGetScheduledItems } from '../../../database/queries';
 import { ScheduledItemsResult } from '../../../database/types';
 import { ACCESS_DENIED_ERROR } from '../../../shared/types';
-import { IContext } from '../../context';
+import { IAdminContext } from '../../context';
 
 /**
  * Retrieves a list of Approved Items that are scheduled to appear on a Scheduled Surface
@@ -11,7 +11,7 @@ import { IContext } from '../../context';
 export async function getScheduledItems(
   parent,
   { filters },
-  context: IContext
+  context: IAdminContext
 ): Promise<ScheduledItemsResult[]> {
   //check if the user does not have the permissions to access this query
   if (

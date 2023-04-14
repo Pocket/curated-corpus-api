@@ -1,5 +1,7 @@
 import { S3 } from 'aws-sdk';
 import { IncomingHttpHeaders } from 'http';
+import Express from 'express';
+import { BaseContext } from '@apollo/server';
 import { PrismaClient, RejectedCuratedCorpusItem } from '@prisma/client';
 import { client } from '../database/client';
 import { ApprovedItem, ScheduledItem } from '../database/types';
@@ -16,9 +18,10 @@ import {
   getScheduledSurfaceByGuid,
   scheduledSurfaceAccessGroups,
 } from '../shared/utils';
+import { curatedCorpusEventEmitter } from '../events/init';
 
 // Custom properties we get from Admin API for the authenticated user
-export interface AdminAPIUser {
+export interface AdminAPIUser extends BaseContext {
   name: string;
   groups: string[];
   username: string;
@@ -32,7 +35,7 @@ export interface AdminAPIUser {
 }
 
 // Context interface
-export interface IContext {
+export interface IAdminContext {
   db: PrismaClient;
   headers: IncomingHttpHeaders;
   eventEmitter: CuratedCorpusEventEmitter;
@@ -50,17 +53,17 @@ export interface IContext {
   ): void;
 }
 
-export class ContextManager implements IContext {
+export class AdminContextManager implements IAdminContext {
   constructor(
     private config: {
-      request: any;
+      request: Express.Request;
       db: PrismaClient;
       s3: S3;
       eventEmitter: CuratedCorpusEventEmitter;
     }
   ) {}
 
-  get db(): IContext['db'] {
+  get db(): IAdminContext['db'] {
     return this.config.db;
   }
 
@@ -68,7 +71,7 @@ export class ContextManager implements IContext {
     return this.config.request.headers;
   }
 
-  get s3(): IContext['s3'] {
+  get s3(): IAdminContext['s3'] {
     return this.config.s3;
   }
 
@@ -154,20 +157,20 @@ export class ContextManager implements IContext {
 }
 
 /**
- * Context factory function. Creates a new context upon
- * every request
- * @param request server request
- * @param emitter a pre-initialized itemsEventEmitter
- * @returns ContextManager
+ * Context factory. Creates a new request context with
+ * apollo compatible interface and default singleton
+ * clients.
+ * @returns AdminContextManager
  */
-export function getContext(
-  request: any,
-  emitter: CuratedCorpusEventEmitter
-): ContextManager {
-  return new ContextManager({
-    request: request,
+export async function getAdminContext({
+  req,
+}: {
+  req: Express.Request;
+}): Promise<AdminContextManager> {
+  return new AdminContextManager({
+    request: req,
     db: client(),
     s3,
-    eventEmitter: emitter,
+    eventEmitter: curatedCorpusEventEmitter,
   });
 }

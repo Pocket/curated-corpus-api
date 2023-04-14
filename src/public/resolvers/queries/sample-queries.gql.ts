@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server';
+import { gql } from 'graphql-tag';
 
 export const GET_SCHEDULED_SURFACE = gql`
   query scheduledSurface($id: ID!) {
@@ -48,6 +48,37 @@ export const CORPUS_ITEM_REFERENCE_RESOLVER = gql`
         title
         authors {
           name
+        }
+      }
+      ... on SavedItem {
+        corpusItem {
+          id
+          title
+          authors {
+            name
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const CORPUS_ITEM_TARGET_REFERENCE_RESOLVER = gql`
+  query ($representations: [_Any!]!) {
+    _entities(representations: $representations) {
+      ... on CorpusItem {
+        id
+        title
+        target {
+          __typename
+
+          ... on Collection {
+            slug
+          }
+
+          ... on SyndicatedArticle {
+            slug
+          }
         }
       }
     }

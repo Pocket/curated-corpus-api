@@ -1,6 +1,11 @@
 import { expect } from 'chai';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import { RejectedCuratedCorpusItem as dbRejectedCuratedCorpusItem } from '@prisma/client';
-import { db } from '../../../test/admin-server';
 import {
   clearDb,
   createRejectedCuratedCorpusItemHelper,
@@ -9,31 +14,33 @@ import {
   GET_REJECTED_ITEMS,
   REJECTED_ITEM_REFERENCE_RESOLVER,
 } from './sample-queries.gql';
-import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
 import { MozillaAccessGroup } from '../../../shared/types';
-import { getServerWithMockedHeaders } from '../../../test/helpers/getServerWithMockedHeaders';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('queries: RejectedCorpusItem', () => {
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
+
+  beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
+    await clearDb(db);
+  });
+
+  afterAll(async () => {
+    await server.stop();
+    await db.$disconnect();
+  });
+
   const headers = {
     name: 'Test User',
     username: 'test.user@test.com',
     groups: `group1,group2,${MozillaAccessGroup.READONLY}`,
   };
-
-  const server = getServerWithMockedHeaders(
-    headers,
-    new CuratedCorpusEventEmitter()
-  );
-
-  beforeAll(async () => {
-    await clearDb(db);
-    await server.start();
-  });
-
-  afterAll(async () => {
-    await db.$disconnect();
-    await server.stop();
-  });
 
   describe('getRejectedCorpusItem query', () => {
     // Fake sample Rejected Curated Corpus items
@@ -91,12 +98,17 @@ describe('queries: RejectedCorpusItem', () => {
     });
 
     it('should get all items when number of requested items is greater than total items', async () => {
-      const { data } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          pagination: { first: 20 },
-        },
-      });
+      const {
+        body: { data },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            pagination: { first: 20 },
+          },
+        });
 
       expect(data?.getRejectedCorpusItems.edges).to.have.length(
         rejectedCuratedCorpusItems.length
@@ -107,9 +119,12 @@ describe('queries: RejectedCorpusItem', () => {
     });
 
     it('should correctly sort items by createdAt when using default sort', async () => {
-      const { data } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-      });
+      const {
+        body: { data },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({ query: print(GET_REJECTED_ITEMS) });
 
       const firstItem = data?.getRejectedCorpusItems.edges[0].node;
       const secondItem = data?.getRejectedCorpusItems.edges[1].node;
@@ -118,48 +133,63 @@ describe('queries: RejectedCorpusItem', () => {
     });
 
     it('should return all available properties of an rejected curated corpus item', async () => {
-      const { data } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          pagination: { first: 1 },
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            pagination: { first: 1 },
+          },
+        });
 
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.undefined;
       const firstItem: dbRejectedCuratedCorpusItem =
-        data?.getRejectedCorpusItems.edges[0].node;
+        result.body.data?.getRejectedCorpusItems.edges[0].node;
       // The important thing to test here is that the query returns all of these
       // properties without falling over, and not that they hold any specific value.
-      expect(firstItem.externalId).to.be.not.undefined;
-      expect(firstItem.prospectId).to.be.not.undefined;
-      expect(firstItem.title).to.be.not.undefined;
-      expect(firstItem.language).to.be.not.undefined;
-      expect(firstItem.publisher).to.be.not.undefined;
-      expect(firstItem.url).to.be.not.undefined;
-      expect(firstItem.topic).to.be.not.undefined;
-      expect(firstItem.reason).to.be.not.undefined;
-      expect(firstItem.createdAt).to.be.not.undefined;
-      expect(firstItem.createdBy).to.be.not.undefined;
+      expect(firstItem.externalId).to.exist;
+      expect(firstItem.prospectId).to.exist;
+      expect(firstItem.title).to.exist;
+      expect(firstItem.language).to.exist;
+      expect(firstItem.publisher).to.exist;
+      expect(firstItem.url).to.exist;
+      expect(firstItem.topic).to.exist;
+      expect(firstItem.reason).to.exist;
+      expect(firstItem.createdAt).to.exist;
+      expect(firstItem.createdBy).to.exist;
     });
 
     it('should return correct paginated results', async () => {
-      const { data } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          pagination: { first: 2 },
-        },
-      });
+      const {
+        body: { data },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            pagination: { first: 2 },
+          },
+        });
 
       // We expect to get two results back
       expect(data?.getRejectedCorpusItems.edges).to.have.length(2);
     });
 
     it('should return a PageInfo object', async () => {
-      const { data } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          pagination: { first: 5 },
-        },
-      });
+      const {
+        body: { data },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            pagination: { first: 5 },
+          },
+        });
 
       const pageInfo = data?.getRejectedCorpusItems.pageInfo;
       expect(pageInfo.hasNextPage).to.equal(true);
@@ -168,21 +198,31 @@ describe('queries: RejectedCorpusItem', () => {
       expect(pageInfo.endCursor).to.be.a('string');
     });
     it('should return after cursor without overfetching', async () => {
-      const { data } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          pagination: { first: 4 },
-        },
-      });
+      const {
+        body: { data },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            pagination: { first: 4 },
+          },
+        });
 
       const cursor = data?.getRejectedCorpusItems.edges[3].cursor;
 
-      const { data: nextPageData } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          pagination: { first: 4, after: cursor },
-        },
-      });
+      const {
+        body: { data: nextPageData },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            pagination: { first: 4, after: cursor },
+          },
+        });
 
       expect(nextPageData?.getRejectedCorpusItems.edges)
         .to.be.an('array')
@@ -190,21 +230,31 @@ describe('queries: RejectedCorpusItem', () => {
     });
 
     it('should return before cursor without overfetching', async () => {
-      const { data } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          pagination: { last: 4 },
-        },
-      });
+      const {
+        body: { data },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            pagination: { last: 4 },
+          },
+        });
 
       const cursor = data?.getRejectedCorpusItems.edges[0].cursor;
 
-      const { data: prevPageData } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          pagination: { last: 4, before: cursor },
-        },
-      });
+      const {
+        body: { data: prevPageData },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            pagination: { last: 4, before: cursor },
+          },
+        });
 
       expect(prevPageData?.getRejectedCorpusItems.edges)
         .to.be.an('array')
@@ -212,12 +262,17 @@ describe('queries: RejectedCorpusItem', () => {
     });
 
     it('should filter by language', async () => {
-      const { data } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          filters: { language: 'DE' },
-        },
-      });
+      const {
+        body: { data },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            filters: { language: 'DE' },
+          },
+        });
 
       const germanItems = rejectedCuratedCorpusItems.filter(
         (item) => item.language === 'DE'
@@ -233,12 +288,17 @@ describe('queries: RejectedCorpusItem', () => {
     });
 
     it('should filter by story title', async () => {
-      const { data } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          filters: { title: 'laravel' },
-        },
-      });
+      const {
+        body: { data },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            filters: { title: 'laravel' },
+          },
+        });
 
       // we only have one story with "laravel" in the title
       expect(data?.getRejectedCorpusItems.edges).to.have.length(1);
@@ -247,12 +307,17 @@ describe('queries: RejectedCorpusItem', () => {
     });
 
     it('should filter by topic', async () => {
-      const { data } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          filters: { topic: 'Technology' },
-        },
-      });
+      const {
+        body: { data },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            filters: { topic: 'Technology' },
+          },
+        });
 
       // we only have two stories categorized as "Technology"
       expect(data?.getRejectedCorpusItems.edges).to.have.length(2);
@@ -262,12 +327,17 @@ describe('queries: RejectedCorpusItem', () => {
     });
 
     it('should filter by story URL', async () => {
-      const { data } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          filters: { url: 'sample-domain' },
-        },
-      });
+      const {
+        body: { data },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            filters: { url: 'sample-domain' },
+          },
+        });
 
       // expect to see just the one story with the above domain
       expect(data?.getRejectedCorpusItems.edges).to.have.length(1);
@@ -276,17 +346,22 @@ describe('queries: RejectedCorpusItem', () => {
     });
 
     it('should filter url, title, topic and language', async () => {
-      const { data } = await server.executeOperation({
-        query: GET_REJECTED_ITEMS,
-        variables: {
-          filters: {
-            url: 'sample-domain',
-            title: 'PHP',
-            topic: 'Technology',
-            language: 'EN',
+      const {
+        body: { data },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_REJECTED_ITEMS),
+          variables: {
+            filters: {
+              url: 'sample-domain',
+              title: 'PHP',
+              topic: 'Technology',
+              language: 'EN',
+            },
           },
-        },
-      });
+        });
 
       // expect to see just the one story
       expect(data?.getRejectedCorpusItems.edges).to.have.length(1);
@@ -349,63 +424,69 @@ describe('queries: RejectedCorpusItem', () => {
     });
 
     it('returns the rejected item if it exists', async () => {
-      const result = await server.executeOperation({
-        query: REJECTED_ITEM_REFERENCE_RESOLVER,
-        variables: {
-          representations: [
-            {
-              __typename: 'RejectedCorpusItem',
-              url: 'https://www.test2.com/story-three',
-            },
-          ],
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(REJECTED_ITEM_REFERENCE_RESOLVER),
+          variables: {
+            representations: [
+              {
+                __typename: 'RejectedCorpusItem',
+                url: 'https://www.test2.com/story-three',
+              },
+            ],
+          },
+        });
 
-      expect(result.errors).to.be.undefined;
+      expect(result.body.errors).to.be.undefined;
 
-      expect(result.data).to.not.be.null;
-      expect(result.data?._entities).to.have.lengthOf(1);
+      expect(result.body.data).to.not.be.null;
+      expect(result.body.data?._entities).to.have.lengthOf(1);
     });
 
     it('returns multiple items in the correct order', async () => {
-      const result = await server.executeOperation({
-        query: REJECTED_ITEM_REFERENCE_RESOLVER,
-        variables: {
-          representations: [
-            {
-              __typename: 'RejectedCorpusItem',
-              url: 'https://www.test2.com/story-seven',
-            },
-            {
-              __typename: 'RejectedCorpusItem',
-              url: 'https://www.test2.com/story-three',
-            },
-            {
-              __typename: 'RejectedCorpusItem',
-              url: 'https://www.sample-domain.com/what-zombies-can-teach-you-graphql',
-            },
-            {
-              __typename: 'RejectedCorpusItem',
-              url: 'https://www.test2.com/story-two',
-            },
-          ],
-        },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(REJECTED_ITEM_REFERENCE_RESOLVER),
+          variables: {
+            representations: [
+              {
+                __typename: 'RejectedCorpusItem',
+                url: 'https://www.test2.com/story-seven',
+              },
+              {
+                __typename: 'RejectedCorpusItem',
+                url: 'https://www.test2.com/story-three',
+              },
+              {
+                __typename: 'RejectedCorpusItem',
+                url: 'https://www.sample-domain.com/what-zombies-can-teach-you-graphql',
+              },
+              {
+                __typename: 'RejectedCorpusItem',
+                url: 'https://www.test2.com/story-two',
+              },
+            ],
+          },
+        });
 
-      expect(result.errors).to.be.undefined;
+      expect(result.body.errors).to.be.undefined;
 
-      expect(result.data).to.not.be.null;
-      expect(result.data?._entities).to.have.lengthOf(4);
-      expect(result.data?._entities[0].url).to.equal(
+      expect(result.body.data).to.not.be.null;
+      expect(result.body.data?._entities).to.have.lengthOf(4);
+      expect(result.body.data?._entities[0].url).to.equal(
         'https://www.test2.com/story-seven'
       );
-      expect(result.data?._entities[1].url).to.equal(
+      expect(result.body.data?._entities[1].url).to.equal(
         'https://www.test2.com/story-three'
       );
-      expect(result.data?._entities[2].url).to.equal(
+      expect(result.body.data?._entities[2].url).to.equal(
         'https://www.sample-domain.com/what-zombies-can-teach-you-graphql'
       );
-      expect(result.data?._entities[3].url).to.equal(
+      expect(result.body.data?._entities[3].url).to.equal(
         'https://www.test2.com/story-two'
       );
     });

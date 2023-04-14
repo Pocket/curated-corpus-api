@@ -28,10 +28,25 @@ type ScheduledSurfaceItem {
     corpusItem: CorpusItem!
 }
 
+type SyndicatedArticle @key(fields: "slug") {
+    slug: String!
+}
+
+type Collection @key(fields: "slug") {
+    slug: String!
+}
+
+"""
+TODO: Make this type implement PocketResource when available.
+https://getpocket.atlassian.net/wiki/spaces/PE/pages/2771714049/The+Future+of+Item
+"""
+union CorpusTarget = SyndicatedArticle | Collection
+
 """
 Represents an item that is in the Corpus and its associated manually edited metadata.
+TODO: CorpusItem to implement PocketResource when it becomes available.
 """
-type CorpusItem @key(fields: "id") {
+type CorpusItem @key(fields: "id") @key(fields: "url") {
     """
     The GUID that is stored on an approved corpus item
     """
@@ -74,6 +89,11 @@ type CorpusItem @key(fields: "id") {
     The topic associated with the Approved Item.
     """
     topic: String
+
+    """
+    If the Corpus Item is pocket owned with a specific type, this is the associated object (Collection or SyndicatedArticle).
+    """
+    target: CorpusTarget
 }
 
 """
@@ -108,6 +128,18 @@ type Query {
     This is a future improvement, not needed now.
     """
     surface(id: ID!): Surface!
+}
+
+type SavedItem @key(fields: "url") {
+    """
+    key field to identify the SavedItem entity in the ListApi service
+    """
+    url: String! @external
+
+    """
+    If the item is in corpus allow the saved item to reference it.  Exposing curated info for consistent UX
+    """
+    corpusItem: CorpusItem
 }
 
 # Commented out until RecsAPI implements the fields that lets us extend Recommendation

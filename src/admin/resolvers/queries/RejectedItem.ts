@@ -5,8 +5,8 @@ import {
   getRejectedItemByUrl as dbGetRejectedItemByUrl,
   getRejectedCuratedCorpusItems as dbGetRejectedCuratedCorpusItems,
 } from '../../../database/queries';
-import { IContext } from '../../context';
-import { AuthenticationError } from 'apollo-server-errors';
+import { IAdminContext } from '../../context';
+import { AuthenticationError } from '@pocket-tools/apollo-utils';
 import { ACCESS_DENIED_ERROR } from '../../../shared/types';
 
 /**
@@ -19,7 +19,7 @@ import { ACCESS_DENIED_ERROR } from '../../../shared/types';
 export async function getRejectedItems(
   parent,
   args,
-  context: IContext
+  context: IAdminContext
 ): Promise<Connection<RejectedCuratedCorpusItem>> {
   //check if the user has the required permissions to access this query
   if (
@@ -70,7 +70,7 @@ export async function getRejectedItems(
 export async function getRejectedItemByUrl(
   parent,
   args,
-  context: IContext
+  context: IAdminContext
 ): Promise<RejectedCuratedCorpusItem | null> {
   //check if the user does not have the permissions to access this query
   if (

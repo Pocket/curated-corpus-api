@@ -1,36 +1,49 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { db } from '../../../test/admin-server';
+import { print } from 'graphql';
+import request from 'supertest';
+import { ApolloServer } from '@apollo/server';
+import { PrismaClient } from '@prisma/client';
+import { client } from '../../../database/client';
+
 import {
   clearDb,
   createApprovedItemHelper,
   createRejectedCuratedCorpusItemHelper,
-  getServerWithMockedHeaders,
 } from '../../../test/helpers';
 import { CREATE_REJECTED_ITEM } from './sample-mutations.gql';
 import { CreateRejectedItemInput } from '../../../database/types';
-import { CuratedCorpusEventEmitter } from '../../../events/curatedCorpusEventEmitter';
+import { curatedCorpusEventEmitter as eventEmitter } from '../../../events/init';
 import { ReviewedCorpusItemEventType } from '../../../events/types';
 import { ACCESS_DENIED_ERROR, MozillaAccessGroup } from '../../../shared/types';
+import { startServer } from '../../../express';
+import { IAdminContext } from '../../context';
 
 describe('mutations: RejectedItem', () => {
-  const eventEmitter = new CuratedCorpusEventEmitter();
+  let app: Express.Application;
+  let server: ApolloServer<IAdminContext>;
+  let graphQLUrl: string;
+  let db: PrismaClient;
 
-  const headers = {
+  beforeAll(async () => {
+    // port 0 tells express to dynamically assign an available port
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    db = client();
+    await clearDb(db);
+  });
+
+  afterAll(async () => {
+    await server.stop();
+    await db.$disconnect();
+  });
+
+  const baseHeaders = {
     name: 'Test User',
     username: 'test.user@test.com',
     groups: `group1,group2,${MozillaAccessGroup.SCHEDULED_SURFACE_CURATOR_FULL}`,
   };
-  const server = getServerWithMockedHeaders(headers, eventEmitter);
-
-  beforeAll(async () => {
-    await server.start();
-  });
-
-  afterAll(async () => {
-    await db.$disconnect();
-    await server.stop();
-  });
+  // set default headers for tests that don't modify headers
+  const headers = { ...baseHeaders };
 
   beforeEach(async () => {
     await clearDb(db);
@@ -58,19 +71,22 @@ describe('mutations: RejectedItem', () => {
       const eventTracker = sinon.fake();
       eventEmitter.on(ReviewedCorpusItemEventType.REJECT_ITEM, eventTracker);
 
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
       // Expect to see all the input data we supplied in the Approved Item
       // returned by the mutation
-      expect(result.data?.createRejectedCorpusItem).to.deep.include(input);
+      expect(result.body.data?.createRejectedCorpusItem).to.deep.include(input);
       // Expect to see the SSO username in the `createdBy` field
-      expect(result.data?.createRejectedCorpusItem.createdBy).to.equal(
+      expect(result.body.data?.createRejectedCorpusItem.createdBy).to.equal(
         headers.username
       );
 
@@ -84,7 +100,7 @@ describe('mutations: RejectedItem', () => {
       // 3- Event has the right entity passed to it.
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(result.data?.createRejectedCorpusItem.externalId);
+      ).to.equal(result.body.data?.createRejectedCorpusItem.externalId);
     });
 
     it('creates a rejected item without a prospectId', async () => {
@@ -95,21 +111,24 @@ describe('mutations: RejectedItem', () => {
       const inputWithoutProspectId = { ...input };
       delete inputWithoutProspectId.prospectId;
 
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: inputWithoutProspectId },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: inputWithoutProspectId },
+        });
 
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
       // Expect to see all the input data we supplied in the Approved Item
       // returned by the mutation
-      expect(result.data?.createRejectedCorpusItem).to.deep.include(
+      expect(result.body.data?.createRejectedCorpusItem).to.deep.include(
         inputWithoutProspectId
       );
       // Expect to see the SSO username in the `createdBy` field
-      expect(result.data?.createRejectedCorpusItem.createdBy).to.equal(
+      expect(result.body.data?.createRejectedCorpusItem.createdBy).to.equal(
         headers.username
       );
 
@@ -123,30 +142,29 @@ describe('mutations: RejectedItem', () => {
       // 3- Event has the right entity passed to it.
       expect(
         await eventTracker.getCall(0).args[0].reviewedCorpusItem.externalId
-      ).to.equal(result.data?.createRejectedCorpusItem.externalId);
+      ).to.equal(result.body.data?.createRejectedCorpusItem.externalId);
     });
 
     it('should create a rejected item if the user has access to at least one of the scheduled surfaces', async () => {
-      const server = getServerWithMockedHeaders({
-        ...headers,
+      const headers = {
+        ...baseHeaders,
         groups: `group-1,${MozillaAccessGroup.NEW_TAB_CURATOR_DEDE}`,
-      });
+      };
 
-      await server.start();
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
-
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
 
       // Expect to see all the input data we supplied in the Approved Item
       // returned by the mutation
-      expect(result.data?.createRejectedCorpusItem).to.deep.include(input);
-
-      await server.stop();
+      expect(result.body.data?.createRejectedCorpusItem).to.deep.include(input);
     });
 
     it('should fail to create a rejected item with a duplicate URL', async () => {
@@ -161,19 +179,24 @@ describe('mutations: RejectedItem', () => {
       });
 
       // Attempt to create another item with the same URL
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
       // ...without success. There is no data
-      expect(result.errors).not.to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // And there is the correct error from the resolvers
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors?.[0].message).to.contain(
         `A rejected item with the URL "${input.url}" already exists.`
       );
-      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'BAD_USER_INPUT'
+      );
 
       // Check that the REJECT_ITEM event was not fired
       expect(eventTracker.callCount).to.equal(0);
@@ -191,113 +214,120 @@ describe('mutations: RejectedItem', () => {
       });
 
       // Attempt to create another item with the same URL
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
       // ...without success. There is no data
-      expect(result.errors).not.to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
 
       // And there is the correct error from the resolvers
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors?.[0].message).to.contain(
         `An approved item with the URL "${input.url}" already exists.`
       );
-      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'BAD_USER_INPUT'
+      );
 
       // Check that the REJECT_ITEM event was not fired
       expect(eventTracker.callCount).to.equal(0);
     });
 
     it('should throw an error if user has read-only access', async () => {
-      const server = getServerWithMockedHeaders({
-        ...headers,
-        groups: MozillaAccessGroup.READONLY,
-      });
+      const headers = { ...baseHeaders, groups: MozillaAccessGroup.READONLY };
 
-      await server.start();
-
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
       // ...without success. There is no data
-      expect(result.data).to.be.null;
+      expect(result.body.data).to.be.null;
 
-      expect(result.errors).not.to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
       // And there is an access denied error
-      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
+      expect(result.body.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
     });
 
     it('should throw an error if the user does not have any scheduled surface access', async () => {
-      const server = getServerWithMockedHeaders({
-        ...headers,
+      const headers = {
+        ...baseHeaders,
         groups: 'group-1, group-2',
-      });
+      };
 
-      await server.start();
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
+      expect(result.body.data).to.be.null;
 
-      expect(result.data).to.be.null;
-
-      expect(result.errors).not.to.be.null;
-      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
+      expect(result.body.errors).to.not.be.undefined;
+      expect(result.body.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
     });
 
     it('should throw an error if the request header groups are undefined', async () => {
-      const server = getServerWithMockedHeaders({
-        ...headers,
-        groups: undefined,
-      });
+      // destructure groups to remove it from baseHeaders
+      const { groups, ...headers } = {
+        ...baseHeaders,
+      };
+      // expect whatever to avoid unused eslint error
+      expect(groups).to.exist;
 
-      await server.start();
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
+      expect(result.body.data).to.be.null;
 
-      expect(result.data).to.be.null;
-
-      expect(result.errors).not.to.be.null;
-      expect(result.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
-
-      await server.stop();
+      expect(result.body.errors).to.not.be.undefined;
+      expect(result.body.errors?.[0].message).to.contain(ACCESS_DENIED_ERROR);
     });
 
     it('should succeed with spaces in rejection reasons', async () => {
       input.reason = ' MISINFORMATION, OTHER ';
 
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.errors).to.be.undefined;
-      expect(result.data).not.to.be.null;
+      expect(result.body.errors).to.be.undefined;
+      expect(result.body.data).to.not.be.null;
     });
 
     it('should fail when given an invalid rejection reason', async () => {
       input.reason = 'BADFONT';
 
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.errors).not.to.be.undefined;
-      expect(result.data).to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
+      expect(result.body.data).to.be.null;
 
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors?.[0].message).to.contain(
         ` is not a valid rejection reason.`
       );
     });
@@ -305,15 +335,18 @@ describe('mutations: RejectedItem', () => {
     it('should fail when given invalid rejection reasons', async () => {
       input.reason = 'BADFONT,BORINGCOLORS';
 
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.errors).not.to.be.undefined;
-      expect(result.data).to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
+      expect(result.body.data).to.be.null;
 
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors?.[0].message).to.contain(
         ` is not a valid rejection reason.`
       );
     });
@@ -321,15 +354,18 @@ describe('mutations: RejectedItem', () => {
     it('should fail when given valid and invalid rejection reasons', async () => {
       input.reason = 'MISINFORMATION,IDONTLIKEIT';
 
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.errors).not.to.be.undefined;
-      expect(result.data).to.be.null;
+      expect(result.body.errors).to.not.be.undefined;
+      expect(result.body.data).to.be.null;
 
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors?.[0].message).to.contain(
         ` is not a valid rejection reason.`
       );
     });
@@ -337,16 +373,21 @@ describe('mutations: RejectedItem', () => {
     it('should fail if language code is outside of allowed values', async () => {
       input.language = 'ZZ';
 
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.errors).not.to.be.undefined;
-      expect(result.data).to.be.oneOf([null, undefined]);
+      expect(result.body.errors).to.not.be.undefined;
+      expect(result.body.data).to.be.undefined;
 
-      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'BAD_USER_INPUT'
+      );
+      expect(result.body.errors?.[0].message).to.contain(
         'does not exist in "CorpusLanguage" enum.'
       );
     });
@@ -354,17 +395,102 @@ describe('mutations: RejectedItem', () => {
     it('should fail if language code is correct but not in upper case', async () => {
       input.language = 'de';
 
-      const result = await server.executeOperation({
-        query: CREATE_REJECTED_ITEM,
-        variables: { data: input },
-      });
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
 
-      expect(result.errors).not.to.be.undefined;
-      expect(result.data).to.be.oneOf([null, undefined]);
-      expect(result.errors?.[0].extensions?.code).to.equal('BAD_USER_INPUT');
-      expect(result.errors?.[0].message).to.contain(
+      expect(result.body.errors).to.not.be.undefined;
+      expect(result.body.data).to.be.undefined;
+      expect(result.body.errors?.[0].extensions?.code).to.equal(
+        'BAD_USER_INPUT'
+      );
+      expect(result.body.errors?.[0].message).to.contain(
         'does not exist in "CorpusLanguage" enum.'
       );
+    });
+
+    it('should succeed if language code (English) is correct and upper case', async () => {
+      input.language = 'EN';
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(result.body.errors).to.be.undefined;
+      const data = result.body.data;
+      expect(data.createRejectedCorpusItem.language).to.equal('EN');
+    });
+
+    it('should succeed if language code (Deutsch) is correct and upper case', async () => {
+      input.language = 'DE';
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(result.body.errors).to.be.undefined;
+      const data = result.body.data;
+      expect(data.createRejectedCorpusItem.language).to.equal('DE');
+    });
+
+    it('should succeed if language code (Italian) is correct and upper case', async () => {
+      input.language = 'IT';
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(result.body.errors).to.be.undefined;
+      const data = result.body.data;
+      expect(data.createRejectedCorpusItem.language).to.equal('IT');
+    });
+
+    it('should succeed if language code (Spanish) is correct and upper case', async () => {
+      input.language = 'ES';
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(result.body.errors).to.be.undefined;
+      const data = result.body.data;
+      expect(data.createRejectedCorpusItem.language).to.equal('ES');
+    });
+
+    it('should succeed if language code (French) is correct and upper case', async () => {
+      input.language = 'FR';
+
+      const result = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(CREATE_REJECTED_ITEM),
+          variables: { data: input },
+        });
+      // Good to check for any errors before proceeding with the rest of the test
+      expect(result.body.errors).to.be.undefined;
+      const data = result.body.data;
+      expect(data.createRejectedCorpusItem.language).to.equal('FR');
     });
   });
 });
