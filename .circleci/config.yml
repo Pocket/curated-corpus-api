@@ -1,13 +1,13 @@
 version: 2.1
 
 orbs:
-  aws-ecs: circleci/aws-ecs@2.2.1
-  pocket: pocket/circleci-orbs@1.2.8
+  aws-ecs: circleci/aws-ecs@3.2.0
+  pocket: pocket/circleci-orbs@2.1.1
 
 parameters:
   cache-version:
     default: node-v2
-    description: "Version prefix for the cache name, primarily for node_modules caching in this pipeline."
+    description: 'Version prefix for the cache name, primarily for node_modules caching in this pipeline.'
     type: string
 
 # Workflow shortcuts
@@ -52,7 +52,7 @@ only_dev: &only_dev
 jobs:
   apollo:
     docker:
-      - image: node:16@sha256:27fab5920246070cf13449cf44c25bc4f5adef18ca7482b2bda90b7cf9e64481
+      - image: cimg/node:16.20
     steps:
       - checkout
       - run:
@@ -108,26 +108,17 @@ jobs:
                   export APOLLO_KEY=$ADMIN_APOLLO_KEY
                   rover subgraph publish pocket-admin-api@development --schema ./schema-admin-api.graphql --routing-url https://curated-corpus-api.getpocket.dev/admin --name=curated-corpus
 
-
   build:
     docker:
-      - image: node:16@sha256:27fab5920246070cf13449cf44c25bc4f5adef18ca7482b2bda90b7cf9e64481
+      - image: cimg/node:16.20
     steps:
       - checkout
       # Define the working directory for this job
       - attach_workspace:
           at: /tmp/workspace
-      - restore_cache:
-          keys:
-            - <<pipeline.parameters.cache-version>>-{{ checksum "package-lock.json" }}-{{ checksum "prisma/schema.prisma" }}
       - run:
           name: install node modules
           command: npm ci
-      # Save the cache to avoid extraneous downloads
-      - save_cache:
-          key: <<pipeline.parameters.cache-version>>-{{ checksum "package-lock.json" }}-{{ checksum "prisma/schema.prisma" }}
-          paths:
-            - ./node_modules
       - run:
           name: generate prisma client
           command: npm run db:generate-client
@@ -155,7 +146,7 @@ jobs:
         description: 'Integration tests'
         type: string
     docker:
-      - image: node:16@sha256:27fab5920246070cf13449cf44c25bc4f5adef18ca7482b2bda90b7cf9e64481
+      - image: cimg/node:16.20
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -163,7 +154,7 @@ jobs:
           NODE_ENV: test
           AWS_XRAY_LOG_LEVEL: silent
           AWS_XRAY_CONTEXT_MISSING: LOG_ERROR
-      - image: mysql:5.7@sha256:8cf035b14977b26f4a47d98e85949a7dd35e641f88fc24aa4b466b36beecf9d6
+      - image: cimg/mysql:5.7.38
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -188,17 +179,9 @@ jobs:
           password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - <<pipeline.parameters.cache-version>>-{{ checksum "package-lock.json" }}-{{ checksum "prisma/schema.prisma" }}
       - run:
           name: install node modules
           command: npm ci
-      # Save the cache to avoid extraneous downloads
-      - save_cache:
-          key: <<pipeline.parameters.cache-version>>-{{ checksum "package-lock.json" }}-{{ checksum "prisma/schema.prisma" }}
-          paths:
-            - ./node_modules
       - run:
           name: run setup.sh
           command: |
@@ -210,7 +193,6 @@ jobs:
             npm run migrate:reset -- --skip-seed --force
             ./node_modules/.bin/prisma --version
             << parameters.command >>
-
 
 workflows:
   all:
