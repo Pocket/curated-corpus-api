@@ -74,7 +74,7 @@
     "node-fetch": "2.6.9"
   },
   "devDependencies": {
-    "@faker-js/faker": "6.3.1",
+    "@faker-js/faker": "7.6.0",
     "@pocket-tools/eslint-config": "2.0.0",
     "@pocket-tools/tsconfig": "2.0.1",
     "@types/chai": "4.3.4",
