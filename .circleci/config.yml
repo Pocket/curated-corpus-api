@@ -61,7 +61,7 @@ slack-fail-post-step: &slack-fail-post-step
 jobs:
   apollo:
     docker:
-      - image: cimg/node:16.20
+      - image: cimg/node:16.20.0@sha256:10e49cc973bde5ab9c4143a445fb204bdb00d8b2c335698fd36491e72f830f2c
     steps:
       - checkout
       - run:
@@ -119,7 +119,7 @@ jobs:
 
   build:
     docker:
-      - image: cimg/node:16.20
+      - image: cimg/node:16.20.0@sha256:10e49cc973bde5ab9c4143a445fb204bdb00d8b2c335698fd36491e72f830f2c
     steps:
       - checkout
       # Define the working directory for this job
@@ -155,7 +155,7 @@ jobs:
         description: 'Integration tests'
         type: string
     docker:
-      - image: cimg/node:16.20
+      - image: cimg/node:16.20.0@sha256:10e49cc973bde5ab9c4143a445fb204bdb00d8b2c335698fd36491e72f830f2c
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
