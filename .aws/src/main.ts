@@ -5,11 +5,12 @@ import {
   RemoteBackend,
   TerraformStack,
 } from 'cdktf';
-import { AwsProvider } from '@cdktf/provider-aws';
-import {
-  DataAwsCallerIdentity,
-  DataAwsRegion,
-} from '@cdktf/provider-aws/lib/datasources';
+import { AwsProvider } from '@cdktf/provider-aws/lib/provider';
+import { PagerdutyProvider } from '@cdktf/provider-pagerduty/lib/provider';
+import { LocalProvider } from '@cdktf/provider-local/lib/provider';
+import { NullProvider } from '@cdktf/provider-null/lib/provider';
+import { DataAwsRegion } from '@cdktf/provider-aws/lib/data-aws-region';
+import { DataAwsCallerIdentity } from '@cdktf/provider-aws/lib/data-aws-caller-identity';
 import { config } from './config';
 import {
   ApplicationRDSCluster,
@@ -18,12 +19,9 @@ import {
   PocketPagerDuty,
   PocketVPC,
 } from '@pocket-tools/terraform-modules';
-import { PagerdutyProvider } from '@cdktf/provider-pagerduty';
-import { LocalProvider } from '@cdktf/provider-local';
-import { NullProvider } from '@cdktf/provider-null';
-import { DataAwsSnsTopic } from '@cdktf/provider-aws/lib/sns';
-import { DataAwsKmsAlias } from '@cdktf/provider-aws/lib/kms';
-import { S3Bucket } from '@cdktf/provider-aws/lib/s3';
+import { DataAwsSnsTopic } from '@cdktf/provider-aws/lib/data-aws-sns-topic';
+import { DataAwsKmsAlias } from '@cdktf/provider-aws/lib/data-aws-kms-alias';
+import { S3Bucket } from '@cdktf/provider-aws/lib/s3-bucket';
 
 class CuratedCorpusAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
