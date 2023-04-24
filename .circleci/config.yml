@@ -163,7 +163,7 @@ jobs:
           NODE_ENV: test
           AWS_XRAY_LOG_LEVEL: silent
           AWS_XRAY_CONTEXT_MISSING: LOG_ERROR
-      - image: cimg/mysql:5.7.38
+      - image: cimg/mysql:8.0.28@sha256:ac7d14096f9bac9558797e0df5e0c069e21143baff8666784415a545e3b6e8c9
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
