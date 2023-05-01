@@ -15,7 +15,7 @@ services:
     depends_on:
       - mysql
       - localstack
-      # - snowplow
+      - snowplow
 
   mysql:
     image: mysql:5.7@sha256:f57eef421000aaf8332a91ab0b6c96b3c83ed2a981c29e6528b21ce10197cd16
@@ -65,10 +65,10 @@ services:
     depends_on:
       - mysql
       - localstack
-      # - snowplow
+      - snowplow
 
-  # snowplow:
-  #   image: pocket/snowplow-micro:latest
-  #   platform: linux/amd64
-  #   ports:
-  #     - '9090:9090'
+  snowplow:
+    image: pocket/snowplow-micro:latest
+    platform: linux/amd64
+    ports:
+      - '9090:9090'
