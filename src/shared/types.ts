@@ -112,7 +112,6 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
       ProspectType.COUNTS,
       ProspectType.TIMESPENT,
       ProspectType.RECOMMENDED,
-      ProspectType.TITLE_URL_MODELED,
       ProspectType.DISMISSED,
     ],
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ENINTL,
