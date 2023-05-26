@@ -50,7 +50,7 @@ services:
       - HOSTNAME_EXTERNAL=localstack
 
   app:
-    image: node:18@sha256:d9946ebbeb3ca08ccaa24a8220d7da1f9e9fd749d489913faeed89e02f70a202
+    image: node:18@sha256:468ce1d592311c66820e29954d878ba9ce4aa03f9e621a18dca17215c00c5f26
     platform: linux/amd64
     env_file:
       - .docker/local.env
