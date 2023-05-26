@@ -45,7 +45,7 @@ export async function createApprovedItemHelper(
   const authors: ApprovedItemAuthor[] = [];
 
   for (let i = 0; i < authorCount; i++) {
-    authors.push({ name: faker.name.findName(), sortOrder: i });
+    authors.push({ name: faker.name.fullName(), sortOrder: i });
   }
 
   // defaults for optional properties
@@ -64,7 +64,7 @@ export async function createApprovedItemHelper(
       CuratedStatus.CORPUS,
     ]),
     language: faker.helpers.arrayElement(['EN', 'DE']),
-    publisher: faker.company.companyName(),
+    publisher: faker.company.name(),
     imageUrl: faker.helpers.arrayElement([
       `${faker.image.nature()}?random=${random}`,
       `${faker.image.city()}?random=${random}`,
@@ -99,7 +99,7 @@ export async function createApprovedItemHelper(
     isTimeSensitive: faker.datatype.boolean(),
     isSyndicated: faker.datatype.boolean(),
     createdAt: faker.date.recent(14),
-    createdBy: faker.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
+    createdBy: faker.helpers.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
     // occasionally, this may create an item that was updated before it was created. It's ok though,
     // we're only setting this so that orderBy in queries can be tested.
     updatedAt: faker.date.recent(7),
