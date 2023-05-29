@@ -71,7 +71,7 @@
     "graphql-tag": "2.12.6",
     "graphql-upload": "15.0.2",
     "luxon": "3.3.0",
-    "node-fetch": "2.6.9"
+    "node-fetch": "2.6.11"
   },
   "devDependencies": {
     "@faker-js/faker": "7.6.0",
