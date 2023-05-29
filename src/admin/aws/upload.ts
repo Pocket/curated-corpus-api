@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import mime from 'mime-types';
-import { S3 } from 'aws-sdk';
+import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+
 import config from '../../config';
 import Upload from 'graphql-upload/Upload.js';
 import { ApprovedItemS3ImageUrl } from '../../shared/types';
@@ -18,18 +19,18 @@ export async function uploadImageToS3(
   const stream = createReadStream();
   const key = `${uuidv4()}.${mime.extension(mimetype)}`;
 
-  const params: S3.Types.PutObjectRequest = {
+  const command = new PutObjectCommand({
     Bucket: config.aws.s3.bucket,
     Key: key,
     Body: stream,
     ContentType: mimetype,
     ACL: 'public-read',
-  };
+  });
 
-  const response = await s3.upload(params).promise();
+  await s3.send(command);
 
   return {
-    url: response.Location,
+    url: `https://${config.aws.s3.bucket}.s3.amazonaws.com/${key}`,
   };
 }
 

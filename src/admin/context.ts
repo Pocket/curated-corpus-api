@@ -1,4 +1,4 @@
-import { S3 } from 'aws-sdk';
+import { S3 } from '@aws-sdk/client-s3';
 import { IncomingHttpHeaders } from 'http';
 import Express from 'express';
 import { BaseContext } from '@apollo/server';
