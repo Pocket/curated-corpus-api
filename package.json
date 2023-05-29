@@ -75,7 +75,7 @@
   },
   "devDependencies": {
     "@aws-sdk/types": "^3.341.0",
-    "@faker-js/faker": "7.6.0",
+    "@faker-js/faker": "^8.0.2",
     "@pocket-tools/eslint-config": "2.0.0",
     "@pocket-tools/tsconfig": "2.0.1",
     "@types/chai": "4.3.5",
