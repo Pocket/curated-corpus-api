@@ -11,7 +11,7 @@ import {
   AuthenticationError,
   UserInputError,
 } from '@pocket-tools/apollo-utils';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { NotFoundError } from '@pocket-tools/apollo-utils';
 import { IAdminContext } from '../../context';
 

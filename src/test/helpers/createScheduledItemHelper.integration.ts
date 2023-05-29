@@ -45,7 +45,7 @@ describe('createScheduledItemHelper', () => {
 
   it('should create a scheduled item with all properties supplied', async () => {
     const data: CreateScheduledItemHelperInput = {
-      createdBy: faker.fake('auth-provider|test@example.com'),
+      createdBy: faker.helpers.fake('auth-provider|test@example.com'),
       scheduledDate: '2022-01-01T00:00:00.000Z',
       approvedItem,
       scheduledSurfaceGuid: scheduledSurfaceGuid,

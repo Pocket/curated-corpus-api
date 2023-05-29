@@ -8,18 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Verdict from one of the curators on a prospect
-enum CuratedStatus {
-  RECOMMENDATION
-  CORPUS
-}
-
-enum CuratedItemSource {
-  PROSPECT
-  MANUAL
-  BACKFILL
-}
-
 model ApprovedItemAuthor {
   externalId     String       @id @default(uuid()) @db.VarChar(255)
   name           String       @db.VarChar(255)
@@ -30,80 +18,67 @@ model ApprovedItemAuthor {
   @@index([approvedItemId])
 }
 
-// A prospect that is deemed good enough for saving in the corpus
-// and (optionally) making it to a Scheduled Surface.
 model ApprovedItem {
-  // fields
   id              Int                  @id @default(autoincrement())
-  externalId      String               @default(uuid()) @db.VarChar(255)
-  prospectId      String?              @db.VarChar(255)
-  url             String               @db.VarChar(500)
+  externalId      String               @unique @default(uuid()) @db.VarChar(255)
+  url             String               @unique @db.VarChar(500)
   title           String               @db.VarChar(255)
   excerpt         String               @db.Text
-  authors         ApprovedItemAuthor[]
   status          CuratedStatus        @default(CORPUS)
   language        String               @db.VarChar(2)
   publisher       String               @db.VarChar(255)
   imageUrl        String               @db.VarChar(500)
   topic           String?              @db.VarChar(255)
-  source          CuratedItemSource?
   isCollection    Boolean              @default(false)
-  isTimeSensitive Boolean              @default(false)
   isSyndicated    Boolean              @default(false)
   createdAt       DateTime             @default(now())
   createdBy       String               @db.VarChar(255)
   updatedAt       DateTime             @updatedAt
   updatedBy       String?              @db.VarChar(255)
-
-  // associated models
-  scheduledItems ScheduledItem[]
-
-  // indexes
-  @@unique([externalId])
-  @@unique([url])
+  prospectId      String?              @db.VarChar(255)
+  isTimeSensitive Boolean              @default(false)
+  source          CuratedItemSource?
+  authors         ApprovedItemAuthor[]
+  scheduledItems  ScheduledItem[]
 }
 
 model RejectedCuratedCorpusItem {
-  // fields
   id         Int      @id @default(autoincrement())
-  externalId String   @default(uuid()) @db.VarChar(255)
-  prospectId String?  @db.VarChar(255)
-  url        String   @db.VarChar(500)
+  externalId String   @unique @default(uuid()) @db.VarChar(255)
+  url        String   @unique @db.VarChar(500)
   title      String?  @db.VarChar(255)
-  topic      String?   @db.VarChar(255)
+  topic      String?  @db.VarChar(255)
   language   String?  @db.VarChar(2)
   publisher  String?  @db.VarChar(255)
-  // Can be multiple reasons. For the MVP, Snowplow and the frontend
-  // will be the only consumers of this data.
-  // Will be likely stored either as comma-separated values or JSON.
   reason     String   @db.VarChar(255)
   createdAt  DateTime @default(now())
   createdBy  String   @db.VarChar(255)
-
-  // indexes
-  @@unique([externalId])
-  @@unique([url])
+  prospectId String?  @db.VarChar(255)
 }
 
-// A curated item that's been scheduled to go on to one or more Scheduled Surfaces
 model ScheduledItem {
-  // fields
-  id                   Int      @id @default(autoincrement())
-  externalId           String   @default(uuid()) @db.VarChar(255)
+  id                   Int          @id @default(autoincrement())
+  externalId           String       @unique @default(uuid()) @db.VarChar(255)
   approvedItemId       Int
-  scheduledSurfaceGuid String   @db.VarChar(50)
-  createdAt            DateTime @default(now())
-  createdBy            String   @db.VarChar(255)
-  updatedAt            DateTime @updatedAt
-  updatedBy            String?  @db.VarChar(255)
-  scheduledDate        DateTime @db.Date
+  createdAt            DateTime     @default(now())
+  createdBy            String       @db.VarChar(255)
+  updatedAt            DateTime     @updatedAt
+  updatedBy            String?      @db.VarChar(255)
+  scheduledDate        DateTime     @db.Date
+  scheduledSurfaceGuid String       @db.VarChar(50)
+  approvedItem         ApprovedItem @relation(fields: [approvedItemId], references: [id])
 
-  // associated entities
-  approvedItem ApprovedItem @relation(fields: [approvedItemId], references: [id])
-
-  // indexes
-  // Prevent scheduling the same item on the same Scheduled Surface for the same day multiple times.
-  @@unique([externalId])
   @@unique([approvedItemId, scheduledSurfaceGuid, scheduledDate], name: "ItemScheduledSurfaceDate")
   @@index([scheduledSurfaceGuid])
+}
+
+enum CuratedStatus {
+  RECOMMENDATION
+  CORPUS
+}
+
+enum CuratedItemSource {
+  PROSPECT
+  MANUAL
+  BACKFILL
 }

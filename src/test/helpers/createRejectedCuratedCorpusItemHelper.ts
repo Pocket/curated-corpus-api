@@ -39,10 +39,10 @@ export async function createRejectedCuratedCorpusItemHelper(
     url: faker.internet.url(),
     topic: faker.lorem.words(2),
     language: faker.helpers.arrayElement(['EN', 'DE']),
-    publisher: faker.company.companyName(),
+    publisher: faker.company.name(),
     reason: faker.lorem.word(),
     createdAt: faker.date.recent(14),
-    createdBy: faker.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
+    createdBy: faker.helpers.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
   };
 
   const inputs: Prisma.RejectedCuratedCorpusItemCreateInput = {
