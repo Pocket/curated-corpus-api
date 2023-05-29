@@ -30,7 +30,7 @@ export async function uploadImageToS3(
   await s3.send(command);
 
   return {
-    url: `https://${config.aws.s3.bucket}.s3.amazonaws.com/${key}`,
+    url: `${config.aws.s3.path}${key}`,
   };
 }
 

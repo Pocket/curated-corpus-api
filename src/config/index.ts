@@ -6,8 +6,15 @@ import {
 // Work out the AWS/localstack endpoint
 const awsEnvironments = ['production', 'development'];
 let localEndpoint;
+let s3path;
+
+const bucket = process.env.AWS_S3_BUCKET || 'curated-corpus-api-local-images';
+
 if (!awsEnvironments.includes(process.env.NODE_ENV ?? '')) {
   localEndpoint = process.env.AWS_S3_ENDPOINT || 'http://localhost:4566';
+  s3path = `${localEndpoint}/${bucket}/`;
+} else {
+  s3path = `https://${bucket}.s3.amazonaws.com/`;
 }
 
 // Work out the Snowplow HTTP protocol.
@@ -35,7 +42,8 @@ export default {
     endpoint: localEndpoint,
     s3: {
       localEndpoint,
-      bucket: process.env.AWS_S3_BUCKET || 'curated-corpus-api-local-images',
+      bucket,
+      path: s3path,
     },
     eventBus: {
       name: process.env.EVENT_BUS_NAME || 'default',
