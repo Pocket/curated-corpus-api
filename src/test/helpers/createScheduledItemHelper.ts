@@ -35,11 +35,11 @@ export async function createScheduledItemHelper(
 ): Promise<ScheduledItem> {
   // defaults for optional properties
   const creatScheduledItemDefaults = {
-    createdAt: faker.date.recent(14),
+    createdAt: faker.date.recent({ days: 14 }),
     createdBy: faker.helpers.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
     scheduledDate: faker.helpers.arrayElement([
-      faker.date.soon(7).toISOString(),
-      faker.date.recent(7).toISOString(),
+      faker.date.soon({ days: 7 }).toISOString(),
+      faker.date.recent({ days: 7 }).toISOString(),
     ]),
     scheduledSurfaceGuid: 'NEW_TAB_EN_US',
   };
