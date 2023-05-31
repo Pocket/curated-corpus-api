@@ -63,14 +63,7 @@ class CuratedCorpusAPI extends TerraformStack {
       prefix: config.prefix,
       query: [
         {
-          // New Tab relies upon scheduledSurface query
-          endpoint: config.domain,
-          data: '{"query": "query {scheduledSurface(id: \\"NEW_TAB_EN_US\\"){id}}"}',
-          jmespath: 'data.scheduledSurface.id',
-          response: 'NEW_TAB_EN_US',
-        },
-        {
-          // New Tab also relies upon corpusItem resolution
+          // New Tab relies upon scheduledSurface query & upon corpusItem resolution
           endpoint: config.domain,
           data: '{"query": "query { scheduledSurface(id: \\"NEW_TAB_EN_US\\") {items(date: \\"2023-05-30\\") {corpusItem {id, url}}}}"}',
           jmespath:
