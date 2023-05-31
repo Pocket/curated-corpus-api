@@ -15,6 +15,7 @@ import { config } from './config';
 import {
   ApplicationRDSCluster,
   PocketALBApplication,
+  PocketAwsSyntheticChecks,
   PocketECSCodePipeline,
   PocketPagerDuty,
   PocketVPC,
@@ -28,10 +29,9 @@ class CuratedCorpusAPI extends TerraformStack {
     super(scope, name);
 
     new AwsProvider(this, 'aws', { region: 'us-east-1' });
-
-    new PagerdutyProvider(this, 'pagerduty_provider', { token: undefined });
     new LocalProvider(this, 'local_provider');
     new NullProvider(this, 'null_provider');
+    new PagerdutyProvider(this, 'pagerduty_provider', { token: undefined });
 
     new RemoteBackend(this, {
       hostname: 'app.terraform.io',
@@ -39,14 +39,15 @@ class CuratedCorpusAPI extends TerraformStack {
       workspaces: [{ prefix: `${config.name}-` }],
     });
 
-    const pocketVpc = new PocketVPC(this, 'pocket-vpc');
-    const region = new DataAwsRegion(this, 'region');
     const caller = new DataAwsCallerIdentity(this, 'caller');
+    const region = new DataAwsRegion(this, 'region');
+    const pocketVpc = new PocketVPC(this, 'pocket-vpc');
+    const curatedCorpusPagerduty = this.createPagerDuty();
 
     const pocketApp = this.createPocketAlbApplication({
       rds: this.createRds(pocketVpc),
       s3: this.createS3Bucket(),
-      pagerDuty: this.createPagerDuty(),
+      pagerDuty: curatedCorpusPagerduty,
       secretsManagerKmsAlias: this.getSecretsManagerKmsAlias(),
       snsTopic: this.getCodeDeploySnsTopic(),
       region,
@@ -54,6 +55,38 @@ class CuratedCorpusAPI extends TerraformStack {
     });
 
     this.createApplicationCodePipeline(pocketApp);
+
+    new PocketAwsSyntheticChecks(this, 'synthetics', {
+      // alarmTopicArn: config.environment === 'Prod' ? curatedCorpusPagerduty.snsCriticalAlarmTopic.arn : '', // this should be improved, empty string recreates updates constantly as is in cdktf
+      alarmTopicArn: '', // remove this line & uncomment above line when we're ready to alert on synchecks
+      environment: process.env.NODE_ENV === 'development' ? 'Dev' : 'Prod', // yes we should use config.environment, but needs more refinment in module
+      prefix: config.prefix,
+      query: [
+        {
+          endpoint: config.domain,
+          data: '{"query": "query {scheduledSurface(id: \\"NEW_TAB_EN_US\\"){id}}"}', // New Tab relies upon scheduledSurface query
+          jmespath: 'data.scheduledSurface.id',
+          response: 'NEW_TAB_EN_US',
+        },
+        {
+          endpoint: config.domain,
+          data: '{"query": "query { scheduledSurface(id: \\"NEW_TAB_EN_US\\") {items(date: \\"2023-05-30\\") {corpusItem {id, url}}}}"}', // New Tab also relies upon corpusItem resolution
+          jmespath:
+            'to_string(length(data.scheduledSurface.items[*].corpusItem.id))',
+          response: `${config.environment === 'Prod' ? '25' : '2'}`,
+        },
+      ],
+      securityGroupIds: pocketVpc.defaultSecurityGroups.ids,
+      shortName: config.shortName,
+      subnetIds: pocketVpc.privateSubnetIds,
+      tags: config.tags,
+      uptime: [
+        {
+          response: 'ok',
+          url: `${config.domain}/.well-known/apollo/server-health`, // is the express server up?
+        },
+      ],
+    });
   }
 
   /**
