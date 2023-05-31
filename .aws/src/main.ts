@@ -57,8 +57,10 @@ class CuratedCorpusAPI extends TerraformStack {
     this.createApplicationCodePipeline(pocketApp);
 
     new PocketAwsSyntheticChecks(this, 'synthetics', {
-      // alarmTopicArn: config.environment === 'Prod' ? curatedCorpusPagerduty.snsCriticalAlarmTopic.arn : '', // this should be improved, empty string recreates updates constantly as is in cdktf
-      alarmTopicArn: '', // remove this line & uncomment above line when we're ready to alert on synchecks
+      alarmTopicArn:
+        config.environment === 'Prod'
+          ? curatedCorpusPagerduty.snsCriticalAlarmTopic.arn
+          : '', // this should be improved, empty string recreates updates constantly as is in cdktf
       environment: process.env.NODE_ENV === 'development' ? 'Dev' : 'Prod', // yes we should use config.environment, but needs more refinment in module
       prefix: config.prefix,
       query: [
