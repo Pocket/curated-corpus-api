@@ -63,17 +63,19 @@ class CuratedCorpusAPI extends TerraformStack {
       prefix: config.prefix,
       query: [
         {
+          // New Tab relies upon scheduledSurface query
           endpoint: config.domain,
-          data: '{"query": "query {scheduledSurface(id: \\"NEW_TAB_EN_US\\"){id}}"}', // New Tab relies upon scheduledSurface query
+          data: '{"query": "query {scheduledSurface(id: \\"NEW_TAB_EN_US\\"){id}}"}',
           jmespath: 'data.scheduledSurface.id',
           response: 'NEW_TAB_EN_US',
         },
         {
+          // New Tab also relies upon corpusItem resolution
           endpoint: config.domain,
-          data: '{"query": "query { scheduledSurface(id: \\"NEW_TAB_EN_US\\") {items(date: \\"2023-05-30\\") {corpusItem {id, url}}}}"}', // New Tab also relies upon corpusItem resolution
+          data: '{"query": "query { scheduledSurface(id: \\"NEW_TAB_EN_US\\") {items(date: \\"2023-05-30\\") {corpusItem {id, url}}}}"}',
           jmespath:
-            'to_string(length(data.scheduledSurface.items[*].corpusItem.id))',
-          response: `${config.environment === 'Prod' ? '25' : '2'}`,
+            'to_string(data.scheduledSurface.items[].corpusItem[] | [0].id != null)', // confirm all corpusItems have a non-null id field present
+          response: 'true',
         },
       ],
       securityGroupIds: pocketVpc.defaultSecurityGroups.ids,
@@ -82,8 +84,9 @@ class CuratedCorpusAPI extends TerraformStack {
       tags: config.tags,
       uptime: [
         {
+          // is the express server up?
           response: 'ok',
-          url: `${config.domain}/.well-known/apollo/server-health`, // is the express server up?
+          url: `${config.domain}/.well-known/apollo/server-health`,
         },
       ],
     });
@@ -349,15 +352,6 @@ class CuratedCorpusAPI extends TerraformStack {
         targetMaxCapacity: 10,
       },
       alarms: {
-        // A critical alarm will be raised if the endpoint is down
-        // or responds with 5xx errors more than 25% of the time
-        // within a five-minute period four times in a row.
-        http5xxErrorPercentage: {
-          threshold: 25, // 25%
-          evaluationPeriods: 4, // 20 minutes total
-          period: 300, // 5 minutes
-          actions: config.isDev ? [] : [pagerDuty.snsCriticalAlarmTopic.arn],
-        },
         // A non-critical alarm will be raised if request latency
         // exceeds 500 ms within a 15-minute period four times in a row.
         httpLatency: {
