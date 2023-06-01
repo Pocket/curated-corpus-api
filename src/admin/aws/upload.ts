@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import mime from 'mime-types';
-import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 import config from '../../config';
 import Upload from 'graphql-upload/Upload.js';
@@ -12,7 +12,7 @@ import { getFileUploadFromUrl } from './utils';
  * @param image
  */
 export async function uploadImageToS3(
-  s3: S3,
+  s3: S3Client,
   image: Upload
 ): Promise<ApprovedItemS3ImageUrl> {
   const { mimetype, createReadStream } = image;
@@ -40,7 +40,7 @@ export async function uploadImageToS3(
  * @param url
  */
 export async function uploadImageToS3FromUrl(
-  s3: S3,
+  s3: S3Client,
   url: string
 ): Promise<ApprovedItemS3ImageUrl> {
   const image = await getFileUploadFromUrl(url);
