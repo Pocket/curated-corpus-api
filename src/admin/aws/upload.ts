@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import mime from 'mime-types';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { S3Client } from '@aws-sdk/client-s3';
+import { Upload as AWSUpload } from '@aws-sdk/lib-storage';
 
 import config from '../../config';
 import Upload from 'graphql-upload/Upload.js';
@@ -19,18 +20,27 @@ export async function uploadImageToS3(
   const stream = createReadStream();
   const key = `${uuidv4()}.${mime.extension(mimetype)}`;
 
-  const command = new PutObjectCommand({
-    Bucket: config.aws.s3.bucket,
-    Key: key,
-    Body: stream,
-    ContentType: mimetype,
-    ACL: 'public-read',
+  // The S3 client requires the ContentLength heading; going
+  // via their Upload utility negates the need for that when
+  // the file length is unknown.
+  const upload = new AWSUpload({
+    client: s3,
+    params: {
+      Bucket: config.aws.s3.bucket,
+      Key: key,
+      Body: stream,
+      ContentType: mimetype,
+      ACL: 'public-read',
+    },
   });
 
-  await s3.send(command);
+  const response = await upload.done();
 
   return {
-    url: `${config.aws.s3.path}${key}`,
+    url:
+      'Location' in response // optional return parameter
+        ? response.Location
+        : `${config.aws.s3.path}${key}`,
   };
 }
 

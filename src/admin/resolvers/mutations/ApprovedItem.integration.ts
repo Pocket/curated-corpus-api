@@ -5,7 +5,6 @@ import { PrismaClient } from '@prisma/client';
 import { client } from '../../../database/client';
 import FormData from 'form-data';
 
-import config from '../../../config';
 import { CuratedStatus } from '@prisma/client';
 import { expect } from 'chai';
 import sinon from 'sinon';
@@ -48,6 +47,7 @@ import { ImportApprovedCorpusItemInput } from '../types';
 import nock from 'nock';
 import { startServer } from '../../../express';
 import { IAdminContext } from '../../context';
+import { integrationTestsS3UrlPattern } from '../../aws/upload.integration';
 
 describe('mutations: ApprovedItem', () => {
   let app: Express.Application;
@@ -1069,15 +1069,10 @@ describe('mutations: ApprovedItem', () => {
         .set(headers)
         .send(body);
 
-      const urlPrefix = config.aws.s3.localEndpoint;
-      const urlPattern = new RegExp(
-        `^${urlPrefix}/${config.aws.s3.bucket}/.+.jpeg$`
-      );
-
       expect(result.body.errors).to.be.undefined;
       expect(result.body.data).to.have.keys('uploadApprovedCorpusItemImage');
       expect(result.body.data?.uploadApprovedCorpusItemImage.url).to.match(
-        urlPattern
+        integrationTestsS3UrlPattern
       );
     });
   });
@@ -1182,12 +1177,8 @@ describe('mutations: ApprovedItem', () => {
         result.body.data?.importApprovedCorpusItem.scheduledItem;
 
       // Check approvedItem
-      const urlPrefix = config.aws.s3.localEndpoint;
-      const urlPattern = new RegExp(
-        `^${urlPrefix}/${config.aws.s3.bucket}/.+.png$`
-      );
       expect(approvedItem.url).to.equal(input.url);
-      expect(approvedItem.imageUrl).to.match(urlPattern);
+      expect(approvedItem.imageUrl).to.match(integrationTestsS3UrlPattern);
       expect(approvedItem.externalId).to.not.be.null;
       expect(scheduledItem.externalId).to.not.be.null;
       expect(scheduledItem.scheduledSurfaceGuid).equals(
