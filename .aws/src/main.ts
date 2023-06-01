@@ -15,6 +15,7 @@ import { config } from './config';
 import {
   ApplicationRDSCluster,
   PocketALBApplication,
+  PocketAwsSyntheticChecks,
   PocketECSCodePipeline,
   PocketPagerDuty,
   PocketVPC,
@@ -28,10 +29,9 @@ class CuratedCorpusAPI extends TerraformStack {
     super(scope, name);
 
     new AwsProvider(this, 'aws', { region: 'us-east-1' });
-
-    new PagerdutyProvider(this, 'pagerduty_provider', { token: undefined });
     new LocalProvider(this, 'local_provider');
     new NullProvider(this, 'null_provider');
+    new PagerdutyProvider(this, 'pagerduty_provider', { token: undefined });
 
     new RemoteBackend(this, {
       hostname: 'app.terraform.io',
@@ -39,14 +39,15 @@ class CuratedCorpusAPI extends TerraformStack {
       workspaces: [{ prefix: `${config.name}-` }],
     });
 
-    const pocketVpc = new PocketVPC(this, 'pocket-vpc');
-    const region = new DataAwsRegion(this, 'region');
     const caller = new DataAwsCallerIdentity(this, 'caller');
+    const region = new DataAwsRegion(this, 'region');
+    const pocketVpc = new PocketVPC(this, 'pocket-vpc');
+    const curatedCorpusPagerduty = this.createPagerDuty();
 
     const pocketApp = this.createPocketAlbApplication({
       rds: this.createRds(pocketVpc),
       s3: this.createS3Bucket(),
-      pagerDuty: this.createPagerDuty(),
+      pagerDuty: curatedCorpusPagerduty,
       secretsManagerKmsAlias: this.getSecretsManagerKmsAlias(),
       snsTopic: this.getCodeDeploySnsTopic(),
       region,
@@ -54,6 +55,36 @@ class CuratedCorpusAPI extends TerraformStack {
     });
 
     this.createApplicationCodePipeline(pocketApp);
+
+    new PocketAwsSyntheticChecks(this, 'synthetics', {
+      alarmTopicArn:
+        config.environment === 'Prod'
+          ? curatedCorpusPagerduty.snsCriticalAlarmTopic.arn
+          : '', // this should be improved, empty string recreates updates constantly as is in cdktf
+      environment: process.env.NODE_ENV === 'development' ? 'Dev' : 'Prod', // yes we should use config.environment, but needs more refinment in module
+      prefix: config.prefix,
+      query: [
+        {
+          // New Tab relies upon scheduledSurface query & upon corpusItem resolution
+          endpoint: config.domain,
+          data: '{"query": "query { scheduledSurface(id: \\"NEW_TAB_EN_US\\") {items(date: \\"2023-05-30\\") {corpusItem {id, url}}}}"}',
+          jmespath:
+            'to_string(data.scheduledSurface.items[].corpusItem[] | [0].id != null)', // confirm all corpusItems have a non-null id field present
+          response: 'true',
+        },
+      ],
+      securityGroupIds: pocketVpc.defaultSecurityGroups.ids,
+      shortName: config.shortName,
+      subnetIds: pocketVpc.privateSubnetIds,
+      tags: config.tags,
+      uptime: [
+        {
+          // is the express server up?
+          response: 'ok',
+          url: `${config.domain}/.well-known/apollo/server-health`,
+        },
+      ],
+    });
   }
 
   /**
@@ -316,15 +347,6 @@ class CuratedCorpusAPI extends TerraformStack {
         targetMaxCapacity: 10,
       },
       alarms: {
-        // A critical alarm will be raised if the endpoint is down
-        // or responds with 5xx errors more than 25% of the time
-        // within a five-minute period four times in a row.
-        http5xxErrorPercentage: {
-          threshold: 25, // 25%
-          evaluationPeriods: 4, // 20 minutes total
-          period: 300, // 5 minutes
-          actions: config.isDev ? [] : [pagerDuty.snsCriticalAlarmTopic.arn],
-        },
         // A non-critical alarm will be raised if request latency
         // exceeds 500 ms within a 15-minute period four times in a row.
         httpLatency: {
