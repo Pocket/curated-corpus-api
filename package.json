@@ -75,7 +75,7 @@
     "@types/chai": "4.3.5",
     "@types/faker": "6.6.8",
     "@types/graphql-upload": "8.0.12",
-    "@types/jest": "29.5.1",
+    "@types/jest": "29.5.2",
     "@types/node": "18.16.16",
     "@types/sinon": "10.0.15",
     "chai": "4.3.7",
