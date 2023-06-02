@@ -35,13 +35,13 @@ export async function createRejectedCuratedCorpusItemHelper(
 ): Promise<RejectedCuratedCorpusItem> {
   // defaults for optional properties
   const createRejectedCuratedCorpusItemDefaults = {
-    prospectId: faker.datatype.uuid(),
+    prospectId: faker.string.uuid(),
     url: faker.internet.url(),
     topic: faker.lorem.words(2),
     language: faker.helpers.arrayElement(['EN', 'DE']),
     publisher: faker.company.name(),
     reason: faker.lorem.word(),
-    createdAt: faker.date.recent(14),
+    createdAt: faker.date.recent({ days: 14 }),
     createdBy: faker.helpers.fake('{{hacker.noun}}|{{internet.email}}'), // imitation auth0 user id
   };
 

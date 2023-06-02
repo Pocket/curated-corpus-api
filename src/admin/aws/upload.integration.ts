@@ -8,14 +8,16 @@ import { ApprovedItemS3ImageUrl } from '../../shared/types';
 
 const testFilePath = __dirname + '/test-image.jpeg';
 
+// Port is not used in CircleCI, so make it optional in the regex.
+// Also, AWS Upload turns the test file in CircleCI into a PNG.
+export const integrationTestsS3UrlPattern = new RegExp(
+  `^http://localstack(:4566)?/${config.aws.s3.bucket}/.+.(jpeg|png)$`
+);
+
 function expectSuccessfulUpload(upload: ApprovedItemS3ImageUrl) {
   // Check that the returned url matches the expected pattern
   // http://localstack:4566/curated-corpus-api-local-images/some-random-path.jpeg
-  const urlPrefix = config.aws.s3.localEndpoint;
-  const urlPattern = new RegExp(
-    `^${urlPrefix}/${config.aws.s3.bucket}/.+.jpeg$`
-  );
-  expect(upload.url).toMatch(urlPattern);
+  expect(upload.url).toMatch(integrationTestsS3UrlPattern);
 }
 
 describe('Upload', () => {

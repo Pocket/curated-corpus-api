@@ -50,7 +50,7 @@ describe('createApprovedItemHelper', () => {
       excerpt: faker.lorem.sentences(3),
       status: CuratedStatus.RECOMMENDATION,
       language: 'EN',
-      imageUrl: faker.image.imageUrl(),
+      imageUrl: faker.image.url(),
       createdBy: 'big-company|name.surname@example.com',
       topic: 'Business',
       source: CorpusItemSource.PROSPECT,
