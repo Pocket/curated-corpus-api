@@ -192,5 +192,8 @@ export type ApprovedItemS3ImageUrl = {
   url: string;
 };
 
+export type DescriptionTool = {
+  data: string;
+}
 export const ACCESS_DENIED_ERROR =
   'You do not have access to perform this action.';
