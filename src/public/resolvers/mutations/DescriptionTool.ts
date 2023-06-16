@@ -10,10 +10,9 @@ import getMetaData from 'metadata-scraper';
  */
 export async function mutateDescriptionTool(
   parent,
-  { data }
+  { input }
 ): Promise<DescriptionTool> {
-  const url = 'https://github.com/BetaHuhn/metadata-scraper';
-  const pageMetadata = await getMetaData(url);
+  const pageMetadata = await getMetaData(input.url);
   const result: DescriptionTool = {
     data: pageMetadata.description,
   };
