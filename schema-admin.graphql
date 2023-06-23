@@ -962,3 +962,14 @@ type CorpusItem @key(fields: "url") {
     """
     url: Url!
 }
+
+"""
+Tool to get OG description of URL that is not yet implemented in parser
+"""
+type Mutation {
+  requestOpenGraphFields(url: Url!): OpenGraphFields!
+}
+
+type OpenGraphFields {
+  description: String
+}
