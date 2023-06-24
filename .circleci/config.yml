@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   aws-ecs: circleci/aws-ecs@3.2.0
-  pocket: pocket/circleci-orbs@2.1.1
+  pocket: pocket/circleci-orbs@2.1.2
   slack: circleci/slack@4.1
 
 parameters:
