@@ -65,7 +65,7 @@
     "graphql-tag": "2.12.6",
     "graphql-upload": "15.0.2",
     "luxon": "3.3.0",
-    "node-fetch": "2.6.11"
+    "node-fetch": "2.6.12"
   },
   "devDependencies": {
     "@aws-sdk/types": "^3.341.0",
