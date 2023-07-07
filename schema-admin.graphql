@@ -948,6 +948,11 @@ type Mutation {
     Uploads an image to S3 for an Approved Item
     """
     uploadApprovedCorpusItemImage(data: Upload!): ApprovedCorpusImageUrl!
+
+    """
+    Tool to get OG description of URL that is not yet implemented in parser
+    """
+    requestOpenGraphFields(url: Url!): OpenGraphFields!
 }
 
 """
@@ -961,13 +966,6 @@ type CorpusItem @key(fields: "url") {
     The URL of the Approved Item.
     """
     url: Url!
-}
-
-"""
-Tool to get OG description of URL that is not yet implemented in parser
-"""
-type Mutation {
-  requestOpenGraphFields(url: Url!): OpenGraphFields!
 }
 
 type OpenGraphFields {
