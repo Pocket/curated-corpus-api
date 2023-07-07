@@ -8,7 +8,7 @@ import getMetaData from 'metadata-scraper';
  * @param context
  * @param db
  */
-export async function requestOpenGraphFields(
+export async function getOpenGraphFields(
   parent,
   { url }
 ): Promise<OpenGraphFields> {

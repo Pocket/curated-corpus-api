@@ -27,7 +27,7 @@ import {
   getApprovedItemByUrl as dbGetApprovedItemByUrl,
   getRejectedItemByUrl as dbGetRejectedItemByUrl,
 } from '../../database/queries';
-import { requestOpenGraphFields } from './mutations/OpenGraphFields';
+import { getOpenGraphFields } from './queries/OpenGraphFields';
 
 export const resolvers = {
   // The custom scalars from GraphQL-Scalars that we find useful.
@@ -89,10 +89,10 @@ export const resolvers = {
     getScheduledCorpusItems: getScheduledItems,
     getApprovedCorpusItemByUrl: getApprovedItemByUrl,
     getScheduledSurfacesForUser: getScheduledSurfacesForUser,
+    getOpenGraphFields: getOpenGraphFields,
   },
   // Mutations that we need in the admin interface
   Mutation: {
-    requestOpenGraphFields: requestOpenGraphFields,
     createApprovedCorpusItem: createApprovedItem,
     rejectApprovedCorpusItem: rejectApprovedItem,
     updateApprovedCorpusItem: updateApprovedItem,
