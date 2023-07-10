@@ -170,7 +170,7 @@ jobs:
         environment:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           TZ: 'UTC'
-      - image: localstack/localstack@sha256:154c89da5a860ad001510d8b32f9c6560b9893a82710b7f9f74daccb1df2e3a5
+      - image: localstack/localstack@sha256:cb7f798dcde643eba909b6b35d6c72f7d2b9dae3fa5a038cebcf0bcff90d47a6
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
