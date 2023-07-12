@@ -7,7 +7,9 @@ import { GET_OPEN_GRAPH_FIELDS } from './sample-queries.gql';
 import { MozillaAccessGroup } from '../../../shared/types';
 import { startServer } from '../../../express';
 import { IAdminContext } from '../../context';
-import express from 'express';
+import http from 'http';
+
+const WEB_SERVER_PORT = 1234;
 
 const getDummyPageWithOGDescription = (description) => {
   return (
@@ -20,45 +22,60 @@ const getDummyPageWithOGDescription = (description) => {
   );
 };
 
-const pagePath = '/testpage';
-const missingPagePath = '/missingPage';
-const hangingPagePath = '/hangingPage';
-const emptyPagePath = '/emptyPage';
+const pagePath = 'testpage';
+const missingPagePath = 'missingPage';
+const hangingPagePath = 'hangingPage';
+const emptyPagePath = 'emptyPage';
 
 const sampleDescriptionText = 'this is a test';
 
 const makeWebServer = () => {
-  const app = express();
-  app.get(pagePath, async (req, res) => {
-    res.status(200);
-    res.contentType('text/html; charset=utf-8');
-    res.send(getDummyPageWithOGDescription(sampleDescriptionText));
+  const host = 'localhost';
+  const port = WEB_SERVER_PORT;
+  const requestListener = async (req, res) => {
+    const pathComponent = req.url.split('/').slice(-1)[0];
+
+    if (pathComponent === pagePath) {
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(getDummyPageWithOGDescription(sampleDescriptionText));
+      return;
+    }
+    if (pathComponent === emptyPagePath) {
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end('');
+      return;
+    }
+    if (pathComponent === hangingPagePath) {
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      await new Promise((f) => setTimeout(f, 500000));
+      res.end(getDummyPageWithOGDescription(sampleDescriptionText));
+      return;
+    }
+    res.writeHead(404);
+    res.end();
+  };
+  const server = http.createServer(requestListener);
+  server.listen(port, host, () => {
+    console.log(`Test web server is running on http://${host}:${port}`);
   });
-  app.get(emptyPagePath, (req, res) => {
-    res.status(200);
-    res.contentType('text/html; charset=utf-8');
-    res.send('');
-  });
-  app.get(hangingPagePath, async (req, res) => {
-    res.status(200);
-    res.contentType('text/html; charset=utf-8');
-    await new Promise((f) => setTimeout(f, 500000));
-    res.send(getDummyPageWithOGDescription(sampleDescriptionText));
-  });
-  return app.listen(0); // finds open port
+  return server;
 };
+
 describe('queries: OpenGraphFields', () => {
   let app: Express.Application;
   let server: ApolloServer<IAdminContext>;
   let graphQLUrl: string;
+  let webServer;
 
   beforeAll(async () => {
     // port 0 tells express to dynamically assign an available port
     ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
+    webServer = makeWebServer();
   });
 
   afterAll(async () => {
     await server.stop();
+    await webServer.close();
   });
 
   const headers = {
@@ -70,19 +87,8 @@ describe('queries: OpenGraphFields', () => {
   describe('getOpenGraphFields query', () => {
     // Fake sample Rejected Curated Corpus items
 
-    let webServer;
-
-    beforeEach(async () => {
-      webServer = makeWebServer();
-    });
-
-    afterEach(async () => {
-      await webServer.close();
-    });
-
     it('should get OG data', async () => {
-      const serverInfo = webServer.address();
-      const serverURL = `http://localhost:${serverInfo.port}${pagePath}`;
+      const serverURL = `http://localhost:${WEB_SERVER_PORT}/${pagePath}`;
       const {
         body: { data },
       } = await request(app)
@@ -100,8 +106,24 @@ describe('queries: OpenGraphFields', () => {
     });
 
     it('missing page', async () => {
-      const serverInfo = webServer.address();
-      const serverURL = `http://localhost:${serverInfo.port}${missingPagePath}`;
+      const serverURL = `http://localhost:${WEB_SERVER_PORT}${missingPagePath}`;
+      const {
+        body: { data },
+      } = await request(app)
+        .post(graphQLUrl)
+        .set(headers)
+        .send({
+          query: print(GET_OPEN_GRAPH_FIELDS),
+          variables: {
+            url: serverURL,
+          },
+        });
+      expect(data?.getOpenGraphFields.description).to.be.undefined;
+    });
+
+
+    it('empty page', async () => {
+      const serverURL = `http://localhost:${WEB_SERVER_PORT}${emptyPagePath}`;
       const {
         body: { data },
       } = await request(app)
@@ -117,8 +139,7 @@ describe('queries: OpenGraphFields', () => {
     });
 
     it('hanging page', async () => {
-      const serverInfo = webServer.address();
-      const serverURL = `http://localhost:${serverInfo.port}${hangingPagePath}`;
+      const serverURL = `http://localhost:${WEB_SERVER_PORT}${hangingPagePath}`;
       const {
         body: { data },
       } = await request(app)
