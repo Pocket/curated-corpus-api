@@ -121,7 +121,6 @@ describe('queries: OpenGraphFields', () => {
       expect(data?.getOpenGraphFields.description).to.be.undefined;
     });
 
-
     it('empty page', async () => {
       const serverURL = `http://localhost:${WEB_SERVER_PORT}${emptyPagePath}`;
       const {
