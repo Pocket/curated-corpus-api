@@ -54,11 +54,7 @@ describe('queries: OpenGraphFields', () => {
 
   beforeAll(async () => {
     // port 0 tells express to dynamically assign an available port
-    ({
-      app,
-      adminServer: server,
-      adminUrl: graphQLUrl,
-    } = await startServer(0));
+    ({ app, adminServer: server, adminUrl: graphQLUrl } = await startServer(0));
   });
 
   afterAll(async () => {
