@@ -9,9 +9,10 @@ import getMetaData from 'metadata-scraper';
 export async function getOpenGraphFields(
   parent,
   { url }
-): Promise<OpenGraphFields> {
+): Promise<OpenGraphFields | null> {
   const pageMetadata = await getMetaData(url, { maxRedirects: 2, timeout: 5 });
+  if (!pageMetadata?.description) return null;
   return {
-    description: pageMetadata?.description || null,
+    description: pageMetadata.description,
   };
 }

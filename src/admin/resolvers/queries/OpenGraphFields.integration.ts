@@ -118,7 +118,7 @@ describe('queries: OpenGraphFields', () => {
             url: serverURL,
           },
         });
-      expect(data?.getOpenGraphFields.description).to.be.undefined;
+      expect(data?.getOpenGraphFields).to.be.null;
     });
 
     it('empty page', async () => {
@@ -134,7 +134,7 @@ describe('queries: OpenGraphFields', () => {
             url: serverURL,
           },
         });
-      expect(data?.getOpenGraphFields.description).to.be.undefined;
+      expect(data?.getOpenGraphFields).to.be.null;
     });
 
     it('hanging page', async () => {
@@ -150,7 +150,7 @@ describe('queries: OpenGraphFields', () => {
             url: serverURL,
           },
         });
-      expect(data?.getOpenGraphFields.description).to.be.undefined;
+      expect(data?.getOpenGraphFields).to.be.null;
     });
   });
 });

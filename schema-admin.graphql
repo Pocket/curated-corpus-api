@@ -881,7 +881,7 @@ type Query {
     """
     Tool to get OG description of URL that is not yet implemented in parser
     """
-    getOpenGraphFields(url: Url!): OpenGraphFields!
+    getOpenGraphFields(url: Url!): OpenGraphFields
 }
 
 type Mutation {
@@ -969,5 +969,5 @@ type CorpusItem @key(fields: "url") {
 }
 
 type OpenGraphFields {
-  description: String
+  description: String!
 }

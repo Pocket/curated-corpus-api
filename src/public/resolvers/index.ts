@@ -21,5 +21,5 @@ export const resolvers = {
   Query: {
     // Gets the metadata for a Scheduled Surface (for example, New Tab).
     scheduledSurface: getScheduledSurface,
-  }
+  },
 };
