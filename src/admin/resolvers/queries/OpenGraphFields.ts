@@ -10,7 +10,12 @@ export async function getOpenGraphFields(
   parent,
   { url }
 ): Promise<OpenGraphFields | null> {
-  const pageMetadata = await getMetaData(url, { maxRedirects: 2, timeout: 6000 });
+  let pageMetadata = null;
+  try {
+    pageMetadata = await getMetaData(url, { maxRedirects: 2, timeout: 6000 });
+  } catch (ex) {
+    // empty
+  }
   if (!pageMetadata?.description) return null;
   return {
     description: pageMetadata.description,
