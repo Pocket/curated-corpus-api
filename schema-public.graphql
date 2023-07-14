@@ -142,6 +142,7 @@ type SavedItem @key(fields: "url") {
     corpusItem: CorpusItem
 }
 
+
 # Commented out until RecsAPI implements the fields that lets us extend Recommendation
 #extend type Recommendation  @key(fields: "corpusItemId") {
 #    """
