@@ -172,3 +172,4 @@ There may come a time when you need to reset the Dev environment. For example, i
 Another common scenario is the need to reset all test data to the initial seed data provided by the seed script.
 
 To reset the Dev database, [follow the instructions in Confluence](https://getpocket.atlassian.net/wiki/spaces/PE/pages/2938273799/Resetting+Data+for+a+Prisma-based+Subgraph+on+Dev).
+

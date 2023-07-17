@@ -877,6 +877,11 @@ type Query {
     Retrieves all ScheduledSurfaces available to the given SSO user. Requires an Authorization header.
     """
     getScheduledSurfacesForUser: [ScheduledSurface!]!
+
+    """
+    Tool to get OG description of URL that is not yet implemented in parser
+    """
+    getOpenGraphFields(url: Url!): OpenGraphFields
 }
 
 type Mutation {
@@ -961,4 +966,8 @@ type CorpusItem @key(fields: "url") {
     The URL of the Approved Item.
     """
     url: Url!
+}
+
+type OpenGraphFields {
+  description: String!
 }

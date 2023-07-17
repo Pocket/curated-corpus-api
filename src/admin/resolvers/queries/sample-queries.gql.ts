@@ -143,3 +143,11 @@ export const REJECTED_ITEM_REFERENCE_RESOLVER = gql`
   }
   ${RejectedItemData}
 `;
+
+export const GET_OPEN_GRAPH_FIELDS = gql`
+  query GetOpenGraphFields($url: Url!) {
+    getOpenGraphFields(url: $url) {
+      description
+    }
+  }
+`;
