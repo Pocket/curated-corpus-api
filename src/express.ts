@@ -1,17 +1,20 @@
-import * as Sentry from '@sentry/node';
+import cors from 'cors';
 import express from 'express';
 import http from 'http';
-import cors from 'cors';
-import xrayExpress from 'aws-xray-sdk-express';
+
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 //See https://github.com/jaydenseric/graphql-upload/issues/305#issuecomment-1135285811 on why we do this
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
+import xrayExpress from 'aws-xray-sdk-express';
+import * as Sentry from '@sentry/node';
+
+import { client } from './database/client';
 import config from './config';
-import { getPublicContext, IPublicContext } from './public/context';
 import { getAdminContext, IAdminContext } from './admin/context';
-import { startPublicServer } from './public/server';
+import { getPublicContext, IPublicContext } from './public/context';
 import { startAdminServer } from './admin/server';
+import { startPublicServer } from './public/server';
 
 const serviceName = 'CurationCorpusAPI';
 
@@ -45,9 +48,17 @@ export async function startServer(port: number): Promise<{
     })
   );
 
-  // expose a health check url
-  app.get('/.well-known/apollo/server-health', (req, res) => {
-    res.status(200).send('ok');
+  // expose a health check url that makes sure the express app is up and the db
+  // is reachable
+  app.get('/.well-known/apollo/server-health', async (req, res) => {
+    try {
+      const db = client();
+      await db.$queryRaw`SELECT 1`;
+      res.status(200).send('ok');
+      return;
+    } catch (e) {
+      res.status(500).send('fail');
+    }
   });
 
   // set up admin server
