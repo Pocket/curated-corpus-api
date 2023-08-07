@@ -35,9 +35,6 @@ export async function startServer(port: number): Promise<{
   const app = express();
   const httpServer = http.createServer(app);
 
-  // // If there is no host header (really there always should be..) then use default name
-  // app.use(xrayExpress.openSegment(serviceName));
-
   app.use(
     // JSON parser to enable POST body with JSON
     express.json(),
@@ -87,9 +84,6 @@ export async function startServer(port: number): Promise<{
       context: getPublicContext,
     })
   );
-
-  // Make sure the express app has the xray close segment handler
-  // app.use(xrayExpress.closeSegment());
 
   await new Promise<void>((resolve) => httpServer.listen({ port }, resolve));
   return { app, adminServer, adminUrl, publicServer, publicUrl };
