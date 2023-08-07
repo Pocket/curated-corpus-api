@@ -9,7 +9,7 @@ import {
 } from '@aws-sdk/client-eventbridge';
 import { eventBusConfig } from './EventBusConfig';
 import * as Sentry from '@sentry/node';
-import { serverLogger} from '../../express';
+import { serverLogger } from '../../express';
 
 /**
  * This class listens to events emitted by the application. When the
