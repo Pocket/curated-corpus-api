@@ -3,6 +3,7 @@ import { Tracker } from '@snowplow/node-tracker';
 import { PayloadBuilder, SelfDescribingJson } from '@snowplow/tracker-core';
 
 import { CuratedCorpusEventEmitter } from '../curatedCorpusEventEmitter';
+import { serverLogger } from '../../express';
 
 export class CuratedCorpusSnowplowHandler {
   constructor(
@@ -32,7 +33,10 @@ export class CuratedCorpusSnowplowHandler {
       await this.tracker.track(event, context);
     } catch (ex) {
       const message = `Failed to send event to snowplow.\n event: ${event}\n context: ${context}`;
-      console.log(message);
+      serverLogger.error('sendEvent: Failed to send event to snowplow', {
+        event: event,
+        context: context,
+      });
       Sentry.addBreadcrumb({ message });
       Sentry.captureException(ex);
     }

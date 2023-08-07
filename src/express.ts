@@ -6,7 +6,6 @@ import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 //See https://github.com/jaydenseric/graphql-upload/issues/305#issuecomment-1135285811 on why we do this
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.js';
-import xrayExpress from 'aws-xray-sdk-express';
 import * as Sentry from '@sentry/node';
 
 import { client } from './database/client';
@@ -15,8 +14,9 @@ import { getAdminContext, IAdminContext } from './admin/context';
 import { getPublicContext, IPublicContext } from './public/context';
 import { startAdminServer } from './admin/server';
 import { startPublicServer } from './public/server';
+import { setLogger, setMorgan } from '@pocket-tools/ts-logger';
 
-const serviceName = 'CurationCorpusAPI';
+export const serverLogger = setLogger();
 
 export async function startServer(port: number): Promise<{
   app: Express.Application;
@@ -35,11 +35,14 @@ export async function startServer(port: number): Promise<{
   const app = express();
   const httpServer = http.createServer(app);
 
-  // If there is no host header (really there always should be..) then use default name
-  app.use(xrayExpress.openSegment(serviceName));
+  // // If there is no host header (really there always should be..) then use default name
+  // app.use(xrayExpress.openSegment(serviceName));
 
-  // JSON parser to enable POST body with JSON
-  app.use(express.json());
+  app.use(
+    // JSON parser to enable POST body with JSON
+    express.json(),
+    setMorgan(serverLogger)
+  );
 
   app.use(
     graphqlUploadExpress({
@@ -86,7 +89,7 @@ export async function startServer(port: number): Promise<{
   );
 
   // Make sure the express app has the xray close segment handler
-  app.use(xrayExpress.closeSegment());
+  // app.use(xrayExpress.closeSegment());
 
   await new Promise<void>((resolve) => httpServer.listen({ port }, resolve));
   return { app, adminServer, adminUrl, publicServer, publicUrl };

@@ -24,6 +24,7 @@ const snowplowHttpProtocol =
 // Environment variables below are set in .aws/src/main.ts
 export default {
   app: {
+    port: 4025,
     environment: process.env.NODE_ENV || 'development',
     defaultMaxAge: 86400,
     pagination: {
