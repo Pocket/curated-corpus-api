@@ -16,6 +16,7 @@ import {
 import config from '../../config';
 import { setTimeout } from 'timers/promises';
 import EventEmitter from 'events';
+import { serverLogger } from '../../express';
 
 /**
  * Mock event payload
@@ -61,7 +62,7 @@ describe('EventBusHandler', () => {
     .stub(EventBridgeClient.prototype, 'send')
     .resolves({ FailedEntryCount: 0 });
   const sentryStub = sandbox.stub(Sentry, 'captureException').resolves();
-  const consoleSpy = sandbox.spy(console, 'log');
+  const serverLoggerStub = sandbox.stub(serverLogger, 'error');
   const emitter = new CuratedCorpusEventEmitter();
   new EventBusHandler(emitter);
   const scheduledEventData: ScheduledCorpusItemPayload = {
@@ -109,7 +110,7 @@ describe('EventBusHandler', () => {
       // Wait just a tad in case promise needs time to resolve
       await setTimeout(100);
       expect(sentryStub.callCount).toBe(0);
-      expect(consoleSpy.callCount).toBe(0);
+      expect(serverLoggerStub.callCount).toBe(0);
       // Listener was registered on event
       expect(
         emitter.listeners(ReviewedCorpusItemEventType.UPDATE_ITEM).length
@@ -184,7 +185,7 @@ describe('EventBusHandler', () => {
         // Wait just a tad in case promise needs time to resolve
         await setTimeout(100);
         expect(sentryStub.callCount).toBe(0);
-        expect(consoleSpy.callCount).toBe(0);
+        expect(serverLoggerStub.callCount).toBe(0);
         // Listener was registered on event
         expect(emitter.listeners(emittedEvent).length).toBe(1);
         // Event was sent to Event Bus
@@ -219,9 +220,9 @@ describe('EventBusHandler', () => {
     expect(sentryStub.getCall(0).firstArg.message).toContain(
       `Failed to send event 'add-scheduled-item' to event bus`
     );
-    expect(consoleSpy.callCount).toBe(1);
-    expect(consoleSpy.getCall(0).firstArg.message).toContain(
-      `Failed to send event 'add-scheduled-item' to event bus`
+    expect(serverLoggerStub.callCount).toBe(1);
+    expect(serverLoggerStub.getCall(0).firstArg).toContain(
+      `sendEvent: Failed to send event to event bus`
     );
   });
 });

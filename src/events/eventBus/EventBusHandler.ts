@@ -9,6 +9,7 @@ import {
 } from '@aws-sdk/client-eventbridge';
 import { eventBusConfig } from './EventBusConfig';
 import * as Sentry from '@sentry/node';
+import { serverLogger } from '../../express';
 
 /**
  * This class listens to events emitted by the application. When the
@@ -67,7 +68,12 @@ export class EventBusHandler {
           // In the unlikely event that the payload generator throws an error,
           // log to Sentry and Cloudwatch but don't halt program
           Sentry.captureException(error);
-          console.log(error);
+          serverLogger.error(
+            'EventBusHandler: Failed to send event to event bus',
+            {
+              error,
+            }
+          );
         }
       });
     });
@@ -102,7 +108,10 @@ export class EventBusHandler {
       );
       // Don't halt program, but capture the failure in Sentry and Cloudwatch
       Sentry.captureException(failedEventError);
-      console.log(failedEventError);
+      serverLogger.error('sendEvent: Failed to send event to event bus', {
+        eventType: eventPayload.eventType,
+        payload: JSON.stringify(eventPayload),
+      });
     }
   }
 }

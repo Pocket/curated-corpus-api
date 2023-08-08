@@ -35,3 +35,6 @@ tmp
 
 # Build files
 dist
+
+# logs
+logs

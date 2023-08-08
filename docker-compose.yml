@@ -60,7 +60,7 @@ services:
     volumes:
       - ./:/app
     environment:
-      - NODE_ENV=local
+      - NODE_ENV=development
     command: "bash -c 'cd /app && npm ci && npm run start:dev'"
     depends_on:
       - mysql
