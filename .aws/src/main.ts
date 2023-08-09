@@ -130,8 +130,7 @@ class CuratedCorpusAPI extends TerraformStack {
       subnetIds: pocketVpc.privateSubnetIds,
       rdsConfig: {
         databaseName: 'curation_corpus',
-        // changed from pkt_curation_corpus to pkt_cur_corpus, see here: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_CreateDBInstance.html
-        masterUsername: 'pkt_cur_corpus',
+        masterUsername: 'pkt_curation_corpus',
         engine: 'aurora-mysql',
         engineMode: 'serverless',
         scalingConfiguration: {
