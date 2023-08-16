@@ -23,6 +23,7 @@ import {
 import { DataAwsSnsTopic } from '@cdktf/provider-aws/lib/data-aws-sns-topic';
 import { DataAwsKmsAlias } from '@cdktf/provider-aws/lib/data-aws-kms-alias';
 import { S3Bucket } from '@cdktf/provider-aws/lib/s3-bucket';
+import { CloudwatchLogGroup } from '@cdktf/provider-aws/lib/cloudwatch-log-group';
 
 class CuratedCorpusAPI extends TerraformStack {
   constructor(scope: Construct, name: string) {
@@ -246,6 +247,8 @@ class CuratedCorpusAPI extends TerraformStack {
               value: region.name,
             },
           ],
+          logGroup: this.createCustomLogGroup('app'),
+          logMultilinePattern: '^\\S.+',
           secretEnvVars: [
             {
               name: 'SENTRY_DSN',
@@ -256,19 +259,6 @@ class CuratedCorpusAPI extends TerraformStack {
               valueFrom: `${rds.secretARN}:database_url::`,
             },
           ],
-        },
-        {
-          name: 'xray-daemon',
-          containerImage: 'amazon/aws-xray-daemon',
-          repositoryCredentialsParam: `arn:aws:secretsmanager:${region.name}:${caller.accountId}:secret:Shared/DockerHub`,
-          portMappings: [
-            {
-              hostPort: 2000,
-              containerPort: 2000,
-              protocol: 'udp',
-            },
-          ],
-          command: ['--region', 'us-east-1', '--local-mode'],
         },
       ],
       codeDeploy: {
@@ -316,17 +306,6 @@ class CuratedCorpusAPI extends TerraformStack {
         ],
         taskRolePolicyStatements: [
           {
-            actions: [
-              'xray:PutTraceSegments',
-              'xray:PutTelemetryRecords',
-              'xray:GetSamplingRules',
-              'xray:GetSamplingTargets',
-              'xray:GetSamplingStatisticSummaries',
-            ],
-            resources: ['*'],
-            effect: 'Allow',
-          },
-          {
             actions: ['s3:*'],
             resources: [`arn:aws:s3:::${s3.id}`, `arn:aws:s3:::${s3.id}/*`],
             effect: 'Allow',
@@ -357,6 +336,25 @@ class CuratedCorpusAPI extends TerraformStack {
         },
       },
     });
+  }
+  /**
+   * Create Custom log group for ECS to share across task revisions
+   * @param containerName
+   * @private
+   */
+  private createCustomLogGroup(containerName: string) {
+    const logGroup = new CloudwatchLogGroup(
+      this,
+      `${containerName}-log-group`,
+      {
+        name: `/Backend/${config.prefix}/ecs/${containerName}`,
+        retentionInDays: 90,
+        skipDestroy: true,
+        tags: config.tags,
+      }
+    );
+
+    return logGroup.name;
   }
 }
 
