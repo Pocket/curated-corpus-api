@@ -210,6 +210,7 @@ class CuratedCorpusAPI extends TerraformStack {
 
     return new PocketALBApplication(this, 'application', {
       internal: true,
+
       prefix: config.prefix,
       alb6CharacterPrefix: config.shortName,
       tags: config.tags,
@@ -245,6 +246,10 @@ class CuratedCorpusAPI extends TerraformStack {
             {
               name: 'AWS_REGION',
               value: region.name,
+            },
+            {
+              name: 'DEBUG',
+              value: 'prisma:client,prisma:engine',
             },
           ],
           logGroup: this.createCustomLogGroup('app'),
