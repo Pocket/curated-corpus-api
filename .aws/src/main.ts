@@ -215,6 +215,10 @@ class CuratedCorpusAPI extends TerraformStack {
       tags: config.tags,
       cdn: false,
       domain: config.domain,
+      taskSize: {
+        cpu: 4096,
+        memory: 16384,
+      },
       containerConfigs: [
         {
           name: 'app',
@@ -245,6 +249,10 @@ class CuratedCorpusAPI extends TerraformStack {
             {
               name: 'AWS_REGION',
               value: region.name,
+            },
+            {
+              name: 'DEBUG',
+              value: 'prisma:client,prisma:engine',
             },
           ],
           logGroup: this.createCustomLogGroup('app'),
