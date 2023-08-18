@@ -216,6 +216,10 @@ class CuratedCorpusAPI extends TerraformStack {
       tags: config.tags,
       cdn: false,
       domain: config.domain,
+      taskSize: {
+          cpu: 4096,
+          memory: 16384,
+      },
       containerConfigs: [
         {
           name: 'app',
