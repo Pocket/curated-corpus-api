@@ -210,7 +210,6 @@ class CuratedCorpusAPI extends TerraformStack {
 
     return new PocketALBApplication(this, 'application', {
       internal: true,
-
       prefix: config.prefix,
       alb6CharacterPrefix: config.shortName,
       tags: config.tags,
