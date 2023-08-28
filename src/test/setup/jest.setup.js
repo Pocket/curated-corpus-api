@@ -15,6 +15,7 @@ module.exports = async () => {
   process.env.DATABASE_URL =
     process.env.DATABASE_URL ??
     'mysql://root:@localhost:3306/curation_corpus?connect_timeout=300';
+  process.env.MODIFIED_DATABASE_URL = process.env.DATABASE_URL;
   process.env.SNOWPLOW_ENDPOINT =
     process.env.SNOWPLOW_ENDPOINT ?? 'localhost:9090';
   require('dotenv').config({ path: '../../../.docker/local.env' });
