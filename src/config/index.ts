@@ -21,6 +21,14 @@ if (!awsEnvironments.includes(process.env.NODE_ENV ?? '')) {
 const snowplowHttpProtocol =
   process.env.NODE_ENV === 'production' ? 'https' : 'http';
 
+// Override the connection on the database_url, to avoid
+// "Timed out fetching a new connection from the connection pool"
+// https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#increasing-the-pool-size
+// Aurora Serverless has a connection limit of 2,000:
+// https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.setting-capacity.html
+// Value of 50 was chosen arbitrarily because it is 10x the original value of 5.
+process.env.MODIFIED_DATABASE_URL = `${process.env.DATABASE_URL}?connection_limit=50`;
+
 // Environment variables below are set in .aws/src/main.ts
 export default {
   app: {
