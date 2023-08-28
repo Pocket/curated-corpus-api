@@ -12,4 +12,10 @@ ENV GIT_SHA=${GIT_SHA}
 
 EXPOSE ${PORT}
 
-CMD ["npm", "start"]
+# Override the connection on the database_url, to avoid
+# "Timed out fetching a new connection from the connection pool"
+# https://www.prisma.io/docs/guides/performance-and-optimization/connection-management#increasing-the-pool-size
+# Aurora Serverless has a connection limit of 2,000:
+# https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.setting-capacity.html
+# Value of 50 was chosen arbitrarily because it is 10x the original value of 5.
+CMD sh -c 'export MODIFIED_DATABASE_URL="${DATABASE_URL}?connection_limit=50" && npm start'
