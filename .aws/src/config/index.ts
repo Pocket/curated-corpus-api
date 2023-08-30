@@ -15,7 +15,7 @@ const snowplowEndpoint = isDev
   : 'com-getpocket-prod1.collector.snplow.net';
 
 const rds = {
-  minCapacity: isDev ? 1 : 2,
+  minCapacity: isDev ? 1 : 8,
   maxCapacity: isDev ? 1 : undefined,
 };
 
