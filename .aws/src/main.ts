@@ -251,8 +251,8 @@ class CuratedCorpusAPI extends TerraformStack {
               value: region.name,
             },
             {
-              name: 'DEBUG',
-              value: 'prisma:client,prisma:engine',
+              name: 'LOG_LEVEL',
+              value: 'DEBUG',
             },
           ],
           logGroup: this.createCustomLogGroup('app'),
