@@ -251,8 +251,8 @@ class CuratedCorpusAPI extends TerraformStack {
               value: region.name,
             },
             {
-              name: 'DEBUG',
-              value: 'prisma:client,prisma:engine',
+              name: 'LOG_LEVEL',
+              value: 'debug',
             },
           ],
           logGroup: this.createCustomLogGroup('app'),
@@ -330,7 +330,7 @@ class CuratedCorpusAPI extends TerraformStack {
           'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
       },
       autoscalingConfig: {
-        targetMinCapacity: 2,
+        targetMinCapacity: 4,
         targetMaxCapacity: 10,
       },
       alarms: {
