@@ -252,7 +252,7 @@ class CuratedCorpusAPI extends TerraformStack {
             },
             {
               name: 'LOG_LEVEL',
-              value: 'DEBUG',
+              value: 'debug',
             },
           ],
           logGroup: this.createCustomLogGroup('app'),
