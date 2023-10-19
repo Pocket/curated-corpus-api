@@ -80,6 +80,7 @@ enum ProspectType {
     TIMESPENT_MODELED
     TITLE_URL_MODELED
     DISMISSED
+    RSS_LOGISTIC
 }
 
 """
