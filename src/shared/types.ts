@@ -12,6 +12,7 @@ export enum ProspectType {
   TIMESPENT_MODELED = 'TIMESPENT_MODELED',
   TITLE_URL_MODELED = 'TITLE_URL_MODELED',
   DISMISSED = 'DISMISSED',
+  RSS_LOGISTIC = 'RSS_LOGISTIC',
 }
 
 export enum MozillaAccessGroup {
@@ -55,6 +56,7 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
       ProspectType.COUNTS_MODELED,
       ProspectType.TIMESPENT_MODELED,
       ProspectType.TITLE_URL_MODELED,
+      ProspectType.RSS_LOGISTIC,
     ],
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ENUS,
   },
@@ -127,6 +129,7 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
       ProspectType.DISMISSED,
       ProspectType.COUNTS_MODELED,
       ProspectType.TITLE_URL_MODELED,
+      ProspectType.RSS_LOGISTIC,
     ],
     accessGroup: MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS,
   },
