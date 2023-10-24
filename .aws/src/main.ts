@@ -120,15 +120,16 @@ class CuratedCorpusAPI extends TerraformStack {
       bucket: bucket_name,
     });
     const bucket_with_public_acls = new S3BucketPublicAccessBlock(
-    this,
-    `${bucket_name}_access_block`,
-    {
-      blockPublicAcls: false,
-      blockPublicPolicy: false,
-      bucket: bucket.id,
-      ignorePublicAcls: false,
-      restrictPublicBuckets: false,
-    });
+      this,
+      `${bucket_name}_access_block`,
+      {
+        blockPublicAcls: false,
+        blockPublicPolicy: false,
+        bucket: bucket.id,
+        ignorePublicAcls: false,
+        restrictPublicBuckets: false,
+      }
+    );
     bucket_with_public_acls.overrideLogicalId(bucket_name);
     return bucket;
   }
