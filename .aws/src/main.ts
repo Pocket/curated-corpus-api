@@ -24,6 +24,7 @@ import { DataAwsSnsTopic } from '@cdktf/provider-aws/lib/data-aws-sns-topic';
 import { DataAwsKmsAlias } from '@cdktf/provider-aws/lib/data-aws-kms-alias';
 import { S3Bucket } from '@cdktf/provider-aws/lib/s3-bucket';
 import { S3BucketPublicAccessBlock } from '@cdktf/provider-aws/lib/s3-bucket-public-access-block';
+import { S3BucketOwnershipControls } from '@cdktf/provider-aws/lib/s3-bucket-ownership-controls';
 
 import { CloudwatchLogGroup } from '@cdktf/provider-aws/lib/cloudwatch-log-group';
 
@@ -130,7 +131,18 @@ class CuratedCorpusAPI extends TerraformStack {
         restrictPublicBuckets: false,
       }
     );
+    const ownershipControls = new S3BucketOwnershipControls(
+      this,
+      `${bucket_name}_ownership_controls`,
+      {
+        bucket: bucket.id,
+        rule: {
+          objectOwnership: 'ObjectWriter',
+        },
+      }
+    );
     bucket_with_public_acls.overrideLogicalId(bucket_name);
+    ownershipControls.overrideLogicalId(bucket_name);
     return bucket;
   }
 
