@@ -23,6 +23,8 @@ import {
 import { DataAwsSnsTopic } from '@cdktf/provider-aws/lib/data-aws-sns-topic';
 import { DataAwsKmsAlias } from '@cdktf/provider-aws/lib/data-aws-kms-alias';
 import { S3Bucket } from '@cdktf/provider-aws/lib/s3-bucket';
+import { S3BucketPublicAccessBlock } from '@cdktf/provider-aws/lib/s3-bucket-public-access-block';
+
 import { CloudwatchLogGroup } from '@cdktf/provider-aws/lib/cloudwatch-log-group';
 
 class CuratedCorpusAPI extends TerraformStack {
@@ -113,9 +115,22 @@ class CuratedCorpusAPI extends TerraformStack {
    * @private
    */
   private createS3Bucket() {
-    return new S3Bucket(this, 'image-uploads', {
-      bucket: `pocket-${config.prefix.toLowerCase()}-images`,
+    const bucket_name = `pocket-${config.prefix.toLowerCase()}-images`;
+    const bucket = new S3Bucket(this, 'image-uploads', {
+      bucket: bucket_name,
     });
+    const bucket_with_public_acls = new S3BucketPublicAccessBlock(
+    this,
+    `${bucket_name}_access_block`,
+    {
+      blockPublicAcls: false,
+      blockPublicPolicy: false,
+      bucket: bucket.id,
+      ignorePublicAcls: false,
+      restrictPublicBuckets: false,
+    });
+    bucket_with_public_acls.overrideLogicalId(bucket_name);
+    return bucket;
   }
 
   /**
