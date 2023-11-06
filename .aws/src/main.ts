@@ -358,7 +358,7 @@ class CuratedCorpusAPI extends TerraformStack {
           'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy',
       },
       autoscalingConfig: {
-        targetMinCapacity: 4,
+        targetMinCapacity: config.isDev ? 1 : 4,
         targetMaxCapacity: 10,
       },
       alarms: {
