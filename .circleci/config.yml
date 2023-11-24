@@ -12,11 +12,6 @@ parameters:
     type: string
 
 # Workflow shortcuts
-not_main: &not_main
-  filters:
-    branches:
-      ignore:
-        - main
 
 only_main: &only_main
   filters:
