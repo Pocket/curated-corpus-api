@@ -81,6 +81,7 @@ enum ProspectType {
     TITLE_URL_MODELED
     DISMISSED
     RSS_LOGISTIC
+    RSS_LOGISTIC_RECENT
 }
 
 """
@@ -970,5 +971,5 @@ type CorpusItem @key(fields: "url") {
 }
 
 type OpenGraphFields {
-  description: String!
+    description: String!
 }

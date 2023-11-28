@@ -13,6 +13,7 @@ export enum ProspectType {
   TITLE_URL_MODELED = 'TITLE_URL_MODELED',
   DISMISSED = 'DISMISSED',
   RSS_LOGISTIC = 'RSS_LOGISTIC',
+  RSS_LOGISTIC_RECENT = 'RSS_LOGISTIC_RECENT',
 }
 
 export enum MozillaAccessGroup {
@@ -57,6 +58,7 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
       ProspectType.TIMESPENT_MODELED,
       ProspectType.TITLE_URL_MODELED,
       ProspectType.RSS_LOGISTIC,
+      ProspectType.RSS_LOGISTIC_RECENT,
     ],
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ENUS,
   },
