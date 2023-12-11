@@ -132,6 +132,8 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
       ProspectType.COUNTS_MODELED,
       ProspectType.TITLE_URL_MODELED,
       ProspectType.RSS_LOGISTIC,
+      ProspectType.SYNDICATED_NEW,
+      ProspectType.SYNDICATED_RERUN,
     ],
     accessGroup: MozillaAccessGroup.POCKET_HITS_CURATOR_ENUS,
   },
