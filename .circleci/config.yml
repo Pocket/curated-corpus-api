@@ -235,6 +235,7 @@ workflows:
           repo-name: curatedcorpusapi-dev-app
           ecr-url: 410318598490.dkr.ecr.us-east-1.amazonaws.com
           push: false
+          extra-build-args: --build-arg PORT=4025
           requires:
             - build
 
