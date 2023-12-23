@@ -8,7 +8,7 @@
 #----------------------------------------
 FROM node:20.10-alpine AS base
 
-#ARG SCOPE
+ARG SCOPE
 #ARG APP_PATH
 ARG PORT
 ARG GIT_SHA
@@ -33,7 +33,7 @@ RUN pnpm add -g turbo pnpm
 # the active project.
 #----------------------------------------
 FROM base AS setup
-#ARG SCOPE
+ARG SCOPE
 #ARG APP_PATH
 ARG PORT
 ARG GIT_SHA
@@ -57,7 +57,7 @@ RUN turbo prune --scope=$SCOPE --docker
 #----------------------------------------
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS builder
-#ARG SCOPE
+ARG SCOPE
 #ARG APP_PATH
 ARG PORT
 ARG GIT_SHA
