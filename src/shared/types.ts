@@ -1,5 +1,5 @@
 // Pocket Shared Data - see Confluence for details
-// https://getpocket.atlassian.net/wiki/spaces/PE/pages/2584150049/Pocket+Shared+Data
+// https://mozilla-hub.atlassian.net/wiki/spaces/PE/pages/390642851/Pocket+Shared+Data#Prospect-Types
 export enum ProspectType {
   TIMESPENT = 'TIMESPENT',
   COUNTS = 'COUNTS',
@@ -14,6 +14,7 @@ export enum ProspectType {
   DISMISSED = 'DISMISSED',
   RSS_LOGISTIC = 'RSS_LOGISTIC',
   RSS_LOGISTIC_RECENT = 'RSS_LOGISTIC_RECENT',
+  CONSTRAINT_SCHEDULE = 'CONSTRAINT_SCHEDULE',
 }
 
 export enum MozillaAccessGroup {
@@ -59,6 +60,7 @@ export const ScheduledSurfaces: ScheduledSurface[] = [
       ProspectType.TITLE_URL_MODELED,
       ProspectType.RSS_LOGISTIC,
       ProspectType.RSS_LOGISTIC_RECENT,
+      ProspectType.CONSTRAINT_SCHEDULE,
     ],
     accessGroup: MozillaAccessGroup.NEW_TAB_CURATOR_ENUS,
   },
