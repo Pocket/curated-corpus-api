@@ -1,7 +1,7 @@
 # Curated Corpus API
 
 > [!IMPORTANT]  
-> This repo has been moved to [Content's Monorepo](https://github.com/Pocket/content-monorepo/tree/main/servers/prospect-api)
+> This repo has been moved to [Content's Monorepo](https://github.com/Pocket/content-monorepo/tree/main/servers/curated-corpus-api)
 
 The Curated Corpus API serves three primary functions:
 
