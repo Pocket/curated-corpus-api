@@ -1,5 +1,8 @@
 # Curated Corpus API
 
+> [!IMPORTANT]  
+> This repo has been moved to [Content's Monorepo](https://github.com/Pocket/content-monorepo/tree/main/servers/prospect-api)
+
 The Curated Corpus API serves three primary functions:
 
 1. Allow our editorial team to manage both an approved corpus and a rejected corpus.
