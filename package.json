@@ -64,7 +64,7 @@
     "graphql": "16.6.0",
     "graphql-scalars": "1.22.2",
     "graphql-tag": "2.12.6",
-    "graphql-upload": "15.0.2",
+    "graphql-upload": "16.0.2",
     "luxon": "3.3.0",
     "metadata-scraper": "^0.2.61",
     "node-fetch": "2.6.12"
@@ -76,7 +76,7 @@
     "@pocket-tools/tsconfig": "2.0.1",
     "@types/chai": "4.3.5",
     "@types/faker": "6.6.8",
-    "@types/graphql-upload": "8.0.12",
+    "@types/graphql-upload": "16.0.7",
     "@types/jest": "29.5.3",
     "@types/node": "18.16.19",
     "@types/sinon": "10.0.15",
